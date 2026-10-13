@@ -373,3 +373,35 @@ extension MemoryReflectionTests {
 private extension MemoryChange {
     var isConfirm: Bool { if case .confirm = self { return true } else { return false } }
 }
+
+extension MemoryReflectionTests {
+    func testABatchIsReadByTheModelThatLastAnsweredInIt() {
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        file.enqueue(chat: chat, project: nil, messages: [
+            MemoryBatchMessage(seq: 1, date: t0, text: "a", before: nil, model: "gemma-4-26b"),
+            MemoryBatchMessage(seq: 2, date: t0, text: "b", before: nil, model: "nemotron-coder"),
+            MemoryBatchMessage(seq: 3, date: t0, text: "c", before: nil, model: nil),
+        ], now: t0)
+        XCTAssertEqual(file.queue.last?.model, "nemotron-coder")
+    }
+
+    func testTheReflectPromptKeepsMannersNotMoods() {
+        let system = MemoryReflection.reflectMessages(batch: batch(["hi there"]), candidates: [], topics: ["tone"], language: "English",
+                                                      kinds: Set(MemoryKind.allCases), inProject: false)[0]["content"] as! String
+        XCTAssertTrue(system.contains("How the user tends to talk"))
+        XCTAssertTrue(system.contains("never a passing mood"))
+    }
+
+    func testModelCardLanguages() {
+        let list = "---\nlicense: apache-2.0\nlanguage:\n- en\n- RU\ntags:\n- chat\n---\n# Model"
+        XCTAssertEqual(ModelCardLanguages.parse(readme: list), ["en", "ru"])
+        XCTAssertEqual(ModelCardLanguages.parse(readme: "---\nlanguage: [en, \"de\"]\n---"), ["en", "de"])
+        XCTAssertEqual(ModelCardLanguages.parse(readme: "---\nlanguage: en\n---"), ["en"])
+        XCTAssertNil(ModelCardLanguages.parse(readme: "# No front matter\nlanguage: en"))
+        XCTAssertNil(ModelCardLanguages.parse(readme: "---\nlicense: mit\n---"))
+        XCTAssertTrue(ModelCardLanguages.covers(["en", "ru-RU"], "ru"))
+        XCTAssertTrue(ModelCardLanguages.covers(["multilingual"], "uk"))
+        XCTAssertFalse(ModelCardLanguages.covers(["en"], "ru"))
+    }
+}

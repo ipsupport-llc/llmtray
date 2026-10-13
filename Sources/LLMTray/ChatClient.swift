@@ -729,6 +729,11 @@ final class ChatClient: ObservableObject {
         var lastAnswer: String?
         var previousSeq = 0
         for message in messages {
+            // The model that answered: by default the one that reads it.
+            if message.role == "assistant", let folder = message.answerStats?.modelFolder,
+               let last = items.indices.last, items[last].model == nil {
+                items[last].model = folder
+            }
             if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
                 lastAnswer = previousSeq > met ? message.content : nil
             } else if message.role == "user", !message.isToolContext, let seq = message.seq {

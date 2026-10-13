@@ -70,7 +70,7 @@ final class ServerManager: ObservableObject {
     // in beginRequest(): checkIdleStop already skips while
     // activeRequestCount > 0, so a long-running request can never be
     // judged idle regardless of how stale this timestamp gets meanwhile.
-    private var lastActivityAt = Date()
+    private(set) var lastActivityAt = Date()
     private var idleStopTimer: Timer?
 
     // Remembered from the initial start() call so switchModel() (driven by

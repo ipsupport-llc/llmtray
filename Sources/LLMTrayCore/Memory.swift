@@ -685,15 +685,20 @@ public struct MemoryBatchMessage: Codable, Equatable, Sendable {
     public var date: Date
     public var text: String
     public var before: String?
+    /// The folder of the model that answered it: by default the one that
+    /// reads it for memory too (a chat in Russian with Gemma isn't read by
+    /// an English-only coder loaded later). nil: unknown, any model.
+    public var model: String?
 
     /// At most this much of the answer before a message is kept.
     public static let maxBefore = 300
 
-    public init(seq: Int, date: Date, text: String, before: String?) {
+    public init(seq: Int, date: Date, text: String, before: String?, model: String? = nil) {
         self.seq = seq
         self.date = date
         self.text = text
         self.before = before
+        self.model = model
     }
 
     /// Within a batch: the answer before cut to its start, a very long
@@ -715,6 +720,9 @@ public struct MemoryBatch: Codable, Equatable, Identifiable, Sendable {
     public var project: UUID?
     public var created: Date
     public var messages: [MemoryBatchMessage]
+    /// The model the chat last answered with in it (see MemoryBatchMessage.model).
+    public var model: String? { messages.last { $0.model != nil }?.model }
+
     /// Tries put off (the model busy, cut off): for the backoff.
     public var attempts = 0
     /// Tries that failed (an unreadable reply): dropped after a few.

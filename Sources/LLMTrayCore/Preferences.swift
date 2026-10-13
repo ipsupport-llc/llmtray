@@ -148,6 +148,11 @@ public enum Pref {
     public static let memoryHalfLifeObservation = PrefKey("llmtray.memory.halfLife.observation", default: 30)
     public static let memoryDeleteExpiredAfterDays = PrefKey("llmtray.memory.deleteExpiredAfterDays", default: 30)
     public static let memoryProjects = PrefKey("llmtray.memory.projects", default: true)
+    /// The model memory reads chats with: a model's path, or "" (each
+    /// chat's own: the model that answered in it).
+    public static let memoryModel = PrefKey("llmtray.memory.model", default: "")
+    /// Minutes LLMTray is idle before memory may load its model itself; 0: never.
+    public static let memorySwitchIdleMinutes = PrefKey("llmtray.memory.switchIdleMinutes", default: 0)
     /// What's learned is seen in every chat (off: each project keeps its own).
     public static let memoryShareLearned = PrefKey("llmtray.memory.shareLearned", default: false)
     /// The notes' language: a language code, or "auto" (the app's).

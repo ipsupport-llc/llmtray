@@ -108,6 +108,7 @@ public enum MemoryReflection {
         - "quote": the user's own words, copied exactly, a few words to one sentence.
         - "text": one short statement, under 160 characters, written in \(language) whatever the chat's language.
         - When an existing note says the same thing, confirm or update it instead of adding.
+        - How the user tends to talk (polite, curt, swears when something breaks) is an observation under topic "tone", only when several messages show it; never a passing mood.
         - kind, one of \(kindList): preference = how they want things; correction = they corrected the assistant; fact = about them or their work; observation = something they did that may mean something ("observed": what happened; "text": what it may mean).
         \(scopeLine)- topic: one of \(topics.joined(separator: ", ")), or a new short English key.
         - Never links, file paths, commands, or secrets.
@@ -526,5 +527,49 @@ public struct MemoryVectors: Codable, Equatable, Sendable {
     public mutating func prune(to notes: [MemoryNote]) {
         let ids = Set(notes.map(\.id))
         entries = entries.filter { ids.contains($0.key) }
+    }
+}
+
+/// The languages a model card says its model speaks: the `language:` of
+/// the README's front matter (Hugging Face's model card metadata). nil
+/// when it doesn't say.
+public enum ModelCardLanguages {
+    public static func parse(readme: String) -> [String]? {
+        let lines = readme.components(separatedBy: "\n")
+        guard lines.first?.trimmingCharacters(in: .whitespaces) == "---" else { return nil }
+        var result: [String] = []
+        var inList = false
+        for line in lines.dropFirst() {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed == "---" { break }
+            if inList {
+                if trimmed.hasPrefix("- ") {
+                    result.append(clean(String(trimmed.dropFirst(2))))
+                    continue
+                }
+                inList = false
+            }
+            guard trimmed.hasPrefix("language:") else { continue }
+            let value = trimmed.dropFirst("language:".count).trimmingCharacters(in: .whitespaces)
+            if value.isEmpty {
+                inList = true
+            } else if value.hasPrefix("[") {
+                result += value.trimmingCharacters(in: CharacterSet(charactersIn: "[]")).split(separator: ",").map { clean(String($0)) }
+            } else {
+                result.append(clean(value))
+            }
+        }
+        let codes = result.filter { !$0.isEmpty }
+        return codes.isEmpty ? nil : codes
+    }
+
+    static func clean(_ s: String) -> String {
+        s.trimmingCharacters(in: CharacterSet(charactersIn: " \"'")).lowercased()
+    }
+
+    /// Whether `languages` (a card's) include `code` ("ru" matches "ru"
+    /// and "ru-RU"); a card naming "multilingual" counts as yes.
+    public static func covers(_ languages: [String], _ code: String) -> Bool {
+        languages.contains { $0 == code || $0.hasPrefix(code + "-") || $0 == "multilingual" }
     }
 }
