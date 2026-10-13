@@ -145,6 +145,7 @@ final class ChatClient: ObservableObject {
     private var mfluxStatusCancellable: AnyCancellable?
     private var mfluxProgressCancellable: AnyCancellable?
     private var mfluxPreviewCancellable: AnyCancellable?
+    private var memoryRemovedCancellable: AnyCancellable?
     private var musicTool: MusicToolRunner { toolbox.musicGeneration }
     private var musicManager: MusicManager { musicTool.music }
     private var musicStatusCancellable: AnyCancellable?
@@ -241,6 +242,13 @@ final class ChatClient: ObservableObject {
         mfluxPreviewCancellable = mfluxManager.$previewImage
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.mfluxPreviewImage = $0 }
+        // Synchronous, on the main thread MemoryManager posts on: the block
+        // goes before anything saves this chat again.
+        memoryRemovedCancellable = NotificationCenter.default.publisher(for: .memoryNotesRemoved)
+            .sink { [weak self] note in
+                guard let ids = note.userInfo?["ids"] as? Set<String> else { return }
+                MainActor.assumeIsolated { self?.memoryNotesRemoved(ids) }
+            }
         // Every launch starts a fresh persistent session by default (see
         // ChatSessionStore) -- picking up an older one is an explicit
         // History action (ContentView), and newTemporaryChat() is the
@@ -647,23 +655,31 @@ final class ChatClient: ObservableObject {
         settings.folders = folderChat
         settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
         settings.loadedToolGroups = loadedToolGroups
-        settings.memoryBlock = memoryBlock(project: settings.project?.id)
+        settings.memoryBlock = memoryBlock(project: settings.project?.id, contextTokens: settings.maxTokensCap)
         return settings
     }
 
     /// The chat's memory block (adr/0024): the one it has while its notes
     /// stand, else chosen anew. None in a temporary chat.
-    private func memoryBlock(project: UUID?) -> String? {
+    private func memoryBlock(project: UUID?, contextTokens: Int) -> String? {
         guard currentSessionID != nil else { return nil }
         let estimator = tokenEstimator
-        let next = MemoryManager.shared.snapshot(current: memorySnapshot, project: project) {
+        let next = MemoryManager.shared.snapshot(current: memorySnapshot, project: project, contextTokens: contextTokens) {
             estimator.estimate(PromptTokenEstimator.Measure(bytes: $0.utf8.count))
         }
         if next != memorySnapshot {
             memorySnapshot = next
             hasUnsavedChanges = true
         }
-        return next?.text
+        return next.flatMap { $0.text.isEmpty ? nil : $0.text }
+    }
+
+    /// Notes were forgotten: a block holding one goes now, before this
+    /// chat saves it again; the next turn chooses anew.
+    private func memoryNotesRemoved(_ ids: Set<String>) {
+        guard let snapshot = memorySnapshot, !ids.isDisjoint(with: snapshot.noteIDs) else { return }
+        memorySnapshot = nil
+        hasUnsavedChanges = true
     }
 
     // MARK: - Folder access (adr/0014)
@@ -1360,6 +1376,8 @@ final class ChatClient: ObservableObject {
         now.thinkingStyle = start.thinkingStyle
         now.thinkingEffort = start.thinkingEffort
         now.project = start.project
+        // The block the turn started with, through its tool rounds.
+        now.memoryBlock = start.memoryBlock
         // Turned off mid-turn: stops at once.
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
         // Turned off mid-turn: stops at once; a temporary chat never has one.

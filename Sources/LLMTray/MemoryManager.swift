@@ -42,9 +42,14 @@ final class MemoryManager: ObservableObject {
     }
 
     func load() {
-        guard let data = FileManager.default.contents(atPath: Self.path) else {
+        // No file is no notes; a file that can't be read is not.
+        guard FileManager.default.fileExists(atPath: Self.path) else {
             file = MemoryFile()
             unreadable = false
+            return
+        }
+        guard let data = FileManager.default.contents(atPath: Self.path) else {
+            unreadable = true
             return
         }
         guard let decoded = try? Self.decoder.decode(MemoryFile.self, from: data), decoded.version <= Self.fileVersion else {
@@ -57,22 +62,35 @@ final class MemoryManager: ObservableObject {
     }
 
     /// Applies a change and saves it. Not while the file is unreadable.
+    /// Notes it removed leave every chat's block at once, saved chats too.
     func change(_ apply: (inout MemoryFile) -> Void) {
         guard !unreadable else { return }
         var updated = file
         apply(&updated)
         guard updated != file else { return }
+        let removed = Set(file.notes.map(\.id)).subtracting(updated.notes.map(\.id))
         file = updated
         save()
+        if !removed.isEmpty { dropFromChats(removed) }
     }
 
-    /// Expiry, at most once an hour as chats start.
-    private var lastSweep: Date?
+    /// Expiry: at most once an hour as chats start, and at once when the
+    /// settings it depends on changed.
+    private var lastSweep: (date: Date, settings: MemorySettings)?
     func sweep(now: Date = Date()) {
-        if let lastSweep, now.timeIntervalSince(lastSweep) < 3600 { return }
-        lastSweep = now
         let settings = settings
+        if let lastSweep, lastSweep.settings == settings, now.timeIntervalSince(lastSweep.date) < 3600 { return }
+        lastSweep = (now, settings)
         change { _ = $0.sweep(now: now, settings: settings) }
+    }
+
+    /// Forgotten (or deleted) notes leave the chats that got them: open
+    /// ones drop their block (ChatClient, synchronously, before anything
+    /// saves it again), then saved ones are rewritten without it. On the
+    /// main actor, as chats save there: no save races this.
+    private func dropFromChats(_ ids: Set<String>) {
+        NotificationCenter.default.post(name: .memoryNotesRemoved, object: nil, userInfo: ["ids": ids])
+        ChatSessionStore.dropMemorySnapshots(holdingAnyOf: ids)
     }
 
     private func save() {
@@ -87,18 +105,26 @@ final class MemoryManager: ObservableObject {
         }
     }
 
-    /// The memory block for a chat in `project` (nil: none): `current`
+    /// The memory block for a chat in `project` (nil: none) on a model
+    /// with `contextTokens` of context: `current`
     /// while it still holds (the chat's prompt stays the same for the
-    /// server's cache), else a new one. nil with memory off, an unreadable
-    /// store, or no note to send. `tokens` counts as the chat's estimate does.
-    func snapshot(current: MemorySnapshot?, project: UUID?, tokens: (String) -> Int) -> MemorySnapshot? {
+    /// server's cache), else a new one (empty when no note fits). nil with
+    /// memory off or an unreadable store. `tokens` counts as the chat's
+    /// estimate does.
+    func snapshot(current: MemorySnapshot?, project: UUID?, contextTokens: Int?, tokens: (String) -> Int) -> MemorySnapshot? {
         let settings = settings
         guard settings.enabled, !unreadable else { return nil }
         sweep()
-        let budget = settings.budgetTokens
-        if let current, MemorySelection.isCurrent(current, file: file, settings: settings, project: project, budget: budget) {
+        let budget = MemorySelection.budget(settings, contextTokens: contextTokens)
+        if let current, MemorySelection.isCurrent(current, file: file, settings: settings, project: project,
+                                                  budget: budget, tokens: tokens) {
             return current
         }
         return MemorySelection.choose(file, settings: settings, project: project, budget: budget, now: Date(), tokens: tokens)
     }
+}
+
+extension Notification.Name {
+    /// Memory notes were removed; userInfo "ids": Set<String>.
+    static let memoryNotesRemoved = Notification.Name("LLMTray.memoryNotesRemoved")
 }

@@ -94,7 +94,6 @@ struct MemoryPane: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear { memory.load() }
         .sheet(item: $draft) { d in
             MemoryNoteEditor(draft: d, projects: library.library.projects) { saved in
                 save(saved)
@@ -118,15 +117,15 @@ struct MemoryPane: View {
     private var expiredNotes: [MemoryNote] { memory.file.notes.filter { !$0.isActive } }
 
     /// The user's notes first, then each project's.
-    private var groups: [(title: String, notes: [MemoryNote])] {
+    private var groups: [(subject: MemorySubject, title: String, notes: [MemoryNote])] {
         let user = activeNotes.filter { $0.subject == .user }
-        var result: [(String, [MemoryNote])] = user.isEmpty ? [] : [(NSLocalizedString("About you", comment: "memory notes group"), user)]
+        var result: [(MemorySubject, String, [MemoryNote])] = user.isEmpty ? [] : [(.user, NSLocalizedString("About you", comment: "memory notes group"), user)]
         var byProject: [UUID: [MemoryNote]] = [:]
         for note in activeNotes {
             if case .project(let id) = note.subject { byProject[id, default: []].append(note) }
         }
         for (id, notes) in byProject.sorted(by: { projectName($0.key) < projectName($1.key) }) {
-            result.append((String(format: NSLocalizedString("Project %@", comment: "memory notes group"), projectName(id)), notes))
+            result.append((.project(id), String(format: NSLocalizedString("Project %@", comment: "memory notes group"), projectName(id)), notes))
         }
         return result
     }
@@ -141,7 +140,7 @@ struct MemoryPane: View {
                 Text("No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            ForEach(groups, id: \.title) { group in
+            ForEach(groups, id: \.subject) { group in
                 Text(group.title).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 ForEach(group.notes) { note in noteRow(note) }
             }
@@ -327,7 +326,8 @@ struct ChatMemoryChip: View {
     @State private var shown = false
 
     var body: some View {
-        let notes = (chat.memorySnapshot?.noteIDs ?? []).compactMap { memory.file.note($0) }
+        let snapshot = chat.memorySnapshot
+        let notes = (snapshot?.noteIDs ?? []).compactMap { memory.file.note($0) }
         if memory.isEnabled, !notes.isEmpty {
             Button {
                 shown.toggle()
@@ -344,7 +344,13 @@ struct ChatMemoryChip: View {
                     Text("This chat knows").font(.headline)
                     ForEach(notes) { note in
                         HStack(alignment: .firstTextBaseline) {
-                            Text(note.text).fixedSize(horizontal: false, vertical: true)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(note.text).fixedSize(horizontal: false, vertical: true)
+                                if note.changed > (snapshot?.generation ?? .max) || !note.isActive {
+                                    Text("Changed: the chat gets this from its next message")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
                             Spacer()
                             Button("Forget") { memory.change { $0.forget(note.id) } }
                                 .controlSize(.small)

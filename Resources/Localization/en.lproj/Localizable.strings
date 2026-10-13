@@ -217,6 +217,7 @@
 "Change the prompt, the model or the shape, then make another version" = "Change the prompt, the model or the shape, then make another version";
 "Change the style, lyrics, model or knobs, then make another version" = "Change the style, lyrics, model or knobs, then make another version";
 "Changed since it was proposed: %@" = "Changed since it was proposed: %@";
+"Changed: the chat gets this from its next message" = "Changed: the chat gets this from its next message";
 "Changes an image you attach or one made in the chat, with FLUX.2 klein 4B." = "Changes an image you attach or one made in the chat, with FLUX.2 klein 4B.";
 "Changing files: %1$lld of %2$lld…" = "Changing files: %1$lld of %2$lld…";
 "Chat" = "Chat";

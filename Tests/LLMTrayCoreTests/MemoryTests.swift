@@ -163,7 +163,9 @@ final class MemoryTests: XCTestCase {
         XCTAssertEqual(MemorySelection.choose(file, settings: factsOff, project: project, budget: 1000, now: t0, tokens: tokens)!
             .noteIDs, ["m4"])
         XCTAssertNil(MemorySelection.choose(file, settings: MemorySettings(enabled: false), project: nil, budget: 1000, now: t0, tokens: tokens))
-        XCTAssertNil(MemorySelection.choose(MemoryFile(), settings: on, project: nil, budget: 1000, now: t0, tokens: tokens))
+        let none = MemorySelection.choose(MemoryFile(), settings: on, project: nil, budget: 1000, now: t0, tokens: tokens)!
+        XCTAssertEqual(none.text, "")
+        XCTAssertEqual(none.noteIDs, [])
     }
 
     func testChooseSkipsWhatDoesntFitAndTriesTheNext() {
@@ -174,7 +176,7 @@ final class MemoryTests: XCTestCase {
         let snap = MemorySelection.choose(file, settings: on, project: nil, budget: headerTokens + 6, now: days(2), tokens: tokens)!
         XCTAssertEqual(snap.noteIDs, ["m2"])
         XCTAssertLessThanOrEqual(snap.tokens, headerTokens + 6)
-        XCTAssertNil(MemorySelection.choose(file, settings: on, project: nil, budget: headerTokens, now: days(2), tokens: tokens))
+        XCTAssertEqual(MemorySelection.choose(file, settings: on, project: nil, budget: headerTokens, now: days(2), tokens: tokens)?.noteIDs, [])
     }
 
     func testFirstGroupTakesAtMostHalfTheBudget() {
@@ -199,7 +201,7 @@ final class MemoryTests: XCTestCase {
         let id = file.add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", now: t0)!
         let snap = MemorySelection.choose(file, settings: on, project: project, budget: 1000, now: t0, tokens: tokens)!
         func current(_ f: MemoryFile, settings: MemorySettings? = nil, project p: UUID? = nil, budget: Int = 1000) -> Bool {
-            MemorySelection.isCurrent(snap, file: f, settings: settings ?? on, project: p ?? project, budget: budget)
+            MemorySelection.isCurrent(snap, file: f, settings: settings ?? on, project: p ?? project, budget: budget, tokens: tokens)
         }
         XCTAssertTrue(current(file))
 
@@ -225,6 +227,25 @@ final class MemoryTests: XCTestCase {
         var expired = file
         expired.sweep(now: days(2000), settings: on)
         XCTAssertFalse(current(expired))
+
+        // Another model counting more tokens for the same text.
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: on, project: project, budget: snap.tokens,
+                                                 tokens: { self.tokens($0) * 2 }))
+    }
+
+    func testAnEmptySnapshotStaysEmptyWhenNotesComeLater() {
+        var file = MemoryFile()
+        let snap = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0, tokens: tokens)!
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", now: t0)
+        XCTAssertTrue(MemorySelection.isCurrent(snap, file: file, settings: on, project: nil, budget: 300, tokens: tokens))
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: MemorySettings(enabled: false), project: nil,
+                                                  budget: 300, tokens: tokens))
+    }
+
+    func testBudgetIsCappedByTheModelsContext() {
+        XCTAssertEqual(MemorySelection.budget(on, contextTokens: nil), 300)
+        XCTAssertEqual(MemorySelection.budget(on, contextTokens: 32_768), 300)
+        XCTAssertEqual(MemorySelection.budget(on, contextTokens: 4096), 204)
     }
 
     // MARK: Settings, system prompt

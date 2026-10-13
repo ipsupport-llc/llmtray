@@ -231,6 +231,21 @@ enum ChatSessionStore {
         save(file)
     }
 
+    /// Saved chats whose memory block holds any of `ids` lose it (adr/0024:
+    /// a forgotten note mustn't stay in a chat file). Only files that have
+    /// a block are decoded.
+    static func dropMemorySnapshots(holdingAnyOf ids: Set<String>) {
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return }
+        let key = Data("\"memorySnapshot\"".utf8)
+        for name in names where name.hasSuffix(".json") {
+            guard let data = FileManager.default.contents(atPath: sessionsDir + "/" + name), data.range(of: key) != nil,
+                  var file = try? decoder.decode(ChatSessionFile.self, from: data),
+                  let snapshot = file.memorySnapshot, !ids.isDisjoint(with: snapshot.noteIDs) else { continue }
+            file.memorySnapshot = nil
+            save(file)
+        }
+    }
+
     static func delete(id: UUID) {
         try? FileManager.default.removeItem(atPath: path(for: id))
         try? FileManager.default.removeItem(atPath: imagesDir(for: id))

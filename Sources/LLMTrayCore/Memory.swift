@@ -403,15 +403,29 @@ public enum MemorySelection {
         return parts.joined(separator: "\n")
     }
 
+    /// The most of a model's context memory takes, whatever the budget.
+    public static let maxContextShare = 0.05
+
+    /// The budget for a chat: the user's, within `maxContextShare` of the
+    /// model's context (`contextTokens`, nil: unknown).
+    public static func budget(_ settings: MemorySettings, contextTokens: Int?) -> Int {
+        guard let contextTokens, contextTokens > 0 else { return settings.budgetTokens }
+        return min(settings.budgetTokens, Int(Double(contextTokens) * maxContextShare))
+    }
+
     /// The block for a chat in `project` (nil: none) within `budget`
-    /// tokens as `tokens` counts them; nil when no note is eligible or
-    /// fits. Pinned notes and the user's stated preferences and
-    /// corrections come first (up to half the budget); the rest by
-    /// strength. A note that doesn't fit is skipped, the next tried.
+    /// tokens as `tokens` counts them; nil with memory off. With no note
+    /// eligible or fitting it's empty (no text, no notes): the chat keeps
+    /// that, and a note written later reaches the next chat. Pinned notes
+    /// and the user's stated preferences and corrections come first (up to
+    /// half the budget); the rest by strength. A note that doesn't fit is
+    /// skipped, the next tried.
     public static func choose(_ file: MemoryFile, settings: MemorySettings, project: UUID?, budget: Int,
                               now: Date, tokens: (String) -> Int) -> MemorySnapshot? {
+        guard settings.enabled else { return nil }
+        let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0)
         let eligible = file.notes.filter { settings.allows($0, project: project) }
-        guard !eligible.isEmpty, budget > 0 else { return nil }
+        guard !eligible.isEmpty, budget > 0 else { return empty }
         func isFirst(_ n: MemoryNote) -> Bool {
             n.pinned || n.subject == .user && n.confidence == .stated && (n.kind == .preference || n.kind == .correction)
         }
@@ -434,18 +448,21 @@ public enum MemorySelection {
         for note in rest where fits(chosen + [note], within: budget) {
             chosen.append(note)
         }
-        guard !chosen.isEmpty else { return nil }
+        guard !chosen.isEmpty else { return empty }
         let text = render(chosen)
         return MemorySnapshot(text: text, noteIDs: chosen.map(\.id), generation: file.generation,
                               project: project, tokens: tokens(text))
     }
 
-    /// Whether a chat's snapshot still holds: same project, within the
-    /// budget, and each of its notes still there, eligible and unchanged
-    /// since. New notes alone don't make it stale: they reach the next chat.
+    /// Whether a chat's snapshot still holds: memory on, same project,
+    /// within the budget as `tokens` counts it now (another model may
+    /// count more), and each of its notes still there, eligible and
+    /// unchanged since. New notes alone don't make it stale: they reach the
+    /// next chat.
     public static func isCurrent(_ snapshot: MemorySnapshot, file: MemoryFile, settings: MemorySettings,
-                                 project: UUID?, budget: Int) -> Bool {
-        guard snapshot.project == project, snapshot.tokens <= budget else { return false }
+                                 project: UUID?, budget: Int, tokens: (String) -> Int) -> Bool {
+        guard settings.enabled, snapshot.project == project else { return false }
+        guard snapshot.text.isEmpty || tokens(snapshot.text) <= budget else { return false }
         for id in snapshot.noteIDs {
             guard let note = file.note(id), settings.allows(note, project: project),
                   note.changed <= snapshot.generation else { return false }
