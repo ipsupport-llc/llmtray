@@ -94,6 +94,10 @@ struct MemoryPane: View {
             }
         }
         .formStyle(.grouped)
+        // Expiry follows its settings at once, not at the next chat.
+        .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in
+            memory.sweep()
+        }
         .sheet(item: $draft) { d in
             MemoryNoteEditor(draft: d, projects: library.library.projects) { saved in
                 save(saved)

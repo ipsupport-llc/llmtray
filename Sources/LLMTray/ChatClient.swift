@@ -1376,8 +1376,9 @@ final class ChatClient: ObservableObject {
         now.thinkingStyle = start.thinkingStyle
         now.thinkingEffort = start.thinkingEffort
         now.project = start.project
-        // The block the turn started with, through its tool rounds.
-        now.memoryBlock = start.memoryBlock
+        // The block the turn started with, through its tool rounds -- not
+        // once a note of it was forgotten or memory turned off.
+        now.memoryBlock = memorySnapshot != nil && MemoryManager.shared.isEnabled ? start.memoryBlock : nil
         // Turned off mid-turn: stops at once.
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
         // Turned off mid-turn: stops at once; a temporary chat never has one.
