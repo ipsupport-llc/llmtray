@@ -267,6 +267,21 @@ fi
 # libpython in config-X.Y-darwin, numpy's .a) can't be signed (ITMS-90284).
 if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   rm -rf "$LIB/config-$PY_SHORT_VERSION-darwin"
+  # App Review refuses any mention of the itms-services URL scheme (its
+  # 2026-10-13 rejection of 0.8.8, guideline 2.5.2). The standard library
+  # names it in urllib.parse's netloc list and in its own tests; this is
+  # what CPython's --with-app-store-compliance patch changes. The test
+  # suite isn't needed at run time at all.
+  rm -rf "$LIB/test"
+  PARSE="$LIB/urllib/parse.py"
+  grep -qF "'wss', 'itms-services']" "$PARSE" || { echo "error: $PARSE changed, itms-services not where expected" >&2; exit 1; }
+  sed -i '' "s/'wss', 'itms-services']/'wss']/" "$PARSE"
+  rm -f "$LIB/urllib/__pycache__"/parse.*.pyc
+  "$FRAMEWORK_PYTHON" -m py_compile "$PARSE"
+  # Fails closed: grep exits 1 only when nothing matched.
+  ITMS_STATUS=0
+  ITMS="$(grep -rlF "itms-services" "$APP")" || ITMS_STATUS=$?
+  [[ $ITMS_STATUS -eq 1 ]] || { echo "error: itms-services is still in the App Store bundle (grep $ITMS_STATUS): $(head -3 <<< "$ITMS")" >&2; exit 1; }
   find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
   LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) -print -quit)"
   [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
