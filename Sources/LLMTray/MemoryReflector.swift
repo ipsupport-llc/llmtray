@@ -167,6 +167,11 @@ final class MemoryReflector: ObservableObject {
         guard !texts.isEmpty else { return [] }
         var vectors: [[Float]] = []
         for range in embedder.runner.documentBatches(texts) {
+            // A picture or song asking for the GPU meanwhile: stop here.
+            if GenerationQueue.shared.hasInteractiveDemand {
+                embedder.runner.setPaused(true)
+                throw EmbedRunner.Failure.paused
+            }
             let result = try await embedder.runner.embed(Array(texts[range]), kind: kind, timeout: 60)
             vectors += (0..<result.count).map(result.floats)
         }
@@ -333,8 +338,10 @@ final class MemoryReflector: ObservableObject {
         var owners: [(item: Int, target: Target)] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
+            // Only notes the batch may change: a pinned one or a kind that's
+            // off would turn a good update into a merge that can't be made.
             let close = memory.file.notes
-                .filter { $0.subject == p.subject && $0.id != p.op.id }
+                .filter { $0.subject == p.subject && $0.id != p.op.id && !$0.pinned && settings.kinds.contains($0.kind) }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
@@ -395,7 +402,8 @@ final class MemoryReflector: ObservableObject {
                 if p.op.action == .update, case .note(let other)? = related(.same), let mine = shown[id] {
                     // Now the same as another note: the two become one.
                     let (keep, drop) = mine.created <= other.created ? (mine.id, other.id) : (other.id, mine.id)
-                    changes.append(.merge(keep: keep, drop: drop, evidence: evidence))
+                    changes.append(.merge(keep: keep, drop: drop, source: id, text: text, evidence: evidence,
+                                          vector: vector, wrongLanguage: wrongLanguage))
                 } else if p.op.action == .update {
                     changes.append(.update(id: id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
                 } else {

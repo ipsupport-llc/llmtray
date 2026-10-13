@@ -262,6 +262,22 @@ public enum MemoryReflection {
     }
 }
 
+extension MemoryChange {
+    /// With ids merged away replaced by the ones kept.
+    func redirected(_ map: [String: String]) -> MemoryChange {
+        guard !map.isEmpty else { return self }
+        func r(_ id: String) -> String { map[id] ?? id }
+        switch self {
+        case .add: return self
+        case let .confirm(id, e): return .confirm(id: r(id), evidence: e)
+        case let .update(id, t, e, v, w): return .update(id: r(id), text: t, evidence: e, vector: v, wrongLanguage: w)
+        case let .supersede(id, t, e, v, w): return .supersede(id: r(id), text: t, evidence: e, vector: v, wrongLanguage: w)
+        case let .forget(id, v): return .forget(id: r(id), vector: v)
+        case let .merge(k, d, s, t, e, v, w): return .merge(keep: r(k), drop: r(d), source: r(s), text: t, evidence: e, vector: v, wrongLanguage: w)
+        }
+    }
+}
+
 /// One change a reflection pass resolved to, written with its batch.
 public enum MemoryChange: Equatable, Sendable {
     /// `vector`: the text's embedding, checked against tombstones at the
@@ -272,9 +288,11 @@ public enum MemoryChange: Equatable, Sendable {
     case update(id: String, text: String, evidence: MemoryEvidence, vector: [Float]?, wrongLanguage: Bool)
     case supersede(id: String, text: String, evidence: MemoryEvidence, vector: [Float]?, wrongLanguage: Bool)
     case forget(id: String, vector: [Float]?)
-    /// Two notes found to say the same thing: one stays (the older), with
-    /// both's evidence; the other goes, without a tombstone.
-    case merge(keep: String, drop: String, evidence: MemoryEvidence)
+    /// `source` updated to `text` came out the same as another note: one
+    /// stays (the older, `keep`) with the new text and both's evidence; the
+    /// other (`drop`) goes, without a tombstone. Can't be merged (the other
+    /// pinned, say): the update alone.
+    case merge(keep: String, drop: String, source: String, text: String, evidence: MemoryEvidence, vector: [Float]?, wrongLanguage: Bool)
 }
 
 extension MemoryFile {
@@ -302,8 +320,16 @@ extension MemoryFile {
             // store was before this write: a note changed by an earlier
             // change of this batch is still the batch's to change.
             let before = Dictionary(uniqueKeysWithValues: notes.map { ($0.id, $0.changed) })
+            // A note merged away: later changes of it go to the one kept.
+            var merged: [String: String] = [:]
             for change in changes {
+                let change = change.redirected(merged)
                 if let note = apply(change, before: before, since: since, settings: settings, liveProjects: liveProjects, now: now) {
+                    touched.append(note)
+                    if case let .merge(keep, drop, _, _, _, _, _) = change, note == keep { merged[drop] = keep }
+                } else if case let .merge(_, _, source, text, evidence, vector, wrongLanguage) = change,
+                          let note = apply(.update(id: source, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage),
+                                           before: before, since: since, settings: settings, liveProjects: liveProjects, now: now) {
                     touched.append(note)
                 }
             }
@@ -401,10 +427,18 @@ extension MemoryFile {
             guard index(id) != nil else { return nil }
             forget(id, vector: vector, now: now)
             return nil
-        case let .merge(keep, drop, evidence):
-            guard keep != drop, let k = index(keep), let d = index(drop), notes[k].subject == notes[d].subject else { return nil }
+        case let .merge(keep, drop, _, text, evidence, vector, wrongLanguage):
+            guard keep != drop, let k = index(keep), let d = index(drop), notes[k].subject == notes[d].subject,
+                  MemoryText.problem(text) == nil, !tombstoned(vector, subject: notes[k].subject) else { return nil }
             let gone = notes[d]
             for e in gone.evidence + [evidence] { addEvidence(k, e) }
+            if notes[k].text != text {
+                notes[k].history.append(MemoryHistoryEntry(text: notes[k].text, date: now))
+                notes[k].history = Array(notes[k].history.suffix(3))
+                notes[k].text = text
+            }
+            notes[k].wrongLanguage = wrongLanguage ? true : nil
+            notes[k].reviewed = false
             notes[k].confirmed = now
             notes[k].expired = nil
             notes[k].changed = generation + 1

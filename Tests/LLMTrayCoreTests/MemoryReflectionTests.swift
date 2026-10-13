@@ -249,11 +249,30 @@ final class MemoryReflectionTests: XCTestCase {
         let newer = file.add(subject: .user, topic: "tone", kind: .preference, text: "Краткие ответы", now: t0.addingTimeInterval(60), reviewed: false, confidence: .stated)!
         file.notes[1].evidence = [evidence("коротко пожалуйста", seq: 7)]
         let id = queued(&file)
-        file.commit(batch: id, changes: [.merge(keep: older, drop: newer, evidence: evidence("keep it short"))],
-                    since: file.generation, settings: on, liveProjects: [], now: t0)
+        file.commit(batch: id, changes: [
+            .merge(keep: older, drop: newer, source: older, text: "Short answers, always", evidence: evidence("keep it short"),
+                   vector: nil, wrongLanguage: false),
+            .confirm(id: newer, evidence: evidence("short again", seq: 9)),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertNil(file.note(newer))
-        XCTAssertEqual(Set(file.note(older)!.evidence.map(\.quote)), ["коротко пожалуйста", "keep it short"])
+        XCTAssertEqual(file.note(older)?.text, "Short answers, always", "the verified update's text")
+        XCTAssertEqual(Set(file.note(older)!.evidence.map(\.quote)), ["коротко пожалуйста", "keep it short", "short again"],
+                       "a later change of the merged-away note goes to the one kept")
         XCTAssertTrue(file.tombstones.isEmpty, "a merge forgets nothing")
+    }
+
+    func testAMergeThatCantBeMadeIsTheUpdateAlone() {
+        var file = MemoryFile()
+        let mine = file.add(subject: .user, topic: "tone", kind: .preference, text: "Uses Python", now: t0, reviewed: false, confidence: .stated)!
+        let pinned = file.add(subject: .user, topic: "tone", kind: .preference, text: "Python 3.12", now: t0)!
+        file.setPinned(pinned, true, now: t0)
+        let id = queued(&file)
+        file.commit(batch: id, changes: [
+            .merge(keep: mine, drop: pinned, source: mine, text: "Uses Python 3.12", evidence: evidence("python three twelve"),
+                   vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
+        XCTAssertEqual(file.note(mine)?.text, "Uses Python 3.12")
+        XCTAssertEqual(file.note(pinned)?.text, "Python 3.12")
     }
 
     func testTombstonedVectorsAreCheckedAtTheWrite() {
