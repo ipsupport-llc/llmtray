@@ -3,225 +3,336 @@
 **Status: proposed** (2026-10-12, asked for by the user: "after each session,
 extract useful facts, stable user preferences, corrections and behavioral
 observations ... inject relevant information into future sessions ... expire
-old ones ... with config").
+old ones ... with config"). Revised after codex and muse reviews.
 
 ## Why
 
 Every chat starts from zero. The user repeats who they are, what they work
 on, how they want answers ("short, in Russian", "no invented charts"), and
-corrects the same mistakes again. IPSupport Code has a reflection pass
-(its ADR 0007); its lessons for us:
+corrects the same mistakes again. IPSupport Code has a reflection pass (its
+ADR 0007). What we take from it:
 
-- Reflection runs off the answer path and never delays it. Keep that.
-- A short prompt; enforcement in code. A long list of what not to write made
+- Reflection runs off the answer path and never delays it.
+- A short prompt, enforcement in code. A long list of things not to write made
   models recite the list until the repetition guard cut them off.
-- Its weak spots, which this design avoids: every fact is folded into every
-  prompt (no relevance), facts carry no date or evidence, an observation and
-  what it supposedly means are one string, and the only expiry is "last seen".
 
-The hard problem the user named: **the same thing must stay one note.** With
-different models, and chats in different languages, a naive pass writes "Prefers
-short answers", "Хочет краткие ответы" and "Answer length: brief" as three
-notes. Most of this design is about preventing that.
+What we do differently, because its weak spots show:
+
+- It folds every fact into every prompt; we pick by relevance within a budget.
+- Its facts carry no date and no evidence; ours carry both.
+- An observation and what it supposedly means are one string there; here they
+  are separate fields.
+- Its only expiry is "last seen"; here every kind ages at its own rate.
+
+The hard problem the user named: **the same thing must stay one note**. With
+different models, and chats in different languages, a naive pass writes
+"Prefers short answers", "Хочет краткие ответы" and "Answer length: brief" as
+three notes. The design's core is the reconcile step below.
 
 ## Decision
 
 ### The note
 
-One note is one short statement, at most 160 characters:
+One note is one claim, `text` at most 160 characters:
 
 | Field | |
 |---|---|
-| `id` | short stable id (`m42`) |
-| `subject` | `user`, or `project:<project id>` (the id, never the project's name, which can change) |
-| `topic` | a key from the topic list (below), e.g. `reply-language`, `answer-length`, `hardware`, `esp32-webcam` |
+| `id` | stable (`m42`); a merge keeps the older id, the other becomes a redirect |
+| `subject` | `user`, or `project:<project id>` (the id, never the name) |
+| `topic` | a retrieval category from the topic list (`answer-length`, `hardware`, …). Several notes may share a topic |
 | `kind` | `fact`, `preference`, `correction`, `observation` |
-| `text` | the statement, in the memory language |
-| `observed` | what actually happened, kept apart from `text` for observations and promoted preferences |
-| `evidence` | up to 5 entries: chat id, date, and a quote of the user's own words |
-| `created`, `confirmed`, `used` | ISO dates: first written, last confirmed by a chat, last injected |
+| `text` | the claim, in the memory language, with its condition if it has one ("Short answers for routine questions") |
+| `observed` | for observations: what happened, kept apart from the reading in `text` |
+| `evidence` | up to 5: chat id, message seq, date, quote (≤ 200 characters) |
+| `created`, `confirmed` | first written; last confirmed by a chat |
 | `confidence` | `stated` (the user said it) or `inferred` |
-| `pinned` | never expires, never rewritten by reflection |
-| `history` | the last 3 superseded texts with their dates (audit only, never injected) |
+| `reviewed` | the user wrote, edited, pinned or approved it in Settings |
+| `pinned` | never expires; reflection and tidy-up never change it |
+| `history` | the last 3 replaced texts with dates (audit only, never injected) |
 
 Kinds:
 
 - **fact**: about the user or a project ("Builds an ESP32-S3 speaker with OTA updates").
-- **preference**: how the user wants things. Stored as a preference only when
-  the user stated it, or when the same observation was confirmed in at least
-  2 different chats on at least 2 different days. Until then it stays an
-  observation.
+- **preference**: how the user wants things. A preference is written only when
+  the user stated it, or when an observation was confirmed in 2+ different
+  chats on 2+ different days (promotion). Until then it stays an observation.
 - **correction**: the user corrected the model ("Don't invent chart data").
-- **observation**: what the user did, with evidence. Its interpretation (what it
-  may mean) goes in `text` and is shown to the model as a guess; the
-  observation itself is in `observed`.
+- **observation**: what the user did (`observed`, with evidence) and, separately,
+  what it may mean (`text`). Shown to the model as "observed: …; likely: …".
 
-**Observations stay apart from interpretations**: `observed` is what happened
-(close to the user's words, with the quote in `evidence`), `text` is the reading
-of it. The model sees both, marked: "observed: …; likely: …".
+Notes never hold URLs, file paths, commands, hosts or anything shaped like a
+key or password. The code refuses them, as IPSupport Code does for its lessons.
+A note is about the person and their work, not a place to stash data.
 
-### Evidence is checked, and only the user's words count
+### Evidence: provenance in code, support by the model
 
-Every `add` and `confirm` carries a quote. The code checks that the quote is
-a substring (after whitespace and case folding) of a **user** message in that
-chat. Nothing is learned from the model's own replies, tool results, web
-pages, project files or documents. This blocks two failures at once: a note
-the model invented, and a web page or file that says "remember that the user
-wants…" (prompt injection into long-term memory).
+Every operation that changes memory (`add`, `confirm`, `update`, `supersede`,
+`forget`) carries a quote. Two checks follow.
 
-### Same thing, one note: the update mechanism
+1. **Provenance (code).** The quote must be a substring (whitespace and case
+   folded) of what the user **typed** in that chat: a user message's text, not
+   its attachments, pasted documents (a paste over ~1,500 characters or inside
+   a code fence), or a quoted block (`>`). Nothing is learned from the model's
+   replies, tool results, web pages, project files or documents.
+2. **Support (model).** Provenance doesn't make a claim true: "Translate 'I live
+   in Berlin'" contains the quote but doesn't say where the user lives.
+   Hypotheticals, negations and talk about other people pass a substring check
+   too. So each surviving operation goes through a short verify call: "Does the
+   quote, as the user's own statement, support this claim about <subject>?
+   yes / no / unclear". Only `yes` is applied.
 
-Five layers, each catching what the previous one missed:
+### Same thing, one note: reconcile
 
-1. **One memory language.** Setting, default the app's language. Reflection is
-   told to write every `text` in it whatever the chat's language. The code checks
-   (`NLLanguageRecognizer`, only for texts long enough to tell). A mismatch gets
-   one rewrite request in the same pass; a second mismatch drops the note.
-2. **A topic list.** Topics are short English kebab-case keys, a closed set per
-   subject that grows slowly: the built-in ones (`reply-language`,
-   `answer-length`, `tone`, `formatting`, `hardware`, `os`, `work`, `tools`,
-   `documents`, `code-style`, ...) plus project topics created over time.
-   Reflection gets the current list and must reuse a topic when one fits. A
-   new topic is accepted only if its embedding isn't within 0.85 of an
-   existing topic's name and description (else it's mapped to that one).
-3. **Reflection edits, not appends.** The pass receives the notes it may touch:
-   all notes of the topics the chat's user messages are closest to, plus the
-   top-k notes by embedding similarity to those messages, each with its id. It
-   answers with operations:
-   - `confirm(id, quote)`: still true; adds evidence and refreshes `confirmed`.
-   - `update(id, text, quote)`: same thing, said better or changed in detail.
-     The old text goes to `history`.
-   - `supersede(id, text, quote)`: the user now wants the opposite. `confidence`
-     becomes `stated` only when the quote says so.
-   - `add(subject, topic, kind, text, observed?, quote)`.
-   - `forget(id, quote)`: the user asked to forget it, or said it's no longer true.
-   Ids are checked; an unknown id drops the operation.
-4. **A duplicate guard in code.** Before any `add`, its text is embedded (bge-m3,
-   which matches across languages) and compared with every note of the same
-   subject: at 0.88 or above the `add` becomes a `confirm` of that note; between
-   0.75 and 0.88 it's stored with a `near:<id>` mark for the next tidy-up. A
-   `preference` or `correction` with a topic that already has an active one of
-   the same kind is turned into an `update` of it (a topic holds one active
-   preference per subject: "answer-length" has one value).
-5. **Tidy-up.** Once a day, when the server is idle, clusters of notes with
-   similarity ≥ 0.80 (and every `near:` pair) in one subject go to the model in
-   one call: "merge these into one note in <language>, or say they differ". A
-   merge keeps the earliest `created`, the latest `confirmed`, the union of
-   evidence (5 newest), and `pinned` if any had it. The same pass rewrites
-   notes not in the memory language (after the user changes it).
+Embeddings only **find candidates**. They never decide that two notes are the
+same: "prefers long answers" and "prefers short answers" can be close.
 
-Without an embedder (the project-files feature off), layers 2 and 4 fall back
-to exact topic match and normalized-text match, and the settings say memory
-works better with it on (it downloads only when the user agrees,
-adr/0012).
+1. **One memory language.** A setting; default is the app's language. Reflection
+   writes every `text` in it. The code checks with `NLLanguageRecognizer` only
+   when the recognizer is confident (texts of 40+ characters, not mostly names or
+   code). A mismatch is kept and marked for the tidy-up to rewrite; it's not dropped.
+2. **Topics as categories.** Short English keys: the built-in set plus ones added
+   over time. Reflection gets the list and reuses a topic when one fits. A new
+   topic is an ordinary candidate for reconcile against the existing topic names.
+   A wrong topic costs retrieval quality, not duplicates.
+3. **Reflection edits, not appends.** The pass gets the notes it may touch, each
+   with its id: candidates by embedding similarity to the batch's user messages
+   (top 12), plus the notes in the same topics (up to 12). It answers with
+   operations: `confirm(id)`, `update(id, text)`, `supersede(id, text)`,
+   `add(scope, topic, kind, text, observed?)`, `forget(id)`, each with a quote.
+   The code checks that every id exists, is not pinned, and is in a subject this
+   chat may touch.
+4. **Reconcile in code + one classify call.** Any operation that creates or
+   changes text (an `add` or `update` from reflection, an edit or restore in
+   Settings, a tidy-up merge) is first compared by embedding with active
+   **and expired** notes of its subject. If the top candidates are within reach
+   (similarity ≥ the candidate floor, about 0.6, calibrated by the eval), one
+   classify call labels each pair: `same`, `opposite`, `narrower`, `different`.
+   - `same`: confirm the existing note (an expired one comes back), add the evidence.
+   - `opposite`: supersede the existing note.
+   - `narrower` / `different`: a new note.
+
+   Equivalence is the model's call on an explicit pair, never a threshold.
+
+   **Without an embedder there is no memory.** Turning memory on asks to download
+   bge-m3 (1.1 GB, multilingual, adr/0012), with the same consent as project files.
+   Memory owns its own use of the embed runner, independent of the project-files
+   toggle. `vectors.bin` records the embedder id and revision; a change re-embeds
+   all notes in one transaction before memory is used again.
+5. **Tidy-up.** Daily, when idle. It runs pairwise, not by cluster. It considers
+   pairs of non-pinned notes in one subject whose similarity is at least the
+   candidate floor and that haven't been classified since either changed. Same
+   classify call; a `same` pair merges:
+   - the older id survives;
+   - the merged text is verified against the union of evidence;
+   - `confirmed` is the latest of the two.
+
+   It also rewrites notes marked as in the wrong language. Pinned notes are never
+   merged or rewritten. A likely duplicate of a pinned note is shown in Settings
+   as a suggestion.
+
+### Scope
+
+- A chat outside a project may write `user` notes only.
+- A chat in project P may write `user` and `project:P` notes. The model gives
+  `scope: user | project`, the code maps `project` to P. Facts about the work go
+  to the project by default; `user` needs the claim to be about the person
+  (tone, language, hardware, habits).
+- Moving a chat to another project or deleting a project: below (snapshot,
+  deletion).
 
 ### When reflection runs
 
-- A chat is reflected on when it goes quiet (no message for N minutes, default
-  10), when the user switches to another chat, or when the app quits (queued,
-  done on next launch). Only the messages after the chat's watermark (the last
-  message reflected on) are read.
-- Never: a temporary chat, a chat marked "Don't remember this chat", a chat
-  whose user messages since the watermark total under 20 words.
-- Only when the server has no request running (adr/0021), with thinking off.
-  A user request arriving cancels the pass; it retries later from the same
-  watermark. One pass at a time, at most one queued per chat.
-- On the loaded model by default, never loading another one for it. The
-  setting can point it at a profile; a different model is used only if it's
-  already loaded.
-- Input: the user messages in full (capped at ~6k tokens, newest kept), the
-  assistant's replies cut to their first ~300 characters (context only, never a
-  source), the topic list and the candidate notes.
-- At most 5 operations of each kind per pass. A pass that can't be parsed
-  writes nothing and is logged (the reply length and finish reason, like
-  IPSupport Code does).
+- **Message ids.** Messages get a persistent sequence number in the chat file
+  (`PersistedMessage.seq`, assigned once, kept across reloads). The watermark is a seq.
+- **Trigger.** A chat goes quiet (no message for N minutes, default 10), the user
+  switches away, or the app quits (queued, run on next launch). Before a chat is
+  compacted, its unreflected user messages are copied into the queue entry. A
+  summary is never evidence.
+- **Never.** A temporary chat; a chat marked "Don't remember this chat"
+  (checked again at commit time).
+- **Batches.** Unreflected user messages are read in chronological batches of
+  ~3k tokens, sized against the model's context with the candidates, topics,
+  prompt and output room counted. The watermark advances only through the
+  batch's last message, after its operations commit.
+- **Commit.** Notes, vectors and the watermark are written in one journaled
+  transaction with a batch id. A replay after a crash is a no-op.
+- **Background admission.** Reflection, verify, classify and tidy-up are
+  background work:
+  - Admitted at the proxy with a background mark, only when no foreground
+    request is running.
+  - Bound to the loaded model and the server's epoch. It never loads or
+    switches a model; if the model changed, it's dropped and retried later.
+  - Any foreground request preempts it, from the chat or an external client:
+    the proxy cancels the background request and waits for it to drain before
+    forwarding.
+  - Thinking off. One background job at a time.
+- **Model.** The loaded one, or a profile's if that model is loaded.
 
 ### What goes into a chat
 
-- **Once, when the chat starts** (its first request), the notes for it are
-  chosen, then **frozen** for that chat, so the prompt prefix stays the same
-  and the KV cache keeps working. They're chosen again only when the chat is
-  compacted.
-- Score: `similarity × weight(confidence) × 0.5^(days since confirmed / half-life of the kind)`,
-  similarity against the first user message (and the chat's project).
-  Pinned notes and `user`/`preference` notes with `stated` confidence always
-  go in first (up to half the budget); the rest by score until the budget.
-- Budget: tokens (default 300), set in Settings; a profile can set its own (a
-  small-context model wants less).
-- Shown to the model as data, under a trust barrier like project files: "What
-  you know about the user from earlier chats. It may be outdated; what the
-  user says now wins." Guesses are marked as guesses. A chat in a project gets
-  that project's notes too.
-- The chat shows a small "Memory: 4 notes" chip; clicking lists them, with
-  "Forget" on each. Each injected note's `used` date is updated.
+- **Never in a temporary chat** (no reads, no writes, no `used` stats). Never to
+  external clients through the proxy: the block is added only in the in-app
+  request builder.
+- **A snapshot per chat.** The rendered memory block, its note ids and the memory
+  generation, saved in the chat file. It's built at the chat's first request and
+  reused as is, so the block (and, where nothing before it changes, the prompt
+  prefix) stays the same for the KV cache. Rebuilt when:
+  - the chat moves to another project;
+  - the chat is compacted;
+  - the model or profile changes and the block is over the new budget;
+  - one of its notes is forgotten or memory is turned off (privacy beats the cache).
+- **Position.** In `chatSystemPrompt`: after the profile's prompt, before the
+  project's instructions and pinned files.
+- **Choice.**
+  - Pinned notes and `stated` preferences/corrections of `user` come first, up to
+    half the budget, ordered by recency.
+  - The rest by `similarity(first user message + project name) × weight × recency`,
+    with `weight` 1.0 for stated, 0.6 for inferred.
+  - A first message too short to rank by ("hi") ranks by `weight × recency`.
+- **Budget.** In tokens via `PromptTokenEstimator`, the whole rendered block
+  counted. Default 300, set in Settings; a profile may lower it. The block is
+  also fitted into the request room after history, tools, pins and output
+  allowance. When it doesn't fit, the lowest-ranked notes go first.
+- **Rendering.** `text` and `observed` only. Never the evidence quotes. Framed as
+  data: "What you know about the user from earlier chats. It may be outdated;
+  what the user says now wins." Guesses are marked as guesses.
+- **Shown.** A "Memory: 4 notes" chip; clicking lists them with "Forget" on each.
+
+### Trust
+
+Notes come only from the user's own typed words, are verified, and may not
+hold URLs, paths, commands or secrets. So the proposal treats an injected
+memory block as **user-derived, not as outside text**: it does not raise the
+tool barrier (`ToolTrust`), which would switch off web search and folder
+changes in every chat with memory.
+
+**Open for the user:** whether unreviewed (learned, not `reviewed`) notes
+should raise the barrier anyway. That's safer, but turns guarded tools off
+whenever memory is on.
+
+### Forgetting
+
+- **Forget** (one note, or every note learned from one chat):
+  - the note is deleted;
+  - a tombstone (the text's embedding, its subject and the source quotes' hashes)
+    stops reflection from writing it again from the same evidence;
+  - the snapshots that held it are rebuilt;
+  - the memory generation goes up, and a queued batch started under an older
+    generation re-checks before commit.
+- **Forget everything:**
+  - deletes notes, vectors, the queue and tombstones;
+  - raises the generation;
+  - clears every chat's snapshot.
+- **Deleting a chat** removes its evidence entries and queue items. A note left
+  with no evidence from any other chat is deleted too, unless it's `reviewed`
+  (setting: "Forget what was learned only from a deleted chat", default on).
+- "Don't remember this chat" stops reflection for it and asks whether to forget
+  what was already learned from it.
+- Storage is plaintext in `~/Library/Application Support/LLMTray/memory/`
+  (`notes.json`, `vectors.bin`, `queue.json`, `tombstones.json`), like chats.
+  Local only.
 
 ### Expiry
 
-- Each kind has a half-life in days, set in Settings (defaults: observation 30,
-  fact 90, preference 180, correction 180). Confirming a note restarts it.
-- A note whose recency factor falls under 0.1 (about 3.3 half-lives) is
-  **expired**: it's no longer injected or offered to reflection, shown under
-  "Expired" in Settings, and deleted 30 days later unless the user restores it.
-- At most 300 active notes (setting); over it, the lowest-scoring unpinned
-  ones expire.
-- Pinned notes never expire.
+- **Half-life.** Each kind has a half-life in days, set in Settings (defaults:
+  observation 30, fact 90, preference 180, correction 180). A confirm restarts it.
+- **Expired.** A note whose recency falls under 0.1 (about 3.3 half-lives):
+  - no longer injected or offered to reflection;
+  - still searched by reconcile, so a repeat brings it back rather than writing
+    a duplicate;
+  - shown under "Expired" in Settings;
+  - deleted after N days (setting, default 30).
+- **Cap.** At most 300 active notes (setting). Over it, the unpinned notes with
+  the lowest `weight × recency` (query-independent) expire.
+- **Pinned** notes never expire.
 
 ### Settings › Memory
 
-- Memory on/off: **off by default** (every LLMTray feature is opt-in); the
-  first-run setup offers it.
-- What to collect: facts / preferences / corrections / observations (each a
-  toggle).
-- Injection budget (tokens), max active notes.
-- Half-life per kind; "delete expired notes after (days)".
-- Memory language (Auto = app language).
-- Reflection: when the chat is idle for N minutes; model: the loaded one or a
-  profile.
-- Project memory on/off.
-- The notes: grouped by subject and topic, each with its evidence and dates;
-  edit, pin, forget; "Expired" with restore; "Forget everything".
-- Per chat, in its menu: "Don't remember this chat".
-
-Everything stays in `~/Library/Application Support/LLMTray/memory/`
-(`notes.json`, `vectors.bin` for the embeddings, `queue.json` for pending
-passes). Local only. External clients through the proxy never get memory:
-it's for LLMTray's own chat.
+- **Memory on/off.** Off by default (every LLMTray feature is opt-in). Turning it
+  on downloads the embedder if needed, with consent. Off: nothing is injected or
+  learned; notes are kept.
+- **What to collect.** Facts / preferences / corrections / observations, a toggle
+  each. A kind turned off is neither learned nor injected; its notes stay, shown
+  dimmed. Promotion of an observation needs both observations and preferences on.
+- **Budgets.** Injection budget (tokens), with a profile override (`Profile`
+  gains an optional field; old profiles inherit). Max active notes.
+- **Expiry.** Half-life per kind; delete expired after N days; forget what was
+  learned only from deleted chats.
+- **Memory language.** Auto = the app's language.
+- **Reflection.** Idle minutes; model: the loaded one or a profile.
+- **Project memory** on/off. Off: no `project:` notes learned or injected.
+- **The notes.**
+  - grouped by subject and topic, with evidence and dates;
+  - edit, pin, approve (`reviewed`), forget;
+  - "Expired" with restore;
+  - tidy-up suggestions;
+  - "Forget everything".
+- **Per chat**, in its menu: "Don't remember this chat".
 
 ### Later (todo)
 
-- **Temporary states** ("tired", "in a hurry", "ill"): a solvable problem, not
-  in the first version. The first version tells reflection to skip them and
-  drops a note whose text the code recognizes as a state. The plan for later:
-  a `state` kind with a TTL in hours, never promoted to a preference, injected
-  only while it lives.
-- A `remember` tool so "запомни, что…" lands at once, with a visible chip,
+- **Temporary states** ("tired", "in a hurry", "ill"): a solvable problem, kept
+  for later.
+  - First version: reflection is told not to record them, and the topic list
+    has no topic for them. Code can't reliably recognize a state in every
+    language, so it doesn't pretend to.
+  - Later: a `state` kind with a TTL in hours, never promoted, injected only
+    while it lives.
+- **A `remember` tool**: "запомни, что…" lands at once with a visible chip,
   instead of waiting for the pass.
 
 ## Order of work
 
-1. Store + Settings › Memory with hand-written notes (no model involved):
-   format, expiry, list UI, injection with the budget and the freeze.
-2. Reflection pass: prompt, operations, evidence check, language check,
-   duplicate guard, queue and idle scheduling.
-3. Tidy-up pass.
-4. Project memory.
+1. **Store and settings.**
+   - notes, reconcile store API, tombstones, expiry;
+   - Settings › Memory with hand-written notes (no model involved yet);
+   - snapshot and injection with budget and invalidation;
+   - message seq in chat files.
+2. **Background admission** at the proxy (preemption, epoch binding).
+3. **Reflection pass.**
+   - batches, provenance, verify, classify, commit journal;
+   - queue and idle scheduling;
+   - compaction hand-off.
+4. **Tidy-up.**
+5. **Project memory.**
 
 ## Testing
 
-- Unit: note store round-trip; every operation incl. unknown ids; the evidence
-  check (quote from the assistant or a tool result is refused); duplicate guard
-  with fixture vectors (an English and a Russian note of one preference merge);
-  topic mapping; decay and expiry; injection order and budget; freeze per chat.
-- Reflection eval: a set of fixture chats (Russian and English, the same
-  preferences said differently) run through two different models; measured:
-  notes per real fact (target 1.0), notes in the wrong language (target 0),
-  notes without valid evidence (must be 0: the code refuses them). Runs on the
-  user's Mac only on their command.
+- **Unit.**
+  - the store round-trip;
+  - each operation, including unknown, pinned and out-of-scope ids;
+  - provenance: a quote from the assistant, a tool result, an attachment, a long
+    paste or a `>` block is refused;
+  - reconcile with fixture vectors and classify replies (same, opposite, narrower);
+  - expired notes coming back;
+  - tombstones blocking a rewrite;
+  - generation checks on commit;
+  - decay and the cap;
+  - injection order, budget and every snapshot invalidation;
+  - temporary chats get no block;
+  - the watermark only advancing through committed batches;
+  - journal replay.
+- **Calibration.**
+  - Hard pairs across Russian and English: paraphrases, opposites, conditional
+    variants, two different hardware facts.
+  - Measured: bge-m3 similarity distributions, to set the candidate floor so
+    real duplicates are always candidates.
+  - Measured: the classify call's accuracy per model.
+- **Reflection eval.**
+  - Fixture chats in Russian and English, the same preferences said differently,
+    with traps (translations, hypotheticals, other people's facts, pasted text).
+  - Run through two different models.
+  - Measured: notes per real fact (target 1.0), false merges (target 0), notes in
+    the wrong language, claims the traps sneak in (target 0).
+  - Runs on the user's Mac only on their command.
 
 ## Consequences
 
-- Reflection costs model time while the user isn't asking for anything; it
-  never competes with a request.
-- What is learned is bounded by the model; the evidence rule and the guards
-  limit the damage, the Settings list lets the user fix the rest.
-- The embedder (1.1 GB) is a soft requirement for good deduplication.
+- Each pass costs several background calls (reflect, verify, classify). They
+  never compete with a request, but on a busy server memory lags behind.
+- What is learned is bounded by the model. Provenance, verify, reconcile and the
+  Settings list limit the damage and let the user fix the rest.
+- Memory needs the embedder: 1.1 GB on disk, and its runner's memory while it
+  embeds.
+- Chat files gain message seqs and a memory snapshot. Old chats get seqs on
+  first load.
