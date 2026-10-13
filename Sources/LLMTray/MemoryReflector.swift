@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import LLMTrayCore
+import NaturalLanguage
 
 /// Memory's reflection pass (adr/0024): reads the queue of what chats
 /// said, a batch at a time, while the model has nothing else to do, and
@@ -26,6 +27,8 @@ final class MemoryReflector: ObservableObject {
     private weak var server: ServerManager?
     private var running: Task<Void, Never>?
     private var scheduled: DispatchWorkItem?
+    /// A look asked for while a pass ran: scheduled when it ends.
+    private var lookAfterRun: Double?
     private var watches: Set<AnyCancellable> = []
 
     /// Notes a reflect call is shown, by meaning, and more of their topics.
@@ -56,14 +59,22 @@ final class MemoryReflector: ObservableObject {
 
     /// A look at the queue in `seconds`, unless one runs or comes sooner.
     func poke(after seconds: Double) {
-        guard running == nil else { return }
+        guard running == nil else {
+            lookAfterRun = min(lookAfterRun ?? seconds, seconds)
+            return
+        }
         scheduled?.cancel()
         let work = DispatchWorkItem { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, self.running == nil else { return }
+                self.lookAfterRun = nil
                 self.running = Task { @MainActor in
                     await self.runQueue()
                     self.running = nil
+                    if let next = self.lookAfterRun {
+                        self.lookAfterRun = nil
+                        self.poke(after: next)
+                    }
                 }
             }
         }
@@ -77,6 +88,8 @@ final class MemoryReflector: ObservableObject {
         case later(String)
         /// This batch didn't work out (an unreadable reply): counted.
         case failed(String)
+        /// The notes file couldn't be written: everything waits.
+        case stored(String)
     }
 
     private func runQueue() async {
@@ -95,29 +108,45 @@ final class MemoryReflector: ObservableObject {
                 poke(after: 120)
                 return
             }
+            guard !GenerationQueue.shared.hasInteractiveDemand else {
+                status = .waiting(NSLocalizedString("Waits for a picture or song to finish.", comment: "memory status"))
+                poke(after: 120)
+                return
+            }
             status = .reading
             let outcome = await reflect(batch, embedder: embedder, modelPath: model)
+            // Every queue write checked: one that doesn't reach the disk
+            // stops the loop (else the same batch would be read again now).
+            let saving = NSLocalizedString("The notes couldn't be saved.", comment: "memory status")
             switch outcome {
             case .done:
                 continue
             case .later(let reason):
                 status = .waiting(reason)
-                memory.change { $0.deferBatch(batch.id) }
+                guard memory.change({ $0.deferBatch(batch.id) }) else { return waitForStorage(saving) }
                 poke(after: min(30 * 60, 120 * Double(batch.attempts + 1)))
                 return
+            case .stored(let reason):
+                return waitForStorage(reason)
             case .failed(let reason):
                 NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
-                if batch.attempts + 1 >= Self.maxAttempts {
-                    memory.change { $0.dropBatch(batch.id) }
-                } else {
-                    memory.change { $0.deferBatch(batch.id) }
-                    poke(after: 300)
-                    status = .idle
-                    return
+                var failures = 0
+                guard memory.change({ failures = $0.failBatch(batch.id) }) else { return waitForStorage(saving) }
+                if failures >= Self.maxAttempts {
+                    guard memory.change({ $0.dropBatch(batch.id) }) else { return waitForStorage(saving) }
+                    continue
                 }
+                poke(after: 300)
+                status = .idle
+                return
             }
         }
         status = .idle
+    }
+
+    private func waitForStorage(_ reason: String) {
+        status = .waiting(reason)
+        poke(after: 300)
     }
 
     // MARK: Embedder
@@ -183,6 +212,8 @@ final class MemoryReflector: ObservableObject {
         defer {
             if !(ProjectIndexer.shared.isEnabled && ProjectIndexer.shared.isEmbedderReady) { embedder.runner.stop() }
         }
+        // Paused while a picture or song wants the GPU, whoever owns it.
+        embedder.runner.setPaused(GenerationQueue.shared.hasInteractiveDemand)
         guard !embedder.runner.isPaused else { return .later(NSLocalizedString("Waits for a picture or song to finish.", comment: "memory status")) }
 
         // Every note's vector of its current text; the batch's messages'.
@@ -206,8 +237,10 @@ final class MemoryReflector: ObservableObject {
 
         // The notes this batch may touch: by meaning, then their topics.
         let project = settings.projectMemory ? batch.project : nil
+        // Pinned notes are the user's alone: never shown to be changed.
         let touchable = memory.file.notes.filter { note in
-            note.isActive && (note.subject == .user || project.map { note.subject == .project($0) } == true)
+            note.isActive && !note.pinned && settings.kinds.contains(note.kind)
+                && (note.subject == .user || project.map { note.subject == .project($0) } == true)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -271,8 +304,7 @@ final class MemoryReflector: ObservableObject {
                                                                  message: message.text, quote: op.quote, before: message.before)))
         }
         guard !pending.isEmpty else {
-            memory.change { $0.commit(batch: batch.id, changes: [], since: since, settings: settings, now: Date()) }
-            return .done
+            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
         }
 
         // Verify: only claims the user, speaking for themselves, makes.
@@ -284,35 +316,38 @@ final class MemoryReflector: ObservableObject {
             return error.outcome
         }
 
-        // New and changed texts' vectors: a forgotten note's words aren't
-        // learned again; a new note close to an old one is compared with it.
-        let newTexts = pending.compactMap { p -> String? in p.op.action == .confirm || p.op.action == .forget ? nil : p.op.text }
+        // New and changed texts' vectors.
+        let newTexts = Array(Set(pending.compactMap { p -> String? in p.op.action == .confirm || p.op.action == .forget ? nil : p.op.text }))
         let newVectors: [String: [Float]]
         do {
             newVectors = Dictionary(zip(newTexts, try await embed(newTexts, kind: .document, with: embedder)), uniquingKeysWith: { a, _ in a })
         } catch {
             return .later(String(format: NSLocalizedString("The embedding model failed: %@", comment: "memory status"), error.localizedDescription))
         }
-        let tombstones = memory.file.tombstones
-        pending.removeAll { p in
-            guard p.op.action == .add, let v = p.op.text.flatMap({ newVectors[$0] }) else { return false }
-            return tombstones.contains { $0.subject == p.subject && $0.vector.map { MemoryReflection.cosine($0, v) >= Self.tombstoneFloor } == true }
-        }
 
-        // Adds against the notes they're close to (active or expired).
+        // Reconcile against a working set: every new or changed text with
+        // the notes close to it (active or expired, not its own) and the
+        // batch's earlier additions; the model says how each pair relates.
+        enum Target { case note(MemoryNote), earlierAdd(Int) }
         var pairs: [(new: String, old: String)] = []
-        var pairOwners: [(pendingIndex: Int, noteID: String)] = []
-        for (i, p) in pending.enumerated() where p.op.action == .add {
+        var owners: [(item: Int, target: Target)] = []
+        for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
             let close = memory.file.notes
-                .filter { $0.subject == p.subject }
+                .filter { $0.subject == p.subject && $0.id != p.op.id }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
                 .prefix(3)
             for (note, _) in close {
                 pairs.append((new: text, old: note.text))
-                pairOwners.append((i, note.id))
+                owners.append((i, .note(note)))
+            }
+            guard p.op.action == .add else { continue }
+            for j in 0..<i where pending[j].op.action == .add && pending[j].subject == p.subject {
+                guard let earlier = pending[j].op.text, let w = newVectors[earlier], MemoryReflection.cosine(v, w) >= Self.reconcileFloor else { continue }
+                pairs.append((new: text, old: earlier))
+                owners.append((i, .earlierAdd(j)))
             }
         }
         var relations: [MemoryReflection.Relation] = []
@@ -330,36 +365,64 @@ final class MemoryReflector: ObservableObject {
         var changes: [MemoryChange] = []
         for (i, p) in pending.enumerated() {
             let evidence = MemoryEvidence(chat: batch.chat, seq: p.message.seq, date: p.message.date, quote: p.op.quote)
+            let mine = owners.indices.filter { owners[$0].item == i }
+            func related(_ relation: MemoryReflection.Relation) -> Target? {
+                mine.first { relations[$0] == relation }.map { owners[$0].target }
+            }
+            let text = p.op.text ?? ""
+            let vector = newVectors[text]
+            let wrongLanguage = Self.isWrongLanguage(text)
             switch p.op.action {
             case .add:
-                guard let text = p.op.text, let kind = p.op.kind else { continue }
-                let mine = pairOwners.indices.filter { pairOwners[$0].pendingIndex == i }
-                if let same = mine.first(where: { relations[$0] == .same }) {
-                    changes.append(.confirm(id: pairOwners[same].noteID, evidence: evidence))
-                } else if let opposite = mine.first(where: { relations[$0] == .opposite }) {
-                    changes.append(.supersede(id: pairOwners[opposite].noteID, text: text, evidence: evidence))
+                guard let kind = p.op.kind else { continue }
+                if case .note(let note)? = related(.same) {
+                    changes.append(.confirm(id: note.id, evidence: evidence))
+                } else if case .earlierAdd? = related(.same) {
+                    // Said twice in this batch: the first stands.
+                    continue
+                } else if case .note(let note)? = related(.opposite) {
+                    changes.append(.supersede(id: note.id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
                 } else {
-                    changes.append(.add(subject: p.subject, topic: p.op.topic ?? "general", kind: kind, text: text,
+                    changes.append(.add(subject: p.subject, topic: MemoryTopics.normalized(p.op.topic ?? "general"), kind: kind, text: text,
                                         observed: kind == .observation ? p.op.observed : nil,
-                                        confidence: kind == .observation ? .inferred : .stated, evidence: evidence))
+                                        confidence: kind == .observation ? .inferred : .stated, evidence: evidence,
+                                        vector: vector, wrongLanguage: wrongLanguage))
                 }
             case .confirm:
                 changes.append(.confirm(id: p.op.id!, evidence: evidence))
-            case .update:
-                changes.append(.update(id: p.op.id!, text: p.op.text!, evidence: evidence))
-            case .supersede:
-                changes.append(.supersede(id: p.op.id!, text: p.op.text!, evidence: evidence))
+            case .update, .supersede:
+                let id = p.op.id!
+                if p.op.action == .update, case .note(let other)? = related(.same), let mine = shown[id] {
+                    // Now the same as another note: the two become one.
+                    let (keep, drop) = mine.created <= other.created ? (mine.id, other.id) : (other.id, mine.id)
+                    changes.append(.merge(keep: keep, drop: drop, evidence: evidence))
+                } else if p.op.action == .update {
+                    changes.append(.update(id: id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
+                } else {
+                    changes.append(.supersede(id: id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
+                }
             case .forget:
                 let note = shown[p.op.id!]
                 changes.append(.forget(id: p.op.id!, vector: note.flatMap { vectors.vector(for: $0) }))
             }
         }
+        return commit(batch, changes: changes, since: since, vectors: vectors, newVectors: newVectors)
+    }
 
-        // One write: the notes, and the batch out of the queue.
+    /// One write: the changes (checked again against the store, the
+    /// settings and the projects as they are now, tombstones included), and
+    /// the batch out of the queue. The vectors are a cache written after.
+    private func commit(_ batch: MemoryBatch, changes: [MemoryChange], since: Int, vectors: MemoryVectors,
+                        newVectors: [String: [Float]]) -> Outcome {
+        let memory = MemoryManager.shared
+        let settings = memory.settings
+        let projects = Set(ChatLibraryStore.shared.library.projects.map(\.id))
         var touched: [String] = []
-        guard memory.change({ touched = $0.commit(batch: batch.id, changes: changes, since: since, settings: settings, now: Date()) }) else {
-            return .later(NSLocalizedString("The notes couldn't be saved.", comment: "memory status"))
+        guard memory.change({ touched = $0.commit(batch: batch.id, changes: changes, since: since, settings: settings,
+                                                  liveProjects: projects, now: Date()) }) else {
+            return .stored(NSLocalizedString("The notes couldn't be saved.", comment: "memory status"))
         }
+        var vectors = vectors
         for id in touched {
             guard let note = memory.file.note(id), let v = newVectors[note.text] else { continue }
             vectors.entries[id] = MemoryVectors.Entry(textHash: MemoryVectors.textHash(note.text), vector: v)
@@ -397,6 +460,16 @@ final class MemoryReflector: ObservableObject {
         let set = UserDefaults.standard[Pref.memoryLanguage]
         if set != "auto", !set.isEmpty { return set }
         return Bundle.main.preferredLocalizations.first.map { String($0.prefix(2)) } ?? "en"
+    }
+
+    /// A text long enough to tell, confidently in another language than
+    /// memory's: marked for the tidy-up to rewrite.
+    static func isWrongLanguage(_ text: String) -> Bool {
+        guard text.count >= 40 else { return false }
+        let recognizer = NLLanguageRecognizer()
+        recognizer.processString(text)
+        guard let (language, probability) = recognizer.languageHypotheses(withMaximum: 1).first, probability >= 0.8 else { return false }
+        return !language.rawValue.hasPrefix(languageCode())
     }
 
     static func languageName() -> String {

@@ -94,6 +94,8 @@ public struct MemoryNote: Codable, Equatable, Identifiable, Sendable {
     /// The store's generation at its last change: a chat's snapshot that
     /// holds it is stale once this is newer than the snapshot.
     public var changed: Int
+    /// Written in another language than memory's (the tidy-up rewrites it).
+    public var wrongLanguage: Bool?
 
     public var isActive: Bool { expired == nil }
 }
@@ -562,8 +564,10 @@ public struct MemoryBatch: Codable, Equatable, Identifiable, Sendable {
     public var project: UUID?
     public var created: Date
     public var messages: [MemoryBatchMessage]
-    /// Tries that ended without a result (the model busy, cut off).
+    /// Tries put off (the model busy, cut off): for the backoff.
     public var attempts = 0
+    /// Tries that failed (an unreadable reply): dropped after a few.
+    public var failures: Int?
 
     /// About 3k tokens of Russian: a short prompt, so a foreground request
     /// never waits long behind one (adr/0021, BackgroundRequest).
@@ -588,6 +592,8 @@ public struct MemoryTombstone: Codable, Equatable, Sendable {
     public var date: Date
 
     public static let maxKept = 500
+    /// A new text this close to a forgotten one's isn't learned.
+    public static let vectorFloor: Float = 0.92
 
     public static func hash(_ quote: String) -> String {
         SHA256.hash(data: Data(MemoryText.normalizedQuote(quote).utf8)).map { String(format: "%02x", $0) }.joined()

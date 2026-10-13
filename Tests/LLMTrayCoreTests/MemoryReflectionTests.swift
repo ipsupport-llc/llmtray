@@ -65,7 +65,7 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(MemoryReflection.source(of: "keep it short", in: b)?.seq, 1)
         XCTAssertNil(MemoryReflection.source(of: "I live in Berlin", in: b), "inside a code fence")
         XCTAssertNil(MemoryReflection.source(of: "lives in Paris", in: b), "the assistant's words")
-        XCTAssertNil(MemoryReflection.source(of: "ke", in: b), "too short to mean anything")
+        XCTAssertNil(MemoryReflection.source(of: "short", in: b), "one word says nothing on its own")
     }
 
     func testVerifyMarksTheQuoteInTheWholeMessage() {
@@ -98,7 +98,8 @@ final class MemoryReflectionTests: XCTestCase {
 
     func queued(_ file: inout MemoryFile) -> Int {
         file.meet(chat, from: 0)
-        file.enqueue(chat: chat, project: nil, messages: [MemoryBatchMessage(seq: 1, date: t0, text: "x", before: nil)], now: t0)
+        let seq = (file.watermark(chat) ?? 0) + 1
+        file.enqueue(chat: chat, project: nil, messages: [MemoryBatchMessage(seq: seq, date: t0, text: "x", before: nil)], now: t0)
         return file.queue.last!.id
     }
 
@@ -106,9 +107,9 @@ final class MemoryReflectionTests: XCTestCase {
         var file = MemoryFile()
         let id = queued(&file)
         let touched = file.commit(batch: id, changes: [
-            .add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", observed: nil, confidence: .stated, evidence: evidence("keep it short")),
-            .add(subject: .user, topic: "x", kind: .fact, text: "See http://x", observed: nil, confidence: .stated, evidence: evidence("q")),
-        ], since: file.generation, settings: on, now: t0)
+            .add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", observed: nil, confidence: .stated, evidence: evidence("keep it short"), vector: nil, wrongLanguage: false),
+            .add(subject: .user, topic: "x", kind: .fact, text: "See http://x", observed: nil, confidence: .stated, evidence: evidence("q"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertEqual(touched.count, 1)
         let note = file.note(touched[0])!
         XCTAssertFalse(note.reviewed)
@@ -125,7 +126,7 @@ final class MemoryReflectionTests: XCTestCase {
         let otherChat = UUID()
         file.commit(batch: id, changes: [.confirm(id: note, evidence: evidence("table again", chat: otherChat, seq: 4,
                                                                               date: t0.addingTimeInterval(86_400 * 2)))],
-                    since: file.generation, settings: on, now: t0.addingTimeInterval(86_400 * 2))
+                    since: file.generation, settings: on, liveProjects: [], now: t0.addingTimeInterval(86_400 * 2))
         let n = file.note(note)!
         XCTAssertEqual(n.kind, .preference)
         XCTAssertEqual(n.confidence, .inferred, "promoted, still a guess")
@@ -138,9 +139,9 @@ final class MemoryReflectionTests: XCTestCase {
         let b = file.add(subject: .user, topic: "tone", kind: .preference, text: "No emoji", now: t0, reviewed: false, confidence: .inferred)!
         let id = queued(&file)
         file.commit(batch: id, changes: [
-            .update(id: a, text: "Short answers, in Russian", evidence: evidence("short, in Russian")),
-            .supersede(id: b, text: "Emoji are fine", evidence: evidence("emoji are fine")),
-        ], since: file.generation, settings: on, now: t0)
+            .update(id: a, text: "Short answers, in Russian", evidence: evidence("short, in Russian"), vector: nil, wrongLanguage: false),
+            .supersede(id: b, text: "Emoji are fine", evidence: evidence("emoji are fine"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertEqual(file.note(a)?.text, "Short answers, in Russian")
         XCTAssertEqual(file.note(a)?.history.map(\.text), ["Short answers"])
         XCTAssertEqual(file.note(a)?.reviewed, false, "the model's words now")
@@ -157,10 +158,10 @@ final class MemoryReflectionTests: XCTestCase {
         let since = file.generation
         file.edit(edited, text: "Edited by the user meanwhile", now: t0)
         file.commit(batch: id, changes: [
-            .update(id: pinned, text: "Changed", evidence: evidence("x")),
-            .update(id: edited, text: "Model's version", evidence: evidence("y")),
+            .update(id: pinned, text: "Changed", evidence: evidence("x"), vector: nil, wrongLanguage: false),
+            .update(id: edited, text: "Model's version", evidence: evidence("y"), vector: nil, wrongLanguage: false),
             .forget(id: pinned, vector: nil),
-        ], since: since, settings: on, now: t0)
+        ], since: since, settings: on, liveProjects: [], now: t0)
         XCTAssertEqual(file.note(pinned)?.text, "Pinned")
         XCTAssertEqual(file.note(edited)?.text, "Edited by the user meanwhile")
     }
@@ -172,16 +173,16 @@ final class MemoryReflectionTests: XCTestCase {
         file.notes[file.notes.count - 1].evidence = [evidence("i work at acme")]
         file.forget(forgotten)
         file.commit(batch: id, changes: [
-            .add(subject: .user, topic: "work", kind: .fact, text: "Works at Acme", observed: nil, confidence: .stated, evidence: evidence("I  work at ACME")),
-        ], since: file.generation, settings: on, now: t0)
+            .add(subject: .user, topic: "work", kind: .fact, text: "Works at Acme", observed: nil, confidence: .stated, evidence: evidence("I  work at ACME"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertTrue(file.notes.isEmpty, "the same words don't teach a forgotten note again")
 
         var other = MemoryFile()
         let id2 = queued(&other)
         other.optedOut.insert(chat)
         other.commit(batch: id2, changes: [
-            .add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", observed: nil, confidence: .stated, evidence: evidence("q")),
-        ], since: other.generation, settings: on, now: t0)
+            .add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", observed: nil, confidence: .stated, evidence: evidence("q"), vector: nil, wrongLanguage: false),
+        ], since: other.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertTrue(other.notes.isEmpty)
         XCTAssertTrue(other.queue.isEmpty)
     }
@@ -191,7 +192,7 @@ final class MemoryReflectionTests: XCTestCase {
         let n = file.add(subject: .user, topic: "work", kind: .fact, text: "Works at Acme", now: t0, reviewed: false, confidence: .stated)!
         file.notes[0].evidence = [evidence("acme")]
         let id = queued(&file)
-        file.commit(batch: id, changes: [.forget(id: n, vector: [1, 0])], since: file.generation, settings: on, now: t0)
+        file.commit(batch: id, changes: [.forget(id: n, vector: [1, 0])], since: file.generation, settings: on, liveProjects: [], now: t0)
         XCTAssertNil(file.note(n))
         XCTAssertEqual(file.tombstones.last?.vector, [1, 0])
         file.dropTombstoneVectors()
@@ -216,5 +217,91 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(MemoryReflection.cosine([1, 0], [1, 0]), 1, accuracy: 1e-6)
         XCTAssertEqual(MemoryReflection.cosine([1, 0], [0, 1]), 0, accuracy: 1e-6)
         XCTAssertEqual(MemoryReflection.cosine([1], [1, 2]), 0)
+    }
+
+    // MARK: Review fixes
+
+    func testObservedIsHeldToANotesRules() {
+        let reply = #"{"ops":[{"op":"add","kind":"observation","text":"Likes tables","observed":"Opened https://x.com","quote":"show a table"}]}"#
+        XCTAssertEqual(MemoryReflection.parseOperations(reply), [])
+    }
+
+    func testFencesCloseOnlyWithTheirOwnKind() {
+        let text = "Before.\n\n````\n```\ncode inside\n```\nstill code\n````\nAfter fence."
+        let typed = MemoryReflection.typedText(text)
+        XCTAssertTrue(typed.contains("Before."))
+        XCTAssertTrue(typed.contains("After fence."))
+        XCTAssertFalse(typed.contains("code inside"))
+        XCTAssertFalse(typed.contains("still code"))
+    }
+
+    func testALongMessageCountsOnlyItsShortParagraphs() {
+        let paragraph = String(repeating: "word ", count: 150)   // 750 chars, under the paste length
+        let text = (0..<5).map { _ in paragraph }.joined(separator: "\n\n") + "\n\nI prefer tabs."
+        let typed = MemoryReflection.typedText(text)
+        XCTAssertFalse(typed.contains("word word"))
+        XCTAssertTrue(typed.contains("I prefer tabs."))
+    }
+
+    func testMergeKeepsOneWithBothsEvidence() {
+        var file = MemoryFile()
+        let older = file.add(subject: .user, topic: "tone", kind: .preference, text: "Short answers", now: t0, reviewed: false, confidence: .stated)!
+        let newer = file.add(subject: .user, topic: "tone", kind: .preference, text: "Краткие ответы", now: t0.addingTimeInterval(60), reviewed: false, confidence: .stated)!
+        file.notes[1].evidence = [evidence("коротко пожалуйста", seq: 7)]
+        let id = queued(&file)
+        file.commit(batch: id, changes: [.merge(keep: older, drop: newer, evidence: evidence("keep it short"))],
+                    since: file.generation, settings: on, liveProjects: [], now: t0)
+        XCTAssertNil(file.note(newer))
+        XCTAssertEqual(Set(file.note(older)!.evidence.map(\.quote)), ["коротко пожалуйста", "keep it short"])
+        XCTAssertTrue(file.tombstones.isEmpty, "a merge forgets nothing")
+    }
+
+    func testTombstonedVectorsAreCheckedAtTheWrite() {
+        var file = MemoryFile()
+        let id = queued(&file)
+        file.tombstones.append(MemoryTombstone(subject: .user, quoteHashes: [], vector: [1, 0], date: t0))
+        file.commit(batch: id, changes: [
+            .add(subject: .user, topic: "work", kind: .fact, text: "Works at Acme", observed: nil, confidence: .stated,
+                 evidence: evidence("i work at acme"), vector: [0.99, 0.05], wrongLanguage: true),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
+        XCTAssertTrue(file.notes.isEmpty)
+    }
+
+    func testDeletedProjectsAndSettingsChangedMeanwhileWriteNothing() {
+        let project = UUID()
+        var file = MemoryFile()
+        var id = queued(&file)
+        file.commit(batch: id, changes: [
+            .add(subject: .project(project), topic: "work", kind: .fact, text: "Uses OTA", observed: nil, confidence: .stated,
+                 evidence: evidence("over the air"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
+        XCTAssertTrue(file.notes.isEmpty)
+        id = queued(&file)
+        file.commit(batch: id, changes: [
+            .add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", observed: nil, confidence: .stated,
+                 evidence: evidence("be brief"), vector: nil, wrongLanguage: true),
+        ], since: file.generation, settings: MemorySettings(enabled: false), liveProjects: [], now: t0)
+        XCTAssertTrue(file.notes.isEmpty)
+        XCTAssertTrue(file.queue.isEmpty)
+    }
+
+    func testABatchMayChangeTheSameNoteTwice() {
+        var file = MemoryFile()
+        let n = file.add(subject: .user, topic: "tone", kind: .preference, text: "Short answers", now: t0, reviewed: false, confidence: .stated)!
+        let id = queued(&file)
+        file.commit(batch: id, changes: [
+            .update(id: n, text: "Short answers, please", evidence: evidence("short please"), vector: nil, wrongLanguage: false),
+            .supersede(id: n, text: "Detailed answers", evidence: evidence("actually go detailed"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: on, liveProjects: [], now: t0)
+        XCTAssertEqual(file.note(n)?.text, "Detailed answers")
+    }
+
+    func testFailuresAreCountedApartFromDeferrals() {
+        var file = MemoryFile()
+        let id = queued(&file)
+        file.deferBatch(id)
+        file.deferBatch(id)
+        XCTAssertEqual(file.failBatch(id), 1)
+        XCTAssertEqual(file.queue.first?.attempts, 2)
     }
 }
