@@ -722,13 +722,19 @@ final class ChatClient: ObservableObject {
     @discardableResult
     func queueForMemory() -> Bool {
         guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return true }
+        // The answer to a message memory never read (before it met the
+        // chat: opted out, memory off) isn't context either.
+        let met = MemoryManager.shared.file.met(session) ?? .max
         var items: [MemoryBatchMessage] = []
         var lastAnswer: String?
+        var previousSeq = 0
         for message in messages {
             if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
-                lastAnswer = message.content
+                lastAnswer = previousSeq > met ? message.content : nil
             } else if message.role == "user", !message.isToolContext, let seq = message.seq {
                 items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer))
+                lastAnswer = nil
+                previousSeq = seq
             }
         }
         guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return true }

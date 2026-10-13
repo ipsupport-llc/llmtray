@@ -156,3 +156,18 @@ final class MemoryQueueTests: XCTestCase {
         XCTAssertEqual(MemoryTombstone.hash("Answer in Russian"), MemoryTombstone.hash("answer  in\trussian"))
     }
 }
+
+extension MemoryQueueTests {
+    func testMeetingRecordsWhereAndForgettingClearsIt() {
+        var file = MemoryFile()
+        file.meet(chat, from: 4)
+        XCTAssertEqual(file.met(chat), 4)
+        file.setOptedOut(chat, true)
+        XCTAssertNil(file.met(chat))
+        file.setOptedOut(chat, false)
+        file.meet(chat, from: 9)
+        XCTAssertEqual(file.met(chat), 9)
+        file.forgetWatermarks()
+        XCTAssertNil(file.met(chat))
+    }
+}

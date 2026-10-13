@@ -70,11 +70,14 @@ final class MemoryManager: ObservableObject {
         var updated = file
         apply(&updated)
         guard updated != file else { return true }
+        // Saved first: a change that didn't reach the disk isn't made (a
+        // watermark moved in memory only would let compaction drop what
+        // the queue never kept).
+        guard save(updated) else { return false }
         let removed = Set(file.notes.map(\.id)).subtracting(updated.notes.map(\.id))
         file = updated
-        save()
         if !removed.isEmpty { dropFromChats(removed) }
-        return !saveFailed
+        return true
     }
 
     /// Expiry: at most once an hour as chats start, and at once when the
@@ -96,15 +99,17 @@ final class MemoryManager: ObservableObject {
         ChatSessionStore.dropMemorySnapshots(holdingAnyOf: ids)
     }
 
-    private func save() {
+    private func save(_ file: MemoryFile) -> Bool {
         do {
             try FileManager.default.createDirectory(atPath: Self.directory, withIntermediateDirectories: true)
             let data = try Self.encoder.encode(file)
             // Atomic: a crash mid-write mustn't lose the notes.
             try data.write(to: URL(fileURLWithPath: Self.path), options: .atomic)
             saveFailed = false
+            return true
         } catch {
             saveFailed = true
+            return false
         }
     }
 

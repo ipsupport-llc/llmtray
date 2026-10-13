@@ -232,6 +232,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public var queue: [MemoryBatch] = []
     /// Per chat (its id), the last user message (its seq) put in the queue.
     public var watermarks: [String: Int] = [:]
+    /// Per chat, the seq memory met it at: messages up to it were never
+    /// read, nor is the answer to one taken as context.
+    public var metFrom: [String: Int] = [:]
     /// Chats marked "Don't remember this chat".
     public var optedOut: Set<UUID> = []
     /// Forgotten notes, so they aren't learned again from the same words.
@@ -241,7 +244,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case version, generation, nextID, notes, queue, watermarks, optedOut, tombstones, nextBatchID
+        case version, generation, nextID, notes, queue, watermarks, metFrom, optedOut, tombstones, nextBatchID
     }
 
     // The queue and the rest came after the first notes files.
@@ -253,6 +256,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         notes = try c.decode([MemoryNote].self, forKey: .notes)
         queue = try c.decodeIfPresent([MemoryBatch].self, forKey: .queue) ?? []
         watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
+        metFrom = try c.decodeIfPresent([String: Int].self, forKey: .metFrom) ?? [:]
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
         tombstones = try c.decodeIfPresent([MemoryTombstone].self, forKey: .tombstones) ?? []
         nextBatchID = try c.decodeIfPresent(Int.self, forKey: .nextBatchID) ?? 1
@@ -355,7 +359,11 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// nothing said while it was off is read. What's queued stays.
     public mutating func forgetWatermarks() {
         watermarks = [:]
+        metFrom = [:]
     }
+
+    /// Where memory met a chat (see `metFrom`); nil: not met.
+    public func met(_ chat: UUID) -> Int? { metFrom[chat.uuidString] }
 
     /// Everything: notes, what's queued, tombstones. The watermarks stay,
     /// so what was already said isn't learned again; the opt-outs stay.
@@ -378,6 +386,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public mutating func meet(_ chat: UUID, from seq: Int) {
         guard watermarks[chat.uuidString] == nil, !optedOut.contains(chat) else { return }
         watermarks[chat.uuidString] = seq
+        metFrom[chat.uuidString] = seq
     }
 
     /// Queues `messages` of a chat after its watermark, in batches of at
@@ -419,6 +428,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             optedOut.insert(chat)
             queue.removeAll { $0.chat == chat }
             watermarks.removeValue(forKey: chat.uuidString)
+            metFrom.removeValue(forKey: chat.uuidString)
         } else {
             optedOut.remove(chat)
         }
@@ -436,6 +446,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         if queue.count != before { changed = true }
         if !keepState {
             if watermarks.removeValue(forKey: chat.uuidString) != nil { changed = true }
+            metFrom.removeValue(forKey: chat.uuidString)
             if optedOut.remove(chat) != nil { changed = true }
         }
         var removed: [String] = []

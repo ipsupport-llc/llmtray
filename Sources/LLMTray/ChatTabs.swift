@@ -88,6 +88,8 @@ final class ChatTabs: ObservableObject {
 
     /// A new tab with a new chat, selected.
     func newTab() {
+        // Switched away from: what it said goes to memory (adr/0024).
+        if tabs.indices.contains(selectedIndex) { tabs[selectedIndex].queueForMemory() }
         tabs.append(makeClient())
         selectedIndex = tabs.count - 1
         tabsChanged()
@@ -149,6 +151,8 @@ final class ChatTabs: ObservableObject {
         if inNewTab || selected.isBusy {
             let client = makeClient()
             client.loadSession(file)
+            // Switched away from: what it said goes to memory (adr/0024).
+            if tabs.indices.contains(selectedIndex) { tabs[selectedIndex].queueForMemory() }
             tabs.append(client)
             selectedIndex = tabs.count - 1
             tabsChanged()
