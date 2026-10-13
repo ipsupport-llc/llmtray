@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 // Memory between chats (adr/0024): short notes about the user and their
@@ -193,6 +194,11 @@ public enum MemoryText {
         case empty, tooLong, link, path, secret
     }
 
+    /// A quote as compared: case and runs of whitespace folded.
+    public static func normalizedQuote(_ quote: String) -> String {
+        quote.lowercased().split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+    }
+
     /// Why `text` can't be a note; nil when it can. A note is about the
     /// person and their work, never a place to keep links, paths or keys.
     public static func problem(_ text: String) -> Problem? {
@@ -220,8 +226,37 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public var generation = 0
     public var nextID = 1
     public var notes: [MemoryNote] = []
+    /// What's still to be learned from (MemoryBatch), oldest first. In the
+    /// same file as the notes: a batch's notes and its leaving the queue
+    /// are one write.
+    public var queue: [MemoryBatch] = []
+    /// Per chat (its id), the last user message (its seq) put in the queue.
+    public var watermarks: [String: Int] = [:]
+    /// Chats marked "Don't remember this chat".
+    public var optedOut: Set<UUID> = []
+    /// Forgotten notes, so they aren't learned again from the same words.
+    public var tombstones: [MemoryTombstone] = []
+    public var nextBatchID = 1
 
     public init() {}
+
+    enum CodingKeys: String, CodingKey {
+        case version, generation, nextID, notes, queue, watermarks, optedOut, tombstones, nextBatchID
+    }
+
+    // The queue and the rest came after the first notes files.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decode(Int.self, forKey: .version)
+        generation = try c.decode(Int.self, forKey: .generation)
+        nextID = try c.decode(Int.self, forKey: .nextID)
+        notes = try c.decode([MemoryNote].self, forKey: .notes)
+        queue = try c.decodeIfPresent([MemoryBatch].self, forKey: .queue) ?? []
+        watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
+        optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
+        tombstones = try c.decodeIfPresent([MemoryTombstone].self, forKey: .tombstones) ?? []
+        nextBatchID = try c.decodeIfPresent(Int.self, forKey: .nextBatchID) ?? 1
+    }
 
     public func note(_ id: String) -> MemoryNote? { notes.first { $0.id == id } }
 
@@ -295,9 +330,17 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         notes[i].changed = bump()
     }
 
-    public mutating func forget(_ id: String) {
-        guard notes.contains(where: { $0.id == id }) else { return }
+    /// The user forgets a note. One learned from chats leaves a tombstone
+    /// (its quotes' hashes, and `vector`, its text's embedding, when
+    /// known), so the same words don't teach it again.
+    public mutating func forget(_ id: String, vector: [Float]? = nil, now: Date = Date()) {
+        guard let note = note(id) else { return }
         notes.removeAll { $0.id == id }
+        if !note.evidence.isEmpty || vector != nil {
+            tombstones.append(MemoryTombstone(subject: note.subject, quoteHashes: note.evidence.map { MemoryTombstone.hash($0.quote) },
+                                              vector: vector, date: now))
+            tombstones = Array(tombstones.suffix(MemoryTombstone.maxKept))
+        }
         _ = bump()
     }
 
@@ -308,8 +351,101 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         if notes.count != before { _ = bump() }
     }
 
+    /// Everything: notes, what's queued, tombstones. The watermarks stay,
+    /// so what was already said isn't learned again; the opt-outs stay.
     public mutating func forgetAll() {
         notes = []
+        queue = []
+        tombstones = []
+        _ = bump()
+    }
+
+    // MARK: Chats
+
+    /// A chat's watermark: user messages after it aren't queued yet; nil:
+    /// a chat memory hasn't met.
+    public func watermark(_ chat: UUID) -> Int? { watermarks[chat.uuidString] }
+
+    /// A chat memory meets for the first time: learned from `seq` on (0: a
+    /// new chat, from its start; an older chat opened again: from now).
+    public mutating func meet(_ chat: UUID, from seq: Int) {
+        guard watermarks[chat.uuidString] == nil else { return }
+        watermarks[chat.uuidString] = seq
+    }
+
+    /// Queues `messages` of a chat after its watermark, in batches of at
+    /// most `MemoryBatch.maxBytes`, and moves the watermark past them.
+    /// Nothing for an opted-out chat, or one memory hasn't met. True when
+    /// anything was queued.
+    @discardableResult
+    public mutating func enqueue(chat: UUID, project: UUID?, messages: [MemoryBatchMessage], now: Date) -> Bool {
+        guard !optedOut.contains(chat), let mark = watermark(chat) else { return false }
+        let fresh = messages.filter { $0.seq > mark && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .sorted { $0.seq < $1.seq }
+        guard let last = fresh.last else { return false }
+        var batch: [MemoryBatchMessage] = []
+        var bytes = 0
+        func flush() {
+            guard !batch.isEmpty else { return }
+            queue.append(MemoryBatch(id: nextBatchID, chat: chat, project: project, created: now, messages: batch))
+            nextBatchID += 1
+            batch = []
+            bytes = 0
+        }
+        for message in fresh {
+            let size = message.text.utf8.count + (message.before?.utf8.count ?? 0)
+            if bytes + size > MemoryBatch.maxBytes { flush() }
+            batch.append(message.clipped)
+            bytes += min(size, MemoryBatch.maxBytes)
+        }
+        flush()
+        watermarks[chat.uuidString] = last.seq
+        return true
+    }
+
+    /// "Don't remember this chat": nothing more is learned from it, and
+    /// what's queued from it goes.
+    public mutating func setOptedOut(_ chat: UUID, _ out: Bool) {
+        if out {
+            optedOut.insert(chat)
+            queue.removeAll { $0.chat == chat }
+        } else {
+            optedOut.remove(chat)
+        }
+    }
+
+    /// A chat deleted, or the user forgetting what was learned from it:
+    /// its queue and evidence go; a note left with no evidence goes too
+    /// unless the user reviewed it. `keepState` keeps its watermark and
+    /// opt-out (the chat is still there); `keepNotes` leaves the notes and
+    /// their evidence alone (a deleted chat, the setting off).
+    public mutating func forgetLearned(fromChat chat: UUID, keepState: Bool, keepNotes: Bool = false, now: Date = Date()) {
+        var changed = false
+        let before = queue.count
+        queue.removeAll { $0.chat == chat }
+        if queue.count != before { changed = true }
+        if !keepState {
+            if watermarks.removeValue(forKey: chat.uuidString) != nil { changed = true }
+            if optedOut.remove(chat) != nil { changed = true }
+        }
+        var removed: [String] = []
+        for i in notes.indices where !keepNotes && notes[i].evidence.contains(where: { $0.chat == chat }) {
+            let whole = notes[i].evidence
+            notes[i].evidence.removeAll { $0.chat == chat }
+            if notes[i].evidence.isEmpty, !notes[i].reviewed {
+                tombstones.append(MemoryTombstone(subject: notes[i].subject, quoteHashes: whole.map { MemoryTombstone.hash($0.quote) },
+                                                  vector: nil, date: now))
+                removed.append(notes[i].id)
+            }
+            changed = true
+        }
+        if !removed.isEmpty {
+            notes.removeAll { removed.contains($0.id) }
+            tombstones = Array(tombstones.suffix(MemoryTombstone.maxKept))
+        }
+        // Evidence gone is not a claim changed: a chat's block keeps a
+        // note that stays (its `changed` is untouched); a removed one goes.
+        guard changed else { return }
         _ = bump()
     }
 
@@ -356,6 +492,80 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// A note's standing apart from any chat: weight × recency.
     public static func strength(_ note: MemoryNote, now: Date, settings: MemorySettings) -> Double {
         note.confidence.weight * recency(note, now: now, settings: settings)
+    }
+}
+
+/// A user message waiting to be learned from: what the user typed, and
+/// the start of the answer before it (context only, never evidence).
+public struct MemoryBatchMessage: Codable, Equatable, Sendable {
+    public var seq: Int
+    public var date: Date
+    public var text: String
+    public var before: String?
+
+    /// At most this much of the answer before a message is kept.
+    public static let maxBefore = 300
+
+    public init(seq: Int, date: Date, text: String, before: String?) {
+        self.seq = seq
+        self.date = date
+        self.text = text
+        self.before = before
+    }
+
+    /// Within a batch: the answer before cut to its start, a very long
+    /// message (a paste) to the batch size.
+    var clipped: MemoryBatchMessage {
+        var m = self
+        m.before = before.map { String($0.prefix(Self.maxBefore)) }.flatMap { $0.isEmpty ? nil : $0 }
+        if m.text.utf8.count > MemoryBatch.maxBytes {
+            m.text = String(decoding: m.text.utf8.prefix(MemoryBatch.maxBytes), as: UTF8.self)
+        }
+        return m
+    }
+}
+
+/// User messages of one chat, read together by the reflection pass.
+public struct MemoryBatch: Codable, Equatable, Identifiable, Sendable {
+    public var id: Int
+    public var chat: UUID
+    public var project: UUID?
+    public var created: Date
+    public var messages: [MemoryBatchMessage]
+    /// Tries that ended without a result (the model busy, cut off).
+    public var attempts = 0
+
+    /// About 3k tokens of Russian: a short prompt, so a foreground request
+    /// never waits long behind one (adr/0021, BackgroundRequest).
+    public static let maxBytes = 9_000
+
+    public init(id: Int, chat: UUID, project: UUID?, created: Date, messages: [MemoryBatchMessage]) {
+        self.id = id
+        self.chat = chat
+        self.project = project
+        self.created = created
+        self.messages = messages
+    }
+}
+
+/// What's left of a forgotten note: enough to recognise it, never its text.
+public struct MemoryTombstone: Codable, Equatable, Sendable {
+    public var subject: MemorySubject
+    /// SHA-256 of each source quote, normalized (MemoryText.normalizedQuote).
+    public var quoteHashes: [String]
+    /// The text's embedding, when known; dropped when the embedder changes.
+    public var vector: [Float]?
+    public var date: Date
+
+    public static let maxKept = 500
+
+    public static func hash(_ quote: String) -> String {
+        SHA256.hash(data: Data(MemoryText.normalizedQuote(quote).utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// Whether `quote` is one a forgotten note was learned from.
+    public func blocks(quote: String) -> Bool {
+        quoteHashes.contains(Self.hash(quote))
     }
 }
 

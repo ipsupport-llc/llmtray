@@ -49,11 +49,13 @@ struct PersistedMessage: Codable {
     var documents: [DocumentRef]?
     // See ChatMessage.projectFilesAdded; nil, and not written, when none.
     var projectFilesAdded: [String]?
+    // See ChatMessage.seq; nil, and not written, when none.
+    var seq: Int?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats, documents, projectFilesAdded
+        case answerStats, documents, projectFilesAdded, seq
     }
 
     init(
@@ -93,6 +95,7 @@ struct PersistedMessage: Codable {
         answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
         documents = try c.decodeIfPresent([DocumentRef].self, forKey: .documents)
         projectFilesAdded = try c.decodeIfPresent([String].self, forKey: .projectFilesAdded)
+        seq = try c.decodeIfPresent(Int.self, forKey: .seq)
     }
 }
 
@@ -135,6 +138,9 @@ struct ChatSessionFile: Codable, Identifiable {
     /// The memory block the chat got (adr/0024). Nil, and not written,
     /// when none.
     var memorySnapshot: MemorySnapshot? = nil
+    /// The last seq a user message got (ChatMessage.seq): numbers aren't
+    /// reused after compaction drops messages. Nil in chats from before.
+    var lastSeq: Int? = nil
 }
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --

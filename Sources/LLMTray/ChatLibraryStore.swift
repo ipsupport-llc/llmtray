@@ -216,6 +216,10 @@ final class ChatLibraryStore: ObservableObject {
             tabs.intoDefaultProject(chat)
         }
         ChatSessionStore.delete(id: id)
+        // What memory learned only from it goes too, unless the user keeps
+        // it (Settings); its queue and watermark go either way (adr/0024).
+        let keepNotes = !UserDefaults.standard[Pref.memoryForgetDeletedChats]
+        MemoryManager.shared.change { $0.forgetLearned(fromChat: id, keepState: false, keepNotes: keepNotes) }
     }
 
     // MARK: - library.json

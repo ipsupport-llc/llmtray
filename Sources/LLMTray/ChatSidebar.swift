@@ -10,6 +10,7 @@ struct ChatSidebar: View {
     @ObservedObject private var store = ChatLibraryStore.shared
     @ObservedObject private var tabs = ChatTabs.shared
     @ObservedObject private var indexer = ProjectIndexer.shared
+    @ObservedObject private var memory = MemoryManager.shared
     /// Hides the sidebar (the popover's overlay closes; the window's
     /// collapses).
     let close: () -> Void
@@ -29,6 +30,8 @@ struct ChatSidebar: View {
     @State private var chatDraft = ""
     @State private var projectDraft = ""
     @State private var chatToDelete: ChatSummary?
+    /// "Don't Remember This Chat…" asked about.
+    @State private var chatToOptOut: ChatSummary?
     @State private var projectToDelete: ChatLibrary.Project?
     @State private var collapsedProjects: Set<UUID> = []
     /// Where a dragged chat would land: a project's id, "pinned" or
@@ -92,6 +95,20 @@ struct ChatSidebar: View {
             Button("Delete", role: .destructive) { store.delete(summary.id) }
         } message: { summary in
             Text(summary.title)
+        }
+        .confirmationDialog(
+            Text("Don't remember this chat?"), isPresented: Binding(get: { chatToOptOut != nil }, set: { if !$0 { chatToOptOut = nil } }),
+            presenting: chatToOptOut
+        ) { summary in
+            Button("Also Forget What It Taught", role: .destructive) {
+                memory.change {
+                    $0.setOptedOut(summary.id, true)
+                    $0.forgetLearned(fromChat: summary.id, keepState: true)
+                }
+            }
+            Button("Keep What It Taught") { memory.change { $0.setOptedOut(summary.id, true) } }
+        } message: { _ in
+            Text("Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.")
         }
         .confirmationDialog(
             Text("Delete this project?"), isPresented: Binding(get: { projectToDelete != nil }, set: { if !$0 { projectToDelete = nil } }),
@@ -359,6 +376,13 @@ struct ChatSidebar: View {
             }
             if store.library.projectOfChat[summary.id] != nil {
                 Button("Remove from Project") { store.move(summary.id, to: nil) }
+            }
+        }
+        if memory.isEnabled {
+            if memory.file.optedOut.contains(summary.id) {
+                Button("Remember This Chat") { memory.change { $0.setOptedOut(summary.id, false) } }
+            } else {
+                Button("Don't Remember This Chat…") { chatToOptOut = summary }
             }
         }
         Divider()

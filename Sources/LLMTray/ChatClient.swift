@@ -172,6 +172,10 @@ final class ChatClient: ObservableObject {
     /// The memory block this chat got (adr/0024), kept with it so its
     /// system prompt stays the same while the notes in it don't change.
     @Published private(set) var memorySnapshot: MemorySnapshot?
+    /// The last seq a user message of this chat got (ChatMessage.seq).
+    private var lastSeq = 0
+    /// Queues the chat for memory once it's been quiet a while.
+    private var memoryIdleWork: DispatchWorkItem?
     /// A request's shape for the estimate: its size, how many messages of
     /// the history it sent, and the rest serialized -- the system prompt
     /// and parameters, and each tool declaration by name; and its model
@@ -290,6 +294,10 @@ final class ChatClient: ObservableObject {
     /// landing in the new chat (adr/0003), and cancelling the transport
     /// drops the abandoned stream's late callbacks.
     private func resetConversationState() {
+        // Left: what it said goes to memory now (adr/0024).
+        queueForMemory()
+        memoryIdleWork?.cancel()
+        memoryIdleWork = nil
         AudioPlayback.shared.stop(ifAnyOf: messages)   // this chat's song leaves the screen
         cancel()
         titleTask?.cancel()
@@ -312,6 +320,7 @@ final class ChatClient: ObservableObject {
         pendingToolGroups = []
         projectFilesSeen = nil
         memorySnapshot = nil
+        lastSeq = 0
     }
 
     /// The user loads a tool group from the + menu (adr/0020): declared
@@ -340,6 +349,7 @@ final class ChatClient: ObservableObject {
             message.citations = pm.citations ?? []
             message.answerStats = pm.answerStats
             message.projectFilesAdded = pm.projectFilesAdded ?? []
+            message.seq = pm.seq
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -356,6 +366,12 @@ final class ChatClient: ObservableObject {
         loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
         projectFilesSeen = file.projectFilesSeen
         memorySnapshot = file.memorySnapshot
+        // Numbers for user messages from before seqs, after any saved.
+        lastSeq = max(file.lastSeq ?? 0, messages.compactMap(\.seq).max() ?? 0)
+        for i in messages.indices where messages[i].role == "user" && messages[i].seq == nil {
+            lastSeq += 1
+            messages[i].seq = lastSeq
+        }
         pendingToolGroups = Set((file.pendingToolGroups ?? []).filter { ToolGroups.named($0) != nil }).subtracting(loadedToolGroups)
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
@@ -417,6 +433,7 @@ final class ChatClient: ObservableObject {
     /// no image (an image-only tool-call-carrier message is real content
     /// now that images are persisted, not plumbing to discard).
     private func persistCurrentSession() {
+        scheduleMemoryIdle()
         guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
@@ -459,6 +476,7 @@ final class ChatClient: ObservableObject {
             persisted.answerStats = msg.answerStats
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
+            persisted.seq = msg.seq
             for document in msg.documents {
                 documentFiles.insert(document.filename)
                 if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
@@ -498,7 +516,8 @@ final class ChatClient: ObservableObject {
             loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
             pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted(),
             projectFilesSeen: projectFilesSeen,
-            memorySnapshot: memorySnapshot
+            memorySnapshot: memorySnapshot,
+            lastSeq: lastSeq > 0 ? lastSeq : nil
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -586,6 +605,9 @@ final class ChatClient: ObservableObject {
             // it into the new one would inject (and persist) the old
             // conversation's summary there.
             guard epoch == conversationEpoch, !Task.isCancelled, middleRange.upperBound <= messages.count else { return }
+            // What memory hasn't read of it goes to the queue first: the
+            // summary is never evidence.
+            queueForMemory()
             messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
             // Chosen again for what the chat is now (adr/0024).
             memorySnapshot = nil
@@ -617,6 +639,14 @@ final class ChatClient: ObservableObject {
         message.audios = audios
         message.audioPrompts = audios.map { _ in NSLocalizedString("Recording", comment: "a spoken message's caption") }
         message.projectFilesAdded = projectFilesSinceLastMessage()
+        // Memory meets the chat (from its start when new, from now when
+        // opened again) and numbers the message (adr/0024).
+        if let session = currentSessionID, MemoryManager.shared.isEnabled {
+            let from = lastSeq
+            MemoryManager.shared.change { $0.meet(session, from: from) }
+        }
+        lastSeq += 1
+        message.seq = lastSeq
         messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
@@ -672,6 +702,41 @@ final class ChatClient: ObservableObject {
             hasUnsavedChanges = true
         }
         return next.flatMap { $0.text.isEmpty ? nil : $0.text }
+    }
+
+    /// The chat's new user messages to memory's queue (adr/0024): when it
+    /// goes quiet, is left, compacted, or the app quits. Not a temporary
+    /// chat; nothing with memory off or the chat opted out (the store
+    /// decides). Each with the start of the answer before it, for context.
+    func queueForMemory() {
+        guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return }
+        var items: [MemoryBatchMessage] = []
+        var lastAnswer: String?
+        for message in messages {
+            if message.role == "assistant", !message.content.isEmpty {
+                lastAnswer = message.content
+            } else if message.role == "user", !message.isToolContext, let seq = message.seq {
+                items.append(MemoryBatchMessage(seq: seq, date: Date(), text: message.content, before: lastAnswer))
+            }
+        }
+        guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return }
+        let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
+        MemoryManager.shared.change { $0.enqueue(chat: session, project: project, messages: items, now: Date()) }
+    }
+
+    /// Quiet for the settings' minutes after its last change: queued.
+    private func scheduleMemoryIdle() {
+        memoryIdleWork?.cancel()
+        guard currentSessionID != nil, MemoryManager.shared.isEnabled else { return }
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, !self.isBusy else { return }
+                self.queueForMemory()
+            }
+        }
+        memoryIdleWork = work
+        let minutes = max(1, UserDefaults.standard[Pref.memoryIdleMinutes])
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(minutes * 60), execute: work)
     }
 
     /// Notes were forgotten: a block holding one goes now, before this

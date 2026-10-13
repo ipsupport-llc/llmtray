@@ -55,6 +55,7 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld new since you opened the list: unticked until you tick them.";
 "%lld of 5 stars" = "%lld of 5 stars";
 "%lld pages" = "%lld pages";
+"%lld parts of chats wait to be read." = "%lld parts of chats wait to be read.";
 "%lld pictures" = "%lld pictures";
 "%lld pictures added: kept for documents, not searched." = "%lld pictures added: kept for documents, not searched.";
 "%lld requests" = "%lld requests";
@@ -135,6 +136,7 @@
 "Already in the project: %@." = "Already in the project: %@.";
 "Already on this Mac" = "Already on this Mac";
 "Already open in another tab" = "Already open in another tab";
+"Also Forget What It Taught" = "Also Forget What It Taught";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
 "Always" = "Always";
@@ -316,6 +318,7 @@
 "Delete this project?" = "Delete this project?";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept.";
 "Delete…" = "Delete…";
+"Deleting a chat forgets what it taught" = "Deleting a chat forgets what it taught";
 "Deny" = "Deny";
 "Describe a picture, drawn on this Mac" = "Describe a picture, drawn on this Mac";
 "Diagnostics" = "Diagnostics";
@@ -333,6 +336,8 @@
 "Doesn't open at login" = "Doesn't open at login";
 "Don't Add" = "Don't Add";
 "Don't Ask Again" = "Don't Ask Again";
+"Don't Remember This Chat…" = "Don't Remember This Chat…";
+"Don't remember this chat?" = "Don't remember this chat?";
 "Don't show again" = "Don't show again";
 "Done" = "Done";
 "Done talking: the model answers" = "Done talking: the model answers";
@@ -556,6 +561,7 @@
 "KV group size" = "KV group size";
 "Keep" = "Keep";
 "Keep %@ loaded" = "Keep %@ loaded";
+"Keep What It Taught" = "Keep What It Taught";
 "Keep at most %lld notes" = "Keep at most %lld notes";
 "Keep current" = "Keep current";
 "Keep first messages: %lld" = "Keep first messages: %lld";
@@ -579,6 +585,7 @@
 "Later" = "Later";
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
+"Learning" = "Learning";
 "Leave a Review" = "Leave a Review";
 "Length" = "Length";
 "Let chats make documents" = "Let chats make documents";
@@ -621,6 +628,7 @@
 "Memory" = "Memory";
 "Memory Settings…" = "Memory Settings…";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
+"Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
 "Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
 "Microphone level" = "Microphone level";
@@ -720,6 +728,7 @@
 "Notes about a project go to that project's chats." = "Notes about a project go to that project's chats.";
 "Notes can't hold file paths." = "Notes can't hold file paths.";
 "Notes can't hold links." = "Notes can't hold links.";
+"Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
@@ -842,6 +851,7 @@
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
+"Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading what's installed…" = "Reading what's installed…";
 "Ready." = "Ready.";
@@ -860,6 +870,7 @@
 "Release to cancel" = "Release to cancel";
 "Release to send" = "Release to send";
 "Release to send · move away to cancel" = "Release to send · move away to cancel";
+"Remember This Chat" = "Remember This Chat";
 "Remember things between chats" = "Remember things between chats";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
@@ -1296,6 +1307,7 @@
 "What you corrected before, so it isn't repeated." = "What you corrected before, so it isn't repeated.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "What you did, kept apart from what it may mean. Sent as a guess.";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
+"What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.";
 "What's New" = "What's New";
 "What's New in LLMTray %@" = "What's New in LLMTray %@";
 "What's New…" = "What's New…";

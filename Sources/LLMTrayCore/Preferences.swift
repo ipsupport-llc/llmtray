@@ -148,6 +148,10 @@ public enum Pref {
     public static let memoryHalfLifeObservation = PrefKey("llmtray.memory.halfLife.observation", default: 30)
     public static let memoryDeleteExpiredAfterDays = PrefKey("llmtray.memory.deleteExpiredAfterDays", default: 30)
     public static let memoryProjects = PrefKey("llmtray.memory.projects", default: true)
+    /// A chat is read for memory after this many quiet minutes.
+    public static let memoryIdleMinutes = PrefKey("llmtray.memory.idleMinutes", default: 10)
+    /// Deleting a chat forgets notes learned only from it.
+    public static let memoryForgetDeletedChats = PrefKey("llmtray.memory.forgetDeletedChats", default: true)
 
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)

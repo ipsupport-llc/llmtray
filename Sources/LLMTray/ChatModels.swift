@@ -136,6 +136,9 @@ struct ChatMessage: Identifiable, Equatable {
     // How an LLM text answer was made (its info popover): the turn's
     // requests, set when the turn ends. Saved with the session.
     var answerStats: AnswerStats?
+    // A user message's number in its chat, assigned once and saved: what
+    // memory's watermark and evidence point at (adr/0024). nil for others.
+    var seq: Int?
 }
 
 extension ChatMessage {

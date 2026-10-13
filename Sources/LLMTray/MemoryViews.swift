@@ -11,6 +11,8 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryMaxActive.name) private var maxActive = Pref.memoryMaxActive.defaultValue
     @AppStorage(Pref.memoryDeleteExpiredAfterDays.name) private var deleteAfter = Pref.memoryDeleteExpiredAfterDays.defaultValue
     @AppStorage(Pref.memoryProjects.name) private var projects = Pref.memoryProjects.defaultValue
+    @AppStorage(Pref.memoryIdleMinutes.name) private var idleMinutes = Pref.memoryIdleMinutes.defaultValue
+    @AppStorage(Pref.memoryForgetDeletedChats.name) private var forgetDeletedChats = Pref.memoryForgetDeletedChats.defaultValue
     @AppStorage(Pref.memoryHalfLifeFact.name) private var halfLifeFact = Pref.memoryHalfLifeFact.defaultValue
     @AppStorage(Pref.memoryHalfLifePreference.name) private var halfLifePreference = Pref.memoryHalfLifePreference.defaultValue
     @AppStorage(Pref.memoryHalfLifeCorrection.name) private var halfLifeCorrection = Pref.memoryHalfLifeCorrection.defaultValue
@@ -70,6 +72,18 @@ struct MemoryPane: View {
                     }
                     Stepper(value: $budget, in: 50...4000, step: 50) {
                         SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")
+                    }
+                }
+                Section("Learning") {
+                    Stepper(value: $idleMinutes, in: 1...240) {
+                        SettingLabel(title: "Read a chat after \(idleMinutes) quiet minutes", help: "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
+                    }
+                    Toggle(isOn: $forgetDeletedChats) {
+                        SettingLabel(title: "Deleting a chat forgets what it taught", help: "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.")
+                    }
+                    if !memory.file.queue.isEmpty {
+                        Text("\(memory.file.queue.count) parts of chats wait to be read.")
+                            .font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 Section("How long notes last") {
