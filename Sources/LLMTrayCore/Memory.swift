@@ -257,6 +257,8 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         queue = try c.decodeIfPresent([MemoryBatch].self, forKey: .queue) ?? []
         watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
         metFrom = try c.decodeIfPresent([String: Int].self, forKey: .metFrom) ?? [:]
+        // A watermark from before metFrom: met there, as far as is known.
+        for (chat, mark) in watermarks where metFrom[chat] == nil { metFrom[chat] = mark }
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
         tombstones = try c.decodeIfPresent([MemoryTombstone].self, forKey: .tombstones) ?? []
         nextBatchID = try c.decodeIfPresent(Int.self, forKey: .nextBatchID) ?? 1

@@ -171,3 +171,12 @@ extension MemoryQueueTests {
         XCTAssertNil(file.met(chat))
     }
 }
+
+extension MemoryQueueTests {
+    func testAFileWithWatermarksButNoMeetingPointsMeetsAtTheWatermark() throws {
+        let id = UUID()
+        let json = #"{"version":1,"generation":1,"nextID":1,"notes":[],"watermarks":{"\#(id.uuidString)":7}}"#
+        let file = try JSONDecoder().decode(MemoryFile.self, from: Data(json.utf8))
+        XCTAssertEqual(file.met(id), 7)
+    }
+}
