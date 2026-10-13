@@ -32,6 +32,8 @@ struct ChatSidebar: View {
     @State private var chatToDelete: ChatSummary?
     /// "Don't Remember This Chat…" asked about.
     @State private var chatToOptOut: ChatSummary?
+    /// "Remember This Chat" with what was said meanwhile put aside: read it?
+    @State private var chatToResume: ChatSummary?
     @State private var projectToDelete: ChatLibrary.Project?
     @State private var collapsedProjects: Set<UUID> = []
     /// Where a dragged chat would land: a project's id, "pinned" or
@@ -109,6 +111,15 @@ struct ChatSidebar: View {
             Button("Keep What It Taught") { memory.change { $0.setOptedOut(summary.id, true) } }
         } message: { _ in
             Text("Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.")
+        }
+        .confirmationDialog(
+            Text("Remember this chat again?"), isPresented: Binding(get: { chatToResume != nil }, set: { if !$0 { chatToResume = nil } }),
+            presenting: chatToResume
+        ) { summary in
+            Button("Also Read What Was Said Meanwhile") { memory.change { $0.setOptedOut(summary.id, false, readMeanwhile: true) } }
+            Button("Only From Now On") { memory.change { $0.setOptedOut(summary.id, false, readMeanwhile: false) } }
+        } message: { _ in
+            Text("Memory can learn from what was written in it while it wasn't remembered, or only from what comes next.")
         }
         .confirmationDialog(
             Text("Delete this project?"), isPresented: Binding(get: { projectToDelete != nil }, set: { if !$0 { projectToDelete = nil } }),
@@ -380,7 +391,13 @@ struct ChatSidebar: View {
         }
         if memory.isEnabled {
             if memory.file.optedOut.contains(summary.id) {
-                Button("Remember This Chat") { memory.change { $0.setOptedOut(summary.id, false) } }
+                Button(memory.file.isPaused(summary.id) ? "Remember This Chat…" : "Remember This Chat") {
+                    if memory.file.isPaused(summary.id) {
+                        chatToResume = summary
+                    } else {
+                        memory.change { $0.setOptedOut(summary.id, false) }
+                    }
+                }
             } else {
                 Button("Don't Remember This Chat…") { chatToOptOut = summary }
             }

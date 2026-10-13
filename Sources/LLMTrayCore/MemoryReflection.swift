@@ -78,7 +78,11 @@ public enum MemoryReflection {
 
     /// One note as the model sees it among the candidates.
     static func candidateLine(_ note: MemoryNote) -> String {
-        let scope = note.subject == .user ? "user" : "project"
+        let scope: String
+        switch note.subject {
+        case .user, .general: scope = "user"
+        case .project: scope = "project"
+        }
         let observed = note.observed.map { " (observed: \($0))" } ?? ""
         return "\(note.id) [\(note.kind.rawValue), \(note.topic), \(scope)] \(note.text)\(observed)"
     }

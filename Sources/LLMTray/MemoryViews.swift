@@ -15,6 +15,7 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryMaxActive.name) private var maxActive = Pref.memoryMaxActive.defaultValue
     @AppStorage(Pref.memoryDeleteExpiredAfterDays.name) private var deleteAfter = Pref.memoryDeleteExpiredAfterDays.defaultValue
     @AppStorage(Pref.memoryProjects.name) private var projects = Pref.memoryProjects.defaultValue
+    @AppStorage(Pref.memoryShareLearned.name) private var shareLearned = Pref.memoryShareLearned.defaultValue
     @AppStorage(Pref.memoryIdleMinutes.name) private var idleMinutes = Pref.memoryIdleMinutes.defaultValue
     @AppStorage(Pref.memoryForgetDeletedChats.name) private var forgetDeletedChats = Pref.memoryForgetDeletedChats.defaultValue
     @AppStorage(Pref.memoryHalfLifeFact.name) private var halfLifeFact = Pref.memoryHalfLifeFact.defaultValue
@@ -23,6 +24,10 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryHalfLifeObservation.name) private var halfLifeObservation = Pref.memoryHalfLifeObservation.defaultValue
     @State private var draft: MemoryNoteDraft?
     @State private var confirmForgetAll = false
+    /// Memory on again with something put aside: read what was said meanwhile?
+    @State private var askResume = false
+    @State private var about: [MemoryAboutField: String] = [:]
+    @State private var aboutError: String?
 
     private var kinds: Set<MemoryKind> {
         Set(kindsRaw.split(separator: ",").compactMap { MemoryKind(rawValue: String($0)) })
@@ -52,6 +57,7 @@ struct MemoryPane: View {
                 }
             }
             if enabled {
+                aboutSection
                 notesSection
                 if !expiredNotes.isEmpty { expiredSection }
                 Section("What chats get") {
@@ -69,6 +75,9 @@ struct MemoryPane: View {
                     }
                     Toggle(isOn: $projects) {
                         SettingLabel(title: "Project notes", help: "Notes about a project go to that project's chats.")
+                    }
+                    Toggle(isOn: $shareLearned) {
+                        SettingLabel(title: "Share what's learned everywhere", help: "Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project.")
                     }
                     Stepper(value: $budget, in: 50...4000, step: 50) {
                         SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")
@@ -119,11 +128,26 @@ struct MemoryPane: View {
         .formStyle(.grouped)
         // Off: chats are met anew when it's on again, so nothing said
         // meanwhile is read.
-        // On again, the same (should turning it off not have been saved):
-        // without that, it stays off.
+        // Off: watermarks put aside. On again: the user picks whether what
+        // was said meanwhile is read.
         .onChange(of: enabled) { _, on in
-            if !memory.change({ $0.forgetWatermarks() }), on { enabled = false }
+            if on {
+                if memory.file.hasPaused { askResume = true }
+            } else {
+                memory.change { $0.pauseAll() }
+            }
         }
+        .confirmationDialog("Read what was said while memory was off?", isPresented: $askResume) {
+            Button("Read It Too") { memory.change { $0.resumeAll(readMeanwhile: true) } }
+            Button("Only From Now On") { memory.change { $0.resumeAll(readMeanwhile: false) } }
+        } message: {
+            Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
+        }
+        .onChange(of: askResume) { _, shown in
+            // Closed without a choice: only from now on.
+            if !shown, memory.file.hasPaused { memory.change { $0.resumeAll(readMeanwhile: false) } }
+        }
+        .onAppear(perform: loadAbout)
         // Expiry follows its settings at once, not at the next chat.
         .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in
             memory.sweep()
@@ -194,19 +218,66 @@ struct MemoryPane: View {
         }
     }
 
-    private var activeNotes: [MemoryNote] { memory.file.notes.filter(\.isActive) }
+    private func loadAbout() {
+        about = Dictionary(uniqueKeysWithValues: MemoryAboutField.allCases.map { ($0, memory.file.about($0).map($0.value(of:)) ?? "") })
+    }
+
+    private func aboutBinding(_ field: MemoryAboutField) -> Binding<String> {
+        Binding(get: { about[field] ?? "" }, set: { about[field] = $0 })
+    }
+
+    private func saveAbout() {
+        aboutError = nil
+        let now = Date()
+        var refused: [MemoryAboutField] = []
+        memory.change { file in
+            for field in MemoryAboutField.allCases where !file.setAbout(field, about[field] ?? "", now: now) { refused.append(field) }
+        }
+        if !refused.isEmpty {
+            aboutError = NSLocalizedString("Some of it can't be kept: at most 160 characters each, no links, file paths or keys.", comment: "")
+        }
+        loadAbout()
+    }
+
+    /// Fields the user fills in if they want: pinned notes, sent first.
+    private var aboutSection: some View {
+        Section("About you") {
+            Text("Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.")
+                .font(.caption).foregroundStyle(.secondary)
+            TextField("Name or how to call you", text: aboutBinding(.name)).onSubmit(saveAbout)
+            TextField("Where you are: a city, or an address", text: aboutBinding(.location)).onSubmit(saveAbout)
+            TextField("What you do", text: aboutBinding(.work)).onSubmit(saveAbout)
+            TextField("Anything else chats should know", text: aboutBinding(.other), axis: .vertical)
+                .lineLimit(1...3).onSubmit(saveAbout)
+            HStack {
+                if let aboutError { Text(aboutError).font(.caption).foregroundStyle(.red) }
+                Spacer()
+                Button("Save", action: saveAbout)
+                    .disabled(MemoryAboutField.allCases.allSatisfy { (about[$0] ?? "") == (memory.file.about($0).map($0.value(of:)) ?? "") })
+            }
+        }
+    }
+
+    /// The notes listed: About you's are edited in their own section.
+    private var activeNotes: [MemoryNote] {
+        memory.file.notes.filter { $0.isActive && !$0.topic.hasPrefix("about-") }
+    }
     private var expiredNotes: [MemoryNote] { memory.file.notes.filter { !$0.isActive } }
 
-    /// The user's notes first, then each project's.
+    /// Where they're seen: every chat, chats outside projects, each project's.
     private var groups: [(subject: MemorySubject, title: String, notes: [MemoryNote])] {
         let user = activeNotes.filter { $0.subject == .user }
-        var result: [(MemorySubject, String, [MemoryNote])] = user.isEmpty ? [] : [(.user, NSLocalizedString("About you", comment: "memory notes group"), user)]
+        let general = activeNotes.filter { $0.subject == .general }
+        var result: [(MemorySubject, String, [MemoryNote])] = user.isEmpty ? [] : [(.user, NSLocalizedString("All chats", comment: "memory notes group"), user)]
+        if !general.isEmpty {
+            result.append((.general, NSLocalizedString("Chats outside projects", comment: "memory notes group"), general))
+        }
         var byProject: [UUID: [MemoryNote]] = [:]
         for note in activeNotes {
             if case .project(let id) = note.subject { byProject[id, default: []].append(note) }
         }
         for (id, notes) in byProject.sorted(by: { projectName($0.key) < projectName($1.key) }) {
-            result.append((.project(id), String(format: NSLocalizedString("Project %@", comment: "memory notes group"), projectName(id)), notes))
+            result.append((.project(id), String(format: NSLocalizedString("Chats of project %@", comment: "a memory note's visibility"), projectName(id)), notes))
         }
         return result
     }
@@ -289,7 +360,7 @@ struct MemoryPane: View {
         let now = Date()
         memory.change { file in
             if let id = d.id {
-                file.edit(id, text: d.text, topic: d.topic, kind: d.kind, now: now)
+                file.edit(id, text: d.text, topic: d.topic, kind: d.kind, subject: d.subject, now: now)
             } else {
                 file.add(subject: d.subject, topic: d.topic, kind: d.kind, text: d.text, now: now)
             }
@@ -371,13 +442,12 @@ struct MemoryNoteEditor: View {
             Picker("Topic", selection: $draft.topic) {
                 ForEach(topics, id: \.self) { Text($0).tag($0) }
             }
-            if draft.id == nil {
-                Picker("About", selection: $draft.subject) {
-                    Text("You").tag(MemorySubject.user)
-                    ForEach(projects) { project in
-                        Text(String(format: NSLocalizedString("Project %@", comment: "memory notes group"), project.name))
-                            .tag(MemorySubject.project(project.id))
-                    }
+            Picker("Seen in", selection: $draft.subject) {
+                Text("All chats").tag(MemorySubject.user)
+                Text("Chats outside projects").tag(MemorySubject.general)
+                ForEach(projects) { project in
+                    Text(String(format: NSLocalizedString("Chats of project %@", comment: "a memory note's visibility"), project.name))
+                        .tag(MemorySubject.project(project.id))
                 }
             }
             HStack {

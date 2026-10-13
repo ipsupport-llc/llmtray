@@ -242,10 +242,16 @@ final class MemoryReflector: ObservableObject {
 
         // The notes this batch may touch: by meaning, then their topics.
         let project = settings.projectMemory ? batch.project : nil
-        // Pinned notes are the user's alone: never shown to be changed.
+        // Where what this chat teaches goes: the model's choice when
+        // learning is shared, else this chat's own place (nil: project
+        // notes off, nothing learned in a project's chats).
+        let fixedSubject = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
+        guard settings.shareLearned || fixedSubject != nil else {
+            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
+        }
+        // The notes this chat sees, not pinned ones (the user's alone).
         let touchable = memory.file.notes.filter { note in
-            note.isActive && !note.pinned && settings.kinds.contains(note.kind)
-                && (note.subject == .user || project.map { note.subject == .project($0) } == true)
+            !note.pinned && settings.allows(note, project: batch.project)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -265,7 +271,7 @@ final class MemoryReflector: ObservableObject {
         let reflectReply: String
         switch await ask(MemoryReflection.reflectMessages(batch: batch, candidates: candidates, topics: topicList,
                                                           language: Self.languageName(), kinds: settings.kinds,
-                                                          inProject: project != nil),
+                                                          inProject: settings.shareLearned && project != nil),
                          maxTokens: 1500, modelPath: modelPath) {
         case .success(let reply): reflectReply = reply
         case .failure(let error): return error.outcome
@@ -289,7 +295,7 @@ final class MemoryReflector: ObservableObject {
             switch op.action {
             case .add:
                 guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryText.problem(text) == nil else { continue }
-                subject = op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user
+                subject = fixedSubject ?? (op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user)
                 statement = kind == .observation ? (op.observed ?? text) : text
             case .confirm:
                 guard let note else { continue }
@@ -305,7 +311,7 @@ final class MemoryReflector: ObservableObject {
                 statement = "The user asks to forget this, or says it is no longer true: \(note.text)"
             }
             pending.append(Pending(op: op, message: message, subject: subject,
-                                   claim: MemoryReflection.Claim(statement: statement, aboutProject: subject != .user,
+                                   claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                                  message: message.text, quote: op.quote, before: message.before)))
         }
         guard !pending.isEmpty else {
@@ -338,10 +344,14 @@ final class MemoryReflector: ObservableObject {
         var owners: [(item: Int, target: Target)] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
-            // Only notes the batch may change: a pinned one or a kind that's
-            // off would turn a good update into a merge that can't be made.
+            // An update: only notes the batch may change (a pinned one, or a
+            // kind that's off, would turn it into a merge that can't be
+            // made). An add: pinned ones too -- "My name is …" next to About
+            // you's Name is the same, and confirming a pinned note writes
+            // nothing.
             let close = memory.file.notes
-                .filter { $0.subject == p.subject && $0.id != p.op.id && !$0.pinned && settings.kinds.contains($0.kind) }
+                .filter { $0.subject == p.subject && $0.id != p.op.id && settings.kinds.contains($0.kind)
+                    && (p.op.action == .add || !$0.pinned) }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }

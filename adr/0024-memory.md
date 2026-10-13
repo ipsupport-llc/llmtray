@@ -138,13 +138,27 @@ same: "prefers long answers" and "prefers short answers" can be close.
    merged or rewritten. A likely duplicate of a pinned note is shown in Settings
    as a suggestion.
 
-### Scope
+### Scope: where a note is seen
 
-- A chat outside a project may write `user` notes only.
-- A chat in project P may write `user` and `project:P` notes. The model gives
-  `scope: user | project`, the code maps `project` to P. Facts about the work go
-  to the project by default; `user` needs the claim to be about the person
-  (tone, language, hardware, habits).
+(Revised 2026-10-13 with the user: "project X remembers facts inside project
+X, project Z sees only what the user set about themselves -- or a switch to
+see everything everywhere".)
+
+A note is seen in every chat (`user`), in chats outside projects (`general`),
+or in one project's chats (`project:P`).
+
+- **By default learning is kept apart.** What a project's chats teach is
+  `project:P` and seen only there; what chats outside projects teach is
+  `general` and seen only there. The code assigns it; the model doesn't choose.
+  What the user writes (About you, notes for all chats) is `user`, seen
+  everywhere.
+- **"Share what's learned everywhere"** (Settings, off by default): every chat
+  sees every note, and the model gives `scope: user | project` in a project's
+  chats, so facts about the person stay apart from the work's.
+- Project notes off: nothing is learned in a project's chats (learning kept
+  apart), and no project note is sent.
+- A note's visibility can be changed in Settings (All chats / Chats outside
+  projects / a project's chats).
 - Moving a chat to another project: its snapshot is rebuilt (below).
 - Deleting a project deletes its `project:` notes, drops queued batches for it,
   and rejects any in-flight write to its id at commit. Its chats (which project
@@ -243,6 +257,11 @@ changes in nearly every chat with memory on.
 - **Deleting a chat** removes its evidence entries and queue items. A note left
   with no evidence from any other chat is deleted too, unless it's `reviewed`
   (setting: "Forget what was learned only from a deleted chat", default on).
+- **Back on, the user chooses.** Turning memory off, or "Don't remember this
+  chat", puts the watermarks aside (and, for the chat, what was queued from
+  it goes). Turning it on again, or "Remember this chat", asks: read what was
+  said meanwhile too, or only from now on (closing the question without an
+  answer is "only from now on").
 - "Don't remember this chat" stops reflection for it and asks whether to forget
   what was already learned from it.
 - Storage is plaintext in `~/Library/Application Support/LLMTray/memory/`
@@ -285,6 +304,14 @@ changes in nearly every chat with memory on.
   - tidy-up suggestions;
   - "Forget everything".
 - **Per chat**, in its menu: "Don't remember this chat".
+
+### About you
+
+Settings › Memory › About you: name, where the user is (a city, or an exact
+address, as they like), what they do, anything else. Optional; each field is a
+pinned `user` note ("Name: …"), so it's sent first, never expires, and
+reflection never changes it (a learned "my name is …" reconciles with it and
+writes nothing).
 
 ### Later (todo)
 

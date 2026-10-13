@@ -64,15 +64,39 @@ final class MemoryQueueTests: XCTestCase {
         XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [3])
     }
 
-    func testMemoryOffForgetsWatermarksSoNothingSaidMeanwhileIsRead() {
+    func testMemoryOffPutsWatermarksAsideUntilTheUserChooses() {
         var file = MemoryFile()
         file.meet(chat, from: 0)
         file.enqueue(chat: chat, project: nil, messages: [message(1, "a")], now: t0)
-        file.forgetWatermarks()
+        file.pauseAll()
         XCTAssertEqual(file.queue.count, 1, "what's queued stays")
+        XCTAssertTrue(file.isPaused(chat))
         XCTAssertFalse(file.enqueue(chat: chat, project: nil, messages: [message(2, "said while off")], now: t0))
         file.meet(chat, from: 2)
-        XCTAssertEqual(file.watermark(chat), 2)
+        XCTAssertNil(file.watermark(chat), "not met while put aside")
+
+        var only = file
+        only.resumeAll(readMeanwhile: false)
+        XCTAssertFalse(only.hasPaused)
+        only.meet(chat, from: 2)
+        only.enqueue(chat: chat, project: nil, messages: [message(2, "said while off"), message(3, "after")], now: t0)
+        XCTAssertEqual(only.queue.last?.messages.map(\.seq), [3])
+
+        var read = file
+        read.resumeAll(readMeanwhile: true)
+        read.enqueue(chat: chat, project: nil, messages: [message(2, "said while off"), message(3, "after")], now: t0)
+        XCTAssertEqual(read.queue.last?.messages.map(\.seq), [2, 3])
+    }
+
+    func testRememberingAChatAgainCanReadWhatWasSaidMeanwhile() {
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        file.enqueue(chat: chat, project: nil, messages: [message(1, "queued before opting out")], now: t0)
+        file.setOptedOut(chat, true)
+        XCTAssertTrue(file.queue.isEmpty)
+        file.setOptedOut(chat, false, readMeanwhile: true)
+        file.enqueue(chat: chat, project: nil, messages: [message(1, "queued before opting out"), message(2, "meanwhile")], now: t0)
+        XCTAssertEqual(file.queue.last?.messages.map(\.seq), [1, 2], "what was dropped from the queue is read again too")
     }
 
     func learned(_ file: inout MemoryFile, chats: [UUID], text: String, reviewed: Bool = false) -> String {
@@ -163,11 +187,13 @@ extension MemoryQueueTests {
         file.meet(chat, from: 4)
         XCTAssertEqual(file.met(chat), 4)
         file.setOptedOut(chat, true)
+        XCTAssertEqual(file.met(chat), 4, "kept until the user says whether to read what comes meanwhile")
+        file.setOptedOut(chat, false, readMeanwhile: false)
         XCTAssertNil(file.met(chat))
-        file.setOptedOut(chat, false)
         file.meet(chat, from: 9)
         XCTAssertEqual(file.met(chat), 9)
-        file.forgetWatermarks()
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
         XCTAssertNil(file.met(chat))
     }
 }
