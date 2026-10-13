@@ -1,9 +1,10 @@
 # 0024 — Memory: what LLMTray learns about the user between chats
 
-**Status: proposed** (2026-10-12, asked for by the user: "after each session,
+**Status: accepted** (2026-10-12, asked for by the user: "after each session,
 extract useful facts, stable user preferences, corrections and behavioral
 observations ... inject relevant information into future sessions ... expire
-old ones ... with config"). Revised after codex and muse reviews.
+old ones ... with config"; the plan approved by the user the same day after
+two codex and muse review rounds).
 
 ## Why
 
@@ -216,14 +217,11 @@ same: "prefers long answers" and "prefers short answers" can be close.
 ### Trust
 
 Notes come only from the user's own typed words, are verified, and may not
-hold URLs, paths, commands or secrets. So the proposal treats an injected
-memory block as **user-derived, not as outside text**: it does not raise the
-tool barrier (`ToolTrust`), which would switch off web search and folder
-changes in every chat with memory.
-
-**Open for the user:** whether unreviewed (learned, not `reviewed`) notes
-should raise the barrier anyway. That's safer, but turns guarded tools off
-whenever memory is on.
+hold URLs, paths, commands or secrets. So an injected memory block is
+**user-derived, not outside text**: it does not raise the tool barrier
+(`ToolTrust`). Raising it for unreviewed notes was considered and turned down
+(the user's choice, 2026-10-12): it would switch off web search and folder
+changes in nearly every chat with memory on.
 
 ### Forgetting
 
