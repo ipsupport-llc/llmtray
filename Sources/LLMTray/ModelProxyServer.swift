@@ -594,8 +594,8 @@ final class ModelProxyServer {
         var request = URLRequest(url: url)
         request.httpMethod = method
         // The app's token stays here: the model server has no use for it.
-        // (The gate itself lives in LLMTrayCore.ProxyHeaderGate, tested.)
-        for (key, value) in ProxyHeaderGate.forwardedRequestHeaders(headers) {
+        for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased()
+            && key != BackgroundRequest.header.lowercased() {
             request.setValue(value, forHTTPHeaderField: key)
         }
         if !body.isEmpty {
@@ -847,7 +847,9 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         }
         var head = "HTTP/1.1 \(http.statusCode) \(HTTPURLResponse.localizedString(forStatusCode: http.statusCode))\r\n"
         for (key, value) in http.allHeaderFields {
-            guard let keyStr = key as? String, ProxyHeaderGate.isForwardedResponseHeader(keyStr) else { continue }
+            guard let keyStr = key as? String else { continue }
+            let lower = keyStr.lowercased()
+            if lower == "connection" || lower == "transfer-encoding" || lower == "content-length" { continue }
             head += "\(keyStr): \(value)\r\n"
         }
         head += "Transfer-Encoding: chunked\r\nConnection: close\r\n\r\n"
