@@ -442,7 +442,6 @@
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
-"For now you write the notes yourself. Learning them from your chats comes in a later version." = "For now you write the notes yourself. Learning them from your chats comes in a later version.";
 "Forget" = "Forget";
 "Forget Everything" = "Forget Everything";
 "Forget Everything…" = "Forget Everything…";
@@ -587,6 +586,8 @@
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
 "Learning" = "Learning";
+"Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files.";
+"Learning needs the embedding model (Settings › Memory)." = "Learning needs the embedding model (Settings › Memory).";
 "Leave a Review" = "Leave a Review";
 "Length" = "Length";
 "Let chats make documents" = "Let chats make documents";
@@ -727,8 +728,10 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Notes";
 "Notes about a project go to that project's chats." = "Notes about a project go to that project's chats.";
+"Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.";
 "Notes can't hold file paths." = "Notes can't hold file paths.";
 "Notes can't hold links." = "Notes can't hold links.";
+"Notes in" = "Notes in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
@@ -853,6 +856,7 @@
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
 "Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
+"Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading what's installed…" = "Reading what's installed…";
 "Ready." = "Ready.";
@@ -918,6 +922,7 @@
 "Running — %@ on :%lld" = "Running — %@ on :%lld";
 "Running…" = "Running…";
 "Runtime data" = "Runtime data";
+"Same as LLMTray" = "Same as LLMTray";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64.";
 "Sampling" = "Sampling";
@@ -1092,6 +1097,7 @@
 "The embedder is being downloaded -- try again once it's done." = "The embedder is being downloaded -- try again once it's done.";
 "The embedder list is missing or invalid: %@" = "The embedder list is missing or invalid: %@";
 "The embedding model couldn't be downloaded" = "The embedding model couldn't be downloaded";
+"The embedding model failed: %@" = "The embedding model failed: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
@@ -1137,6 +1143,7 @@
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it.";
+"The notes couldn't be saved." = "The notes couldn't be saved.";
 "The notes file can't be read (damaged, or from a newer LLMTray). Nothing is sent or changed until it can." = "The notes file can't be read (damaged, or from a newer LLMTray). Nothing is sent or changed until it can.";
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
@@ -1288,6 +1295,9 @@
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";
 "Waiting to be sent: %@" = "Waiting to be sent: %@";
+"Waits for a picture or song to finish." = "Waits for a picture or song to finish.";
+"Waits for the model to be free." = "Waits for the model to be free.";
+"Waits for the model to be loaded." = "Waits for the model to be loaded.";
 "Walkie-talkie" = "Walkie-talkie";
 "Weather" = "Weather";
 "Web search" = "Web search";

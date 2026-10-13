@@ -364,6 +364,13 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         metFrom = [:]
     }
 
+    /// The embedder changed: tombstones' vectors are of the old one (their
+    /// quote hashes still hold).
+    public mutating func dropTombstoneVectors() {
+        guard tombstones.contains(where: { $0.vector != nil }) else { return }
+        for i in tombstones.indices { tombstones[i].vector = nil }
+    }
+
     /// Where memory met a chat (see `metFrom`); nil: not met.
     public func met(_ chat: UUID) -> Int? { metFrom[chat.uuidString] }
 

@@ -80,6 +80,13 @@ final class MemoryManager: ObservableObject {
         return true
     }
 
+    /// The user forgets a note: its tombstone gets the text's embedding when
+    /// memory has it, so a rewording isn't learned again either.
+    func forget(_ id: String) {
+        let vector = file.note(id).flatMap(MemoryReflector.storedVector(for:))
+        change { $0.forget(id, vector: vector) }
+    }
+
     /// Expiry: at most once an hour as chats start, and at once when the
     /// settings it depends on changed.
     private var lastSweep: (date: Date, settings: MemorySettings)?

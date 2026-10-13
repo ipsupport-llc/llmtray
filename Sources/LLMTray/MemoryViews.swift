@@ -5,6 +5,10 @@ import LLMTrayCore
 struct MemoryPane: View {
     @ObservedObject private var memory = MemoryManager.shared
     @ObservedObject private var library = ChatLibraryStore.shared
+    @ObservedObject private var reflector = MemoryReflector.shared
+    @ObservedObject private var embedders = ProjectIndexer.shared.embedders
+    @AppStorage(Pref.memoryLanguage.name) private var language = Pref.memoryLanguage.defaultValue
+    @State private var downloadError: String?
     @AppStorage(Pref.memoryEnabled.name) private var enabled = Pref.memoryEnabled.defaultValue
     @AppStorage(Pref.memoryKinds.name) private var kindsRaw = Pref.memoryKinds.defaultValue
     @AppStorage(Pref.memoryBudgetTokens.name) private var budget = Pref.memoryBudgetTokens.defaultValue
@@ -37,10 +41,6 @@ struct MemoryPane: View {
             Section("Memory") {
                 Toggle(isOn: $enabled) {
                     SettingLabel(title: "Remember things between chats", help: "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.")
-                }
-                if enabled {
-                    Text("For now you write the notes yourself. Learning them from your chats comes in a later version.")
-                        .font(.caption).foregroundStyle(.secondary)
                 }
                 if memory.unreadable {
                     Text("The notes file can't be read (damaged, or from a newer LLMTray). Nothing is sent or changed until it can.")
@@ -75,6 +75,15 @@ struct MemoryPane: View {
                     }
                 }
                 Section("Learning") {
+                    learningStatus
+                    Picker(selection: $language) {
+                        Text("Same as LLMTray").tag("auto")
+                        ForEach(Self.languages, id: \.self) { code in
+                            Text(Locale.current.localizedString(forLanguageCode: code) ?? code).tag(code)
+                        }
+                    } label: {
+                        SettingLabel(title: "Notes in", help: "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.")
+                    }
                     Stepper(value: $idleMinutes, in: 1...240) {
                         SettingLabel(title: "Read a chat after \(idleMinutes) quiet minutes", help: "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
                     }
@@ -129,6 +138,53 @@ struct MemoryPane: View {
             Button("Forget Everything", role: .destructive) { memory.change { $0.forgetAll() } }
         } message: {
             Text("Chats won't get them any more. This can't be undone.")
+        }
+    }
+
+    /// The app's languages, for the notes' language.
+    static let languages: [String] = {
+        let codes = Bundle.main.localizations.filter { $0 != "Base" }.map { String($0.prefix(2)) }
+        return Array(Set(codes.isEmpty ? ["en"] : codes)).sorted()
+    }()
+
+    /// What learning does now, and the embedding model it needs.
+    @ViewBuilder private var learningStatus: some View {
+        let ready = FeatureSetup.shared.isProjectFilesEmbedderReady
+        if !ready {
+            VStack(alignment: .leading, spacing: 6) {
+                if let entry = FeatureSetup.shared.projectFilesEmbedder {
+                    Text(String(format: NSLocalizedString("Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files.", comment: ""),
+                                entry.displayName, ModelCatalog.format(FeatureSetup.downloadBytes(entry))))
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                HStack {
+                    Spacer()
+                    Button(embedders.isBusy ? "Downloading…" : "Download") {
+                        downloadError = nil
+                        Task {
+                            if let error = await FeatureSetup.shared.downloadProjectFilesEmbedder() {
+                                downloadError = error.localizedDescription
+                            } else {
+                                await ProjectIndexer.shared.embedderChanged()
+                                reflector.poke(after: 1)
+                            }
+                        }
+                    }
+                    .disabled(embedders.isBusy)
+                }
+                if let downloadError {
+                    Text(downloadError).font(.caption).foregroundStyle(.red)
+                }
+            }
+        } else {
+            switch reflector.status {
+            case .reading:
+                Text("Reading a chat…").font(.caption).foregroundStyle(.secondary)
+            case .waiting(let reason) where !memory.file.queue.isEmpty:
+                Text(reason).font(.caption).foregroundStyle(.secondary)
+            default:
+                EmptyView()
+            }
         }
     }
 
@@ -187,7 +243,7 @@ struct MemoryPane: View {
                     Spacer()
                     Button("Restore") { memory.change { $0.restore(note.id, now: Date()) } }
                     Button {
-                        memory.change { $0.forget(note.id) }
+                        memory.forget(note.id)
                     } label: { Image(systemName: "trash") }
                         .buttonStyle(.borderless)
                         .help("Forget")
@@ -220,7 +276,7 @@ struct MemoryPane: View {
                     Button("Approve") { memory.change { $0.approve(note.id) } }
                 }
                 Divider()
-                Button("Forget", role: .destructive) { memory.change { $0.forget(note.id) } }
+                Button("Forget", role: .destructive) { memory.forget(note.id) }
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -377,7 +433,7 @@ struct ChatMemoryChip: View {
                                 }
                             }
                             Spacer()
-                            Button("Forget") { memory.change { $0.forget(note.id) } }
+                            Button("Forget") { memory.forget(note.id) }
                                 .controlSize(.small)
                         }
                     }
