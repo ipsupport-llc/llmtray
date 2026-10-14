@@ -108,11 +108,70 @@ boundaries of the AI". So:
   chats showed it (Settings, default 2), or the user approved it; reflection
   still sees it, so a second chat confirms it rather than adding it again.
   Preferences and corrections the user stated go at once.
-- **At most 2 new notes per batch,** what the user asked for first.
+- **At most 4 new notes per batch,** what the user asked for first.
 - **Starting over:** "Forget What Was Learned…" removes every learned note the
   user didn't write, edit, pin or approve (no tombstones: better rules may learn
   them again) and the queue; "and read all chats again" also forgets where each
   chat was read, then queues them all.
+
+### Targeted steps (revised 2026-10-14, the user's call: "a pointed prompt, not a general one")
+
+One general reflect prompt had to judge everything at once -- what matters,
+which kind, confirm or add, manner, what's off limits -- and every rule added
+moved the others (more caution lost the confirms; a rule about complaints folded
+"short, in Russian" into "concrete versions"). A batch is now read in narrow
+steps (`MemoryExtraction`), each with only the messages and notes it needs; the
+operations they give go through provenance, verify, reconcile and commit as
+before.
+
+1. **Triage.** One call labels each message (one line each, "2: about-me"):
+   `how-to-answer` (how they want answers, a complaint, a correction),
+   `about-me` (something lasting about them or their work), `forget`, `manner`
+   (the words show how they talk), `mood` (a strong feeling now), `none`
+   (questions, tasks, content requests, creative or test prompts, other
+   people, sensitive topics). Most batches end here.
+2. **Instructions**: the `how-to-answer` messages, with the preference and
+   correction notes. One note per wish; a complaint is a wish for the opposite;
+   an "update" of a wish becomes an add (a small model used it to fold two
+   wishes together), and reconcile confirms it if it's the same.
+3. **Facts**: the `about-me` messages, with the fact notes.
+4. **Forget**: the `forget` messages, with the candidates.
+5. **Manner**: only when two messages are labelled `manner` (one more confirms
+   a manner noted before), with every manner note; an add needs two quotes from
+   two of those messages, checked in code; the same "observed" as a note there
+   confirms it.
+6. **Mood**: below.
+
+Code holds each step to its kind and its notes' ids. A confirm whose quote
+isn't the user's words (a model copying the note into it) takes the step's one
+message as its quote; verify still judges the claim against the whole message,
+and for a confirm asks whether the message says again at least part of the note,
+in any language. Texts this close in meaning (cosine >= 0.95) are the same,
+whatever classify says. Steps see only what the user typed (no code, quotes or
+pastes). Live eval (`MemoryLiveEval`, sets 1-4): Gemma 4 26B gives the expected
+notes run after run; E4B keeps every trap out, its misses are safe (a confirm
+not made, so a note waits).
+
+### Mood (2026-10-14, the user: "mood is a short-lived metric")
+
+How the user seems right now -- angry at a failing build, tired, in a hurry --
+is not a note. Triage labels `mood` messages; a step reads the last few of them
+said within the setting's hours (default 3, 0: off) and writes what it shows and
+how to answer now ("Angry: the linker keeps failing" / "Brief, straight to the
+fix"). The newest one is kept (`MemoryFile.mood`), from the message's time;
+new chats get a line "Right now (from the user's last messages, a guess): ...",
+at most half the budget; a chat whose block holds a mood that ran out chooses
+its block again. Sensitive topics never become a mood. Reading past chats gives
+none (their hours are gone). Settings shows the mood now, with Forget; forgetting
+a chat's lessons, everything, or what was learned drops it.
+
+### Settings: privacy and the exact block
+
+Settings › Memory starts with a privacy note: memory stays on this Mac, is
+never uploaded or shared, and goes only into the prompt of LLMTray's own chats
+(not to API clients, not temporary chats). "Show What Chats Get…" shows the
+exact block a new chat gets now (outside projects, or a project's), chosen by
+the same code a chat uses, with its size.
 
 ### Same thing, one note: reconcile
 
