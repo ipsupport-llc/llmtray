@@ -77,10 +77,13 @@ struct MemoryPane: View {
                         SettingLabel(title: "Observations", help: "What you did, kept apart from what it may mean. Sent as a guess.")
                     }
                     Toggle(isOn: $projects) {
-                        SettingLabel(title: "Project notes", help: "Notes about a project go to that project's chats.")
+                        SettingLabel(title: "Remember in projects", help: "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.")
                     }
-                    Toggle(isOn: $shareLearned) {
-                        SettingLabel(title: "Share what's learned everywhere", help: "Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project.")
+                    Picker(selection: $shareLearned) {
+                        Text("Stays in its project").tag(false)
+                        Text("Shared by all chats").tag(true)
+                    } label: {
+                        SettingLabel(title: "Learned from chats", help: "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way.")
                     }
                     Stepper(value: $budget, in: 50...4000, step: 50) {
                         SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")

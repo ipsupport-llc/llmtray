@@ -81,6 +81,7 @@
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire.";
 "A package: moved as one item." = "A package: moved as one item.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers.";
+"A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent." = "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.";
@@ -590,6 +591,7 @@
 "Later" = "Later";
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
+"Learned from chats" = "Learned from chats";
 "Learning" = "Learning";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files.";
 "Learning needs the embedding model (Settings › Memory)." = "Learning needs the embedding model (Settings › Memory).";
@@ -737,7 +739,6 @@
 "Not sent any more. Bring one back, or it's deleted later." = "Not sent any more. Bring one back, or it's deleted later.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Notes";
-"Notes about a project go to that project's chats." = "Notes about a project go to that project's chats.";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.";
 "Notes can't hold file paths." = "Notes can't hold file paths.";
 "Notes can't hold links." = "Notes can't hold links.";
@@ -755,7 +756,6 @@
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.";
 "Off" = "Off";
 "Off · enable in Settings" = "Off · enable in Settings";
-"Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project." = "Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
@@ -838,7 +838,6 @@
 "Project files were turned off" = "Project files were turned off";
 "Project files will be turned on first." = "Project files will be turned on first.";
 "Project name" = "Project name";
-"Project notes" = "Project notes";
 "Projects" = "Projects";
 "Projects' files on disk" = "Projects' files on disk";
 "Prompt" = "Prompt";
@@ -891,6 +890,7 @@
 "Release to send · move away to cancel" = "Release to send · move away to cancel";
 "Remember This Chat" = "Remember This Chat";
 "Remember This Chat…" = "Remember This Chat…";
+"Remember in projects" = "Remember in projects";
 "Remember things between chats" = "Remember things between chats";
 "Remember this chat again?" = "Remember this chat again?";
 "Remove" = "Remove";
@@ -985,7 +985,7 @@
 "Setup assistant" = "Setup assistant";
 "Shape" = "Shape";
 "Share anonymous usage statistics" = "Share anonymous usage statistics";
-"Share what's learned everywhere" = "Share what's learned everywhere";
+"Shared by all chats" = "Shared by all chats";
 "Share…" = "Share…";
 "Show All Files…" = "Show All Files…";
 "Show Chat Window" = "Show Chat Window";
@@ -1036,6 +1036,8 @@
 "Starting…" = "Starting…";
 "Startup" = "Startup";
 "Staying up to date" = "Staying up to date";
+"Stays in its project" = "Stays in its project";
+"Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way.";
 "Step %lld/%lld" = "Step %lld/%lld";
 "Stop" = "Stop";
 "Stop Indexing" = "Stop Indexing";

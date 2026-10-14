@@ -155,7 +155,8 @@ or in one project's chats (`project:P`).
   `general` and seen only there. The code assigns it; the model doesn't choose.
   What the user writes (About you, notes for all chats) is `user`, seen
   everywhere.
-- **"Share what's learned everywhere"** (Settings, off by default): every chat
+- **"Learned from chats: Shared by all chats"** (Settings; the default is
+  "Stays in its project"): every chat
   sees every note, and the model gives `scope: user | project` in a project's
   chats, so facts about the person stay apart from the work's.
 - Kept apart, a batch writes only its own place: it's shown only those notes
@@ -166,7 +167,7 @@ or in one project's chats (`project:P`).
 - A `user` note learned while sharing was on and never approved is seen,
   once sharing is off, only in chats outside projects; one the user wrote or
   approved is seen everywhere.
-- Project notes off: nothing is learned in a project's chats, shared or not,
+- "Remember in projects" off: nothing is learned in a project's chats, shared or not,
   and no project note is sent.
 - A chat's block is chosen again when the settings it depends on change
   (sharing, project notes, kinds, the budget), not only its notes.
