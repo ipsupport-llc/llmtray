@@ -212,6 +212,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Bigger than the recommended one: better answers, but slower, with less memory left for other apps.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "Built into macOS · LLMTray's chat only";
 "Cached" = "Cached";
 "Calculator" = "Calculator";
 "Calls" = "Calls";

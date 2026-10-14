@@ -314,6 +314,9 @@ extension ChatSettings {
                          thinkingStyle: ThinkingStyle = .none, supportsAudio: Bool = false) -> ChatSettings {
         let cap = maxContext ?? Self.maxContext(forModel: modelID)
         var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
+        // Apple's context holds the input and the answer: at most half for
+        // the answer, so the input budget (pinned files, history) has room.
+        if modelID == AppleSystemModel.id { settings.maxTokens = min(settings.maxTokens, max(256, cap / 2)) }
         settings.modelSupportsVision = supportsVision
         settings.thinkingStyle = thinkingStyle
         settings.modelSupportsAudio = supportsAudio
@@ -325,6 +328,8 @@ extension ChatSettings {
     /// The model's trained context ceiling (max_position_embeddings);
     /// 32768 only when its config.json doesn't say.
     static func maxContext(forModel modelID: String?) -> Int {
-        max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
+        // Apple's model: its context holds the input and the answer both.
+        if modelID == AppleSystemModel.id { return AppleSystemModel.contextSize ?? 4096 }
+        return max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
     }
 }

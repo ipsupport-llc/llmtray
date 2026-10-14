@@ -64,6 +64,8 @@ private final class ChatStream: NSObject, URLSessionDataDelegate, @unchecked Sen
     let options: CLICommand.ChatOptions
     let done = DispatchSemaphore(value: 0)
     private(set) var failure: String?
+    /// An error the stream reported after it began.
+    private var streamedFailure: String?
     private var decoder = SSEDecoder()
     private var statusCode = 200
     private var errorBody = Data()
@@ -112,6 +114,8 @@ private final class ChatStream: NSObject, URLSessionDataDelegate, @unchecked Sen
             failure = (error as NSError).code == NSURLErrorCancelled ? nil : "the request failed: \(error.localizedDescription)"
         } else if statusCode != 200 {
             failure = CommandLineOutput.apiError(status: statusCode, body: errorBody)
+        } else if let streamedFailure {
+            failure = "the model failed mid-answer: \(streamedFailure)"
         }
         finishLine()
         done.signal()
@@ -139,6 +143,9 @@ private final class ChatStream: NSObject, URLSessionDataDelegate, @unchecked Sen
                 if options.json { emit(["tool_call": ["name": name, "arguments": arguments]]) }
             case .image:
                 break
+            case .error(let message):
+                streamedFailure = message
+                if options.json { emit(["error": message]); continue }
             }
         }
     }

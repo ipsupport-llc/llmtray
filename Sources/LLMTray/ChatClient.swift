@@ -1366,7 +1366,10 @@ final class ChatClient: ObservableObject {
             settings.modelPath.map(DownloadQueue.isFetching(modelPath:)) == true && !server.canAnswer
         }
         func modelAway() -> Bool {
-            server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting || downloading()
+            // Apple's model stays answerable while a picture, song or voice
+            // holds the GPU (adr/0025).
+            let apple = settings.modelPath == AppleSystemModel.id && server.servesAppleModel
+            return !apple && (server.suspendedForImageGeneration || isAnotherChatUnloadingModel()) || server.isStarting || downloading()
         }
         guard modelAway() else { return startStreamIfModelUp(request, server: server) }
         let token = turnToken, epoch = conversationEpoch
@@ -2047,6 +2050,9 @@ final class ChatClient: ObservableObject {
                 appendToAssistant(image: data)
             case .toolCall(let id, let name, let argumentsJSON):
                 appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
+            case .error(let message):
+                // Failed mid-answer: shown, not taken for a finished answer.
+                errorText = message
             case .usage(let completionTokens, let promptTokens, let cachedTokens, let reasoningTokens):
                 usageCompletionTokens = completionTokens
                 requestStats.completionTokens = completionTokens
