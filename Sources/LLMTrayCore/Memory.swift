@@ -168,7 +168,10 @@ public struct MemorySettings: Equatable, Sendable {
 
     /// Whether `note` is past being a candidate (see `factChats`).
     public func isEstablished(_ note: MemoryNote) -> Bool {
-        if note.reviewed || note.pinned || note.kind == .preference || note.kind == .correction { return true }
+        if note.reviewed || note.pinned { return true }
+        // What the user asked for, not one read from what they did (an
+        // observation seen again becomes an inferred preference).
+        if note.confidence == .stated, note.kind == .preference || note.kind == .correction { return true }
         return Set(note.evidence.map(\.chat)).count >= factChats
     }
 
@@ -342,21 +345,23 @@ public enum MemoryText {
 
     /// Topics never learned from chats, whatever the model says: only the
     /// user writes these (About you). Word starts, in the languages notes
-    /// are most often written in.
+    /// are most often written in -- narrow ones, so work words ("diagnostics",
+    /// "technical debt", "caching policy") don't match.
     static let sensitiveStems = [
         // health
-        "diagnos", "disease", "illness", "depress", "anxiety", "therap", "medicat", "pregnan",
-        "диагноз", "болезн", "болен", "болит", "депресс", "тревожн", "терапи", "лекарств", "беремен",
-        "хвороб", "депрес", "ліки",
+        "diagnosed", "diagnosis", "disease", "illness", "depression", "depressed", "anxiety", "therapist", "therapy",
+        "medication", "pregnan",
+        "диагноз", "болезн", "болит", "депресси", "тревожност", "терапевт", "лекарств", "беремен",
+        "хвороб", "депресі",
         // drugs, alcohol
         "drug", "lsd", "cocaine", "heroin", "cannabis", "marijuana", "psychedel", "alcohol", "drunk",
         "наркот", "лсд", "кокаин", "психодел", "алкогол", "пьян", "п'ян",
         // sex
         "sex", "porn", "секс", "порн",
         // religion, politics
-        "religio", "church", "politic", "религ", "церк", "политик", "релігі", "політик",
+        "religion", "religious", "political", "politics", "религи", "церков", "политическ", "релігі", "політичн",
         // money, law
-        "salary", "debt", "lawsuit", "arrest", "crime", "criminal", "зарплат", "арест", "преступ", "кримин", "борг", "злочин",
+        "salary", "lawsuit", "arrested", "criminal", "зарплат", "арестов", "преступлен", "судим", "злочин",
     ]
 
     /// One-off asks phrased as facts ("User asked for …"): a question isn't
@@ -364,15 +369,21 @@ public enum MemoryText {
     static let oneOffPattern = #"^(the )?(user )?(asked|asks|is asking|requested|requests|wanted to know|wants to know|is looking for|looked for)\b"#
         + #"|^(пользователь )?(спросил|спрашивает|попросил|просит|интересовался|ищет)"#
 
-    /// Whether a learned note's `text` must not be kept: a sensitive topic,
-    /// or a one-off question written up as a fact. What the user writes
-    /// themselves isn't checked.
-    public static func unlearnable(_ text: String) -> Bool {
-        let lower = text.lowercased()
-        if lower.trimmingCharacters(in: .whitespaces).range(of: oneOffPattern, options: .regularExpression) != nil { return true }
-        let words = lower.split { !$0.isLetter && $0 != "'" }
+    /// Whether a learned note's `text` is on a topic never learned. What
+    /// the user writes themselves isn't checked.
+    public static func sensitive(_ text: String) -> Bool {
+        let words = text.lowercased().split { !$0.isLetter && $0 != "'" }
         return words.contains { word in sensitiveStems.contains { word.hasPrefix($0) } }
     }
+
+    /// Whether `text` is a one-off ask written up as a fact ("User asked
+    /// for …"). Not for preferences: "Requests short answers" is one.
+    public static func oneOff(_ text: String) -> Bool {
+        text.lowercased().trimmingCharacters(in: .whitespacesAndNewlines).range(of: oneOffPattern, options: .regularExpression) != nil
+    }
+
+    /// Whether a learned fact or observation's `text` must not be kept.
+    public static func unlearnable(_ text: String) -> Bool { sensitive(text) || oneOff(text) }
 
     /// Topics an observation may be under: how the user wants to be
     /// answered, never a guess at why they asked something.

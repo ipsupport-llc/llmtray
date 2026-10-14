@@ -143,7 +143,7 @@ struct MemoryPane: View {
                             .disabled(memory.unreadable || memory.file.hasPaused)
                     }
                     HStack {
-                        SettingLabel(title: "Start over", help: "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules.")
+                        SettingLabel(title: "Start over", help: "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile.")
                         Spacer()
                         Button("Forget What Was Learned…") { confirmForgetLearned = true }
                             .disabled(memory.unreadable || memory.file.unreviewedCount == 0 && memory.file.queue.isEmpty)
@@ -202,9 +202,9 @@ struct MemoryPane: View {
         }
         .confirmationDialog("Forget what was learned?", isPresented: $confirmForgetLearned) {
             Button("Forget and Read All Chats Again") {
-                if memory.change({ $0.forgetUnreviewed(readAgain: true) }) { learnFromPastChats() }
+                if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
             }
-            Button("Only Forget", role: .destructive) { memory.change { $0.forgetUnreviewed(readAgain: false) } }
+            Button("Only Forget", role: .destructive) { memory.forgetLearned(readAgain: false) }
         } message: {
             Text("\(memory.file.unreviewedCount) learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.")
         }

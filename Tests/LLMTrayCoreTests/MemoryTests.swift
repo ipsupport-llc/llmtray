@@ -406,7 +406,9 @@ extension MemoryTests {
             XCTAssertTrue(MemoryText.unlearnable(text), text)
         }
         for text in ["Works on quantizing LLMs with GPTQ", "Prefers short answers in Russian", "Uses a healthcheck endpoint",
-                     "Runs Kubernetes with DRA on 8 GPUs", "Предпочитает долгие подробные ответы"] {
+                     "Runs Kubernetes with DRA on 8 GPUs", "Предпочитает долгие подробные ответы", "Builds GPU diagnostics with DCGM",
+                     "Pays down technical debt first", "Uses Church encoding in Haskell", "Настраивает политику ретраев",
+                     "Writes diagnostic tools", "Works on depressurization tests"] {
             XCTAssertFalse(MemoryText.unlearnable(text), text)
         }
     }
@@ -429,5 +431,14 @@ extension MemoryTests {
         XCTAssertNil(again.met(chat))
         XCTAssertNil(again.watermark(chat))
         XCTAssertTrue(again.enqueuePast(chat: chat, project: nil, messages: [MemoryBatchMessage(seq: 1, date: t0, text: "hi", before: nil)], now: t0))
+    }
+
+    func testAnInferredPreferenceWaitsLikeAFact() {
+        var file = MemoryFile()
+        let id = file.add(subject: .general, topic: "tone", kind: .preference, text: "Likes terse replies", now: t0,
+                          reviewed: false, confidence: .inferred)!
+        file.notes[0].evidence = [MemoryEvidence(chat: UUID(), seq: 1, date: t0, quote: "q"), MemoryEvidence(chat: UUID(), seq: 1, date: t0, quote: "q")]
+        XCTAssertTrue(on.allows(file.note(id)!, project: nil))
+        XCTAssertFalse(MemorySettings(enabled: true, factChats: 3).allows(file.note(id)!, project: nil), "not the user's own words")
     }
 }

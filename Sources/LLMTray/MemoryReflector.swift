@@ -320,19 +320,27 @@ final class MemoryReflector: ObservableObject {
             guard candidates.count < Self.candidatesAtMost else { break }
             candidates.append(note)
         }
-        let shown = Dictionary(uniqueKeysWithValues: candidates.map { ($0.id, $0) })
+        // What the model may name: the candidates, and every manner note (MemoryExtraction's toneNotes).
+        let shown = Dictionary((candidates + touchable.filter { $0.kind == .observation && $0.topic == "tone" }).map { ($0.id, $0) },
+                               uniquingKeysWith: { a, _ in a })
 
-        // Reflect.
+        // Read it: triage, then the targeted steps (MemoryExtraction).
         let topicList = Array(Set(MemoryTopics.builtIn + memory.file.notes.map(\.topic))).sorted()
-        let reflectReply: String
-        switch await ask(MemoryReflection.reflectMessages(batch: batch, candidates: candidates, topics: topicList,
-                                                          language: Self.languageName(), kinds: settings.kinds,
-                                                          inProject: settings.shareLearned && project != nil),
-                         maxTokens: 1500, modelPath: modelPath) {
-        case .success(let reply): reflectReply = reply
-        case .failure(let error): return error.outcome
+        let operations: [MemoryReflection.Operation]
+        do {
+            guard let ops = try await MemoryExtraction.operations(
+                batch: batch, candidates: candidates,
+                toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
+                topics: topicList, language: Self.languageName(), kinds: settings.kinds,
+                inProject: settings.shareLearned && project != nil,
+                ask: { messages, maxTokens in try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath).get() }
+            ) else { return .failed("unreadable reply") }
+            operations = ops
+        } catch let error as OutcomeError {
+            return error.outcome
+        } catch {
+            return .failed(error.localizedDescription)
         }
-        guard let operations = MemoryReflection.parseOperations(reflectReply) else { return .failed("unreadable reflect reply") }
 
         // What survives the code's checks: the user's own words, ids it was
         // shown, kinds that are on, texts a note may hold.
@@ -358,7 +366,7 @@ final class MemoryReflector: ObservableObject {
                 subject = note.subject
                 statement = note.text
             case .update, .supersede:
-                guard let note, let text = op.text, MemoryReflection.mayLearn(op) else { continue }
+                guard let note, let text = op.text, MemoryReflection.mayLearn(op, kind: note.kind) else { continue }
                 subject = note.subject
                 statement = text
             case .forget:
@@ -404,6 +412,7 @@ final class MemoryReflector: ObservableObject {
         enum Target { case note(MemoryNote), earlierAdd(Int), own(MemoryNote) }
         var pairs: [(new: String, old: String)] = []
         var owners: [(item: Int, target: Target)] = []
+        var similarities: [Float?] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
             // An update: only notes the batch may change (a pinned one, or a
@@ -424,9 +433,10 @@ final class MemoryReflector: ObservableObject {
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
                 .prefix(3)
-            for (note, _) in close {
+            for (note, similarity) in close {
                 pairs.append((new: text, old: note.text))
                 owners.append((i, .note(note)))
+                similarities.append(similarity)
             }
             // An update against its own note: one that says less than the
             // note did isn't an update ("short answers" after "short
@@ -434,12 +444,14 @@ final class MemoryReflector: ObservableObject {
             if p.op.action == .update, let own = p.op.id.flatMap({ shown[$0] }) {
                 pairs.append((new: text, old: own.text))
                 owners.append((i, .own(own)))
+                similarities.append(nil)
             }
             guard p.op.action == .add else { continue }
             for j in 0..<i where pending[j].op.action == .add && pending[j].subject == p.subject {
                 guard let earlier = pending[j].op.text, let w = newVectors[earlier], MemoryReflection.cosine(v, w) >= Self.reconcileFloor else { continue }
                 pairs.append((new: text, old: earlier))
                 owners.append((i, .earlierAdd(j)))
+                similarities.append(MemoryReflection.cosine(v, w))
             }
         }
         var relations: [MemoryReflection.Relation] = []
@@ -447,7 +459,7 @@ final class MemoryReflector: ObservableObject {
             switch await ask(MemoryReflection.classifyMessages(pairs), maxTokens: 40 + 12 * pairs.count, modelPath: modelPath) {
             case .success(let reply):
                 guard let parsed = MemoryReflection.parseRelations(reply, count: pairs.count) else { return .failed("unreadable classify reply") }
-                relations = parsed
+                relations = MemoryReflection.settled(parsed, similarities: similarities)
             case .failure(let error):
                 return error.outcome
             }

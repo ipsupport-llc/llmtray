@@ -94,6 +94,7 @@ final class MemoryManager: ObservableObject {
     /// and how many are answering (theirs is queued once they're done).
     func learnFromPastChats() -> (queued: Int, waiting: Int) {
         guard isEnabled, !unreadable else { return (0, 0) }
+        pastRun += 1
         var count = 0
         var open = Set<UUID>()
         var busy: [(tab: ChatClient, chat: UUID)] = []
@@ -104,7 +105,7 @@ final class MemoryManager: ObservableObject {
                 if !file.optedOut.contains(id), file.pausedWatermarks[id.uuidString] == nil { busy.append((tab, id)) }
             } else if tab.queuePastForMemory() { count += 1 }
         }
-        if !busy.isEmpty { learnFromPast(busy, tries: 360) }
+        if !busy.isEmpty { learnFromPast(busy, run: pastRun, tries: 360) }
         for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
             let key = id.uuidString
             // Opted out, or waiting for the user's answer about while memory
@@ -137,14 +138,26 @@ final class MemoryManager: ObservableObject {
         return (count, busy.count)
     }
 
+    /// The last "Learn from past chats now": a later one, or forgetting
+    /// what was learned, ends the earlier one's waiting for busy chats.
+    private var pastRun = 0
+
+    /// "Forget What Was Learned" (MemoryFile.forgetUnreviewed): chats still
+    /// waiting to be read from the past aren't, after it.
+    @discardableResult
+    func forgetLearned(readAgain: Bool) -> Bool {
+        pastRun += 1
+        return change { $0.forgetUnreviewed(readAgain: readAgain) }
+    }
+
     /// Chats answering when "Learn from past chats now" was pressed: theirs
     /// is queued once they're done (looked at every 5 s, half an hour at most).
     /// A chat left meanwhile (another one in its tab, the tab closed) waits
     /// for the button again.
-    private func learnFromPast(_ chats: [(tab: ChatClient, chat: UUID)], tries: Int) {
+    private func learnFromPast(_ chats: [(tab: ChatClient, chat: UUID)], run: Int, tries: Int) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, self.isEnabled else { return }
+                guard let self, self.isEnabled, run == self.pastRun else { return }
                 let open = chats.filter { c in ChatTabs.shared.tabs.contains { $0 === c.tab } && c.tab.currentSessionID == c.chat }
                 var queued = false
                 for c in open where !c.tab.isBusy {
@@ -152,7 +165,7 @@ final class MemoryManager: ObservableObject {
                 }
                 if queued { MemoryReflector.shared.poke(after: 1) }
                 let waiting = open.filter { $0.tab.isBusy }
-                if !waiting.isEmpty, tries > 1 { self.learnFromPast(waiting, tries: tries - 1) }
+                if !waiting.isEmpty, tries > 1 { self.learnFromPast(waiting, run: run, tries: tries - 1) }
             }
         }
     }

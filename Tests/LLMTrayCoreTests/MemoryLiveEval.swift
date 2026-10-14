@@ -92,6 +92,9 @@ final class MemoryLiveEval: XCTestCase {
             throw XCTSkip("MEMORY_EVAL_PORT not set")
         }
         self.port = port
+        // Line by line, so a redirected run's log has it all.
+        setvbuf(stdout, nil, _IOLBF, 0)
+        defer { fflush(stdout) }
         modelPath = env["MEMORY_EVAL_MODEL"] ?? ""
         let template = (try? String(contentsOfFile: modelPath + "/chat_template.jinja", encoding: .utf8)) ?? ""
         thinking = Thinking.requestFields(style: Thinking.style(chatTemplate: template), effort: .off)
@@ -159,14 +162,22 @@ final class MemoryLiveEval: XCTestCase {
             return (note, v.map { nv in messageVectors.map { MemoryReflection.cosine(nv, $0) }.max() ?? 0 } ?? 0)
         }.filter { $0.1 >= 0.35 }.sorted { $0.1 > $1.1 }
         let candidates = Array(ranked.prefix(12).map(\.0))
-        let shown = Dictionary(uniqueKeysWithValues: candidates.map { ($0.id, $0) })
+        // What the model may name: the candidates, and every manner note (MemoryExtraction's toneNotes).
+        let shown = Dictionary((candidates + touchable.filter { $0.kind == .observation && $0.topic == "tone" }).map { ($0.id, $0) },
+                               uniquingKeysWith: { a, _ in a })
         let topics = Array(Set(MemoryTopics.builtIn + file.notes.map(\.topic))).sorted()
 
-        let reflectReply = try await ask(MemoryReflection.reflectMessages(batch: batch, candidates: candidates, topics: topics,
-                                                                         language: "Russian", kinds: settings.kinds,
-                                                                         inProject: settings.shareLearned && project != nil), 1500)
-        guard let ops = MemoryReflection.parseOperations(reflectReply) else {
-            print("!! unreadable reflect reply:\n\(reflectReply.prefix(600))")
+        let debug = ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1"
+        guard let ops = try await MemoryExtraction.operations(
+            batch: batch, candidates: candidates, toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
+            topics: topics, language: "Russian", kinds: settings.kinds,
+            inProject: settings.shareLearned && project != nil,
+            ask: { messages, maxTokens in
+                let reply = try await self.ask(messages, maxTokens)
+                if debug { print("  [\((messages[0]["content"] as? String ?? "").prefix(40))…] → \(reply.prefix(400))") }
+                return reply
+            }) else {
+            print("!! unreadable reply")
             file.failBatch(batch.id)
             file.dropBatch(batch.id)
             return
@@ -192,7 +203,7 @@ final class MemoryLiveEval: XCTestCase {
                 subject = note.subject
                 statement = op.action == .confirm ? note.text : "The user asks to forget this, or says it is no longer true: \(note.text)"
             case .update, .supersede:
-                guard let note, let text = op.text, MemoryReflection.mayLearn(op) else { print("  ✗ id/rules: \(label)"); continue }
+                guard let note, let text = op.text, MemoryReflection.mayLearn(op, kind: note.kind) else { print("  ✗ id/rules: \(label)"); continue }
                 subject = note.subject
                 statement = text
             }
@@ -220,6 +231,7 @@ final class MemoryLiveEval: XCTestCase {
         let newVectors = Dictionary(zip(newTexts, try await embed(newTexts, .document, runner)), uniquingKeysWith: { a, _ in a })
         var pairs: [(new: String, old: String)] = []
         var owners: [(Int, MemoryNote?)] = []
+        var similarities: [Float?] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
             let close = file.notes.filter { note in
@@ -231,18 +243,21 @@ final class MemoryLiveEval: XCTestCase {
             for (n, sim) in close {
                 pairs.append((text, n.text))
                 owners.append((i, n))
+                similarities.append(sim)
                 print(String(format: "  ~ %.2f \"%@\" vs \"%@\"", sim, text, n.text))
             }
             if p.op.action == .update, let own = p.op.id.flatMap({ shown[$0] }) {
                 pairs.append((text, own.text))
                 owners.append((i, nil))
+                similarities.append(nil)
                 print("  ~ own \"\(text)\" vs \"\(own.text)\"")
             }
         }
         var relations: [MemoryReflection.Relation] = []
         if !pairs.isEmpty {
             let reply = try await ask(MemoryReflection.classifyMessages(pairs), 40 + 12 * pairs.count)
-            relations = MemoryReflection.parseRelations(reply, count: pairs.count) ?? Array(repeating: .different, count: pairs.count)
+            relations = MemoryReflection.settled(MemoryReflection.parseRelations(reply, count: pairs.count)
+                                                     ?? Array(repeating: .different, count: pairs.count), similarities: similarities)
             print("  classify: \(relations.map(\.rawValue))")
         }
         var changes: [MemoryChange] = []
