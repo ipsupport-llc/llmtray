@@ -103,6 +103,20 @@ final class MemoryReflector: ObservableObject {
                 status = .waiting(NSLocalizedString("Learning needs the embedding model (Settings › Memory).", comment: "memory status"))
                 return
             }
+            // Apple's model reads in-process, on the Neural Engine
+            // (adr/0025): nothing to load, the user's model and the GPU
+            // untouched -- only it must be available.
+            if Self.reader(for: head) == AppleSystemModel.id {
+                if case .unavailable(let why) = AppleSystemModel.availability {
+                    status = .waiting(why)
+                    poke(after: 300)
+                    return
+                }
+                status = .reading
+                let outcome = await reflect(head, embedder: embedder, modelPath: AppleSystemModel.id)
+                guard handle(outcome, of: head) else { return }
+                continue
+            }
             // The first batch the loaded model may read: its chat's model
             // (or the one set for memory). None: wait for one, or load it
             // when LLMTray has been idle long enough, if allowed.
@@ -131,33 +145,41 @@ final class MemoryReflector: ObservableObject {
             }
             status = .reading
             let outcome = await reflect(batch, embedder: embedder, modelPath: model)
-            // Every queue write checked: one that doesn't reach the disk
-            // stops the loop (else the same batch would be read again now).
-            let saving = NSLocalizedString("The notes couldn't be saved.", comment: "memory status")
-            switch outcome {
-            case .done:
-                continue
-            case .later(let reason):
-                status = .waiting(reason)
-                guard memory.change({ $0.deferBatch(batch.id) }) else { return waitForStorage(saving) }
-                poke(after: min(30 * 60, 120 * Double(batch.attempts + 1)))
-                return
-            case .stored(let reason):
-                return waitForStorage(reason)
-            case .failed(let reason):
-                NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
-                var failures = 0
-                guard memory.change({ failures = $0.failBatch(batch.id) }) else { return waitForStorage(saving) }
-                if failures >= Self.maxAttempts {
-                    guard memory.change({ $0.dropBatch(batch.id) }) else { return waitForStorage(saving) }
-                    continue
-                }
-                poke(after: 300)
-                status = .idle
-                return
-            }
+            guard handle(outcome, of: batch) else { return }
         }
         status = .idle
+    }
+
+    /// A pass's outcome on the queue: true to go on with the next batch,
+    /// false when the loop stops for now (it's poked again as needed).
+    private func handle(_ outcome: Outcome, of batch: MemoryBatch) -> Bool {
+        let memory = MemoryManager.shared
+        // Every queue write checked: one that doesn't reach the disk
+        // stops the loop (else the same batch would be read again now).
+        let saving = NSLocalizedString("The notes couldn't be saved.", comment: "memory status")
+        switch outcome {
+        case .done:
+            return true
+        case .later(let reason):
+            status = .waiting(reason)
+            guard memory.change({ $0.deferBatch(batch.id) }) else { waitForStorage(saving); return false }
+            poke(after: min(30 * 60, 120 * Double(batch.attempts + 1)))
+            return false
+        case .stored(let reason):
+            waitForStorage(reason)
+            return false
+        case .failed(let reason):
+            NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
+            var failures = 0
+            guard memory.change({ failures = $0.failBatch(batch.id) }) else { waitForStorage(saving); return false }
+            if failures >= Self.maxAttempts {
+                guard memory.change({ $0.dropBatch(batch.id) }) else { waitForStorage(saving); return false }
+                return true
+            }
+            poke(after: 300)
+            status = .idle
+            return false
+        }
     }
 
     /// The model (its path) `batch` is read with: the one set for memory,
@@ -167,12 +189,16 @@ final class MemoryReflector: ObservableObject {
     static func reader(for batch: MemoryBatch) -> String? {
         let installed = Set(ModelCatalog.shared.models.map(\.path))
         let fixed = UserDefaults.standard[Pref.memoryModel]
+        // Apple's model, set for memory: it reads everything, and when it
+        // isn't available memory waits for it, not for another model.
+        if fixed == AppleSystemModel.id { return fixed }
         if !fixed.isEmpty, installed.contains(fixed) { return fixed }
         return batch.model.flatMap { installed.contains($0) ? $0 : nil }
     }
 
     static func displayName(_ path: String) -> String {
-        ModelCatalog.shared.model(id: path)?.displayName ?? (path as NSString).lastPathComponent
+        if path == AppleSystemModel.id { return AppleSystemModel.displayName }
+        return ModelCatalog.shared.model(id: path)?.displayName ?? (path as NSString).lastPathComponent
     }
 
     /// Memory's model loaded by memory itself: only when the user allowed
@@ -335,7 +361,9 @@ final class MemoryReflector: ObservableObject {
                 topics: topicList, language: Self.languageName(), kinds: settings.kinds,
                 inProject: settings.shareLearned && project != nil,
                 moodSince: settings.moodHours > 0 ? Date().addingTimeInterval(-Double(settings.moodHours) * 3600) : nil,
-                ask: { messages, maxTokens in try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath).get() }
+                ask: { messages, maxTokens, shape in
+                    try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath, shape: shape).get()
+                }
             ) else { return .failed("unreadable reply") }
             operations = reading.operations
             // Kept with the batch's commit (only while it's still queued).
@@ -390,7 +418,8 @@ final class MemoryReflector: ObservableObject {
         }
 
         // Verify: only claims the user, speaking for themselves, makes.
-        switch await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), maxTokens: 40 + 12 * pending.count, modelPath: modelPath) {
+        switch await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), maxTokens: 40 + 12 * pending.count, modelPath: modelPath,
+                         shape: MemoryReflection.verdictShape(pending.count)) {
         case .success(let reply):
             guard let verdicts = MemoryReflection.parseVerdicts(reply, count: pending.count) else { return .failed("unreadable verify reply") }
             pending = zip(pending, verdicts).filter { $0.1 == .yes }.map(\.0)
@@ -462,7 +491,8 @@ final class MemoryReflector: ObservableObject {
         }
         var relations: [MemoryReflection.Relation] = []
         if !pairs.isEmpty {
-            switch await ask(MemoryReflection.classifyMessages(pairs), maxTokens: 40 + 12 * pairs.count, modelPath: modelPath) {
+            switch await ask(MemoryReflection.classifyMessages(pairs), maxTokens: 40 + 12 * pairs.count, modelPath: modelPath,
+                             shape: MemoryReflection.relationShape(pairs.count)) {
             case .success(let reply):
                 guard let parsed = MemoryReflection.parseRelations(reply, count: pairs.count) else { return .failed("unreadable classify reply") }
                 relations = MemoryReflection.settled(parsed, similarities: similarities)
@@ -554,7 +584,26 @@ final class MemoryReflector: ObservableObject {
     }
 
     /// One background call to the loaded model: its answer, or why not now.
-    private func ask(_ messages: [[String: Any]], maxTokens: Int, modelPath: String) async -> Result<String, OutcomeError> {
+    /// `shape`: what the reply must look like, for a model held to one.
+    private func ask(_ messages: [[String: Any]], maxTokens: Int, modelPath: String,
+                     shape: ReplyShape? = nil) async -> Result<String, OutcomeError> {
+        if modelPath == AppleSystemModel.id {
+            do {
+                return .success(try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape))
+            } catch let failure as AppleSystemModel.Failure {
+                // Not now (off, not ready, too slow): later. Declined or too
+                // long: this batch failed (counted, dropped after a few).
+                switch failure {
+                case .unavailable(let why): return .failure(OutcomeError(.later(why.isEmpty ? AppleSystemModel.displayName : why)))
+                case .timedOut: return .failure(OutcomeError(.later(NSLocalizedString("Apple's model took too long.", comment: "memory status"))))
+                case .refused(let why): return .failure(OutcomeError(.failed("refused: \(why)")))
+                case .contextExceeded: return .failure(OutcomeError(.failed("context exceeded")))
+                case .failed(let why): return .failure(OutcomeError(.failed(why)))
+                }
+            } catch {
+                return .failure(OutcomeError(.failed(error.localizedDescription)))
+            }
+        }
         let style = ModelDiscovery.thinkingStyle(forModelPath: modelPath)
         var fields = Thinking.requestFields(style: style, effort: .off)
         fields["temperature"] = 0.2

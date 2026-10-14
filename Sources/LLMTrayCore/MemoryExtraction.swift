@@ -23,8 +23,9 @@ public enum MemoryExtraction {
         case none
     }
 
-    /// A model call: the messages, the most tokens to write; the reply.
-    public typealias Ask = (_ messages: [[String: Any]], _ maxTokens: Int) async throws -> String
+    /// A model call: the messages, the most tokens to write, the reply's
+    /// shape (for a model held to one); the reply.
+    public typealias Ask = (_ messages: [[String: Any]], _ maxTokens: Int, _ shape: ReplyShape?) async throws -> String
 
     /// Messages that must show a manner before it's noted.
     public static let toneMessages = 2
@@ -77,15 +78,23 @@ public enum MemoryExtraction {
             read = true
         }
         if read { return lines }
-        guard let list = MemoryReflection.object(reply)?["labels"] as? [Any], list.count == count else { return nil }
-        return list.map { item in
-            let names: [String]
-            if let s = item as? String { names = s.split(separator: ",").map(String.init) }
-            else if let a = item as? [Any] { names = a.compactMap { $0 as? String } }
-            else { names = [] }
-            let labels = Set(names.compactMap { Label(rawValue: $0.trimmingCharacters(in: .whitespaces).lowercased()) })
-            return labels.isEmpty ? [.none] : labels
+        let object = MemoryReflection.object(reply)
+        // {"message1": [...], ...} (a model held to a shape).
+        if let object, object["message1"] != nil {
+            let list = (1...max(1, count)).map { object["message\($0)"] ?? "none" }
+            return list.map(labels(of:))
         }
+        guard let list = object?["labels"] as? [Any], list.count == count else { return nil }
+        return list.map(labels(of:))
+    }
+
+    static func labels(of item: Any) -> Set<Label> {
+        let names: [String]
+        if let s = item as? String { names = s.split(separator: ",").map(String.init) }
+        else if let a = item as? [Any] { names = a.compactMap { $0 as? String } }
+        else { names = [] }
+        let labels = Set(names.compactMap { Label(rawValue: $0.trimmingCharacters(in: .whitespaces).lowercased()) })
+        return labels.isEmpty ? [.none] : labels
     }
 
     // MARK: The steps
@@ -207,7 +216,8 @@ public enum MemoryExtraction {
                                ask: Ask) async throws -> Reading? {
         let messages = batch.messages
         guard !messages.isEmpty else { return Reading(operations: [], mood: nil) }
-        guard let labels = parseLabels(try await ask(triageMessages(batch), 30 + 12 * messages.count), count: messages.count) else {
+        let labelShape = ReplyShape.labels(count: messages.count, choices: Label.allCases.map(\.rawValue))
+        guard let labels = parseLabels(try await ask(triageMessages(batch), 30 + 12 * messages.count, labelShape), count: messages.count) else {
             return nil
         }
         func with(_ label: Label) -> [MemoryBatchMessage] { messages.indices.filter { labels[$0].contains(label) }.map { messages[$0] } }
@@ -216,9 +226,9 @@ public enum MemoryExtraction {
         /// A quote that isn't the user's words (a model copying the note's
         /// text into a confirm) is, when the step read one message, that
         /// message: verify still checks the claim against all of it.
-        func run(_ prompt: [[String: Any]], messages read: [MemoryBatchMessage], notes: [MemoryNote],
+        func run(_ prompt: [[String: Any]], messages read: [MemoryBatchMessage], notes: [MemoryNote], shape: ReplyShape,
                  fix: (inout MemoryReflection.Operation) -> Bool) async throws -> Bool {
-            guard let parsed = MemoryReflection.parseOperations(try await ask(prompt, 600)) else { return false }
+            guard let parsed = MemoryReflection.parseOperations(try await ask(prompt, 600, shape)) else { return false }
             let ids = Set(notes.map(\.id))
             let only = MemoryBatch(id: batch.id, chat: batch.chat, project: batch.project, created: batch.created, messages: read)
             for var op in parsed {
@@ -238,7 +248,9 @@ public enum MemoryExtraction {
         if !answering.isEmpty, !askedKinds.isEmpty {
             let notes = candidates.filter { askedKinds.contains($0.kind) }
             let ok = try await run(instructionMessages(answering, notes: notes, topics: topics, language: language,
-                                                       corrections: kinds.contains(.correction)), messages: answering, notes: notes) { op in
+                                                       corrections: kinds.contains(.correction)), messages: answering, notes: notes,
+                                   shape: .ops(actions: ["add", "confirm", "update", "supersede"], ids: notes.map(\.id),
+                                               kinds: askedKinds.map(\.rawValue).sorted(), quote2: false, scope: false)) { op in
                 guard op.action != .forget else { return false }
                 // A wish made "more precise" is how a small model folds two
                 // into one ("short, in Russian" became "concrete versions"):
@@ -266,7 +278,9 @@ public enum MemoryExtraction {
         if !telling.isEmpty, kinds.contains(.fact) {
             let notes = candidates.filter { $0.kind == .fact }
             let ok = try await run(factMessages(telling, notes: notes, topics: topics, language: language, inProject: inProject),
-                                   messages: telling, notes: notes) { op in
+                                   messages: telling, notes: notes,
+                                   shape: .ops(actions: ["add", "confirm", "update", "supersede"], ids: notes.map(\.id), kinds: [],
+                                               quote2: false, scope: inProject)) { op in
                 guard op.action != .forget else { return false }
                 if op.action == .add {
                     op.kind = .fact
@@ -280,7 +294,10 @@ public enum MemoryExtraction {
 
         let forgetting = with(.forget)
         if !forgetting.isEmpty, !candidates.isEmpty {
-            let ok = try await run(forgetMessages(forgetting, notes: candidates), messages: forgetting, notes: candidates) { $0.action == .forget }
+            let ok = try await run(forgetMessages(forgetting, notes: candidates), messages: forgetting, notes: candidates,
+                                   shape: .ops(actions: ["forget"], ids: candidates.map(\.id), kinds: [], quote2: false, scope: false)) {
+                $0.action == .forget
+            }
             guard ok else { return nil }
         }
 
@@ -292,7 +309,8 @@ public enum MemoryExtraction {
         if kinds.contains(.observation), talking.count >= toneMessages || !talking.isEmpty && !notes.isEmpty {
             var adds = 0
             let shown = MemoryBatch(id: batch.id, chat: batch.chat, project: batch.project, created: batch.created, messages: talking)
-            let ok = try await run(toneMessages(talking, notes: notes, language: language), messages: talking, notes: notes) { op in
+            let ok = try await run(toneMessages(talking, notes: notes, language: language), messages: talking, notes: notes,
+                                   shape: .ops(actions: ["add", "confirm"], ids: notes.map(\.id), kinds: [], quote2: true, scope: false)) { op in
                 switch op.action {
                 case .confirm: return true
                 case .add:
@@ -325,7 +343,7 @@ public enum MemoryExtraction {
         if let moodSince {
             let feeling = Array(with(.mood).filter { $0.date >= moodSince }.suffix(4))
             if !feeling.isEmpty {
-                let reply = try await ask(moodMessages(feeling, language: language), 200).trimmingCharacters(in: .whitespacesAndNewlines)
+                let reply = try await ask(moodMessages(feeling, language: language), 200, .mood).trimmingCharacters(in: .whitespacesAndNewlines)
                 let shown = MemoryBatch(id: batch.id, chat: batch.chat, project: batch.project, created: batch.created, messages: feeling)
                 if !["NONE", "NONE."].contains(reply.uppercased()) {
                     guard let object = MemoryReflection.object(reply) ?? MemoryReflection.lineObject(reply) else { return nil }

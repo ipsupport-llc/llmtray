@@ -136,11 +136,14 @@ struct MemoryPane: View {
                     learningStatus
                     Picker(selection: $learningModel) {
                         Text("The chat's own model").tag("")
+                        if AppleSystemModel.isAvailable || learningModel == AppleSystemModel.id {
+                            Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
+                        }
                         ForEach(learningModels, id: \.path) { model in
                             Text(model.displayName).tag(model.path)
                         }
                     } label: {
-                        SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.")
+                        SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below. Apple (on this Mac): the system's own model reads every chat on the Neural Engine -- nothing to download or load, your model and the GPU untouched; it's small, so notes may be plainer.")
                     }
                     if let warning = languageWarning {
                         Text(warning).font(.caption).foregroundStyle(.orange)
@@ -288,6 +291,13 @@ struct MemoryPane: View {
 
     /// The model set for memory doesn't say it speaks the notes' language.
     private var languageWarning: String? {
+        if learningModel == AppleSystemModel.id {
+            if case .unavailable(let why) = AppleSystemModel.availability { return why }
+            let code = MemoryReflector.languageCode()
+            guard !ModelCardLanguages.covers(Array(AppleSystemModel.languageCodes), code) else { return nil }
+            let name = Locale.current.localizedString(forLanguageCode: code) ?? code
+            return String(format: NSLocalizedString("Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists.", comment: ""), name)
+        }
         guard !learningModel.isEmpty,
               let readme = try? String(contentsOfFile: learningModel + "/README.md", encoding: .utf8),
               let languages = ModelCardLanguages.parse(readme: readme) else { return nil }
