@@ -441,4 +441,39 @@ extension MemoryTests {
         XCTAssertTrue(on.allows(file.note(id)!, project: nil))
         XCTAssertFalse(MemorySettings(enabled: true, factChats: 3).allows(file.note(id)!, project: nil), "not the user's own words")
     }
+
+    // MARK: Mood
+
+    func testAMoodReachesNewChatsUntilItRunsOut() {
+        var file = MemoryFile()
+        let chat = UUID()
+        file.add(subject: .user, topic: "answer-length", kind: .preference, text: "Short answers", now: t0)
+        file.setMood(MemoryMood(observed: "Angry: the linker fails", text: "Brief, straight to the fix", date: t0, chat: chat, quote: "q"))
+        let block = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0.addingTimeInterval(3600), tokens: tokens)!
+        XCTAssertTrue(block.text.contains("Short answers"))
+        XCTAssertTrue(block.text.hasSuffix("Right now (from the user's last messages, a guess): Angry: the linker fails. So: Brief, straight to the fix"))
+        XCTAssertEqual(block.moodUntil, t0.addingTimeInterval(3 * 3600))
+        XCTAssertTrue(MemorySelection.isCurrent(block, file: file, settings: on, project: nil, budget: 300,
+                                                now: t0.addingTimeInterval(2 * 3600), tokens: tokens))
+        XCTAssertFalse(MemorySelection.isCurrent(block, file: file, settings: on, project: nil, budget: 300,
+                                                 now: t0.addingTimeInterval(3 * 3600), tokens: tokens), "ran out: chosen again")
+        let later = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0.addingTimeInterval(4 * 3600), tokens: tokens)!
+        XCTAssertFalse(later.text.contains("Right now"))
+        XCTAssertNil(later.moodUntil)
+        let off = MemorySettings(enabled: true, moodHours: 0)
+        XCTAssertFalse(MemorySelection.choose(file, settings: off, project: nil, budget: 300, now: t0, tokens: tokens)!.text.contains("Right now"))
+    }
+
+    func testAMoodAloneIsABlockAndOnlyANewerOneReplacesIt() {
+        var file = MemoryFile()
+        let chat = UUID()
+        file.setMood(MemoryMood(observed: "Tired", text: "Keep it short", date: t0, chat: chat, quote: "q"))
+        file.setMood(MemoryMood(observed: "Older", text: "x", date: t0.addingTimeInterval(-60), chat: chat, quote: "q"))
+        XCTAssertEqual(file.mood?.observed, "Tired")
+        let block = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0, tokens: tokens)!
+        XCTAssertTrue(block.text.hasPrefix("Right now"))
+        XCTAssertEqual(block.noteIDs, [])
+        file.forgetLearned(fromChat: chat, keepState: true)
+        XCTAssertNil(file.mood, "the chat's lessons go, its mood too")
+    }
 }

@@ -99,6 +99,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes.";
 "About LLMTray" = "About LLMTray";
 "About you" = "About you";
 "About you and your work: what you do, what you use." = "About you and your work: what you do, what you use.";
@@ -458,7 +459,7 @@
 "Forget Everything…" = "Forget Everything…";
 "Forget What Was Learned…" = "Forget What Was Learned…";
 "Forget and Read All Chats Again" = "Forget and Read All Chats Again";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules." = "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules.";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile.";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";
@@ -515,6 +516,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
 "How you like things: language, length, tone, formatting." = "How you like things: language, length, tone, formatting.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.";
 "How?" = "How?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
@@ -651,6 +653,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats.";
 "Memory was off. Read what was said meanwhile?" = "Memory was off. Read what was said meanwhile?";
 "Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
@@ -760,7 +763,9 @@
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
 "Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
+"Nothing: no note is sent to these chats now." = "Nothing: no note is sent to these chats now.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here.";
+"Now: %@ → %@ (until %@)" = "Now: %@ → %@ (until %@)";
 "OK" = "OK";
 "Observation" = "Observation";
 "Observations" = "Observations";
@@ -796,6 +801,7 @@
 "Opens at login" = "Opens at login";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Other apps reach your models through an OpenAI-compatible API on this Mac.";
 "Other devices on your network can use the server" = "Other devices on your network can use the server";
+"Outside projects" = "Outside projects";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "PDF · %lld pages" = "PDF · %lld pages";
@@ -1008,6 +1014,7 @@
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
 "Show Reports…" = "Show Reports…";
+"Show What Chats Get…" = "Show What Chats Get…";
 "Show in Finder" = "Show in Finder";
 "Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
@@ -1138,6 +1145,7 @@
 "The embedding model couldn't be downloaded" = "The embedding model couldn't be downloaded";
 "The embedding model failed: %@" = "The embedding model failed: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.";
+"The exact text a new chat gets, before your first message." = "The exact text a new chat gets, before your first message.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "The full chat window, with projects and every chat (⌘⇧O)";
@@ -1393,6 +1401,8 @@
 "Your Mac" = "Your Mac";
 "Your files" = "Your files";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
+"Your mood: for %lld hours" = "Your mood: for %lld hours";
+"Your mood: not read" = "Your mood: not read";
 "Your name (optional)" = "Your name (optional)";
 "Your site or profile (optional, https://…)" = "Your site or profile (optional, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

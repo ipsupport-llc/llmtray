@@ -7,7 +7,7 @@ import XCTest
 /// commit) on fixture chats and prints the notes it ends with. Run it on the
 /// user's Mac only on their say-so:
 ///
-///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3 \
+///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3|4 \
 ///   MEMORY_EVAL_STATE=/tmp/memory-eval.json swift test --filter MemoryLiveEval
 ///
 /// with an mlx_lm.server of that model on the port. The state file carries
@@ -19,6 +19,8 @@ final class MemoryLiveEval: XCTestCase {
     struct Chat {
         var project: UUID?
         var messages: [(before: String?, text: String)]
+        /// How long ago it was said (a mood counts only for a few hours).
+        var hoursAgo: Double = 0
     }
 
     static let projectX = UUID(uuidString: "00000000-0000-0000-0000-0000000000AA")!
@@ -80,6 +82,19 @@ final class MemoryLiveEval: XCTestCase {
                 ("Вот сравнение списком...", "для сравнений мне больше нравятся таблицы, делай таблицей"),
             ]),
         ],
+        // Mood: a day-old tired chat gives none; a fresh angry one does;
+        // depression never. Expected mood: angry at the linker, answer briefly.
+        4: [
+            Chat(project: nil, messages: [
+                (nil, "я так устал от этого проекта, сил нет"),
+                ("Понимаю. Чем помочь?", "ладно, давай посмотрим конфиг"),
+            ], hoursAgo: 30),
+            Chat(project: nil, messages: [
+                (nil, "у меня депрессия, всё бесит"),
+                ("Сочувствую.", "что за фигня, опять линкер падает, третий раз за час!"),
+                ("Давай разберёмся: что в логе?", "просто скажи, что делать, без длинных объяснений"),
+            ]),
+        ],
     ]
 
     var port = 0
@@ -116,7 +131,8 @@ final class MemoryLiveEval: XCTestCase {
             let id = UUID()
             file.meet(id, from: 0)
             let messages = chat.messages.enumerated().map {
-                MemoryBatchMessage(seq: $0.offset + 1, date: Date(), text: $0.element.text, before: $0.element.before, model: modelPath)
+                MemoryBatchMessage(seq: $0.offset + 1, date: Date().addingTimeInterval(-chat.hoursAgo * 3600), text: $0.element.text,
+                                   before: $0.element.before, model: modelPath)
             }
             file.enqueue(chat: id, project: chat.project, messages: messages, now: Date())
         }
@@ -128,6 +144,7 @@ final class MemoryLiveEval: XCTestCase {
         try JSONEncoder().encode(vectors).write(to: URL(fileURLWithPath: vectorsPath))
 
         print("\n=== notes after set \(set) (\((modelPath as NSString).lastPathComponent))")
+        if let mood = file.mood { print("- [mood] \(mood.observed) → \(mood.text) — evidence: \"\(mood.quote)\"") }
         for note in file.notes {
             let scope: String
             switch note.subject {
@@ -168,10 +185,11 @@ final class MemoryLiveEval: XCTestCase {
         let topics = Array(Set(MemoryTopics.builtIn + file.notes.map(\.topic))).sorted()
 
         let debug = ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1"
-        guard let ops = try await MemoryExtraction.operations(
+        guard let reading = try await MemoryExtraction.reading(
             batch: batch, candidates: candidates, toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
             topics: topics, language: "Russian", kinds: settings.kinds,
             inProject: settings.shareLearned && project != nil,
+            moodSince: Date().addingTimeInterval(-Double(settings.moodHours) * 3600),
             ask: { messages, maxTokens in
                 let reply = try await self.ask(messages, maxTokens)
                 if debug { print("  [\((messages[0]["content"] as? String ?? "").prefix(40))…] → \(reply.prefix(400))") }
@@ -181,6 +199,11 @@ final class MemoryLiveEval: XCTestCase {
             file.failBatch(batch.id)
             file.dropBatch(batch.id)
             return
+        }
+        let ops = reading.operations
+        if let mood = reading.mood {
+            print("  ☁ mood: \(mood.observed) → \(mood.text) ← \"\(mood.quote)\"")
+            file.setMood(MemoryMood(observed: mood.observed, text: mood.text, date: mood.message.date, chat: batch.chat, quote: mood.quote))
         }
         print("reflect: \(ops.count) op(s)")
         struct Pending { var op: MemoryReflection.Operation; var message: MemoryBatchMessage; var subject: MemorySubject; var claim: MemoryReflection.Claim }
@@ -201,7 +224,7 @@ final class MemoryLiveEval: XCTestCase {
             case .confirm, .forget:
                 guard let note else { print("  ✗ unknown id: \(label)"); continue }
                 subject = note.subject
-                statement = op.action == .confirm ? note.text : "The user asks to forget this, or says it is no longer true: \(note.text)"
+                statement = op.action == .confirm ? MemoryReflection.confirmStatement(note) : "The user asks to forget this, or says it is no longer true: \(note.text)"
             case .update, .supersede:
                 guard let note, let text = op.text, MemoryReflection.mayLearn(op, kind: note.kind) else { print("  ✗ id/rules: \(label)"); continue }
                 subject = note.subject

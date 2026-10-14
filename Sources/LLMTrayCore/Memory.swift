@@ -130,12 +130,16 @@ public struct MemorySettings: Equatable, Sendable {
     /// approved or pinned, and what they asked for (preferences,
     /// corrections), go at once.
     public var factChats: Int
+    /// Hours a mood read from the user's last messages reaches new chats;
+    /// 0: moods aren't read.
+    public var moodHours: Int
 
     public static let defaultHalfLives: [MemoryKind: Double] = [.observation: 30, .fact: 90, .preference: 180, .correction: 180]
 
     public init(enabled: Bool = false, kinds: Set<MemoryKind> = Set(MemoryKind.allCases), budgetTokens: Int = 300,
                 maxActive: Int = 300, halfLifeDays: [MemoryKind: Double] = MemorySettings.defaultHalfLives,
-                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true, shareLearned: Bool = false, factChats: Int = 2) {
+                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true, shareLearned: Bool = false, factChats: Int = 2,
+                moodHours: Int = 3) {
         self.enabled = enabled
         self.kinds = kinds
         self.budgetTokens = budgetTokens
@@ -145,6 +149,7 @@ public struct MemorySettings: Equatable, Sendable {
         self.projectMemory = projectMemory
         self.shareLearned = shareLearned
         self.factChats = max(1, factChats)
+        self.moodHours = max(0, moodHours)
     }
 
     public func halfLife(_ kind: MemoryKind) -> Double {
@@ -193,7 +198,7 @@ public struct MemorySettings: Equatable, Sendable {
     /// (sharing turned on, a kind back on, a bigger budget) makes a new one.
     public var fingerprint: String {
         let k = MemoryKind.allCases.filter(kinds.contains).map(\.rawValue).joined(separator: ",")
-        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)|facts:\(factChats)"
+        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)|facts:\(factChats)|mood:\(moodHours)"
     }
 }
 
@@ -216,7 +221,7 @@ extension MemorySettings {
             halfLifeDays: Dictionary(uniqueKeysWithValues: MemoryKind.allCases.map { ($0, Double(max(1, defaults[Self.halfLifeKey($0)]))) }),
             deleteExpiredAfterDays: max(0, defaults[Pref.memoryDeleteExpiredAfterDays]),
             projectMemory: defaults[Pref.memoryProjects], shareLearned: defaults[Pref.memoryShareLearned],
-            factChats: defaults[Pref.memoryFactChats])
+            factChats: defaults[Pref.memoryFactChats], moodHours: defaults[Pref.memoryMoodHours])
     }
 
     /// Stores which kinds are on.
@@ -390,6 +395,39 @@ public enum MemoryText {
     public static let observationTopics: Set<String> = ["tone", "answer-length", "formatting", "reply-language", "code-style"]
 }
 
+/// The user's mood as their last messages showed it (adr/0024, "Mood"):
+/// what was seen and how to answer now; it reaches new chats for
+/// MemorySettings.moodHours from the message, then it's gone.
+public struct MemoryMood: Codable, Equatable, Sendable {
+    /// What the messages show ("Angry: the linker fails again").
+    public var observed: String
+    /// How to answer now ("Brief, straight to the fix").
+    public var text: String
+    /// The message's: the mood counts from when it was said.
+    public var date: Date
+    public var chat: UUID
+    public var quote: String
+
+    public init(observed: String, text: String, date: Date, chat: UUID, quote: String) {
+        self.observed = observed
+        self.text = text
+        self.date = date
+        self.chat = chat
+        self.quote = quote
+    }
+
+    public func until(hours: Int) -> Date { date.addingTimeInterval(Double(hours) * 3600) }
+    public func isFresh(now: Date, hours: Int) -> Bool { hours > 0 && until(hours: hours) > now }
+}
+
+extension MemoryFile {
+    /// A mood read from a chat: kept when it's newer than the one there.
+    public mutating func setMood(_ new: MemoryMood) {
+        guard mood.map({ new.date > $0.date }) ?? true else { return }
+        mood = new
+    }
+}
+
 /// The memory store as it is on disk (memory/notes.json).
 public struct MemoryFile: Codable, Equatable, Sendable {
     public var version = 1
@@ -418,11 +456,14 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// Forgotten notes, so they aren't learned again from the same words.
     public var tombstones: [MemoryTombstone] = []
     public var nextBatchID = 1
+    /// The user's mood as their last messages showed it: short-lived, not a
+    /// note (MemorySettings.moodHours).
+    public var mood: MemoryMood?
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, readBefore, optedOut, tombstones, nextBatchID
+        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, readBefore, optedOut, tombstones, nextBatchID, mood
     }
 
     // The queue and the rest came after the first notes files.
@@ -442,6 +483,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
         tombstones = try c.decodeIfPresent([MemoryTombstone].self, forKey: .tombstones) ?? []
         nextBatchID = try c.decodeIfPresent(Int.self, forKey: .nextBatchID) ?? 1
+        mood = try c.decodeIfPresent(MemoryMood.self, forKey: .mood)
     }
 
     public func note(_ id: String) -> MemoryNote? { notes.first { $0.id == id } }
@@ -597,6 +639,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         notes = []
         queue = []
         tombstones = []
+        mood = nil
         _ = bump()
     }
 
@@ -611,6 +654,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public mutating func forgetUnreviewed(readAgain: Bool) {
         notes.removeAll { !$0.reviewed && !$0.pinned }
         queue = []
+        mood = nil
         if readAgain {
             watermarks = [:]
             metFrom = [:]
@@ -761,6 +805,10 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// their evidence alone (a deleted chat, the setting off).
     public mutating func forgetLearned(fromChat chat: UUID, keepState: Bool, keepNotes: Bool = false, now: Date = Date()) {
         var changed = false
+        if mood?.chat == chat {
+            mood = nil
+            changed = true
+        }
         let before = queue.count
         queue.removeAll { $0.chat == chat }
         if queue.count != before { changed = true }
@@ -976,8 +1024,12 @@ public struct MemorySnapshot: Codable, Equatable, Sendable {
     public var tokens: Int
     /// The settings it was chosen under (MemorySettings.fingerprint).
     public var settings: String?
+    /// When the mood it carries runs out: then it's chosen again.
+    public var moodUntil: Date?
 
-    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int, settings: String? = nil) {
+    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int, settings: String? = nil,
+                moodUntil: Date? = nil) {
+        self.moodUntil = moodUntil
         self.text = text
         self.noteIDs = noteIDs
         self.generation = generation
@@ -1033,7 +1085,17 @@ public enum MemorySelection {
         let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0,
                                    settings: settings.fingerprint)
         let eligible = file.notes.filter { settings.allows($0, project: project) }
-        guard !eligible.isEmpty, budget > 0 else { return empty }
+        // The mood first (it's what's timely), at most half the room.
+        let mood = file.mood.flatMap { $0.isFresh(now: now, hours: settings.moodHours) ? $0 : nil }
+        let moodText = mood.map(moodLine).flatMap { tokens($0) <= budget / 2 ? $0 : nil }
+        let budget = budget - (moodText.map { tokens($0) + 1 } ?? 0)
+        func snapshot(_ chosen: [MemoryNote]) -> MemorySnapshot {
+            let text = ((chosen.isEmpty ? [] : [render(chosen)]) + [moodText].compactMap { $0 }).joined(separator: "\n")
+            return MemorySnapshot(text: text, noteIDs: chosen.map(\.id), generation: file.generation, project: project,
+                                  tokens: text.isEmpty ? 0 : tokens(text), settings: settings.fingerprint,
+                                  moodUntil: moodText == nil ? nil : mood?.until(hours: settings.moodHours))
+        }
+        guard !eligible.isEmpty, budget > 0 else { return moodText == nil ? empty : snapshot([]) }
         func isFirst(_ n: MemoryNote) -> Bool {
             guard !n.pinned else { return true }
             if case .project = n.subject { return false }
@@ -1058,10 +1120,13 @@ public enum MemorySelection {
         for note in rest where fits(chosen + [note], within: budget) {
             chosen.append(note)
         }
-        guard !chosen.isEmpty else { return empty }
-        let text = render(chosen)
-        return MemorySnapshot(text: text, noteIDs: chosen.map(\.id), generation: file.generation,
-                              project: project, tokens: tokens(text), settings: settings.fingerprint)
+        guard !chosen.isEmpty || moodText != nil else { return empty }
+        return snapshot(chosen)
+    }
+
+    /// The mood as the model reads it: a guess about now, not a note.
+    static func moodLine(_ mood: MemoryMood) -> String {
+        "Right now (from the user's last messages, a guess): \(mood.observed). So: \(mood.text)"
     }
 
     /// Whether a chat's snapshot still holds: memory on, same project,
@@ -1070,8 +1135,10 @@ public enum MemorySelection {
     /// unchanged since. New notes alone don't make it stale: they reach the
     /// next chat.
     public static func isCurrent(_ snapshot: MemorySnapshot, file: MemoryFile, settings: MemorySettings,
-                                 project: UUID?, budget: Int, tokens: (String) -> Int) -> Bool {
+                                 project: UUID?, budget: Int, now: Date = Date(), tokens: (String) -> Int) -> Bool {
         guard settings.enabled, snapshot.project == project, snapshot.settings == settings.fingerprint else { return false }
+        // A mood that ran out leaves the chat.
+        if let until = snapshot.moodUntil, until <= now { return false }
         guard snapshot.text.isEmpty || tokens(snapshot.text) <= budget else { return false }
         for id in snapshot.noteIDs {
             guard let note = file.note(id), settings.allows(note, project: project),

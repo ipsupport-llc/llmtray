@@ -484,7 +484,7 @@ extension MemoryReflectionTests {
             .enumerated().map { MemoryBatchMessage(seq: $0.offset + 1, date: t0, text: $0.element, before: nil) }
         let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: t0, messages: messages)
         var asked: [String] = []
-        let ops = try await MemoryExtraction.operations(batch: batch, candidates: [], topics: ["tone"], language: "English",
+        let ops = try await MemoryExtraction.reading(batch: batch, candidates: [], topics: ["tone"], language: "English",
                                                         kinds: Set(MemoryKind.allCases), inProject: false) { prompt, _ in
             let system = prompt[0]["content"] as! String
             asked.append(String(system.prefix(20)))
@@ -497,7 +497,7 @@ extension MemoryReflectionTests {
                 return #"{"op":"add","observed":"Swears when it breaks","text":"Stay calm","quote":"damn, broken again","quote2":"the linker again"}"#
             }
             return "NONE"
-        }
+        }?.operations
         XCTAssertEqual(asked.count, 3, "triage, instructions, manner -- no fact or forget step")
         XCTAssertEqual(ops?.map(\.action), [.add, .add])
         XCTAssertEqual(ops?.first?.kind, .preference)
@@ -509,12 +509,56 @@ extension MemoryReflectionTests {
         let messages = ["damn, broken again", "thanks, what is RDMA?", "ok"]
             .enumerated().map { MemoryBatchMessage(seq: $0.offset + 1, date: t0, text: $0.element, before: nil) }
         let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: t0, messages: messages)
-        let ops = try await MemoryExtraction.operations(batch: batch, candidates: [], topics: [], language: "English",
+        let ops = try await MemoryExtraction.reading(batch: batch, candidates: [], topics: [], language: "English",
                                                         kinds: Set(MemoryKind.allCases), inProject: false) { prompt, _ in
             let system = prompt[0]["content"] as! String
             if system.hasPrefix("You sort") { return "1: none, manner\n2: none\n3: none" }
             return #"{"op":"add","observed":"Swears","text":"Stay calm","quote":"damn, broken again","quote2":"what is RDMA"}"#
-        }
+        }?.operations
         XCTAssertEqual(ops, [], "one message showing it: no step, no manner")
+    }
+
+    func testAMoodIsReadOnlyFromRecentMessages() async throws {
+        let now = Date()
+        let messages = [
+            MemoryBatchMessage(seq: 1, date: now.addingTimeInterval(-86_400), text: "so tired of this", before: nil),
+            MemoryBatchMessage(seq: 2, date: now, text: "damn, the linker failed again", before: nil),
+        ]
+        let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: now, messages: messages)
+        var moodPrompt = ""
+        let reading = try await MemoryExtraction.reading(batch: batch, candidates: [], topics: [], language: "English",
+                                                         kinds: Set(MemoryKind.allCases), inProject: false,
+                                                         moodSince: now.addingTimeInterval(-3 * 3600)) { prompt, _ in
+            let system = prompt[0]["content"] as! String
+            if system.hasPrefix("You sort") { return "1: none, mood\n2: none, mood" }
+            if system.hasPrefix("From a user") {
+                moodPrompt = prompt[1]["content"] as! String
+                return #"{"observed":"Angry: the linker fails","text":"Brief, straight to the fix","quote":"the linker failed again"}"#
+            }
+            return "NONE"
+        }
+        XCTAssertFalse(moodPrompt.contains("so tired"), "a day old: not now")
+        XCTAssertEqual(reading?.mood?.message.seq, 2)
+        XCTAssertEqual(reading?.mood?.text, "Brief, straight to the fix")
+        let off = try await MemoryExtraction.reading(batch: batch, candidates: [], topics: [], language: "English",
+                                                     kinds: Set(MemoryKind.allCases), inProject: false) { prompt, _ in
+            (prompt[0]["content"] as! String).hasPrefix("You sort") ? "1: mood\n2: mood" : #"{"observed":"x","text":"y","quote":"linker failed again"}"#
+        }
+        XCTAssertNil(off?.mood, "moods off")
+    }
+
+    func testTheSameMannerSeenAgainConfirmsItsNote() async throws {
+        var file = MemoryFile()
+        let id = file.add(subject: .general, topic: "tone", kind: .observation, text: "Stay calm", observed: "Swears when a build breaks",
+                          now: t0, reviewed: false, confidence: .inferred)!
+        let messages = ["damn, broken", "argh, damn it"].enumerated().map { MemoryBatchMessage(seq: $0.offset + 1, date: t0, text: $0.element, before: nil) }
+        let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: t0, messages: messages)
+        let ops = try await MemoryExtraction.reading(batch: batch, candidates: [], toneNotes: file.notes, topics: [], language: "English",
+                                                     kinds: Set(MemoryKind.allCases), inProject: false) { prompt, _ in
+            (prompt[0]["content"] as! String).hasPrefix("You sort") ? "1: manner\n2: manner"
+                : #"{"op":"add","observed":"swears when a build breaks","text":"Go straight to the fix","quote":"damn, broken","quote2":"argh, damn it"}"#
+        }?.operations
+        XCTAssertEqual(ops?.map(\.action), [.confirm])
+        XCTAssertEqual(ops?.first?.id, id)
     }
 }

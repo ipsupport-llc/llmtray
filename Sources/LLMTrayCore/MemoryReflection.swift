@@ -151,6 +151,13 @@ public enum MemoryReflection {
         return "\(note.id) [\(note.kind.rawValue), \(note.topic), \(scope)] \(note.text)\(observed)"
     }
 
+    /// What verify is asked about a confirm: the note isn't changed, so
+    /// saying part of it again is enough ("keep it short" confirms "short
+    /// answers, in Russian").
+    public static func confirmStatement(_ note: MemoryNote) -> String {
+        "The user says again, in any language or words, at least part of this: \(note.text)"
+    }
+
     public enum Verdict: String, Sendable { case yes, no, unclear }
 
     /// A claim for the verify call: what it says, about whom, and the

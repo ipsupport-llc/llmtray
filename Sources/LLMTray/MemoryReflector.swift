@@ -328,14 +328,21 @@ final class MemoryReflector: ObservableObject {
         let topicList = Array(Set(MemoryTopics.builtIn + memory.file.notes.map(\.topic))).sorted()
         let operations: [MemoryReflection.Operation]
         do {
-            guard let ops = try await MemoryExtraction.operations(
+            guard let reading = try await MemoryExtraction.reading(
                 batch: batch, candidates: candidates,
                 toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
                 topics: topicList, language: Self.languageName(), kinds: settings.kinds,
                 inProject: settings.shareLearned && project != nil,
+                moodSince: settings.moodHours > 0 ? Date().addingTimeInterval(-Double(settings.moodHours) * 3600) : nil,
                 ask: { messages, maxTokens in try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath).get() }
             ) else { return .failed("unreadable reply") }
-            operations = ops
+            operations = reading.operations
+            // The mood at once: it's for the next chats, and short-lived.
+            if let mood = reading.mood {
+                memory.change {
+                    $0.setMood(MemoryMood(observed: mood.observed, text: mood.text, date: mood.message.date, chat: batch.chat, quote: mood.quote))
+                }
+            }
         } catch let error as OutcomeError {
             return error.outcome
         } catch {
@@ -364,7 +371,7 @@ final class MemoryReflector: ObservableObject {
             case .confirm:
                 guard let note else { continue }
                 subject = note.subject
-                statement = note.text
+                statement = MemoryReflection.confirmStatement(note)
             case .update, .supersede:
                 guard let note, let text = op.text, MemoryReflection.mayLearn(op, kind: note.kind) else { continue }
                 subject = note.subject

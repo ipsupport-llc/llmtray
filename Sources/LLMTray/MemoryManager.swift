@@ -203,6 +203,19 @@ final class MemoryManager: ObservableObject {
         }
     }
 
+    /// The block a new chat in `project` would get now (Settings' preview):
+    /// as a chat chooses it, within the budget (a model with a small context
+    /// gets less: at most 5% of it). nil with memory off or the file unreadable.
+    func preview(project: UUID?) -> MemorySnapshot? {
+        let settings = settings
+        guard settings.enabled, !unreadable else { return nil }
+        let estimator = PromptTokenEstimator()
+        return MemorySelection.choose(file, settings: settings, project: project,
+                                      budget: MemorySelection.budget(settings, contextTokens: nil), now: Date()) {
+            estimator.estimate(PromptTokenEstimator.Measure(bytes: $0.utf8.count))
+        }
+    }
+
     /// The memory block for a chat in `project` (nil: none) on a model
     /// with `contextTokens` of context: `current`
     /// while it still holds (the chat's prompt stays the same for the

@@ -17,6 +17,7 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryProjects.name) private var projects = Pref.memoryProjects.defaultValue
     @AppStorage(Pref.memoryShareLearned.name) private var shareLearned = Pref.memoryShareLearned.defaultValue
     @AppStorage(Pref.memoryFactChats.name) private var factChats = Pref.memoryFactChats.defaultValue
+    @AppStorage(Pref.memoryMoodHours.name) private var moodHours = Pref.memoryMoodHours.defaultValue
     @AppStorage(Pref.memoryModel.name) private var learningModel = Pref.memoryModel.defaultValue
     @AppStorage(Pref.memorySwitchIdleMinutes.name) private var switchIdleMinutes = Pref.memorySwitchIdleMinutes.defaultValue
     @ObservedObject private var catalog = ModelCatalog.shared
@@ -32,6 +33,7 @@ struct MemoryPane: View {
     @State private var askResume = false
     @State private var confirmLearnPast = false
     @State private var confirmForgetLearned = false
+    @State private var showPreview = false
     /// What "Learn from Past Chats Now" did, shown under it.
     @State private var learnPastResult: String?
     @State private var about: [MemoryAboutField: String] = [:]
@@ -51,6 +53,14 @@ struct MemoryPane: View {
 
     var body: some View {
         Form {
+            Section {
+                Label {
+                    Text("Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats.")
+                        .font(.callout)
+                } icon: {
+                    Image(systemName: "lock.shield")
+                }
+            }
             Section("Memory") {
                 Toggle(isOn: $enabled) {
                     SettingLabel(title: "Remember things between chats", help: "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.")
@@ -69,6 +79,12 @@ struct MemoryPane: View {
                 notesSection
                 if !expiredNotes.isEmpty { expiredSection }
                 Section("What chats get") {
+                    HStack {
+                        Text("The exact text a new chat gets, before your first message.").font(.caption).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Show What Chats Get…") { showPreview = true }
+                            .disabled(memory.unreadable)
+                    }
                     Toggle(isOn: kindBinding(.preference)) {
                         SettingLabel(title: "Preferences", help: "How you like things: language, length, tone, formatting.")
                     }
@@ -80,6 +96,19 @@ struct MemoryPane: View {
                     }
                     Toggle(isOn: kindBinding(.observation)) {
                         SettingLabel(title: "Observations", help: "What you did, kept apart from what it may mean. Sent as a guess.")
+                    }
+                    Stepper(value: $moodHours, in: 0...24) {
+                        SettingLabel(title: moodHours == 0 ? "Your mood: not read" : "Your mood: for \(moodHours) hours",
+                                     help: "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.")
+                    }
+                    if let mood = memory.file.mood, mood.isFresh(now: Date(), hours: moodHours) {
+                        HStack {
+                            Text(String(format: NSLocalizedString("Now: %@ → %@ (until %@)", comment: "memory mood"), mood.observed, mood.text,
+                                        mood.until(hours: moodHours).formatted(date: .omitted, time: .shortened)))
+                                .font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Forget") { memory.change { $0.mood = nil } }
+                        }
                     }
                     Toggle(isOn: $projects) {
                         SettingLabel(title: "Remember in projects", help: "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.")
@@ -219,6 +248,9 @@ struct MemoryPane: View {
         // Expiry follows its settings at once, not at the next chat.
         .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in
             memory.sweep()
+        }
+        .sheet(isPresented: $showPreview) {
+            MemoryPreviewSheet(projects: library.library.projects) { showPreview = false }
         }
         .sheet(item: $draft) { d in
             MemoryNoteEditor(draft: d, projects: library.library.projects) { saved in
@@ -623,5 +655,46 @@ struct ChatMemoryChip: View {
                 .frame(width: 340)
             }
         }
+    }
+}
+
+/// What a new chat gets from memory, exactly: the block as a chat chooses
+/// it, for chats outside projects or in one project.
+struct MemoryPreviewSheet: View {
+    let projects: [ChatLibrary.Project]
+    let onClose: () -> Void
+    @ObservedObject private var memory = MemoryManager.shared
+    @State private var project: UUID?
+
+    var body: some View {
+        let snapshot = memory.preview(project: project)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("What chats get").font(.headline)
+            Picker("Chat", selection: $project) {
+                Text("Outside projects").tag(UUID?.none)
+                ForEach(projects) { p in Text(p.name).tag(Optional(p.id)) }
+            }
+            if let snapshot, !snapshot.text.isEmpty {
+                ScrollView {
+                    Text(snapshot.text)
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                }
+                .background(Color(nsColor: .textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                Text(String(format: NSLocalizedString("About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes.", comment: ""), snapshot.tokens))
+                    .font(.caption).foregroundStyle(.secondary)
+            } else {
+                Text("Nothing: no note is sent to these chats now.").foregroundStyle(.secondary)
+            }
+            HStack {
+                Spacer()
+                Button("Done", action: onClose).keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(20)
+        .frame(width: 560, height: 460)
     }
 }
