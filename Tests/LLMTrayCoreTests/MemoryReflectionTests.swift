@@ -584,4 +584,22 @@ extension MemoryReflectionTests {
         XCTAssertEqual(MemoryReflection.source(of: "I prefer short answers", in: more)?.seq, 4, "the second I")
         XCTAssertNil(MemoryReflection.parseOperations(#"{"op":"add","text":"a [b] c","quote":"x y"]}"#)?.first, "a line with [ isn't repaired")
     }
+
+    func testTheSortersGateReadsYesOrNoPerMessage() async throws {
+        let messages = ["how do I set up nginx?", "too vague, be concrete"].enumerated().map {
+            MemoryBatchMessage(seq: $0.offset + 1, date: t0, text: $0.element, before: nil)
+        }
+        let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: t0, messages: messages)
+        var shape: ReplyShape?
+        let yes = try await MemoryExtraction.gate(batch) { _, _, s in
+            shape = s
+            return #"{"message1": ["no"], "message2": ["yes"]}"#
+        }
+        XCTAssertEqual(yes, true)
+        XCTAssertEqual(shape, .labels(count: 2, choices: ["yes", "no"]))
+        let no = try await MemoryExtraction.gate(batch) { _, _, _ in #"{"message1": ["no"], "message2": "no"}"# }
+        XCTAssertEqual(no, false)
+        let unreadable = try await MemoryExtraction.gate(batch) { _, _, _ in "sure" }
+        XCTAssertNil(unreadable)
+    }
 }

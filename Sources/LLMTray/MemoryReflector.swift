@@ -23,6 +23,9 @@ final class MemoryReflector: ObservableObject {
     }
 
     @Published private(set) var status: Status = .idle
+    /// Batches Apple's model found something in (adr/0025): the reading
+    /// model sorts and reads them as usual; not sorted by Apple again.
+    private var sorted: Set<Int> = []
 
     private weak var server: ServerManager?
     private var running: Task<Void, Never>?
@@ -117,6 +120,10 @@ final class MemoryReflector: ObservableObject {
                 guard handle(outcome, of: head) else { return }
                 continue
             }
+            // Apple's model as the sorter: every batch is sorted on the
+            // Neural Engine first, and one with nothing to read is done
+            // there, without the reading model.
+            if await sortAhead() { continue }
             // The first batch the loaded model may read: its chat's model
             // (or the one set for memory). None: wait for one, or load it
             // when LLMTray has been idle long enough, if allowed.
@@ -148,6 +155,38 @@ final class MemoryReflector: ObservableObject {
             guard handle(outcome, of: batch) else { return }
         }
         status = .idle
+    }
+
+    /// Apple's model as the sorter goes through the queue first: a batch
+    /// with nothing to read leaves it (true: the queue changed). An
+    /// unreadable reply or an unavailable model leaves sorting to the
+    /// reading model.
+    private func sortAhead() async -> Bool {
+        let memory = MemoryManager.shared
+        guard UserDefaults.standard[Pref.memorySorter] == AppleSystemModel.id, AppleSystemModel.isAvailable else { return false }
+        sorted = sorted.filter { id in memory.file.queue.contains { $0.id == id } }
+        var changed = false
+        for batch in memory.file.queue where !sorted.contains(batch.id) {
+            guard memory.isEnabled else { break }
+            // Only whether there's anything: a small model mixes up which
+            // kind (a wish labelled a fact), so the reading model sorts what's
+            // kept itself.
+            let anything = try? await MemoryExtraction.gate(batch) { messages, maxTokens, shape in
+                try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape)
+            }
+            guard let anything else { continue }
+            if anything {
+                sorted.insert(batch.id)
+                continue
+            }
+            let settings = memory.settings
+            let projects = Set(ChatLibraryStore.shared.library.projects.map(\.id))
+            guard memory.change({ _ = $0.commit(batch: batch.id, changes: [], since: $0.generation, settings: settings,
+                                                liveProjects: projects, now: Date()) }) else { return changed }
+            NSLog("LLMTray memory: batch %d sorted by Apple's model: nothing to read", batch.id)
+            changed = true
+        }
+        return changed
     }
 
     /// A pass's outcome on the queue: true to go on with the next batch,

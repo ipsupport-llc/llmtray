@@ -19,6 +19,7 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryFactChats.name) private var factChats = Pref.memoryFactChats.defaultValue
     @AppStorage(Pref.memoryMoodHours.name) private var moodHours = Pref.memoryMoodHours.defaultValue
     @AppStorage(Pref.memoryModel.name) private var learningModel = Pref.memoryModel.defaultValue
+    @AppStorage(Pref.memorySorter.name) private var sorter = Pref.memorySorter.defaultValue
     @AppStorage(Pref.memorySwitchIdleMinutes.name) private var switchIdleMinutes = Pref.memorySwitchIdleMinutes.defaultValue
     @ObservedObject private var catalog = ModelCatalog.shared
     @AppStorage(Pref.memoryIdleMinutes.name) private var idleMinutes = Pref.memoryIdleMinutes.defaultValue
@@ -136,14 +137,27 @@ struct MemoryPane: View {
                     learningStatus
                     Picker(selection: $learningModel) {
                         Text("The chat's own model").tag("")
-                        if AppleSystemModel.isAvailable || learningModel == AppleSystemModel.id {
+                        // Not offered as the reader (adr/0025: it misses too
+                        // much); kept for a setting made in a test build.
+                        if learningModel == AppleSystemModel.id {
                             Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
                         }
                         ForEach(learningModels, id: \.path) { model in
                             Text(model.displayName).tag(model.path)
                         }
                     } label: {
-                        SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below. Apple (on this Mac): the system's own model reads every chat on the Neural Engine -- nothing to download or load, your model and the GPU untouched; it's small, so notes may be plainer.")
+                        SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.")
+                    }
+                    if AppleSystemModel.isAvailable || sorter == AppleSystemModel.id {
+                        Picker(selection: $sorter) {
+                            Text("The model that reads them").tag("")
+                            Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
+                        } label: {
+                            SettingLabel(title: "Sorts messages with", help: "Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in.")
+                        }
+                        if sorter == AppleSystemModel.id, case .unavailable(let why) = AppleSystemModel.availability {
+                            Text(why).font(.caption).foregroundStyle(.orange)
+                        }
                     }
                     if let warning = languageWarning {
                         Text(warning).font(.caption).foregroundStyle(.orange)
@@ -247,6 +261,7 @@ struct MemoryPane: View {
         }
         .onAppear(perform: loadAbout)
         .onChange(of: learningModel) { _, _ in reflector.poke(after: 2) }
+        .onChange(of: sorter) { _, _ in reflector.poke(after: 2) }
         .onChange(of: switchIdleMinutes) { _, _ in reflector.poke(after: 2) }
         // Expiry follows its settings at once, not at the next chat.
         .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in

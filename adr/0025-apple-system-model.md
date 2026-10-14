@@ -56,6 +56,31 @@ labelled mood (code filters it anyway), a swearing message labelled none.
 - The memory eval (`MemoryLiveEval`, sets 1-4) gains an in-process Apple run;
   the option ships only if it keeps every trap out.
 
+### Part A as built: Apple sorts, the reading model reads (2026-10-14)
+
+The eval (`MemoryLiveEval`, sets 1-5, `MEMORY_EVAL_MODEL=apple-system` and
+`MEMORY_EVAL_SORTER=apple-system`) settled it:
+
+- **As the reader, no.** With guided generation every reply parses, and the
+  traps stay out -- but it misses most of what's there ("short, in Russian",
+  "concrete versions", "no invented charts"), its own verify rejects right
+  confirms across languages, and it makes things up ("Give concrete answers"
+  from the chart sentence). Not offered in Settings (a setting made in a test
+  build still works).
+- **As the sorter, yes -- a gate only.** Settings › Memory › "Sorts messages
+  with": the reading model, or Apple (on this Mac). Apple answers one question
+  per message, "does it tell anything about the user?" (yes/no, "when unsure,
+  yes"), on the Neural Engine, before the reading model is needed: a batch of
+  only "no" is done there -- no model loaded, no GPU. A batch with a "yes" goes
+  to the reading model, which sorts it itself (Apple's six-way labels mixed
+  kinds up: a wish labelled a fact). Eval: every batch with something in it
+  kept (sets 1-4, both runs); 2 of 3 chats of plain questions done by Apple
+  (set 5). It catches manner and complaints less well, so "when unsure, yes"
+  errs toward reading.
+- Guided generation: `ReplyShape` (labels as one field per message -- an
+  array of them didn't keep the count; ops with ids limited to the notes shown;
+  mood; verdicts and relations), turned into the JSON the parsers read.
+
 ### Part B: a chat model in the menus
 
 - The model is in the popover picker, the tray's Select Model and Settings ›

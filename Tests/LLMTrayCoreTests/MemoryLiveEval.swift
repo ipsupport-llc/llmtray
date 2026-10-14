@@ -7,7 +7,7 @@ import XCTest
 /// commit) on fixture chats and prints the notes it ends with. Run it on the
 /// user's Mac only on their say-so:
 ///
-///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3|4 \
+///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3|4|5 \
 ///   MEMORY_EVAL_STATE=/tmp/memory-eval.json swift test --filter MemoryLiveEval
 ///
 /// MEMORY_EVAL_MODEL=apple-system (no port): Apple's on-device model, in-process.
@@ -95,6 +95,24 @@ final class MemoryLiveEval: XCTestCase {
                 (nil, "у меня депрессия, всё бесит"),
                 ("Сочувствую.", "что за фигня, опять линкер падает, третий раз за час!"),
                 ("Давай разберёмся: что в логе?", "просто скажи, что делать, без длинных объяснений"),
+            ]),
+        ],
+        // Nothing to learn: questions and tasks only. With Apple as the
+        // sorter, every batch should be done without the reading model.
+        5: [
+            Chat(project: nil, messages: [
+                (nil, "как поднять nginx reverse proxy для двух доменов?"),
+                ("Вот конфиг...", "а с https через certbot?"),
+                ("Добавь блок...", "спасибо, а как проверить, что сертификат продлевается?"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "Translate to German: the meeting is moved to Friday."),
+                ("Das Meeting wird auf Freitag verschoben.", "and to French?"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "напиши функцию на python, которая считает медиану списка"),
+                ("def median(xs): ...", "добавь тесты"),
+                ("Вот тесты...", "ок, работает"),
             ]),
         ],
     ]
@@ -188,6 +206,18 @@ final class MemoryLiveEval: XCTestCase {
         let topics = Array(Set(MemoryTopics.builtIn + file.notes.map(\.topic))).sorted()
 
         let debug = ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1"
+        // MEMORY_EVAL_SORTER=apple-system: Apple's model sorts first (adr/0025).
+        if ProcessInfo.processInfo.environment["MEMORY_EVAL_SORTER"] == AppleSystemModel.id {
+            let anything = try await MemoryExtraction.gate(batch) { messages, maxTokens, shape in
+                try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape)
+            }
+            print("  ⇢ Apple: anything? \(anything.map(String.init(describing:)) ?? "unreadable")")
+            if anything == false {
+                file.dropBatch(batch.id)
+                print("commit: nothing to read (sorted by Apple)")
+                return
+            }
+        }
         guard let reading = try await MemoryExtraction.reading(
             batch: batch, candidates: candidates, toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
             topics: topics, language: "Russian", kinds: settings.kinds,
