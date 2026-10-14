@@ -1037,7 +1037,7 @@
 "Startup" = "Startup";
 "Staying up to date" = "Staying up to date";
 "Stays in its project" = "Stays in its project";
-"Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere. What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere. What you write yourself (About you, notes for all chats) is seen everywhere either way.";
+"Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way.";
 "Step %lld/%lld" = "Step %lld/%lld";
 "Stop" = "Stop";
 "Stop Indexing" = "Stop Indexing";
