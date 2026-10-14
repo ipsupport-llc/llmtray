@@ -1366,7 +1366,10 @@ final class ChatClient: ObservableObject {
             settings.modelPath.map(DownloadQueue.isFetching(modelPath:)) == true && !server.canAnswer
         }
         func modelAway() -> Bool {
-            server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting || downloading()
+            // Apple's model stays answerable while a picture, song or voice
+            // holds the GPU (adr/0025).
+            let apple = settings.modelPath == AppleSystemModel.id && server.servesAppleModel
+            return (server.suspendedForImageGeneration && !apple) || isAnotherChatUnloadingModel() || server.isStarting || downloading()
         }
         guard modelAway() else { return startStreamIfModelUp(request, server: server) }
         let token = turnToken, epoch = conversationEpoch

@@ -127,7 +127,12 @@ final class MemoryReflector: ObservableObject {
             // The first batch the loaded model may read: its chat's model
             // (or the one set for memory). None: wait for one, or load it
             // when LLMTray has been idle long enough, if allowed.
-            let loaded: String? = { if let server, case .running = server.state { return server.loadedModelPath } else { return nil } }()
+            // Apple's model answering the chat isn't memory's reader
+            // (adr/0025): chats wait for a model that is.
+            let loaded: String? = {
+                guard let server, case .running = server.state, server.loadedModelPath != AppleSystemModel.id else { return nil }
+                return server.loadedModelPath
+            }()
             guard let model = loaded,
                   let batch = memory.file.queue.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
                 let wanted = Self.reader(for: head)

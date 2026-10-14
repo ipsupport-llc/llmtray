@@ -211,6 +211,7 @@ final class ModelCatalog: ObservableObject {
     }
 
     func setAlias(_ alias: String, for modelID: String) {
+        guard modelID != AppleSystemModel.id else { return }
         ModelAliasStore.setAlias(alias, for: modelID)
         aliases[modelID] = ModelAliasStore.alias(for: modelID)
     }

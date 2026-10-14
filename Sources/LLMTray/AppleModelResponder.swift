@@ -14,18 +14,37 @@ final class AppleModelResponder {
     static let stallSeconds: TimeInterval = 60
 
     private var busy = false
-    private var waiters: [CheckedContinuation<Void, Never>] = []
+    private var waiters: [(id: UUID, continuation: CheckedContinuation<Bool, Never>)] = []
+    /// Every request's generation, for Stop.
+    private var running: [UUID: Task<Void, Never>] = [:]
 
-    private func acquire() async {
+    /// Its turn (true), or cancelled while waiting for it (false: it never
+    /// held the turn, nothing to release).
+    private func acquire() async -> Bool {
         guard busy else {
             busy = true
-            return
+            return true
         }
-        await withCheckedContinuation { waiters.append($0) }
+        let id = UUID()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                if Task.isCancelled { continuation.resume(returning: false) } else { waiters.append((id, continuation)) }
+            }
+        } onCancel: {
+            Task { @MainActor in
+                guard let i = self.waiters.firstIndex(where: { $0.id == id }) else { return }
+                self.waiters.remove(at: i).continuation.resume(returning: false)
+            }
+        }
     }
 
     private func release() {
-        if waiters.isEmpty { busy = false } else { waiters.removeFirst().resume() }
+        if waiters.isEmpty { busy = false } else { waiters.removeFirst().continuation.resume(returning: true) }
+    }
+
+    /// Stop: every Apple request ends, running or waiting.
+    func cancelAll() {
+        running.values.forEach { $0.cancel() }
     }
 
     /// `body`: the request (already checked to be a JSON object).
@@ -37,11 +56,19 @@ final class AppleModelResponder {
         server.beginRequest()
         let wire = AppleChatWire()
         let state = Progress()
+        let key = UUID()
         let generation = Task { @MainActor in
-            await self.acquire()
+            defer { self.running[key] = nil }
+            guard await self.acquire() else {
+                server.endRequest(forwarded: false)
+                state.done = true
+                connection.cancel()
+                return
+            }
+            server.beginServingApple()
             defer {
                 self.release()
-                server.endRequest(forwarded: false)
+                server.endRequest(forwarded: true)
                 state.done = true
             }
             guard !Task.isCancelled else {
@@ -87,6 +114,7 @@ final class AppleModelResponder {
                 }
             }
         }
+        running[key] = generation
         // The client gone: its generation stops (a pending receive is how
         // NWConnection notices the peer closing).
         watchClose(connection) { generation.cancel() }

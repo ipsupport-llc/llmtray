@@ -328,6 +328,12 @@ final class ServerManager: ObservableObject {
                 self.currentAlias = alias
                 // Another model's restarts say nothing about this one.
                 self.threadDeathRestarts = RestartBudget()
+                // From Apple's model the runtime may never have been set up
+                // (a first run that started with it).
+                if target != AppleSystemModel.id {
+                    try await self.installer.ensureReady()
+                    try self.checkNotStopped(epoch)
+                }
                 try await self.launchAndWaitReady(modelPath: target, alias: alias, epoch: epoch)
             } else {
                 try await self.loadIfNeeded(epoch: epoch)
@@ -516,6 +522,10 @@ final class ServerManager: ObservableObject {
             drainWaiters.append(continuation)
         }
     }
+
+    /// An Apple generation begins (adr/0025): counted like a forward, so a
+    /// switch waits for it to finish. Paired with endRequest(forwarded: true).
+    func beginServingApple() { forwardingCount += 1 }
 
     private func forwardEnded() {
         forwardingCount = max(0, forwardingCount - 1)
@@ -776,7 +786,8 @@ final class ServerManager: ObservableObject {
     /// Whether a restart would change the launch; drafterOnly: the only
     /// change is a drafter that has been downloaded since.
     private func computePendingLaunchChange() -> (changed: Bool, drafterOnly: Bool) {
-        guard case .running = state, let modelPath = currentModelPath, let last = lastRestartKey else { return (false, false) }
+        guard case .running = state, let modelPath = currentModelPath, modelPath != AppleSystemModel.id,
+              let last = lastRestartKey else { return (false, false) }
         let profile = withLaunchTrial(ProfileManager.shared.resolved(for: modelPath), modelPath: modelPath)
         var context = launchContext(
             modelPath: modelPath, alias: currentAlias,
@@ -920,6 +931,13 @@ final class ServerManager: ObservableObject {
         proxyStartPending = false
         state = .stopped
         process?.terminate()
+        // A start waiting for the listener (Apple's model has no process
+        // whose exit would end it) ends now, or every later transition waits.
+        if let pending = startContinuation {
+            startContinuation = nil
+            pending.resume(throwing: NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "the server was stopped"]))
+        }
+        AppleModelResponder.shared.cancelAll()
         // Its request dies with the proxy: no Switch left to press.
         ModelSwitchPrompter.shared.cancel()
     }
@@ -1252,8 +1270,12 @@ final class ServerManager: ObservableObject {
         try? await serialized(epoch: epoch) {
             guard case .running = self.state else { return }
             // Apple's model runs on the Neural Engine, in the system: it
-            // isn't in a picture's or a song's way, and stays answerable.
-            guard !self.servesAppleModel else { return }
+            // isn't in a picture's or a song's way, and stays answerable --
+            // but no MLX model may load meanwhile (a switch waits).
+            guard !self.servesAppleModel else {
+                if !onlyIfIdle { self.suspendedForImageGeneration = true }
+                return
+            }
             // A request that arrived since the idle check is already
             // counted -- don't unload the model out from under it.
             guard !onlyIfIdle || self.activeRequestCount == 0 else { return }

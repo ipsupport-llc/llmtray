@@ -314,6 +314,9 @@ extension ChatSettings {
                          thinkingStyle: ThinkingStyle = .none, supportsAudio: Bool = false) -> ChatSettings {
         let cap = maxContext ?? Self.maxContext(forModel: modelID)
         var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
+        // Apple's context holds the input and the answer: at most half for
+        // the answer, so the input budget (pinned files, history) has room.
+        if modelID == AppleSystemModel.id { settings.maxTokens = min(settings.maxTokens, max(256, cap / 2)) }
         settings.modelSupportsVision = supportsVision
         settings.thinkingStyle = thinkingStyle
         settings.modelSupportsAudio = supportsAudio

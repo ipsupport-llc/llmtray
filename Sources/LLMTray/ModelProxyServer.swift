@@ -276,6 +276,15 @@ final class ModelProxyServer {
                 ] as [String: Any]])
                 return
             }
+            // Background work reads with Apple's model in-process (memory),
+            // never through here: it doesn't take a foreground turn.
+            guard headers[BackgroundRequest.header.lowercased()] != BackgroundRequest.value else {
+                sendJSON(connection: connection, status: "409 Conflict", ["error": [
+                    "message": "background work doesn't run on Apple's model through the proxy",
+                    "type": BackgroundRequest.notLoadedCode, "code": BackgroundRequest.notLoadedCode,
+                ] as [String: Any]])
+                return
+            }
             guard route == "/v1/chat/completions", !bodyData.isEmpty else {
                 sendError(connection: connection, status: "404 Not Found", message: "Apple's model answers /v1/chat/completions only")
                 return
