@@ -245,8 +245,11 @@ public enum MemoryExtraction {
         var anything = false
         for n in 1...count {
             let item = object["message\(n)"]
-            let answers = ((item as? [Any])?.compactMap { $0 as? String } ?? (item as? String).map { [$0] } ?? [])
-                .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+            // Strings only: anything else in it is a reply not understood.
+            let raw: [Any] = (item as? [Any]) ?? (item.map { [$0] } ?? [])
+            let strings = raw.compactMap { $0 as? String }
+            guard strings.count == raw.count else { return nil }
+            let answers = strings.map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
             guard !answers.isEmpty, answers.allSatisfy({ $0 == "yes" || $0 == "no" }) else { return nil }
             if answers.contains("yes") { anything = true }
         }
