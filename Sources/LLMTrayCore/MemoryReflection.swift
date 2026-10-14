@@ -154,8 +154,20 @@ public enum MemoryReflection {
     /// What verify is asked about a confirm: the note isn't changed, so
     /// saying part of it again is enough ("keep it short" confirms "short
     /// answers, in Russian").
+    /// An observation's is what was observed, shown again (its text is how
+    /// to answer, which no message says).
     public static func confirmStatement(_ note: MemoryNote) -> String {
-        "The user says again, in any language or words, at least part of this: \(note.text)"
+        if note.kind == .observation, let observed = note.observed, !observed.isEmpty { return observed }
+        return "The user says again, in any language or words, at least part of this: \(note.text)"
+    }
+
+    /// Whether verify judges the claim for `op` as something shown, not said.
+    public static func isShown(_ op: Operation, note: MemoryNote?) -> Bool {
+        switch op.action {
+        case .add: return op.kind == .observation
+        case .confirm: return note?.kind == .observation && note?.observed?.isEmpty == false
+        default: return false
+        }
     }
 
     public enum Verdict: String, Sendable { case yes, no, unclear }

@@ -384,7 +384,7 @@ final class MemoryReflector: ObservableObject {
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                                  message: message.text, quote: op.quote, before: message.before,
-                                                                 isObservation: op.action == .add && op.kind == .observation)))
+                                                                 isObservation: MemoryReflection.isShown(op, note: note))))
         }
         guard !pending.isEmpty else {
             return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])

@@ -234,7 +234,7 @@ final class MemoryLiveEval: XCTestCase {
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: .init(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                 message: message.text, quote: op.quote, before: message.before,
-                                                isObservation: op.action == .add && op.kind == .observation)))
+                                                isObservation: MemoryReflection.isShown(op, note: note))))
         }
         if !pending.isEmpty {
             let reply = try await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), 40 + 12 * pending.count)
