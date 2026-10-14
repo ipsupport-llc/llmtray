@@ -169,6 +169,8 @@
 "Anything else chats should know" = "チャットが知っておくべきその他のこと";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "アプリの言語";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Appleは自社モデルの対応言語として%@を挙げていません。読み書きはできますが、一覧にある言語ほど得意ではありません。";
+"Apple's model took too long." = "Appleのモデルに時間がかかりすぎました。";
 "Apply to profile" = "プロファイルに適用";
 "Approve" = "承認";
 "Approve Selected" = "選択を承認";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "バランス（Default）";
 "Barely fits the GPU memory" = "GPU メモリにかろうじて収まります";
 "Be the first to be listed here." = "ここに最初の掲載者になりましょう。";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "チャットを読む前に、各メッセージは「回答の希望」「あなたについて」「気分」、または何もなしに分類されます。Apple（このMac上）: システム内蔵のモデルが、あなたのモデルが必要になる前に Neural Engine で分類します。学習することのないチャットの一部は、あなたのモデルを読み込んだり GPU を使ったりせずにそこで処理され、あなたのモデルは分類された内容だけを読みます。";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "画像や楽曲を作る前に、プロンプトと設定を表示して変更できます。カウントダウン後に自動で実行されます（操作しない場合）。";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "画像や曲が生成される前に、モデルに渡される内容（プロンプト、モデル、設定）を表示します。カウントダウン後に何も操作しなければ自動で進行します。";
 "Benchmark" = "ベンチマーク";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "推奨より大きい：より良い応答だが遅く、他のアプリに使えるメモリが少なくなります。";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us 版からチャット、プロジェクト、プロファイル、画像・音楽・音声・埋め込みモデルおよび設定を取り込みます（先に終了してください）。こちらのチャットとモデルは残り、取り込まれる設定がこれを置き換えます。モデルは追加のディスク容量を要しません。チャットモデルは models フォルダに残ります：設定 › Models で選択してください。";
 "Browse Hugging Face…" = "Hugging Faceをブラウズ…";
+"Built into macOS · LLMTray's chat only" = "macOSに内蔵 · LLMTrayのチャットのみ";
 "Cached" = "キャッシュ済み";
 "Calculator" = "計算機";
 "Calls" = "呼び出し";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "プロジェクト%@のチャット";
 "Chats outside projects" = "プロジェクト外のチャット";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "チャットは、あなたと仕事についての短いノートから始まります：回答の好み、取り組んでいること、以前に修正したこと。予算内に収まるノートだけが送信され、送信先はLLMTray自身のチャットだけです。APIを使うアプリには送信されず、一時チャットにも送信されません。すべてこのコンピュータ上に残ります。";
-"Chats won't get them any more. This can't be undone." = "チャットにこれらは送信されなくなります。この操作は取り消せません。";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "チャットでは今後それらは使われなくなります。これは取り消せません。「あなたについて」は残ります（削除するには各フィールドを消去してください）。再度読むと、チャットは最初から新たに学習されます。忘れられるだけで、前に読んだ内容が再び読まれることはありません。";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us のバージョンからのチャット、プロジェクト、プロファイル、画像・音楽・音声・埋め込みモデルがここに移されました。以前アクセスを許可したフォルダとチャットモデルのフォルダは、再度許可が必要です。";
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "プロジェクト内のすべてのチャットがファイル全体のテキストを取得します。ファイルがピン留めされている間、そのチャットでは Web 検索や画像・音楽生成は無効になります。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "保存済みのすべてのチャットを先頭から読み取り、そこに書いた内容を使ってメモを作成します。バックグラウンドで実行され、時間がかかる場合があります。";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "保存済みの各チャットは、先頭からもう一度読み直されます。すでにあるノートは確認され、重複して追加されることはありません。";
 "Everything in that folder is here already." = "そのフォルダ内のものはすでにここにあります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
 "Experimental — English only" = "実験的 — 英語のみ";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "公開された drafter（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデルではモデルと一緒にダウンロードされます）では、先読みでトークンを予測し、メインモデルが一度のパスで検証します。出力は同じで高速です。単独のリクエストではこれを使用し、複数のリクエストが同時にある場合はこれを使わずにバッチを共有します。";
 "Forget" = "忘れる";
-"Forget Everything" = "すべて忘れる";
 "Forget Everything…" = "すべて忘れる…";
 "Forget What Was Learned…" = "学習した内容を忘れる…";
 "Forget and Read All Chats Again" = "忘れてすべてのチャットを再度読み込む";
@@ -888,6 +892,8 @@
 "Re-index %@" = "%@ を再インデックス";
 "Re-index this file" = "このファイルを再インデックス";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld 個のサブフォルダ（%2$@）を確認します: そこからファイルは取り出されます。";
+"Read All Chats Again" = "すべてのチャットを再度読む";
+"Read All Chats Again…" = "すべてのチャットを再度読む…";
 "Read It Too" = "これも読み取る";
 "Read Them" = "読み取る";
 "Read a chat after %lld quiet minutes" = "%lld分間動きがなければチャットを読み取る";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "変更できなかった設定：";
 "Something went wrong?" = "問題が発生しましたか？";
 "Sort by" = "並べ替え";
+"Sorts messages with" = "メッセージの分類に使用";
 "Source on GitHub" = "GitHub でソースを見る";
 "Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";
 "Speakers work with echo cancellation; headphones are still best." = "スピーカーでもエコーキャンセルは機能しますが、ヘッドホンが最適です。";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "モデルランタイムがまだインストールされていません。モデルを一度起動してから、もう一度お試しください。";
 "The model sees them with your next message." = "次のメッセージでモデルがそれらを参照します。";
 "The model server no longer goes online when it starts." = "モデルサーバーは起動時にオンラインになりません。";
+"The model that reads them" = "それらを読むモデル";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "モデルフォルダが利用できません — ディスクは接続されていますか？ 設定 → Models で再度選択してください。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "過去プロンプトのキャッシュが占め得る最大量（プロファイルのPrompt cacheサイズも上限になります）。多いと長い会話やエージェントが高速になりますが、過剰だと現在読み取るプロンプトの余地がなくなります。";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "以前に修正した内容。繰り返されないようにします。";
 "What you did, kept apart from what it may mean. Sent as a guess." = "あなたが行ったことを、その意味と分けて保持します。推測として送信されます。";
 "What you do" = "職業や活動";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "以前のチャットからわかっているユーザ情報。古くなっている可能性があります。現在ユーザが述べている内容が優先されます。\n- ロシア語で簡潔に回答\n- OTAアップデート対応のESP32-S3スピーカーを作っている\n現時点では（ユーザの直近のメッセージからの推測）: 怒っている: リンカの失敗が続いている。したがって: 簡潔に、すぐ修正方法を示す";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "実行していた操作、期待した結果、実際に見た結果を記載してください。チャット内容は含まれません。";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "チャットに書いた内容は、これだけの時間動きがないとき、チャットを離れたとき、またはLLMTrayの終了時に、ノート用に読み取られます。バックグラウンドで、モデルに他の処理がない場合にのみ行われます。対象になるのは自分の発言だけで、回答、ファイル、Webページは含まれません。一時チャットと「記憶しない」とマークされたチャットは読み取られません。";
 "What's New" = "新機能";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "どのモデルが新しい画像を生成するか。";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "モデルが話している間、この値より小さいマイク音は無音として扱われます：エコーキャンセルが残す自己音の痕跡は除外されますが、上からの声は依然として割り込みます。モデルが自分の声を聞いている場合は値を上げ、あなたの割り込みを検出できない場合は下げてください。次回起動時に反映されます。";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "ノートがある場合は、次のようになります:";
 "Words only" = "単語のみ";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "プロンプトを分割して読み取るための作業メモリ。小さいほど長いプロンプトはより小さく遅いステップで読み取られます。プロンプトキャッシュと合わせて最大で90%の場合: 残りが現在読み取られるプロンプトを保持します。";
 "Works offline" = "オフラインで動作";

@@ -169,6 +169,8 @@
 "Anything else chats should know" = "כל דבר נוסף שצ׳אטים צריכים לדעת";
 "Apache License 2.0" = "רישיון Apache 2.0";
 "App language" = "שפת היישום";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple לא מציינת את %@ עבור המודל שלה: הוא קורא וכותב בה, אבל לא באותה רמה כמו בשפות שהיא מציינת.";
+"Apple's model took too long." = "המודל של Apple ארך זמן רב מדי.";
 "Apply to profile" = "החל על הפרופיל";
 "Approve" = "אשר";
 "Approve Selected" = "אשר נבחרים";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "מאוזן (Default)";
 "Barely fits the GPU memory" = "מתאים בקושי לזיכרון ה‑GPU";
 "Be the first to be listed here." = "היה הראשון שיופיע כאן.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "לפני שקוראים צ׳אט, כל הודעה ממוינת: איך תרצה תשובות, משהו עליך, מצב הרוח שלך, או שום דבר. Apple (ב-Mac הזה): המודל המובנה של המערכת ממיין ב‑Neural Engine, לפני שצריך את המודל שלך — חלק בצ׳אט שאין בו מה ללמוד נעשה שם, בלי לטעון את המודל שלך או להשתמש ב‑GPU; המודל שלך קורא רק את מה שמוין אליו.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "לפני יצירת תמונה או שיר, מציג את ההנחיה וההגדרות לשינוי. הוא ממשיך אחרי הספירה לאחור אלא אם תתערבו.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "לפני יצירת תמונה או שיר, מראה מה המודל ביקש — הפרומפט, המודל, הכפתורים — לשינוי קודם. לאחר הנחסור הוא ממשיך באופן אוטומטי אחרי הספירה לאחור אלא אם תתערבו.";
 "Benchmark" = "מבחן ביצועים";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "גדול מהמומלץ: תשובות טובות יותר, אך איטי יותר ויש פחות זיכרון פנוי לאפליקציות אחרות.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "יבא את השיחות, הפרויקטים, הפרופילים, מודלי תמונה, מוזיקה, קול והטמעה ואת ההגדרות מהגרסה ב-ipsupport.us (סגור אותה קודם). השיחות והמודלים כאן נותרות; ההגדרות שלה יחליפו את אלה. המודלים לא תופסים שטח דיסק נוסף. מודלי שיחה נשארים בתיקיית המודלים שלך: בחר אותה ב‑Settings › Models.";
 "Browse Hugging Face…" = "עיון ב־Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "מובנה ב‑macOS · רק בצ׳אט של LLMTray";
 "Cached" = "מטמון";
 "Calculator" = "מחשבון";
 "Calls" = "קריאות";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "צ'אטים של הפרויקט %@";
 "Chats outside projects" = "צ'אטים מחוץ לפרויקטים";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "צ'אטים מתחילים בהערות קצרות עליך ועל העבודה שלך: איך אתה מעדיף תשובות, על מה אתה עובד, ומה תיקנת בעבר. נשלחות רק הערות שנכנסות לתקציב, ורק בצ'אטים של LLMTray עצמה -- אף פעם לא ליישומים שמשתמשים ב-API, ואף פעם לא בצ'אטים זמניים. הכול נשאר במחשב הזה.";
-"Chats won't get them any more. This can't be undone." = "צ'אטים לא יקבלו אותן יותר. אי אפשר לבטל את זה.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "הצ'אטים לא יקבלו אותם יותר. אי אפשר לבטל את הפעולה הזו. ״עליך״ נשאר (כדי להסיר אותו, נקה את השדות שלו). בקריאה מחדש, הצ'אטים שלך יילמדו מחדש; רק מה שנשכח — מה שנקרא קודם לא ייקרא שוב.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "הצ'אטים, הפרוייקטים, הפרופילים והמודלים לתמונות, מוסיקה, קול והטמעות מהגרסה מ‑ipsupport.us נמצאים כאן כעת. התיקיות שנתת להן גישה, ותיקיית מודלי הצ'אט שלך, נדרשות אישורך שוב.";
 "Check Again" = "בדוק שוב";
 "Check Now" = "בדוק כעת";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "כל צ׳אט שמור נקרא מההתחלה לצורך הערות, באמצעות מה שכתבת בו. הפעולה רצה ברקע ועשויה להימשך זמן מה.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "כל צ׳אט שמור נקרא שוב מההתחלה. הערות שכבר קיימות מאושרות, ולא מוכפלות.";
 "Everything in that folder is here already." = "הכל בתיקיה הזו כבר כאן.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "בדיוק מה ש‑LLMTray שולח אל ipsupport.us, שדה אחר שדה. שום דבר אחר לא יוצא מהמחשב.";
 "Experimental — English only" = "ניסיוני — אנגלית בלבד";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "למודלים עם drafter שפורסם (Gemma 4 26B) או עם MTP head משלהם (מודלי Qwen 3.5 שלנו, שהורדו יחד אתם): הוא מנחש טוקנים קדימה והמודל הראשי מאשר אותם במעבר אחד. אותו פלט, מהר יותר. בקשה משתמשת בו כשהיא לבד; כשיש כמה בקשות יחד הן חולקות את ה-batch בלעדיו.";
 "Forget" = "שכח";
-"Forget Everything" = "שכח הכול";
 "Forget Everything…" = "שכח הכול…";
 "Forget What Was Learned…" = "שכח את מה שנלמד…";
 "Forget and Read All Chats Again" = "שכח וקרא שוב את כל הצ׳אטים";
@@ -888,6 +892,8 @@
 "Re-index %@" = "אונדקס מחדש %@";
 "Re-index this file" = "אונדקס את הקובץ שוב";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "נכנס ל־%1$lld תיקיות משנה (%2$@): הקבצים שלהן יוצאו מהן.";
+"Read All Chats Again" = "קרא שוב את כל הצ׳אטים";
+"Read All Chats Again…" = "קרא שוב את כל הצ׳אטים…";
 "Read It Too" = "קרא גם את זה";
 "Read Them" = "לקרוא אותם";
 "Read a chat after %lld quiet minutes" = "קרא צ׳אט אחרי %lld דקות שקטות";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "חלק מההגדרות לא ניתנו לשינוי:";
 "Something went wrong?" = "קרה משהו לא תקין?";
 "Sort by" = "מיון לפי";
+"Sorts messages with" = "ממיין הודעות באמצעות";
 "Source on GitHub" = "מקור ב‑GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
 "Speakers work with echo cancellation; headphones are still best." = "רמקולים עובדים עם הדחקת הד; אוזניות עדיפות.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "ה-runtime של המודל עדיין לא מותקן — הפעל מודל פעם אחת ואז נסה שוב.";
 "The model sees them with your next message." = "המודל יראה אותם עם ההודעה הבאה שלך.";
 "The model server no longer goes online when it starts." = "שרת המודל כבר לא מתחבר לאינטרנט כשהוא מתחיל לפעול.";
+"The model that reads them" = "המודל שקורא אותן";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "תיקיית ה‑models אינה זמינה — האם הדיסק שלה מחובר? בחרי/ה בחר/י אותה שוב ב‑Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "המקסימום שמטמון הפקודות הקודמות יכול לתפוס (גם הגדרת גודל מטמון הפקודות בפרופיל מהווה תקרה). יותר משפר מהירויות בצ'אטים ארוכים ובסוכנים; יותר מדי ישאיר מעט מקום לקריאת הפקודה הנוכחית.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "מה שתיקנת בעבר, כדי שזה לא יחזור.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "מה שעשית, בנפרד ממה שאולי משתמע ממנו. נשלח כהשערה.";
 "What you do" = "מה עיסוקך";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "מה שידוע לך על המשתמש מצ׳אטים קודמים. ייתכן שזה לא מעודכן: למה שהמשתמש אומר עכשיו יש עדיפות.\n- תשובה בקצרה, ברוסית\n- בונה רמקול מבוסס ESP32-S3 עם עדכוני OTA\nכרגע (לפי ההודעות האחרונות של המשתמש, כהשערה): כועס: המקשר ממשיך להיכשל. לכן: קצר, ישירות לפתרון";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "מה עשית, מה ציפית לקרות ומה ראית בפועל. השיחות שלך לא ייכללו.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "מה שכתבת בצ׳אט נקרא לצורך הערות אחרי פרק שקט באורך הזה, כשעוזבים אותו, או כש־LLMTray נסגר — ברקע, ורק כשהמודל לא עסוק בדבר אחר. רק המילים שלך נחשבות, אף פעם לא התשובות, הקבצים או דפי האינטרנט. צ'אט זמני וצ׳אטים שסומנו „אל תזכור” לעולם אינם נקראים.";
 "What's New" = "מה חדש";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "בעת דיבור המודל, צליל מהמיקרופון שחלש מ‑זה ייתפס כשתיקה: שארית הקול שהסרת הדהוד משאירה תישאר מחוץ, וקול מעליה עדיין יפריע. הגדל אם המודל שומע את עצמו, הקטן אם הוא מפספס את ההפרעות שלך. ייכנס לתוקף בהפעלה הבאה.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "עם הערות, זה נקרא כך:";
 "Words only" = "מילים בלבד";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
 "Works offline" = "עובד ללא חיבור";

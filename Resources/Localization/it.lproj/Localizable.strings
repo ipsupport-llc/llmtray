@@ -169,6 +169,8 @@
 "Anything else chats should know" = "Altro che le chat dovrebbero sapere";
 "Apache License 2.0" = "Licenza Apache 2.0";
 "App language" = "Lingua app";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple non indica %@ per il suo modello: lo legge e lo scrive, ma non bene quanto le lingue che indica.";
+"Apple's model took too long." = "Il modello di Apple ha impiegato troppo tempo.";
 "Apply to profile" = "Applica al profilo";
 "Approve" = "Approva";
 "Approve Selected" = "Approva selezionati";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Bilanciato (Default)";
 "Barely fits the GPU memory" = "Occupa quasi tutta la memoria GPU";
 "Be the first to be listed here." = "Sii il primo a essere elencato qui.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Prima che una chat venga letta, ogni messaggio viene classificato: come vuoi le risposte, qualcosa Su di te, il tuo umore o niente. Apple (su questo Mac): il modello del sistema classifica sul Neural Engine, prima che serva il tuo modello -- una parte della chat, quella senza nulla da apprendere, viene gestita lì, senza caricare il tuo modello né usare la GPU; il tuo modello legge solo ciò che è stato incluso dalla classificazione.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Prima di creare un'immagine o una canzone, mostra il prompt e le impostazioni da modificare. Procede dopo il conto alla rovescia a meno che non lo interrompi.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Prima che si generi un'immagine o una canzone, mostra cosa ha chiesto il modello — il prompt, il modello, le impostazioni — per poterle modificare. Procede da solo dopo il conto alla rovescia a meno che non lo interrompi.";
 "Benchmark" = "Benchmark";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Più grande rispetto a quello consigliato: risposte migliori, ma più lento e con meno memoria disponibile per altre app.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Importa chat, progetti, profili, i modelli per immagini, musica, voce e embedding e le impostazioni della versione da ipsupport.us (chiudila prima). Le chat e i modelli presenti rimangono; le sue impostazioni li sostituiranno. I modelli non occupano spazio aggiuntivo. I modelli di chat restano nella tua cartella models: selezionala in Impostazioni › Models.";
 "Browse Hugging Face…" = "Sfoglia Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "Integrato in macOS · Solo per la Chat di LLMTray";
 "Cached" = "In cache";
 "Calculator" = "Calcolatrice";
 "Calls" = "Chiamate";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "Chat del progetto %@";
 "Chats outside projects" = "Chat fuori dai progetti";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Le chat iniziano con brevi note su di te e sul tuo lavoro: come preferisci le risposte, a cosa stai lavorando, cosa hai corretto in passato. Vengono inviate solo le note che rientrano nel limite, e solo nelle chat di LLMTray: mai alle app che usano l’API, mai nelle chat temporanee. Tutto resta su questo computer.";
-"Chats won't get them any more. This can't be undone." = "Le chat non le riceveranno più. L’operazione non può essere annullata.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Le Chat non li riceveranno più. L’operazione non può essere annullata. «Su di te» resta (svuota i suoi campi per rimuoverlo). Se rileggi, le tue chat vengono apprese di nuovo dall’inizio; se dimentichi, ciò che era già stato letto non viene letto di nuovo.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chat, progetti, profili e i modelli di immagini, musica, voce e embedding della versione da ipsupport.us sono stati importati. Le cartelle a cui avevi dato accesso e la cartella dei modelli di chat richiedono nuovamente la tua autorizzazione.";
 "Check Again" = "Ricontrolla";
 "Check Now" = "Controlla ora";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Tutte le chat del progetto ricevono il testo completo; la ricerca sul web e la generazione di immagini o musica sono disattivate in quelle chat finché un file è appuntato.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Ogni richiesta a cui il server risponde, della chat e di altre app e agenti tramite l’API, conservata su questo Mac. Mediane per modello e impostazioni.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Ogni chat salvata viene letta dall’inizio per creare note, usando ciò che hai scritto lì. L’operazione viene eseguita in background e può richiedere tempo.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Ogni chat salvata viene riletta di nuovo dall’inizio. Le Note già presenti vengono confermate, non duplicate.";
 "Everything in that folder is here already." = "Tutto il contenuto di quella cartella è già presente qui.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Esattamente ciò che LLMTray invia a ipsupport.us, campo per campo. Nient'altro lascia il tuo Mac.";
 "Experimental — English only" = "Sperimentale — solo inglese";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "Per risposte più veloci (decodifica speculativa)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Per i modelli con un drafter pubblicato (Gemma 4 26B) o con una propria MTP head (i nostri modelli Qwen 3.5, scaricati con essi): il drafter anticipa i token e il modello principale li verifica in un unico passaggio. Stesso output, più veloce. Una richiesta lo usa quando è sola; con più richieste condividono il batch senza di esso.";
 "Forget" = "Dimentica";
-"Forget Everything" = "Dimentica tutto";
 "Forget Everything…" = "Dimentica tutto…";
 "Forget What Was Learned…" = "Dimentica ciò che è stato appreso…";
 "Forget and Read All Chats Again" = "Dimentica e rileggi tutte le chat";
@@ -888,6 +892,8 @@
 "Re-index %@" = "Re-indicizza %@";
 "Re-index this file" = "Re-indicizza questo file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Scorre %1$lld sottocartelle (%2$@): i loro file vengono estratti.";
+"Read All Chats Again" = "Rileggi tutte le chat";
+"Read All Chats Again…" = "Rileggi tutte le chat…";
 "Read It Too" = "Leggi anche questo";
 "Read Them" = "Leggile";
 "Read a chat after %lld quiet minutes" = "Leggi una chat dopo %lld minuti di inattività";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "Alcune impostazioni non possono essere modificate:";
 "Something went wrong?" = "Qualcosa è andato storto?";
 "Sort by" = "Ordina per";
+"Sorts messages with" = "Classifica i messaggi con";
 "Source on GitHub" = "Sorgente su GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Spazio occupato dai modelli in questa cartella e spazio ancora libero sul relativo disco.";
 "Speakers work with echo cancellation; headphones are still best." = "La cancellazione dell'eco funziona anche con gli altoparlanti; le cuffie rimangono l'opzione migliore.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Il runtime del modello non è ancora installato — avvia un modello una volta, quindi riprova.";
 "The model sees them with your next message." = "Il modello le vede con il tuo prossimo messaggio.";
 "The model server no longer goes online when it starts." = "Il server del modello non va più online all'avvio.";
+"The model that reads them" = "Il modello che li legge";
 "The model's license, from its card." = "La licenza del modello, dalla sua model card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "La cartella Models non è disponibile: il disco è collegato? Selezionala di nuovo in Impostazioni → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Massimo occupabile dalla cache dei prompt precedenti (la dimensione della Prompt cache del profilo è comunque un limite). Di più accelera chat lunghe e agenti; troppo spazio elimina lo spazio per il prompt in lettura.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "Cosa hai corretto in passato, così non viene ripetuto.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Cosa hai fatto, tenuto separato da ciò che potrebbe significare. Inviato come ipotesi.";
 "What you do" = "Cosa fai";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "Ciò che sai sull’utente dalle chat precedenti. Potrebbe non essere aggiornato: prevale quello che l’utente dice adesso.\n- Rispondi brevemente, in russo\n- Costruisce un altoparlante ESP32-S3 con aggiornamenti OTA\nIn questo momento (in base agli ultimi messaggi dell’utente, è un’ipotesi): Arrabbiato: il linker continua a non riuscire. Quindi: breve, vai dritto alla soluzione";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Cosa stavi facendo, cosa ti aspettavi e cosa hai visto invece. Le tue chat non sono mai incluse.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "Ciò che hai scritto in una chat viene letto per creare Note dopo questo periodo di inattività, quando la lasci o quando LLMTray si chiude, in background e solo mentre il modello non ha altro da fare. Contano solo le tue parole, mai le risposte, i file o le pagine web. Le Chat temporanee e le chat contrassegnate come «Non ricordare» non vengono mai lette.";
 "What's New" = "Novità";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "Quale modello genera nuove immagini.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Mentre il modello parla, il suono del microfono più silenzioso di questo viene considerato silenzio: la traccia della propria voce lasciata dalla cancellazione dell'eco resta fuori, una voce sopra di essa la interrompe comunque. Aumentalo se il modello sente se stesso, diminuiscilo se non rileva la tua interruzione. Ha effetto al prossimo avvio.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "Con le note, legge così:";
 "Words only" = "Solo testo";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memoria di lavoro per leggere il prompt a blocchi; meno memoria fa leggere prompt lunghi in passi più piccoli e lenti. Con la prompt cache complessiva al massimo 90%: il resto è riservato al prompt in lettura.";
 "Works offline" = "Funziona offline";

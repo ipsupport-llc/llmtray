@@ -169,6 +169,8 @@
 "Anything else chats should know" = "Sohbetlerin bilmesi gereken başka şeyler";
 "Apache License 2.0" = "Apache Lisansı 2.0";
 "App language" = "Uygulama dili";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple, %@ dilini modeli için listelemiyor: bu dili okuyup yazıyor, ama listelediği diller kadar iyi değil.";
+"Apple's model took too long." = "Apple’ın modeli çok uzun sürdü.";
 "Apply to profile" = "Profile uygula";
 "Approve" = "Onayla";
 "Approve Selected" = "Seçileni Onayla";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Dengeli (Varsayılan)";
 "Barely fits the GPU memory" = "GPU belleğine zar zor sığıyor";
 "Be the first to be listed here." = "Burada listelenen ilk kişi siz olun.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Bir sohbet okunmadan önce her ileti sınıflandırılır: yanıtları nasıl istediğiniz, Sizin hakkınızda bir şey, ruh hâliniz ya da hiçbir şey. Apple (bu Mac’te): sistemin kendi modeli, sizin modelinize gerek olmadan önce Neural Engine üzerinde sınıflandırır -- öğrenilecek bir şey içermeyen sohbet bölümü, modeliniz yüklenmeden veya GPU kullanılmadan burada işlenir; modeliniz yalnızca sınıflandırılarak eklenenleri okur.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Bir resim veya şarkı oluşturmadan önce uyarıyı ve değiştirilebilecek ayarları gösterir. Geri sayım bitince dokunmazsanız işlem devam eder.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Bir resim veya şarkı oluşturulmadan önce modelin ne istediğini — istem (prompt), model, ayarlar — değiştirmeniz için gösterir. Geri sayımdan sonra bir işlem yapmazsanız otomatik devam eder.";
 "Benchmark" = "Karşılaştırma";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Önerilenden büyük: daha iyi yanıtlar, ancak daha yavaş ve diğer uygulamalar için daha az bellek kalır.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us sürümünün sohbetleri, projeleri, profilleri, görsel, müzik, ses ve embedding modellerini ve ayarlarını getirir (önce onu kapatın). Buradaki sohbetler ve modeller kalır; onun ayarları bunların yerini alır. Modeller ekstra disk alanı kullanmaz. Sohbet modelleri modeller klasörünüzde kalır: Settings › Models bölümünden seçin.";
 "Browse Hugging Face…" = "Hugging Face’e Göz At…";
+"Built into macOS · LLMTray's chat only" = "macOS’e yerleşik · Yalnızca LLMTray Sohbet";
 "Cached" = "Önbellekte";
 "Calculator" = "Hesap Makinesi";
 "Calls" = "Çağrılar";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "%@ projesinin sohbetleri";
 "Chats outside projects" = "Projeler dışındaki sohbetler";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Sohbetler, sizin ve işiniz hakkında kısa notlarla başlar: cevapları nasıl istediğiniz, ne üzerinde çalıştığınız, daha önce neleri düzelttiğiniz. Yalnızca bütçeye sığan notlar gider ve yalnızca LLMTray’in kendi sohbetlerinde; API kullanan uygulamalara hiçbir zaman, geçici sohbetlerde hiçbir zaman gönderilmez. Her şey bu bilgisayarda kalır.";
-"Chats won't get them any more. This can't be undone." = "Sohbetler artık bunları almayacak. Bu işlem geri alınamaz.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Sohbetler artık bunları almayacak. Bu işlem geri alınamaz. Sizin hakkınızda kalır (kaldırmak için alanlarını temizleyin). Yeniden okunursa sohbetleriniz baştan yeniden öğrenilir; yalnızca unutulur, daha önce okunanlar yeniden okunmaz.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us sürümünün sohbetleri, projeleri, profilleri ve görsel, müzik, ses ve embedding modelleri şimdi burada. Ona izin verdiğiniz klasörler ve sohbet modelleri klasörünüz için tekrar onayınız gerekiyor.";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Sunucunun yanıtladığı her istek — sohbetten ve API üzerinden diğer uygulama ve ajanlardan — bu Mac'te tutulur. Model ve ayar başına medyanlar.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Kaydedilen her sohbet, notlar için başından itibaren okunur; orada yazdıklarınız kullanılır. Bu işlem arka planda çalışır ve biraz sürebilir.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Kaydedilmiş her sohbet baştan bir kez daha okunur. Zaten var olan Notlar onaylanır, yinelenmez.";
 "Everything in that folder is here already." = "O klasördeki her şey zaten burada.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray'nin ipsupport.us'a alan alan gönderdiği tam bilgiler. Başka hiçbir şey Mac'inizden ayrılmaz.";
 "Experimental — English only" = "Deneysel — yalnızca İngilizce";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "Daha hızlı yanıtlar için (spekülatif çözümleme)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Yayımlanmış bir drafter'ı olan modeller (Gemma 4 26B) veya kendi MTP başlığına sahip modellerde (Qwen 3.5 modellerimiz, bunlarla birlikte indirilir): önden token tahmini yapar ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. Bir istek yalnızken bunu kullanır; birden çok istek aynı anda olursa paketleri paylaşırlar ve kullanmazlar.";
 "Forget" = "Unut";
-"Forget Everything" = "Her Şeyi Unut";
 "Forget Everything…" = "Her Şeyi Unut…";
 "Forget What Was Learned…" = "Öğrenilenleri Unut…";
 "Forget and Read All Chats Again" = "Unut ve Tüm Sohbetleri Yeniden Oku";
@@ -888,6 +892,8 @@
 "Re-index %@" = "%@ öğesini yeniden dizine al";
 "Re-index this file" = "Bu dosyayı yeniden dizine al";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld alt klasöre (%2$@) giriliyor: dosyaları bu klasörlerden çıkarılır.";
+"Read All Chats Again" = "Tüm sohbetleri yeniden oku";
+"Read All Chats Again…" = "Tüm sohbetleri yeniden oku…";
 "Read It Too" = "Bunu da Oku";
 "Read Them" = "Bunları Oku";
 "Read a chat after %lld quiet minutes" = "Bir sohbeti %lld sessiz dakikadan sonra oku";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "Bazı ayarlar değiştirilemedi:";
 "Something went wrong?" = "Bir şey mi ters gitti?";
 "Sort by" = "Sıralama ölçütü";
+"Sorts messages with" = "İletileri şununla sınıflandırır";
 "Source on GitHub" = "Kaynak GitHub'da";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
 "Speakers work with echo cancellation; headphones are still best." = "Hoparlörler gecikme giderme ile çalışır; en iyi sonuç için kulaklık önerilir.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Model çalışma zamanı henüz yüklü değil — bir model başlatıp sonra tekrar deneyin.";
 "The model sees them with your next message." = "Model bunları bir sonraki mesajınızla görür.";
 "The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
+"The model that reads them" = "Bunları okuyan model";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Models klasörü kullanılamıyor — diski bağlı mı? Ayarlar → Models'den tekrar seçin.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Önceki istemlerin önbelleğinin alabileceği maksimum (profilin İsteme önbelleği boyutu da bir üst sınırdır). Daha fazla uzun sohbetleri ve ajanları hızlandırır; çok fazlası okunan istem için yer bırakmaz.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "Tekrarlanmaması için daha önce düzelttiğiniz şeyler.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Ne yaptığınız; ne anlama gelebileceğinden ayrı tutulur. Tahmin olarak gönderilir.";
 "What you do" = "Ne iş yaptığınız";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "Önceki sohbetlerden kullanıcı hakkında bildikleriniz. Güncelliğini yitirmiş olabilir: kullanıcının şimdi söylediği esas alınır.\n- Kısaca, Rusça yanıt ver\n- OTA güncellemeleri olan bir ESP32-S3 hoparlör yapıyor\nŞu anda (kullanıcının son mesajlarına göre, bir tahmin): Kızgın: bağlayıcı sürekli hata veriyor. Bu yüzden: Kısa ol, doğrudan çözüme geç";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Ne yapıyordunuz, ne bekliyordunuz, bunun yerine ne gördünüz. Sohbetleriniz asla eklenmez.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "Bir sohbette yazdıklarınız, bu kadar süre sessiz kaldığında, sohbetten ayrıldığınızda veya LLMTray kapandığında Notlar için okunur -- arka planda ve yalnızca modelin yapacak başka işi yokken. Yalnızca kendi sözleriniz dikkate alınır; yanıtlar, dosyalar veya web sayfaları asla dikkate alınmaz. Geçici sohbetler ve “Hatırlama” olarak işaretlenen sohbetler asla okunmaz.";
 "What's New" = "Yenilikler";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Model konuşurken, mikrofondan daha sessiz olan sesler buna göre sessizlik olarak algılanır: yankı engellemenin bıraktığı kendi sesinin izi dışarıda kalır, üzerine gelen bir ses yine kesintiye uğratır. Model kendini duyuyorsa artırın; sizi kesintiye uğratmayı kaçırıyorsa azaltın. Bir sonraki başlatmada geçerli olur.";
 "Wikipedia" = "Vikipedi";
+"With notes, it reads like this:" = "Notlarla şöyle görünür:";
 "Words only" = "Sadece kelimeler";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "İstemi parça parça okumak için çalışma belleği; daha az bellek uzun istemleri daha küçük, daha yavaş adımlarla okur. İsteme önbelleği toplamda en fazla %90 ise: kalan, okunan istemi tutar.";
 "Works offline" = "Çevrimdışı çalışır";
