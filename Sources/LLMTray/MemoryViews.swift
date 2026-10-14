@@ -190,10 +190,17 @@ struct MemoryPane: View {
         }
         .confirmationDialog("Learn from all your past chats?", isPresented: $confirmLearnPast) {
             Button("Read Them") {
-                let count = memory.learnFromPastChats()
-                learnPastResult = count == 0
+                let (queued, waiting) = memory.learnFromPastChats()
+                var lines: [String] = []
+                if queued > 0 {
+                    lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
+                }
+                if waiting > 0 {
+                    lines.append(String(format: NSLocalizedString("%d chats are answering: theirs is queued once they're done.", comment: ""), waiting))
+                }
+                learnPastResult = lines.isEmpty
                     ? NSLocalizedString("Nothing left to read: every chat was read from its start.", comment: "")
-                    : String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), count)
+                    : lines.joined(separator: " ")
                 reflector.poke(after: 1)
             }
         } message: {

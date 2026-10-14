@@ -90,21 +90,21 @@ final class MemoryManager: ObservableObject {
     /// "Learn from past chats now": every saved chat's messages from before
     /// memory met it are queued (adr/0024), open ones through their tab.
     /// Messages from before seqs get them, saved with the chat, so later
-    /// loads number them alike. Returns how many chats got anything queued
-    /// (or will, once they finish answering).
-    func learnFromPastChats() -> Int {
-        guard isEnabled, !unreadable else { return 0 }
+    /// loads number them alike. Returns how many chats got anything queued,
+    /// and how many are answering (theirs is queued once they're done).
+    func learnFromPastChats() -> (queued: Int, waiting: Int) {
+        guard isEnabled, !unreadable else { return (0, 0) }
         var count = 0
         var open = Set<UUID>()
         var busy: [(tab: ChatClient, chat: UUID)] = []
         for tab in ChatTabs.shared.tabs {
             guard let id = tab.currentSessionID else { continue }
             open.insert(id)
-            if tab.isBusy { busy.append((tab, id)) } else if tab.queuePastForMemory() { count += 1 }
+            if tab.isBusy {
+                if !file.optedOut.contains(id), file.pausedWatermarks[id.uuidString] == nil { busy.append((tab, id)) }
+            } else if tab.queuePastForMemory() { count += 1 }
         }
-        // Counted: theirs is queued once they're done.
         if !busy.isEmpty { learnFromPast(busy, tries: 360) }
-        count += busy.count
         for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
             let key = id.uuidString
             // Opted out, or waiting for the user's answer about while memory
@@ -134,7 +134,7 @@ final class MemoryManager: ObservableObject {
             }
             if queued { count += 1 }
         }
-        return count
+        return (count, busy.count)
     }
 
     /// Chats answering when "Learn from past chats now" was pressed: theirs

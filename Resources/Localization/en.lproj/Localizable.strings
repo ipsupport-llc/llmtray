@@ -40,6 +40,7 @@
 "%@ 🌐" = "%@ 🌐";
 "%@, p. %lld" = "%@, p. %lld";
 "%@: not supported yet" = "%@: not supported yet";
+"%d chats are answering: theirs is queued once they're done." = "%d chats are answering: theirs is queued once they're done.";
 "%d chats queued; reading starts now if the model is free." = "%d chats queued; reading starts now if the model is free.";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
