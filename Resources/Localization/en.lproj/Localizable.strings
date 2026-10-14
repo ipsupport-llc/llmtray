@@ -243,7 +243,7 @@
 "Chats of project %@" = "Chats of project %@";
 "Chats outside projects" = "Chats outside projects";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.";
-"Chats won't get them any more. This can't be undone." = "Chats won't get them any more. This can't be undone.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
@@ -412,6 +412,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Every saved chat is read from its start once more. Notes already there are confirmed, not doubled.";
 "Everything in that folder is here already." = "Everything in that folder is here already.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
@@ -455,7 +456,6 @@
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
 "Forget" = "Forget";
-"Forget Everything" = "Forget Everything";
 "Forget Everything…" = "Forget Everything…";
 "Forget What Was Learned…" = "Forget What Was Learned…";
 "Forget and Read All Chats Again" = "Forget and Read All Chats Again";
@@ -886,6 +886,8 @@
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
+"Read All Chats Again" = "Read All Chats Again";
+"Read All Chats Again…" = "Read All Chats Again…";
 "Read It Too" = "Read It Too";
 "Read Them" = "Read Them";
 "Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
@@ -1370,6 +1372,7 @@
 "What you corrected before, so it isn't repeated." = "What you corrected before, so it isn't repeated.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "What you did, kept apart from what it may mean. Sent as a guess.";
 "What you do" = "What you do";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.";
 "What's New" = "What's New";
@@ -1389,6 +1392,7 @@
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "With notes, it reads like this:";
 "Words only" = "Words only";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";

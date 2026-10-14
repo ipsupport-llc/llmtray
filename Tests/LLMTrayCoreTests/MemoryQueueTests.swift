@@ -315,4 +315,17 @@ extension MemoryQueueTests {
         XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
         XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1])
     }
+
+    func testForgettingEverythingCanReadAllAgain() {
+        var file = MemoryFile()
+        let all = [message(1, "one"), message(2, "two")]
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        file.queue = []
+        var kept = file
+        kept.forgetAll()
+        XCTAssertFalse(kept.enqueuePast(chat: chat, project: nil, messages: all, now: t0), "only forgotten: read stays read")
+        file.forgetAll(readAgain: true)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2])
+    }
 }
