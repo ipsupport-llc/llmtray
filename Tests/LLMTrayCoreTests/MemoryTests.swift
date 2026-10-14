@@ -332,6 +332,8 @@ extension MemoryTests {
         var file = MemoryFile()
         let learned = file.add(subject: .user, topic: "work", kind: .fact, text: "Learned while shared", now: t0,
                                reviewed: false, confidence: .stated)!
+        file.notes[0].evidence = [MemoryEvidence(chat: UUID(), seq: 1, date: t0, quote: "q")]
+        let on = MemorySettings(enabled: true, factChats: 1)
         XCTAssertFalse(on.allows(file.note(learned)!, project: UUID()))
         XCTAssertTrue(on.allows(file.note(learned)!, project: nil))
         file.approve(learned)
@@ -370,5 +372,62 @@ extension MemoryTests {
         file.resumeAll(readMeanwhile: false)
         XCTAssertFalse(file.hasPaused)
         XCTAssertTrue(file.isPaused(c))
+    }
+
+    // MARK: What's learned
+
+    func testALearnedFactWaitsForASecondChat() {
+        var file = MemoryFile()
+        let fact = file.add(subject: .general, topic: "work", kind: .fact, text: "Builds an ESP32 speaker", now: t0,
+                            reviewed: false, confidence: .stated)!
+        let asked = file.add(subject: .general, topic: "reply-language", kind: .preference, text: "Answers in Russian", now: t0,
+                             reviewed: false, confidence: .stated)!
+        let (a, b) = (UUID(), UUID())
+        func evidence(_ chat: UUID) -> MemoryEvidence { MemoryEvidence(chat: chat, seq: 1, date: t0, quote: "q") }
+        file.notes[0].evidence = [evidence(a), evidence(a)]
+        file.notes[1].evidence = [evidence(a)]
+        XCTAssertFalse(on.allows(file.note(fact)!, project: nil), "one chat, twice: still one chat")
+        XCTAssertTrue(on.allows(file.note(fact)!, project: nil, candidates: true), "reading sees it, to confirm it")
+        XCTAssertTrue(on.allows(file.note(asked)!, project: nil), "what the user asked for goes at once")
+        XCTAssertEqual(MemorySelection.choose(file, settings: on, project: nil, budget: 200, now: t0, tokens: tokens)?.noteIDs, [asked])
+        file.notes[0].evidence.append(evidence(b))
+        XCTAssertTrue(on.allows(file.note(fact)!, project: nil))
+        file.notes[0].evidence = [evidence(a)]
+        file.approve(fact)
+        XCTAssertTrue(on.allows(file.note(fact)!, project: nil), "approved")
+        XCTAssertNotEqual(on.fingerprint, MemorySettings(enabled: true, factChats: 3).fingerprint)
+    }
+
+    func testWhatIsNeverLearned() {
+        for text in ["User asked for the definition of rdma.", "Requested an image of an ocean planet in space.",
+                     "Asks about the release timeline of DRA in Azure", "User is looking for deployment examples",
+                     "Пользователь спросил про RDMA", "Asks for stories with altered states: LSD, then alcohol",
+                     "Has depression", "Votes for a political party", "Пьёт алкоголь по пятницам"] {
+            XCTAssertTrue(MemoryText.unlearnable(text), text)
+        }
+        for text in ["Works on quantizing LLMs with GPTQ", "Prefers short answers in Russian", "Uses a healthcheck endpoint",
+                     "Runs Kubernetes with DRA on 8 GPUs", "Предпочитает долгие подробные ответы"] {
+            XCTAssertFalse(MemoryText.unlearnable(text), text)
+        }
+    }
+
+    func testForgettingWhatWasLearnedKeepsTheUsersOwn() {
+        var file = MemoryFile()
+        let chat = UUID()
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Written by the user", now: t0)
+        let learned = file.add(subject: .general, topic: "work", kind: .fact, text: "Learned", now: t0, reviewed: false)!
+        let approved = file.add(subject: .general, topic: "work", kind: .fact, text: "Approved", now: t0, reviewed: false)!
+        file.approve(approved)
+        file.meet(chat, from: 3)
+        XCTAssertEqual(file.unreviewedCount, 1)
+        var again = file
+        file.forgetUnreviewed(readAgain: false)
+        XCTAssertNil(file.note(learned))
+        XCTAssertEqual(file.notes.count, 2)
+        XCTAssertEqual(file.met(chat), 3, "only forgetting: what was read stays read")
+        again.forgetUnreviewed(readAgain: true)
+        XCTAssertNil(again.met(chat))
+        XCTAssertNil(again.watermark(chat))
+        XCTAssertTrue(again.enqueuePast(chat: chat, project: nil, messages: [MemoryBatchMessage(seq: 1, date: t0, text: "hi", before: nil)], now: t0))
     }
 }

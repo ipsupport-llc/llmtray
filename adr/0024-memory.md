@@ -83,6 +83,37 @@ Every operation that changes memory (`add`, `confirm`, `update`, `supersede`,
    message before it for context: "Does the user, speaking for themselves, say
    this about <subject>? yes / no / unclear". Only `yes` is applied.
 
+### Lasting, not a log (revised 2026-10-13 after the first real use)
+
+Reading a real history ("Learn from Past Chats Now") gave a log of requests,
+not a picture of the person: "User asked for the definition of rdma",
+"requested an image of an ocean planet", and, from a test of the image
+generator ("now imagine it on LSD, now on alcohol"), "is testing the
+boundaries of the AI". So:
+
+- **Lasting only.** The prompt asks for what would still be true and useful in
+  an unrelated chat a month later (role, ongoing work, tools, stack, how they
+  want answers); a question or a thing asked for (an explanation, code, an
+  image, a story) is not a fact about the user, nor a creative or test prompt.
+  The verify call answers "no" for those too.
+- **Never learned:** health, drugs or alcohol, sex, religion, politics, money,
+  legal matters -- even said outright; the user can write them in About you.
+  Checked by the model (reflect, verify) and in code (`MemoryText.unlearnable`:
+  word stems in English, Russian, Ukrainian, and one-off phrasings like "User
+  asked ...").
+- **No motives.** No guess at why the user asked something. An observation is
+  only about how to answer them (topics tone, answer-length, formatting,
+  reply-language, code-style).
+- **A candidate first.** A learned fact or observation is sent once this many
+  chats showed it (Settings, default 2), or the user approved it; reflection
+  still sees it, so a second chat confirms it rather than adding it again.
+  Preferences and corrections the user stated go at once.
+- **At most 2 new notes per batch,** what the user asked for first.
+- **Starting over:** "Forget What Was Learned…" removes every learned note the
+  user didn't write, edit, pin or approve (no tombstones: better rules may learn
+  them again) and the queue; "and read all chats again" also forgets where each
+  chat was read, then queues them all.
+
 ### Same thing, one note: reconcile
 
 Embeddings only **find candidates**. They never decide that two notes are the

@@ -125,12 +125,17 @@ public struct MemorySettings: Equatable, Sendable {
     /// see only their own; chats outside projects, theirs; what the user
     /// wrote for all chats is seen everywhere either way.
     public var shareLearned: Bool
+    /// A learned fact or observation is sent once this many chats showed
+    /// it: one question isn't who the user is. What the user wrote,
+    /// approved or pinned, and what they asked for (preferences,
+    /// corrections), go at once.
+    public var factChats: Int
 
     public static let defaultHalfLives: [MemoryKind: Double] = [.observation: 30, .fact: 90, .preference: 180, .correction: 180]
 
     public init(enabled: Bool = false, kinds: Set<MemoryKind> = Set(MemoryKind.allCases), budgetTokens: Int = 300,
                 maxActive: Int = 300, halfLifeDays: [MemoryKind: Double] = MemorySettings.defaultHalfLives,
-                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true, shareLearned: Bool = false) {
+                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true, shareLearned: Bool = false, factChats: Int = 2) {
         self.enabled = enabled
         self.kinds = kinds
         self.budgetTokens = budgetTokens
@@ -139,6 +144,7 @@ public struct MemorySettings: Equatable, Sendable {
         self.deleteExpiredAfterDays = deleteExpiredAfterDays
         self.projectMemory = projectMemory
         self.shareLearned = shareLearned
+        self.factChats = max(1, factChats)
     }
 
     public func halfLife(_ kind: MemoryKind) -> Double {
@@ -146,8 +152,10 @@ public struct MemorySettings: Equatable, Sendable {
     }
 
     /// Whether `note` may go into a chat in `project` (nil: none).
-    public func allows(_ note: MemoryNote, project: UUID?) -> Bool {
-        guard enabled, note.isActive, kinds.contains(note.kind) else { return false }
+    /// `candidates`: one not yet established counts too (reading a chat:
+    /// it's what a second chat confirms).
+    public func allows(_ note: MemoryNote, project: UUID?, candidates: Bool = false) -> Bool {
+        guard enabled, note.isActive, kinds.contains(note.kind), candidates || isEstablished(note) else { return false }
         switch note.subject {
         // What the user wrote or approved is seen everywhere; a note learned
         // while learning was shared, only where learning is kept apart now
@@ -156,6 +164,12 @@ public struct MemorySettings: Equatable, Sendable {
         case .general: return shareLearned || project == nil
         case .project(let id): return projectMemory && (shareLearned || id == project)
         }
+    }
+
+    /// Whether `note` is past being a candidate (see `factChats`).
+    public func isEstablished(_ note: MemoryNote) -> Bool {
+        if note.reviewed || note.pinned || note.kind == .preference || note.kind == .correction { return true }
+        return Set(note.evidence.map(\.chat)).count >= factChats
     }
 
     /// Where what a chat in `project` teaches is seen, when the model
@@ -176,7 +190,7 @@ public struct MemorySettings: Equatable, Sendable {
     /// (sharing turned on, a kind back on, a bigger budget) makes a new one.
     public var fingerprint: String {
         let k = MemoryKind.allCases.filter(kinds.contains).map(\.rawValue).joined(separator: ",")
-        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)"
+        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)|facts:\(factChats)"
     }
 }
 
@@ -198,7 +212,8 @@ extension MemorySettings {
             budgetTokens: max(0, defaults[Pref.memoryBudgetTokens]), maxActive: max(1, defaults[Pref.memoryMaxActive]),
             halfLifeDays: Dictionary(uniqueKeysWithValues: MemoryKind.allCases.map { ($0, Double(max(1, defaults[Self.halfLifeKey($0)]))) }),
             deleteExpiredAfterDays: max(0, defaults[Pref.memoryDeleteExpiredAfterDays]),
-            projectMemory: defaults[Pref.memoryProjects], shareLearned: defaults[Pref.memoryShareLearned])
+            projectMemory: defaults[Pref.memoryProjects], shareLearned: defaults[Pref.memoryShareLearned],
+            factChats: defaults[Pref.memoryFactChats])
     }
 
     /// Stores which kinds are on.
@@ -324,6 +339,44 @@ public enum MemoryText {
         }
         return nil
     }
+
+    /// Topics never learned from chats, whatever the model says: only the
+    /// user writes these (About you). Word starts, in the languages notes
+    /// are most often written in.
+    static let sensitiveStems = [
+        // health
+        "diagnos", "disease", "illness", "depress", "anxiety", "therap", "medicat", "pregnan",
+        "диагноз", "болезн", "болен", "болит", "депресс", "тревожн", "терапи", "лекарств", "беремен",
+        "хвороб", "депрес", "ліки",
+        // drugs, alcohol
+        "drug", "lsd", "cocaine", "heroin", "cannabis", "marijuana", "psychedel", "alcohol", "drunk",
+        "наркот", "лсд", "кокаин", "психодел", "алкогол", "пьян", "п'ян",
+        // sex
+        "sex", "porn", "секс", "порн",
+        // religion, politics
+        "religio", "church", "politic", "религ", "церк", "политик", "релігі", "політик",
+        // money, law
+        "salary", "debt", "lawsuit", "arrest", "crime", "criminal", "зарплат", "арест", "преступ", "кримин", "борг", "злочин",
+    ]
+
+    /// One-off asks phrased as facts ("User asked for …"): a question isn't
+    /// who someone is.
+    static let oneOffPattern = #"^(the )?(user )?(asked|asks|is asking|requested|requests|wanted to know|wants to know|is looking for|looked for)\b"#
+        + #"|^(пользователь )?(спросил|спрашивает|попросил|просит|интересовался|ищет)"#
+
+    /// Whether a learned note's `text` must not be kept: a sensitive topic,
+    /// or a one-off question written up as a fact. What the user writes
+    /// themselves isn't checked.
+    public static func unlearnable(_ text: String) -> Bool {
+        let lower = text.lowercased()
+        if lower.trimmingCharacters(in: .whitespaces).range(of: oneOffPattern, options: .regularExpression) != nil { return true }
+        let words = lower.split { !$0.isLetter && $0 != "'" }
+        return words.contains { word in sensitiveStems.contains { word.hasPrefix($0) } }
+    }
+
+    /// Topics an observation may be under: how the user wants to be
+    /// answered, never a guess at why they asked something.
+    public static let observationTopics: Set<String> = ["tone", "answer-length", "formatting", "reply-language", "code-style"]
 }
 
 /// The memory store as it is on disk (memory/notes.json).
@@ -533,6 +586,25 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         notes = []
         queue = []
         tombstones = []
+        _ = bump()
+    }
+
+    /// Learned notes the user never wrote, edited, pinned or approved.
+    public var unreviewedCount: Int { notes.filter { !$0.reviewed && !$0.pinned }.count }
+
+    /// "Forget What Was Learned": every learned note the user never wrote,
+    /// edited, pinned or approved goes, with the queue -- no tombstones, so
+    /// better rules may learn them again. `readAgain`: where memory read
+    /// each chat goes too, so "Learn from past chats" reads them all anew.
+    /// Opt-outs, tombstones and the choice waiting after memory was off stay.
+    public mutating func forgetUnreviewed(readAgain: Bool) {
+        notes.removeAll { !$0.reviewed && !$0.pinned }
+        queue = []
+        if readAgain {
+            watermarks = [:]
+            metFrom = [:]
+            readBefore = [:]
+        }
         _ = bump()
     }
 

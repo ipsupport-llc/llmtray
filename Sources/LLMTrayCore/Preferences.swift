@@ -155,6 +155,9 @@ public enum Pref {
     public static let memorySwitchIdleMinutes = PrefKey("llmtray.memory.switchIdleMinutes", default: 0)
     /// What's learned is seen in every chat (off: each project keeps its own).
     public static let memoryShareLearned = PrefKey("llmtray.memory.shareLearned", default: false)
+    /// A learned fact or observation reaches chats once this many chats
+    /// showed it (or the user approved it); preferences and corrections at once.
+    public static let memoryFactChats = PrefKey("llmtray.memory.factChats", default: 2)
     /// The notes' language: a language code, or "auto" (the app's).
     public static let memoryLanguage = PrefKey("llmtray.memory.language", default: "auto")
     /// A chat is read for memory after this many quiet minutes.

@@ -16,6 +16,7 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryDeleteExpiredAfterDays.name) private var deleteAfter = Pref.memoryDeleteExpiredAfterDays.defaultValue
     @AppStorage(Pref.memoryProjects.name) private var projects = Pref.memoryProjects.defaultValue
     @AppStorage(Pref.memoryShareLearned.name) private var shareLearned = Pref.memoryShareLearned.defaultValue
+    @AppStorage(Pref.memoryFactChats.name) private var factChats = Pref.memoryFactChats.defaultValue
     @AppStorage(Pref.memoryModel.name) private var learningModel = Pref.memoryModel.defaultValue
     @AppStorage(Pref.memorySwitchIdleMinutes.name) private var switchIdleMinutes = Pref.memorySwitchIdleMinutes.defaultValue
     @ObservedObject private var catalog = ModelCatalog.shared
@@ -30,6 +31,7 @@ struct MemoryPane: View {
     /// Memory on again with something put aside: read what was said meanwhile?
     @State private var askResume = false
     @State private var confirmLearnPast = false
+    @State private var confirmForgetLearned = false
     /// What "Learn from Past Chats Now" did, shown under it.
     @State private var learnPastResult: String?
     @State private var about: [MemoryAboutField: String] = [:]
@@ -140,6 +142,16 @@ struct MemoryPane: View {
                         Button("Learn from Past Chats Now") { confirmLearnPast = true }
                             .disabled(memory.unreadable || memory.file.hasPaused)
                     }
+                    HStack {
+                        SettingLabel(title: "Start over", help: "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules.")
+                        Spacer()
+                        Button("Forget What Was Learned…") { confirmForgetLearned = true }
+                            .disabled(memory.unreadable || memory.file.unreviewedCount == 0 && memory.file.queue.isEmpty)
+                    }
+                    Stepper(value: $factChats, in: 1...5) {
+                        SettingLabel(title: factChats == 1 ? "Use a learned fact at once" : "Use a learned fact once \(factChats) chats show it",
+                                     help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
+                    }
                     if let learnPastResult {
                         Text(learnPastResult).font(.caption).foregroundStyle(.secondary)
                     }
@@ -188,21 +200,16 @@ struct MemoryPane: View {
         } message: {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
         }
-        .confirmationDialog("Learn from all your past chats?", isPresented: $confirmLearnPast) {
-            Button("Read Them") {
-                let (queued, waiting) = memory.learnFromPastChats()
-                var lines: [String] = []
-                if queued > 0 {
-                    lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
-                }
-                if waiting > 0 {
-                    lines.append(String(format: NSLocalizedString("%d chats are answering: theirs is queued once they're done.", comment: ""), waiting))
-                }
-                learnPastResult = lines.isEmpty
-                    ? NSLocalizedString("Nothing left to read: every chat was read from its start.", comment: "")
-                    : lines.joined(separator: " ")
-                reflector.poke(after: 1)
+        .confirmationDialog("Forget what was learned?", isPresented: $confirmForgetLearned) {
+            Button("Forget and Read All Chats Again") {
+                if memory.change({ $0.forgetUnreviewed(readAgain: true) }) { learnFromPastChats() }
             }
+            Button("Only Forget", role: .destructive) { memory.change { $0.forgetUnreviewed(readAgain: false) } }
+        } message: {
+            Text("\(memory.file.unreviewedCount) learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.")
+        }
+        .confirmationDialog("Learn from all your past chats?", isPresented: $confirmLearnPast) {
+            Button("Read Them") { learnFromPastChats() }
         } message: {
             Text("Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while.")
         }
@@ -224,6 +231,22 @@ struct MemoryPane: View {
         } message: {
             Text("Chats won't get them any more. This can't be undone.")
         }
+    }
+
+    /// Every saved chat queued from its start; what it did, under the button.
+    private func learnFromPastChats() {
+        let (queued, waiting) = memory.learnFromPastChats()
+        var lines: [String] = []
+        if queued > 0 {
+            lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
+        }
+        if waiting > 0 {
+            lines.append(String(format: NSLocalizedString("%d chats are answering: theirs is queued once they're done.", comment: ""), waiting))
+        }
+        learnPastResult = lines.isEmpty
+            ? NSLocalizedString("Nothing left to read: every chat was read from its start.", comment: "")
+            : lines.joined(separator: " ")
+        reflector.poke(after: 1)
     }
 
     /// Chat models big enough to write good notes (about 3B parameters and up).
@@ -409,6 +432,10 @@ struct MemoryPane: View {
                 Text(note.text)
                 Text("\(MemoryNoteDraft.kindName(note.kind)) · \(note.topic) · \(note.confirmed.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption).foregroundStyle(.secondary)
+                if !memory.settings.isEstablished(note) {
+                    Text("Not sent yet: waits for another chat to show it, or your approval.")
+                        .font(.caption).foregroundStyle(.orange)
+                }
             }
             Spacer()
             Button {

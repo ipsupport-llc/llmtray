@@ -426,4 +426,23 @@ extension MemoryReflectionTests {
         XCTAssertTrue(ModelCardLanguages.covers(["multilingual"], "uk"))
         XCTAssertFalse(ModelCardLanguages.covers(["en"], "ru"))
     }
+
+    func testWhatMayBeLearned() {
+        typealias Op = MemoryReflection.Operation
+        XCTAssertTrue(MemoryReflection.mayLearn(Op(action: .add, topic: "work", kind: .fact, text: "Quantizes LLMs with GPTQ", quote: "q")))
+        XCTAssertFalse(MemoryReflection.mayLearn(Op(action: .add, topic: "work", kind: .fact, text: "User asked what RDMA is", quote: "q")))
+        XCTAssertFalse(MemoryReflection.mayLearn(Op(action: .add, topic: "general", kind: .observation, text: "Is testing the AI's limits",
+                                                    observed: "Asked for pictures on LSD", quote: "q")), "sensitive, and not about answering")
+        XCTAssertFalse(MemoryReflection.mayLearn(Op(action: .add, topic: "general", kind: .observation, text: "Curious about space", quote: "q")),
+                       "an observation only about how to answer")
+        XCTAssertTrue(MemoryReflection.mayLearn(Op(action: .add, topic: "tone", kind: .observation, text: "Curt when a build breaks", quote: "q")))
+        XCTAssertFalse(MemoryReflection.mayLearn(Op(action: .update, id: "m1", text: "Has depression", quote: "q")))
+        XCTAssertTrue(MemoryReflection.mayLearn(Op(action: .update, id: "m1", topic: "general", text: "Short answers, in Russian", quote: "q")))
+    }
+
+    func testAddsAreCappedAskedForFirst() {
+        XCTAssertEqual(MemoryReflection.keptAdds([.fact, .observation, .preference, .fact, .correction]), [2, 4])
+        XCTAssertEqual(MemoryReflection.keptAdds([.fact, .fact, .fact]), [0, 1])
+        XCTAssertEqual(MemoryReflection.keptAdds([.observation]), [0])
+    }
 }

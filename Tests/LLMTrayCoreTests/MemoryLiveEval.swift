@@ -7,7 +7,7 @@ import XCTest
 /// commit) on fixture chats and prints the notes it ends with. Run it on the
 /// user's Mac only on their say-so:
 ///
-///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2 \
+///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3 \
 ///   MEMORY_EVAL_STATE=/tmp/memory-eval.json swift test --filter MemoryLiveEval
 ///
 /// with an mlx_lm.server of that model on the port. The state file carries
@@ -54,6 +54,30 @@ final class MemoryLiveEval: XCTestCase {
             Chat(project: nil, messages: [
                 (nil, "Не выдумывай данные для графиков, если цифр нет."),
                 ("Хорошо.", "Я по жизни программист на Swift, пишу под macOS."),
+            ]),
+        ],
+        // One-off questions, creative and test prompts, a sensitive topic:
+        // nothing. A fact said in two chats is sent; said in one, it waits.
+        // Expected: quantization fact (2 chats, sent), "concrete answers
+        // with versions" and "tables for comparisons" (preferences, sent);
+        // Kubernetes/RDMA questions, the images, LSD/alcohol, depression: none.
+        3: [
+            Chat(project: nil, messages: [
+                (nil, "что такое RDMA?"),
+                ("RDMA — это прямой доступ к памяти другого узла...", "нарисуй океаническую планету в космосе"),
+                ("Готово, вот картинка.", "а теперь представь то же самое под ЛСД"),
+                ("Вот вариант в психоделическом стиле.", "а теперь под алкоголем"),
+                ("Вот размытый вариант.", "я вообще занимаюсь квантизацией LLM, сейчас гоняю GPTQ на Nemotron"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "какая версия Kubernetes поддерживает DRA?"),
+                ("DRA появился в одной из версий...", "блин, опять расплывчато. отвечай конкретно, с номерами версий"),
+                ("Kubernetes 1.32 в beta, 1.34 GA.", "ок. кстати, мой GPTQ-пайплайн квантизации сейчас на 8 GPU"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "у меня депрессия последние недели, ничего не хочется"),
+                ("Мне жаль это слышать...", "сравни H100 и B200"),
+                ("Вот сравнение списком...", "для сравнений мне больше нравятся таблицы, делай таблицей"),
             ]),
         ],
     ]
@@ -108,7 +132,7 @@ final class MemoryLiveEval: XCTestCase {
             case .general: scope = "outside"
             case .project: scope = "project X"
             }
-            print("- [\(note.kind.rawValue), \(note.topic), \(scope), \(note.confidence.rawValue)] \(note.text)"
+            print("- [\(note.kind.rawValue), \(note.topic), \(scope), \(note.confidence.rawValue)\(settings.isEstablished(note) ? "" : ", waits")] \(note.text)"
                 + (note.observed.map { " (observed: \($0))" } ?? "")
                 + " — evidence: " + note.evidence.map { "\"\($0.quote)\"" }.joined(separator: "; ")
                 + (note.wrongLanguage == true ? " [wrong language]" : ""))
@@ -128,7 +152,7 @@ final class MemoryLiveEval: XCTestCase {
         let fixed = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
         let project = settings.projectMemory ? batch.project : nil
         let touchable = file.notes.filter { note in
-            !note.pinned && (fixed.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project)
+            !note.pinned && (fixed.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project, candidates: true)
         }
         let ranked = touchable.map { note -> (MemoryNote, Float) in
             let v = vectors.vector(for: note)
@@ -158,7 +182,7 @@ final class MemoryLiveEval: XCTestCase {
             var statement: String
             switch op.action {
             case .add:
-                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryText.problem(text) == nil else {
+                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryReflection.mayLearn(op) else {
                     print("  ✗ rules: \(label)"); continue
                 }
                 subject = fixed ?? (op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user)
@@ -168,7 +192,7 @@ final class MemoryLiveEval: XCTestCase {
                 subject = note.subject
                 statement = op.action == .confirm ? note.text : "The user asks to forget this, or says it is no longer true: \(note.text)"
             case .update, .supersede:
-                guard let note, let text = op.text, MemoryText.problem(text) == nil else { print("  ✗ id/rules: \(label)"); continue }
+                guard let note, let text = op.text, MemoryReflection.mayLearn(op) else { print("  ✗ id/rules: \(label)"); continue }
                 subject = note.subject
                 statement = text
             }
@@ -188,6 +212,10 @@ final class MemoryLiveEval: XCTestCase {
             for (p, v) in zip(pending, verdicts) where v != .yes { print("  ✗ verify \(v.rawValue): \(p.claim.statement)") }
             pending = zip(pending, verdicts).filter { $0.1 == .yes }.map(\.0)
         }
+        let adds = pending.indices.filter { pending[$0].op.action == .add }
+        let kept = Set(MemoryReflection.keptAdds(adds.map { pending[$0].op.kind }).map { adds[$0] })
+        for i in adds where !kept.contains(i) { print("  ✗ over the cap: \(pending[i].op.text ?? "")") }
+        pending = pending.indices.filter { pending[$0].op.action != .add || kept.contains($0) }.map { pending[$0] }
         let newTexts = Array(Set(pending.compactMap { [.add, .update, .supersede].contains($0.op.action) ? $0.op.text : nil }))
         let newVectors = Dictionary(zip(newTexts, try await embed(newTexts, .document, runner)), uniquingKeysWith: { a, _ in a })
         var pairs: [(new: String, old: String)] = []
@@ -196,7 +224,7 @@ final class MemoryLiveEval: XCTestCase {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
             let close = file.notes.filter { note in
                 guard note.id != p.op.id else { return false }
-                if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project) }
+                if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project, candidates: true) }
                 return note.subject == p.subject && !note.pinned
             }.compactMap { n in vectors.vector(for: n).map { (n, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= 0.6 }.sorted { $0.1 > $1.1 }.prefix(3)

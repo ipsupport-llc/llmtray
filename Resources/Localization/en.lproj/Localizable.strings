@@ -51,6 +51,7 @@
 "%lld files couldn't be indexed" = "%lld files couldn't be indexed";
 "%lld interrupted: look at them in Finder" = "%lld interrupted: look at them in Finder";
 "%lld items put back under their names." = "%lld items put back under their names.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.";
 "%lld more" = "%lld more";
 "%lld more…" = "%lld more…";
 "%lld need a look: see the list." = "%lld need a look: see the list.";
@@ -78,6 +79,7 @@
 "A chat model" = "A chat model";
 "A client" = "A client";
 "A deleted project" = "A deleted project";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A model is a tool, not an authority" = "A model is a tool, not an authority";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire.";
@@ -454,6 +456,9 @@
 "Forget" = "Forget";
 "Forget Everything" = "Forget Everything";
 "Forget Everything…" = "Forget Everything…";
+"Forget What Was Learned…" = "Forget What Was Learned…";
+"Forget and Read All Chats Again" = "Forget and Read All Chats Again";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules." = "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then all your chats can be read again with the current rules.";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";
@@ -742,6 +747,7 @@
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not indexed" = "Not indexed";
 "Not sent any more. Bring one back, or it's deleted later." = "Not sent any more. Bring one back, or it's deleted later.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Not sent yet: waits for another chat to show it, or your approval.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Notes";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.";
@@ -766,6 +772,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
+"Only Forget" = "Only Forget";
 "Only From Now On" = "Only From Now On";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
@@ -1036,6 +1043,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Start LLMTray automatically when you log in to this Mac.";
 "Start Server" = "Start Server";
 "Start a new saved chat (⌘N) to add files to a project." = "Start a new saved chat (⌘N) to add files to a project.";
+"Start over" = "Start over";
 "Start server" = "Start server";
 "Start talking" = "Start talking";
 "Start the server first." = "Start the server first.";
@@ -1301,6 +1309,8 @@
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Use This Port" = "Use This Port";
+"Use a learned fact at once" = "Use a learned fact at once";
+"Use a learned fact once %lld chats show it" = "Use a learned fact once %lld chats show it";
 "Use headphones: the model hears its own voice from the speakers." = "Use headphones: the model hears its own voice from the speakers.";
 "Used" = "Used";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.";

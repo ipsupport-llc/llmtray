@@ -307,7 +307,7 @@ final class MemoryReflector: ObservableObject {
         // The notes it may change: kept apart, only its own place's; shared,
         // every one this chat sees. Never pinned ones (the user's alone).
         let touchable = memory.file.notes.filter { note in
-            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project)
+            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project, candidates: true)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -350,7 +350,7 @@ final class MemoryReflector: ObservableObject {
             let statement: String
             switch op.action {
             case .add:
-                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryText.problem(text) == nil else { continue }
+                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryReflection.mayLearn(op) else { continue }
                 subject = fixedSubject ?? (op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user)
                 statement = kind == .observation ? (op.observed ?? text) : text
             case .confirm:
@@ -358,7 +358,7 @@ final class MemoryReflector: ObservableObject {
                 subject = note.subject
                 statement = note.text
             case .update, .supersede:
-                guard let note, let text = op.text, MemoryText.problem(text) == nil else { continue }
+                guard let note, let text = op.text, MemoryReflection.mayLearn(op) else { continue }
                 subject = note.subject
                 statement = text
             case .forget:
@@ -383,6 +383,11 @@ final class MemoryReflector: ObservableObject {
         case .failure(let error):
             return error.outcome
         }
+        // At most a few new notes from one part of a chat: what the user
+        // asked for first, then facts, then observations.
+        let adds = pending.indices.filter { pending[$0].op.action == .add }
+        let kept = Set(MemoryReflection.keptAdds(adds.map { pending[$0].op.kind }).map { adds[$0] })
+        pending = pending.indices.filter { pending[$0].op.action != .add || kept.contains($0) }.map { pending[$0] }
 
         // New and changed texts' vectors.
         let newTexts = Array(Set(pending.compactMap { p -> String? in p.op.action == .confirm || p.op.action == .forget ? nil : p.op.text }))
@@ -412,7 +417,7 @@ final class MemoryReflector: ObservableObject {
             let close = memory.file.notes
                 .filter { note in
                     guard note.id != p.op.id, settings.kinds.contains(note.kind) || memory.file.isAbout(note) else { return false }
-                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project) }
+                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project, candidates: true) }
                     return note.subject == p.subject && !note.pinned
                 }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
