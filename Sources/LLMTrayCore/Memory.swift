@@ -648,8 +648,14 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public mutating func setOptedOut(_ chat: UUID, _ out: Bool, readMeanwhile: Bool = false) {
         let key = chat.uuidString
         if out {
-            // What's queued goes (below), so it doesn't count as read.
+            // What's queued goes (below), so it doesn't count as read --
+            // nor if a pause counted it.
             noteRead(chat, queuedToo: false)
+            let dropped = Set(queue.filter { $0.chat == chat }.flatMap { $0.messages.map(\.seq) })
+            if !dropped.isEmpty, let read = readBefore[key] {
+                readBefore[key] = nil
+                addRead(read.flatMap { Array($0) }.filter { !dropped.contains($0) }, to: key)
+            }
             optedOut.insert(chat)
             // Put aside from before what was queued, which goes: read again
             // only if the user asks for it when remembering the chat.

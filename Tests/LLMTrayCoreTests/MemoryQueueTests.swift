@@ -303,4 +303,16 @@ extension MemoryQueueTests {
         XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
         XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2, 3])
     }
+
+    func testOptingOutAfterAPauseDoesntCountTheDroppedQueueAsRead() {
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
+        file.pauseAll()
+        file.setOptedOut(chat, true)
+        XCTAssertTrue(file.queue.isEmpty)
+        file.setOptedOut(chat, false, readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1])
+    }
 }

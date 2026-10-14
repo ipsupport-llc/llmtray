@@ -90,7 +90,8 @@ final class MemoryManager: ObservableObject {
     /// "Learn from past chats now": every saved chat's messages from before
     /// memory met it are queued (adr/0024), open ones through their tab.
     /// Messages from before seqs get them, saved with the chat, so later
-    /// loads number them alike. Returns how many chats got anything queued.
+    /// loads number them alike. Returns how many chats got anything queued
+    /// (or will, once they finish answering).
     func learnFromPastChats() -> Int {
         guard isEnabled, !unreadable else { return 0 }
         var count = 0
@@ -101,7 +102,9 @@ final class MemoryManager: ObservableObject {
             open.insert(id)
             if tab.isBusy { busy.append((tab, id)) } else if tab.queuePastForMemory() { count += 1 }
         }
+        // Counted: theirs is queued once they're done.
         if !busy.isEmpty { learnFromPast(busy, tries: 360) }
+        count += busy.count
         for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
             let key = id.uuidString
             // Opted out, or waiting for the user's answer about while memory
