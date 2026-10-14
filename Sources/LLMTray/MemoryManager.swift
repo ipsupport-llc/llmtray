@@ -102,9 +102,9 @@ final class MemoryManager: ObservableObject {
         }
         for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
             let key = id.uuidString
-            // Read from its start already, opted out, or waiting for the
-            // user's answer about while memory was off: nothing to do.
-            guard file.metFrom[key] != 0, !file.optedOut.contains(id), file.pausedWatermarks[key] == nil,
+            // Opted out, or waiting for the user's answer about while memory
+            // was off: nothing to do.
+            guard !file.optedOut.contains(id), file.pausedWatermarks[key] == nil,
                   var chat = ChatSessionStore.load(id: id) else { continue }
             var last = max(chat.lastSeq ?? 0, chat.messages.compactMap(\.seq).max() ?? 0, file.watermark(id) ?? 0)
             var numbered = false
@@ -122,7 +122,11 @@ final class MemoryManager: ObservableObject {
             }, readFrom: 0, date: chat.createdAt)
             let project = ChatLibraryStore.shared.library.projectContext(forChat: id)?.id
             var queued = false
-            change { queued = $0.enqueuePast(chat: id, project: project, messages: items, now: Date()) }
+            // The past, then anything after the watermark not queued yet.
+            change {
+                queued = $0.enqueuePast(chat: id, project: project, messages: items, now: Date())
+                if $0.enqueue(chat: id, project: project, messages: items, now: Date()) { queued = true }
+            }
             if queued { count += 1 }
         }
         return count

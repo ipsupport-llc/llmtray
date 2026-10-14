@@ -293,7 +293,8 @@ changes in nearly every chat with memory on.
   confirmation) queues every saved chat's messages from before that, all of a
   chat it never met, and meets it from its start; open chats go through their
   tab, others through their file (user messages from before seqs get them,
-  saved with the chat). What was queued or read already isn't again; chats
+  saved with the chat). What was queued or read already isn't again (also
+  what was read before an "only from now on" made it meet the chat anew); chats
   opted out, or waiting for the "back on" choice, are skipped. The queue is
   then read at once, as usual (the chat's model, the model free).
 - "Don't remember this chat" stops reflection for it and asks whether to forget

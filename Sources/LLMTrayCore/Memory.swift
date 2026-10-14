@@ -346,6 +346,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// remembered again, the user picks whether what was said meanwhile is
     /// read (they come back) or not (they go, and the chat is met anew).
     public var pausedWatermarks: [String: Int] = [:]
+    /// Per chat, the seqs read (queued) before it was met anew ("only from
+    /// now on"): "Learn from past chats" doesn't read them again.
+    public var readBefore: [String: [ClosedRange<Int>]] = [:]
     /// Chats marked "Don't remember this chat".
     public var optedOut: Set<UUID> = []
     /// Forgotten notes, so they aren't learned again from the same words.
@@ -355,7 +358,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, optedOut, tombstones, nextBatchID
+        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, readBefore, optedOut, tombstones, nextBatchID
     }
 
     // The queue and the rest came after the first notes files.
@@ -369,6 +372,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
         metFrom = try c.decodeIfPresent([String: Int].self, forKey: .metFrom) ?? [:]
         pausedWatermarks = try c.decodeIfPresent([String: Int].self, forKey: .pausedWatermarks) ?? [:]
+        readBefore = try c.decodeIfPresent([String: [ClosedRange<Int>]].self, forKey: .readBefore) ?? [:]
         // A watermark from before metFrom: met there, as far as is known.
         for (chat, mark) in watermarks where metFrom[chat] == nil { metFrom[chat] = mark }
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
@@ -503,7 +507,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             watermarks[chat] = min(watermarks[chat] ?? mark, mark)
         } else {
             watermarks.removeValue(forKey: chat)
-            metFrom.removeValue(forKey: chat)
+            if let from = metFrom.removeValue(forKey: chat), mark > from {
+                readBefore[chat, default: []].append((from + 1)...mark)
+            }
         }
     }
 
@@ -576,7 +582,8 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             watermarks[key] = upTo
         }
         metFrom[key] = 0
-        let unread = past.filter { $0.seq <= upTo }
+        let read = readBefore.removeValue(forKey: key) ?? []
+        let unread = past.filter { m in m.seq <= upTo && !read.contains { $0.contains(m.seq) } }
         guard !unread.isEmpty else { return false }
         appendBatches(unread, chat: chat, project: project, now: now)
         return true
@@ -640,6 +647,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             if watermarks.removeValue(forKey: chat.uuidString) != nil { changed = true }
             metFrom.removeValue(forKey: chat.uuidString)
             pausedWatermarks.removeValue(forKey: chat.uuidString)
+            readBefore.removeValue(forKey: chat.uuidString)
             if optedOut.remove(chat) != nil { changed = true }
         }
         var removed: [String] = []

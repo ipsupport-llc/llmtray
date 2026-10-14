@@ -262,4 +262,21 @@ extension MemoryQueueTests {
         XCTAssertEqual(all[0].model, "m")
         XCTAssertEqual(MemoryBatchMessage.reading(turns, readFrom: 1, date: late)[1].before, nil, "answers a message never read")
     }
+
+    func testPastChatsDontReadAgainWhatWasReadBeforeOnlyFromNowOn() throws {
+        var file = MemoryFile()
+        file.meet(chat, from: 1)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(2, "two"), message(3, "three")], now: t0))
+        file.queue = []   // read
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        let reloaded = try JSONDecoder().decode(MemoryFile.self, from: JSONEncoder().encode(file))
+        XCTAssertEqual(reloaded.readBefore[chat.uuidString], [2...3])
+        file = reloaded
+        file.meet(chat, from: 5)
+        let all = (1...6).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 4, 5], "2-3 were read; 6 is enqueue's")
+        XCTAssertNil(file.readBefore[chat.uuidString])
+    }
 }

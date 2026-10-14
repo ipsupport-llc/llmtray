@@ -110,6 +110,8 @@ final class ChatClient: ObservableObject {
     private var pendingToolGroups: Set<String> = []
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
+    /// When the chat was last written (its file's updatedAt).
+    private var sessionUpdatedAt: Date?
     /// The title is the user's or the model's already: no auto-title.
     private var titleIsFinal = false
     /// Bumped by a rename: a title request still running then drops its
@@ -381,6 +383,7 @@ final class ChatClient: ObservableObject {
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
+        sessionUpdatedAt = file.updatedAt
         // An untitled one (an empty chat kept on disk, e.g. Getting
         // Started's) still gets its title from its first exchange.
         titleIsFinal = !file.title.isEmpty
@@ -437,9 +440,13 @@ final class ChatClient: ObservableObject {
     /// content-less assistant message is only dropped if it also carries
     /// no image (an image-only tool-call-carrier message is real content
     /// now that images are persisted, not plumbing to discard).
-    private func persistCurrentSession() {
+    /// `touch`: the chat counts as changed now (false: written for
+    /// bookkeeping, it keeps its place in the list). False when it
+    /// couldn't be written.
+    @discardableResult
+    private func persistCurrentSession(touch: Bool = true) -> Bool {
         scheduleMemoryIdle()
-        guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
+        guard let sessionID = currentSessionID, hasUnsavedChanges else { return true }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
         // Documents' files are written when they're made: only kept.
@@ -490,7 +497,7 @@ final class ChatClient: ObservableObject {
             }
             return persisted
         }
-        guard !persisted.isEmpty else { return }
+        guard !persisted.isEmpty else { return true }
 
         var mediaMissing = false
         if !pendingImageWrites.isEmpty {
@@ -518,7 +525,7 @@ final class ChatClient: ObservableObject {
             id: sessionID,
             title: title,
             createdAt: sessionCreatedAt ?? Date(),
-            updatedAt: Date(),
+            updatedAt: touch ? Date() : (sessionUpdatedAt ?? Date()),
             messages: persisted,
             loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
             pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted(),
@@ -528,13 +535,15 @@ final class ChatClient: ObservableObject {
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
-        guard ChatSessionStore.save(file) else { return }
+        guard ChatSessionStore.save(file) else { return false }
+        sessionUpdatedAt = file.updatedAt
         // Still to write: the next save (a later turn, leaving the chat)
         // tries the media again.
         hasUnsavedChanges = mediaMissing
         for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
             try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
         }
+        return true
     }
 
     private static let compactionSystemPrompt = """
@@ -737,7 +746,11 @@ final class ChatClient: ObservableObject {
     /// it is queued too, then what's new. True when anything was queued.
     @discardableResult
     func queuePastForMemory() -> Bool {
-        guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return false }
+        guard let session = currentSessionID, MemoryManager.shared.isEnabled, !messages.isEmpty, !isBusy else { return false }
+        // The numbers loadSession gave messages from before seqs are written
+        // first: read now, they mustn't be numbered anew when it's opened again.
+        hasUnsavedChanges = true
+        guard persistCurrentSession(touch: false) else { return false }
         let items = memoryReading(readFrom: 0, date: sessionCreatedAt ?? Date())
         let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
         var queued = false
