@@ -40,6 +40,8 @@
 "%@ 🌐" = "%@ 🌐";
 "%@, p. %lld" = "%@, p. %lld";
 "%@: not supported yet" = "%@: not supported yet";
+"%d chats are answering: theirs is queued once they're done." = "%d chats are answering: theirs is queued once they're done.";
+"%d chats queued; reading starts now if the model is free." = "%d chats queued; reading starts now if the model is free.";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld can still be undone from Settings > Files.";
@@ -406,6 +408,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
+"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while.";
 "Everything in that folder is here already." = "Everything in that folder is here already.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
@@ -591,6 +594,7 @@
 "Later" = "Later";
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
+"Learn from Past Chats Now" = "Learn from Past Chats Now";
 "Learned from chats" = "Learned from chats";
 "Learning" = "Learning";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files.";
@@ -641,6 +645,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
+"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped.";
 "Memory was off. Read what was said meanwhile?" = "Memory was off. Read what was said meanwhile?";
 "Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
@@ -744,6 +749,7 @@
 "Notes can't hold links." = "Notes can't hold links.";
 "Notes in" = "Notes in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
+"Nothing left to read: every chat was read from its start." = "Nothing left to read: every chat was read from its start.";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
@@ -787,6 +793,7 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "PDF · %lld pages" = "PDF · %lld pages";
 "Past %lld messages" = "Past %lld messages";
+"Past chats" = "Past chats";
 "Pause" = "Pause";
 "Pause Indexing" = "Pause Indexing";
 "Pause download" = "Pause download";
@@ -867,6 +874,7 @@
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
 "Read It Too" = "Read It Too";
+"Read Them" = "Read Them";
 "Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";

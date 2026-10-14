@@ -288,6 +288,15 @@ changes in nearly every chat with memory on.
   said meanwhile too, or only from now on (closing the question without an
   answer leaves the choice open in Settings › Memory; nothing is read or met
   until it's made). A chat opted out waits for its own "Remember".
+- **Past chats** (added 2026-10-13, the user's ask). Memory reads a chat only
+  from where it met it. "Learn from Past Chats Now" (Settings › Memory, after a
+  confirmation) queues every saved chat's messages from before that, all of a
+  chat it never met, and meets it from its start; open chats go through their
+  tab, others through their file (user messages from before seqs get them,
+  saved with the chat). What was queued or read already isn't again (also
+  what was read before an "only from now on" made it meet the chat anew); chats
+  opted out, or waiting for the "back on" choice, are skipped. The queue is
+  then read at once, as usual (the chat's model, the model free).
 - "Don't remember this chat" stops reflection for it and asks whether to forget
   what was already learned from it.
 - Storage is plaintext in `~/Library/Application Support/LLMTray/memory/`

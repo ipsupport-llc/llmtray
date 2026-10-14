@@ -110,6 +110,8 @@ final class ChatClient: ObservableObject {
     private var pendingToolGroups: Set<String> = []
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
+    /// When the chat was last written (its file's updatedAt).
+    private var sessionUpdatedAt: Date?
     /// The title is the user's or the model's already: no auto-title.
     private var titleIsFinal = false
     /// Bumped by a rename: a title request still running then drops its
@@ -381,6 +383,7 @@ final class ChatClient: ObservableObject {
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
+        sessionUpdatedAt = file.updatedAt
         // An untitled one (an empty chat kept on disk, e.g. Getting
         // Started's) still gets its title from its first exchange.
         titleIsFinal = !file.title.isEmpty
@@ -437,9 +440,13 @@ final class ChatClient: ObservableObject {
     /// content-less assistant message is only dropped if it also carries
     /// no image (an image-only tool-call-carrier message is real content
     /// now that images are persisted, not plumbing to discard).
-    private func persistCurrentSession() {
+    /// `touch`: the chat counts as changed now (false: written for
+    /// bookkeeping, it keeps its place in the list). False when it
+    /// couldn't be written.
+    @discardableResult
+    private func persistCurrentSession(touch: Bool = true) -> Bool {
         scheduleMemoryIdle()
-        guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
+        guard let sessionID = currentSessionID, hasUnsavedChanges else { return true }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
         // Documents' files are written when they're made: only kept.
@@ -490,7 +497,7 @@ final class ChatClient: ObservableObject {
             }
             return persisted
         }
-        guard !persisted.isEmpty else { return }
+        guard !persisted.isEmpty else { return true }
 
         var mediaMissing = false
         if !pendingImageWrites.isEmpty {
@@ -518,7 +525,7 @@ final class ChatClient: ObservableObject {
             id: sessionID,
             title: title,
             createdAt: sessionCreatedAt ?? Date(),
-            updatedAt: Date(),
+            updatedAt: touch ? Date() : (sessionUpdatedAt ?? Date()),
             messages: persisted,
             loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
             pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted(),
@@ -528,13 +535,15 @@ final class ChatClient: ObservableObject {
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
-        guard ChatSessionStore.save(file) else { return }
+        guard ChatSessionStore.save(file) else { return false }
+        sessionUpdatedAt = file.updatedAt
         // Still to write: the next save (a later turn, leaving the chat)
         // tries the media again.
         hasUnsavedChanges = mediaMissing
         for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
             try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
         }
+        return true
     }
 
     private static let compactionSystemPrompt = """
@@ -727,24 +736,34 @@ final class ChatClient: ObservableObject {
         guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return true }
         // The answer to a message memory never read (before it met the
         // chat: opted out, memory off) isn't context either.
-        let met = MemoryManager.shared.file.met(session) ?? .max
-        var items: [MemoryBatchMessage] = []
-        var lastAnswer: String?
-        var previousSeq = 0
-        for message in messages {
-            if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
-                lastAnswer = previousSeq > met ? message.content : nil
-            } else if message.role == "user", !message.isToolContext, let seq = message.seq {
-                // The model it was sent to: by default the one that reads it.
-                items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer,
-                                                model: message.modelPath))
-                lastAnswer = nil
-                previousSeq = seq
-            }
-        }
+        let items = memoryReading(readFrom: MemoryManager.shared.file.met(session) ?? .max, date: Date())
         guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return true }
         let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
         return MemoryManager.shared.change { $0.enqueue(chat: session, project: project, messages: items, now: Date()) }
+    }
+
+    /// "Learn from past chats now": what this chat said before memory met
+    /// it is queued too, then what's new. True when anything was queued.
+    @discardableResult
+    func queuePastForMemory() -> Bool {
+        guard let session = currentSessionID, MemoryManager.shared.isEnabled, !messages.isEmpty, !isBusy else { return false }
+        // The numbers loadSession gave messages from before seqs are written
+        // first: read now, they mustn't be numbered anew when it's opened again.
+        hasUnsavedChanges = true
+        guard persistCurrentSession(touch: false) else { return false }
+        let items = memoryReading(readFrom: 0, date: sessionCreatedAt ?? Date())
+        let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
+        var queued = false
+        MemoryManager.shared.change { queued = $0.enqueuePast(chat: session, project: project, messages: items, now: Date()) }
+        let before = MemoryManager.shared.file.queue.count
+        queueForMemory()
+        return queued || MemoryManager.shared.file.queue.count > before
+    }
+
+    private func memoryReading(readFrom: Int, date: Date) -> [MemoryBatchMessage] {
+        MemoryBatchMessage.reading(messages.filter { !$0.isToolContext }.map {
+            MemoryBatchMessage.Turn(role: $0.role, text: $0.content, isSummary: $0.isSummary, seq: $0.seq, date: $0.sentAt, model: $0.modelPath)
+        }, readFrom: readFrom, date: date)
     }
 
     /// Quiet for the settings' minutes after its last change: queued.

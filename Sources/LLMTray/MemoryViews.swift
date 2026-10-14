@@ -29,6 +29,9 @@ struct MemoryPane: View {
     @State private var confirmForgetAll = false
     /// Memory on again with something put aside: read what was said meanwhile?
     @State private var askResume = false
+    @State private var confirmLearnPast = false
+    /// What "Learn from Past Chats Now" did, shown under it.
+    @State private var learnPastResult: String?
     @State private var about: [MemoryAboutField: String] = [:]
     @State private var aboutError: String?
 
@@ -131,6 +134,15 @@ struct MemoryPane: View {
                     Toggle(isOn: $forgetDeletedChats) {
                         SettingLabel(title: "Deleting a chat forgets what it taught", help: "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.")
                     }
+                    HStack {
+                        SettingLabel(title: "Past chats", help: "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped.")
+                        Spacer()
+                        Button("Learn from Past Chats Now") { confirmLearnPast = true }
+                            .disabled(memory.unreadable || memory.file.hasPaused)
+                    }
+                    if let learnPastResult {
+                        Text(learnPastResult).font(.caption).foregroundStyle(.secondary)
+                    }
                     if !memory.file.queue.isEmpty {
                         Text("\(memory.file.queue.count) parts of chats wait to be read.")
                             .font(.caption).foregroundStyle(.secondary)
@@ -175,6 +187,24 @@ struct MemoryPane: View {
             Button("Only From Now On") { memory.change { $0.resumeAll(readMeanwhile: false) } }
         } message: {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
+        }
+        .confirmationDialog("Learn from all your past chats?", isPresented: $confirmLearnPast) {
+            Button("Read Them") {
+                let (queued, waiting) = memory.learnFromPastChats()
+                var lines: [String] = []
+                if queued > 0 {
+                    lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
+                }
+                if waiting > 0 {
+                    lines.append(String(format: NSLocalizedString("%d chats are answering: theirs is queued once they're done.", comment: ""), waiting))
+                }
+                learnPastResult = lines.isEmpty
+                    ? NSLocalizedString("Nothing left to read: every chat was read from its start.", comment: "")
+                    : lines.joined(separator: " ")
+                reflector.poke(after: 1)
+            }
+        } message: {
+            Text("Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while.")
         }
         .onAppear(perform: loadAbout)
         .onChange(of: learningModel) { _, _ in reflector.poke(after: 2) }

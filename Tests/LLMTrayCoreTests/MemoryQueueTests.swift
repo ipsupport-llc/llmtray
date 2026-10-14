@@ -205,4 +205,114 @@ extension MemoryQueueTests {
         let file = try JSONDecoder().decode(MemoryFile.self, from: Data(json.utf8))
         XCTAssertEqual(file.met(id), 7)
     }
+
+    func testPastChatsQueueWhatWasSaidBeforeMemoryMetThem() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(3, "three")], now: t0))
+        let all = [message(1, "one"), message(2, "two"), message(3, "three"), message(4, "four")]
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.map { $0.messages.map(\.seq) }, [[3], [1, 2]], "only what came before the meeting")
+        XCTAssertEqual(file.met(chat), 0)
+        XCTAssertEqual(file.watermark(chat), 3, "what's new is left to enqueue")
+        XCTAssertFalse(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0), "read from its start already")
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.last?.messages.map(\.seq), [4])
+    }
+
+    func testAPastChatMemoryNeverMetIsReadWhole() {
+        var file = MemoryFile()
+        let project = UUID()
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: project, messages: [message(2, "two"), message(1, "one"), message(3, "  ")], now: t0))
+        XCTAssertEqual(file.queue.first?.messages.map(\.seq), [1, 2])
+        XCTAssertEqual(file.queue.first?.project, project)
+        XCTAssertEqual(file.watermark(chat), 2)
+        XCTAssertEqual(file.met(chat), 0)
+        var empty = MemoryFile()
+        XCTAssertFalse(empty.enqueuePast(chat: chat, project: nil, messages: [], now: t0))
+    }
+
+    func testPastChatsSkipOptedOutAndPausedOnes() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        file.setOptedOut(chat, true)
+        XCTAssertFalse(file.enqueuePast(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
+        let other = UUID()
+        file.meet(other, from: 2)
+        file.pauseAll()
+        XCTAssertFalse(file.enqueuePast(chat: other, project: nil, messages: [message(1, "one")], now: t0))
+        XCTAssertTrue(file.queue.isEmpty)
+        XCTAssertEqual(file.met(other), 2, "waits for the user's answer")
+    }
+
+    func testReadingAChatTakesTheAnswerBeforeOnlyAfterWhereItsRead() {
+        let turns: [MemoryBatchMessage.Turn] = [
+            .init(role: "user", text: "a", seq: 1, date: nil, model: "m"),
+            .init(role: "assistant", text: "answer one", seq: nil, date: nil, model: nil),
+            .init(role: "user", text: "b", seq: 2, date: t0, model: nil),
+            .init(role: "assistant", text: "summary", isSummary: true, seq: nil, date: nil, model: nil),
+            .init(role: "user", text: "c", seq: 3, date: nil, model: nil),
+            .init(role: "user", text: "no seq", seq: nil, date: nil, model: nil),
+        ]
+        let late = Date(timeIntervalSince1970: 1_900_000_000)
+        let all = MemoryBatchMessage.reading(turns, readFrom: 0, date: late)
+        XCTAssertEqual(all.map(\.seq), [1, 2, 3])
+        XCTAssertEqual(all.map(\.before), [nil, "answer one", nil])
+        XCTAssertEqual(all.map(\.date), [late, t0, late])
+        XCTAssertEqual(all[0].model, "m")
+        XCTAssertEqual(MemoryBatchMessage.reading(turns, readFrom: 1, date: late)[1].before, nil, "answers a message never read")
+    }
+
+    func testPastChatsDontReadAgainWhatWasReadBeforeOnlyFromNowOn() throws {
+        var file = MemoryFile()
+        file.meet(chat, from: 1)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(2, "two"), message(3, "three")], now: t0))
+        file.queue = []   // read
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        let reloaded = try JSONDecoder().decode(MemoryFile.self, from: JSONEncoder().encode(file))
+        XCTAssertEqual(reloaded.readBefore[chat.uuidString], [2...3])
+        file = reloaded
+        file.meet(chat, from: 5)
+        let all = (1...6).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 4, 5], "2-3 were read; 6 is enqueue's")
+        XCTAssertNil(file.readBefore[chat.uuidString])
+    }
+
+    func testOptingOutWithThePastStillQueuedKeepsWhatWasRead() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(3, "three")], now: t0))
+        file.queue = []   // 3 read
+        let all = (1...4).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))   // 1-2 queued
+        file.setOptedOut(chat, true)
+        file.setOptedOut(chat, false, readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2, 4], "3 was read; 1-2 never were")
+    }
+
+    func testMemoryOffWithThePastQueuedDoesntQueueItTwice() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        let all = (1...3).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))   // 1-2 queued, kept
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2, 3])
+    }
+
+    func testOptingOutAfterAPauseDoesntCountTheDroppedQueueAsRead() {
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
+        file.pauseAll()
+        file.setOptedOut(chat, true)
+        XCTAssertTrue(file.queue.isEmpty)
+        file.setOptedOut(chat, false, readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: [message(1, "one")], now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1])
+    }
 }

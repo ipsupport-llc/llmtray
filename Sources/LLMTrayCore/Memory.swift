@@ -346,6 +346,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// remembered again, the user picks whether what was said meanwhile is
     /// read (they come back) or not (they go, and the chat is met anew).
     public var pausedWatermarks: [String: Int] = [:]
+    /// Per chat, the seqs read (queued) before it was met anew ("only from
+    /// now on"): "Learn from past chats" doesn't read them again.
+    public var readBefore: [String: [ClosedRange<Int>]] = [:]
     /// Chats marked "Don't remember this chat".
     public var optedOut: Set<UUID> = []
     /// Forgotten notes, so they aren't learned again from the same words.
@@ -355,7 +358,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, optedOut, tombstones, nextBatchID
+        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, readBefore, optedOut, tombstones, nextBatchID
     }
 
     // The queue and the rest came after the first notes files.
@@ -369,6 +372,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
         metFrom = try c.decodeIfPresent([String: Int].self, forKey: .metFrom) ?? [:]
         pausedWatermarks = try c.decodeIfPresent([String: Int].self, forKey: .pausedWatermarks) ?? [:]
+        readBefore = try c.decodeIfPresent([String: [ClosedRange<Int>]].self, forKey: .readBefore) ?? [:]
         // A watermark from before metFrom: met there, as far as is known.
         for (chat, mark) in watermarks where metFrom[chat] == nil { metFrom[chat] = mark }
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
@@ -476,7 +480,11 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// met until it's on again and the user has chosen (`resume`). What's
     /// queued stays.
     public mutating func pauseAll() {
-        for (chat, mark) in watermarks { pausedWatermarks[chat] = min(pausedWatermarks[chat] ?? mark, mark) }
+        for (chat, mark) in watermarks {
+            // What's queued stays and is still read.
+            if let id = UUID(uuidString: chat) { noteRead(id, queuedToo: true) }
+            pausedWatermarks[chat] = min(pausedWatermarks[chat] ?? mark, mark)
+        }
         watermarks = [:]
     }
 
@@ -503,7 +511,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             watermarks[chat] = min(watermarks[chat] ?? mark, mark)
         } else {
             watermarks.removeValue(forKey: chat)
-            metFrom.removeValue(forKey: chat)
+            if let from = metFrom.removeValue(forKey: chat), mark > from {
+                addRead(Array((from + 1)...mark), to: chat)
+            }
         }
     }
 
@@ -551,6 +561,66 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         let fresh = messages.filter { $0.seq > mark && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .sorted { $0.seq < $1.seq }
         guard let last = fresh.last else { return false }
+        appendBatches(fresh, chat: chat, project: project, now: now)
+        watermarks[chat.uuidString] = last.seq
+        return true
+    }
+
+    /// "Learn from past chats now": what a chat said before memory met it
+    /// (all of it, for a chat memory never met) is queued too, and the
+    /// chat is met from its start. What was queued or read already isn't
+    /// again; what's after the watermark is left to `enqueue`. Nothing for
+    /// an opted-out chat, or one put aside while memory was off (the user
+    /// chooses for those first). True when anything was queued.
+    @discardableResult
+    public mutating func enqueuePast(chat: UUID, project: UUID?, messages: [MemoryBatchMessage], now: Date) -> Bool {
+        let key = chat.uuidString
+        guard !optedOut.contains(chat), pausedWatermarks[key] == nil else { return false }
+        let past = messages.filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.sorted { $0.seq < $1.seq }
+        let upTo: Int
+        if let met = metFrom[key] {
+            upTo = met
+        } else {
+            guard let last = past.last else { return false }
+            upTo = last.seq
+            watermarks[key] = upTo
+        }
+        metFrom[key] = 0
+        let read = readBefore.removeValue(forKey: key) ?? []
+        let unread = past.filter { m in m.seq <= upTo && !read.contains { $0.contains(m.seq) } }
+        guard !unread.isEmpty else { return false }
+        appendBatches(unread, chat: chat, project: project, now: now)
+        return true
+    }
+
+    /// Keeps which of a chat's messages were read since memory met it (and
+    /// those `queuedToo`, still to be read) before its watermark goes, so
+    /// "Learn from past chats" doesn't read them again.
+    private mutating func noteRead(_ chat: UUID, queuedToo: Bool) {
+        let key = chat.uuidString
+        guard let mark = watermarks[key] else { return }
+        let from = metFrom[key] ?? mark
+        let queued = Set(queue.filter { $0.chat == chat }.flatMap { $0.messages.map(\.seq) })
+        var seqs = Set(mark > from ? Array((from + 1)...mark) : [])
+        if queuedToo { seqs.formUnion(queued) } else { seqs.subtract(queued) }
+        addRead(Array(seqs), to: key)
+    }
+
+    private mutating func addRead(_ seqs: [Int], to key: String) {
+        let all = Set(seqs + (readBefore[key] ?? []).flatMap { Array($0) }).sorted()
+        var ranges: [ClosedRange<Int>] = []
+        for seq in all {
+            if let last = ranges.last, last.upperBound + 1 == seq {
+                ranges[ranges.count - 1] = last.lowerBound...seq
+            } else {
+                ranges.append(seq...seq)
+            }
+        }
+        readBefore[key] = ranges.isEmpty ? nil : ranges
+    }
+
+    /// `messages` (in order) as batches of at most `MemoryBatch.maxBytes`.
+    private mutating func appendBatches(_ messages: [MemoryBatchMessage], chat: UUID, project: UUID?, now: Date) {
         var batch: [MemoryBatchMessage] = []
         var bytes = 0
         func flush() {
@@ -560,15 +630,13 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             batch = []
             bytes = 0
         }
-        for message in fresh {
+        for message in messages {
             let size = message.text.utf8.count + (message.before?.utf8.count ?? 0)
             if bytes + size > MemoryBatch.maxBytes { flush() }
             batch.append(message.clipped)
             bytes += min(size, MemoryBatch.maxBytes)
         }
         flush()
-        watermarks[chat.uuidString] = last.seq
-        return true
     }
 
     /// "Don't remember this chat": nothing more is learned from it, and
@@ -580,6 +648,14 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public mutating func setOptedOut(_ chat: UUID, _ out: Bool, readMeanwhile: Bool = false) {
         let key = chat.uuidString
         if out {
+            // What's queued goes (below), so it doesn't count as read --
+            // nor if a pause counted it.
+            noteRead(chat, queuedToo: false)
+            let dropped = Set(queue.filter { $0.chat == chat }.flatMap { $0.messages.map(\.seq) })
+            if !dropped.isEmpty, let read = readBefore[key] {
+                readBefore[key] = nil
+                addRead(read.flatMap { Array($0) }.filter { !dropped.contains($0) }, to: key)
+            }
             optedOut.insert(chat)
             // Put aside from before what was queued, which goes: read again
             // only if the user asks for it when remembering the chat.
@@ -609,6 +685,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             if watermarks.removeValue(forKey: chat.uuidString) != nil { changed = true }
             metFrom.removeValue(forKey: chat.uuidString)
             pausedWatermarks.removeValue(forKey: chat.uuidString)
+            readBefore.removeValue(forKey: chat.uuidString)
             if optedOut.remove(chat) != nil { changed = true }
         }
         var removed: [String] = []
@@ -692,6 +769,45 @@ public struct MemoryBatchMessage: Codable, Equatable, Sendable {
 
     /// At most this much of the answer before a message is kept.
     public static let maxBefore = 300
+
+    /// One message of a chat, as memory reads chats.
+    public struct Turn: Sendable {
+        public var role: String
+        public var text: String
+        public var isSummary: Bool
+        public var seq: Int?
+        public var date: Date?
+        public var model: String?
+
+        public init(role: String, text: String, isSummary: Bool = false, seq: Int?, date: Date?, model: String?) {
+            self.role = role
+            self.text = text
+            self.isSummary = isSummary
+            self.seq = seq
+            self.date = date
+            self.model = model
+        }
+    }
+
+    /// A chat's user messages (those with a seq), each with the answer
+    /// before it -- unless that answers a message memory never read (at or
+    /// before `readFrom`). `date` for a message from before dates were kept.
+    public static func reading(_ turns: [Turn], readFrom: Int, date: Date) -> [MemoryBatchMessage] {
+        var items: [MemoryBatchMessage] = []
+        var lastAnswer: String?
+        var previousSeq = 0
+        for turn in turns {
+            if turn.role == "assistant", !turn.text.isEmpty, !turn.isSummary {
+                lastAnswer = previousSeq > readFrom ? turn.text : nil
+            } else if turn.role == "user", let seq = turn.seq {
+                // The model it was sent to: by default the one that reads it.
+                items.append(MemoryBatchMessage(seq: seq, date: turn.date ?? date, text: turn.text, before: lastAnswer, model: turn.model))
+                lastAnswer = nil
+                previousSeq = seq
+            }
+        }
+        return items
+    }
 
     public init(seq: Int, date: Date, text: String, before: String?, model: String? = nil) {
         self.seq = seq
