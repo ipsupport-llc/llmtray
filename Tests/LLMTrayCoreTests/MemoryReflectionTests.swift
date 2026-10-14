@@ -561,4 +561,15 @@ extension MemoryReflectionTests {
         XCTAssertEqual(ops?.map(\.action), [.confirm])
         XCTAssertEqual(ops?.first?.id, id)
     }
+
+    func testAQuoteWithWordsLeftOutNeverDropsANegation() {
+        let batch = MemoryBatch(id: 1, chat: chat, project: nil, created: t0, messages: [
+            MemoryBatchMessage(seq: 1, date: t0, text: "I do not live in Berlin", before: nil),
+            MemoryBatchMessage(seq: 2, date: t0, text: "Отвечай мне, пожалуйста, коротко и по-русски, без воды", before: nil),
+        ])
+        XCTAssertNil(MemoryReflection.source(of: "I live in Berlin", in: batch))
+        XCTAssertEqual(MemoryReflection.source(of: "Отвечай мне, пожалуйста, коротко, без воды", in: batch)?.seq, 2, "two words left out")
+        XCTAssertNil(MemoryReflection.source(of: "Отвечай без воды", in: batch), "too many left out")
+        XCTAssertNil(MemoryReflection.parseOperations(#"{"op":"add","text":"a [b] c","quote":"x y"]}"#)?.first, "a line with [ isn't repaired")
+    }
 }

@@ -1137,8 +1137,10 @@ public enum MemorySelection {
     public static func isCurrent(_ snapshot: MemorySnapshot, file: MemoryFile, settings: MemorySettings,
                                  project: UUID?, budget: Int, now: Date = Date(), tokens: (String) -> Int) -> Bool {
         guard settings.enabled, snapshot.project == project, snapshot.settings == settings.fingerprint else { return false }
-        // A mood that ran out leaves the chat.
-        if let until = snapshot.moodUntil, until <= now { return false }
+        // A mood that ran out, was forgotten or replaced leaves the chat.
+        if let until = snapshot.moodUntil {
+            guard until > now, let mood = file.mood, mood.until(hours: settings.moodHours) == until else { return false }
+        }
         guard snapshot.text.isEmpty || tokens(snapshot.text) <= budget else { return false }
         for id in snapshot.noteIDs {
             guard let note = file.note(id), settings.allows(note, project: project),

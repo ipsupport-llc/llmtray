@@ -222,6 +222,8 @@ public enum MemoryExtraction {
             let ids = Set(notes.map(\.id))
             let only = MemoryBatch(id: batch.id, chat: batch.chat, project: batch.project, created: batch.created, messages: read)
             for var op in parsed {
+                // An add is new: an id on it would skip the duplicate check.
+                if op.action == .add { op.id = nil }
                 if let id = op.id, !ids.contains(id) { continue }
                 if op.action == .confirm, read.count == 1, MemoryReflection.source(of: op.quote, in: only) == nil {
                     op.quote = String(MemoryReflection.typedText(read[0].text).prefix(MemoryText.maxQuote))
@@ -249,7 +251,9 @@ public enum MemoryExtraction {
                 }
                 if op.action == .add {
                     let kind = op.kind == .correction ? MemoryKind.correction : .preference
-                    op.kind = askedKinds.contains(kind) ? kind : askedKinds.first
+                    // A kind that's off isn't learned as another.
+                    guard askedKinds.contains(kind) else { return false }
+                    op.kind = kind
                     op.observed = nil
                     op.scope = "user"
                 }
@@ -329,7 +333,7 @@ public enum MemoryExtraction {
                        let text = (object["text"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines),
                        let quote = object["quote"] as? String,
                        [observed, text].allSatisfy({ MemoryText.problem($0) == nil && !MemoryText.sensitive($0) }),
-                       let message = MemoryReflection.source(of: quote, in: shown) ?? (feeling.count == 1 ? feeling[0] : nil) {
+                       let message = MemoryReflection.source(of: quote, in: shown) {
                         mood = Mood(observed: observed, text: text, quote: quote, message: message)
                     }
                 }

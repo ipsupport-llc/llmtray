@@ -327,6 +327,7 @@ final class MemoryReflector: ObservableObject {
         // Read it: triage, then the targeted steps (MemoryExtraction).
         let topicList = Array(Set(MemoryTopics.builtIn + memory.file.notes.map(\.topic))).sorted()
         let operations: [MemoryReflection.Operation]
+        var mood: MemoryMood?
         do {
             guard let reading = try await MemoryExtraction.reading(
                 batch: batch, candidates: candidates,
@@ -337,11 +338,9 @@ final class MemoryReflector: ObservableObject {
                 ask: { messages, maxTokens in try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath).get() }
             ) else { return .failed("unreadable reply") }
             operations = reading.operations
-            // The mood at once: it's for the next chats, and short-lived.
-            if let mood = reading.mood {
-                memory.change {
-                    $0.setMood(MemoryMood(observed: mood.observed, text: mood.text, date: mood.message.date, chat: batch.chat, quote: mood.quote))
-                }
+            // Kept with the batch's commit (only while it's still queued).
+            mood = reading.mood.map {
+                MemoryMood(observed: $0.observed, text: $0.text, date: $0.message.date, chat: batch.chat, quote: $0.quote)
             }
         } catch let error as OutcomeError {
             return error.outcome
@@ -387,7 +386,7 @@ final class MemoryReflector: ObservableObject {
                                                                  isObservation: MemoryReflection.isShown(op, note: note))))
         }
         guard !pending.isEmpty else {
-            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
+            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:], mood: mood)
         }
 
         // Verify: only claims the user, speaking for themselves, makes.
@@ -527,20 +526,20 @@ final class MemoryReflector: ObservableObject {
                 changes.append(.forget(id: p.op.id!, vector: note.flatMap { vectors.vector(for: $0) }))
             }
         }
-        return commit(batch, changes: changes, since: since, vectors: vectors, newVectors: newVectors)
+        return commit(batch, changes: changes, since: since, vectors: vectors, newVectors: newVectors, mood: mood)
     }
 
     /// One write: the changes (checked again against the store, the
     /// settings and the projects as they are now, tombstones included), and
     /// the batch out of the queue. The vectors are a cache written after.
     private func commit(_ batch: MemoryBatch, changes: [MemoryChange], since: Int, vectors: MemoryVectors,
-                        newVectors: [String: [Float]]) -> Outcome {
+                        newVectors: [String: [Float]], mood: MemoryMood? = nil) -> Outcome {
         let memory = MemoryManager.shared
         let settings = memory.settings
         let projects = Set(ChatLibraryStore.shared.library.projects.map(\.id))
         var touched: [String] = []
         guard memory.change({ touched = $0.commit(batch: batch.id, changes: changes, since: since, settings: settings,
-                                                  liveProjects: projects, now: Date()) }) else {
+                                                  liveProjects: projects, now: Date(), mood: mood) }) else {
             return .stored(NSLocalizedString("The notes couldn't be saved.", comment: "memory status"))
         }
         var vectors = vectors

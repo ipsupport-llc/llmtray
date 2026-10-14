@@ -457,6 +457,10 @@ extension MemoryTests {
                                                 now: t0.addingTimeInterval(2 * 3600), tokens: tokens))
         XCTAssertFalse(MemorySelection.isCurrent(block, file: file, settings: on, project: nil, budget: 300,
                                                  now: t0.addingTimeInterval(3 * 3600), tokens: tokens), "ran out: chosen again")
+        var forgotten = file
+        forgotten.mood = nil
+        XCTAssertFalse(MemorySelection.isCurrent(block, file: forgotten, settings: on, project: nil, budget: 300,
+                                                 now: t0.addingTimeInterval(3600), tokens: tokens), "forgotten: leaves open chats")
         let later = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0.addingTimeInterval(4 * 3600), tokens: tokens)!
         XCTAssertFalse(later.text.contains("Right now"))
         XCTAssertNil(later.moodUntil)

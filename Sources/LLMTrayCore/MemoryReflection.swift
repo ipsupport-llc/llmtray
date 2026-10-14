@@ -54,8 +54,8 @@ public enum MemoryReflection {
     /// left before its closing brace ({"quote":"…"]}) taken out.
     static func lineObject(_ line: String) -> [String: Any]? {
         if case .success(let parsed) = LenientJSON.parse(line), let object = parsed.value as? [String: Any] { return object }
-        guard !line.contains("["), line.contains("]") else { return nil }
-        let repaired = line.replacingOccurrences(of: "]", with: "")
+        guard !line.contains("["), line.hasSuffix("\"]}") else { return nil }
+        let repaired = String(line.dropLast(2)) + "}"
         if case .success(let parsed) = LenientJSON.parse(repaired), let object = parsed.value as? [String: Any] { return object }
         return nil
     }
@@ -325,17 +325,31 @@ public enum MemoryReflection {
         // A quote with a word or two left out ("коротко, без воды" of
         // "коротко и по-русски, без воды"): still the user's own words, in
         // their order, within one message -- three words at least.
+        // their order, within one message -- three words at least, at most
+        // two left out, and never a negation ("I do not live in Berlin"
+        // isn't "I live in Berlin").
         let words = Self.words(q)
         guard words.count >= 3 else { return nil }
         return batch.messages.first { message in
-            var rest = Self.words(MemoryText.normalizedQuote(typedText(message.text)))[...]
-            for word in words {
-                guard let i = rest.firstIndex(of: word) else { return false }
-                rest = rest[(i + 1)...]
+            let all = Self.words(MemoryText.normalizedQuote(typedText(message.text)))
+            guard let start = all.firstIndex(of: words[0]) else { return false }
+            var i = start
+            var skipped = 0
+            for word in words.dropFirst() {
+                i += 1
+                while i < all.count, all[i] != word {
+                    if Self.negations.contains(all[i]) { return false }
+                    skipped += 1
+                    i += 1
+                }
+                guard i < all.count, skipped <= 2 else { return false }
             }
             return true
         }
     }
+
+    static let negations: Set<String> = ["not", "no", "never", "don't", "doesn't", "didn't", "isn't", "aren't", "won't", "can't",
+                                         "не", "нет", "ни", "никогда", "ніколи", "ні", "nicht", "kein", "nie", "pas", "jamais", "nunca"]
 
     static func words(_ text: String) -> [String] {
         text.split { !$0.isLetter && !$0.isNumber && $0 != "-" }.map(String.init)
@@ -423,8 +437,10 @@ extension MemoryFile {
     /// meanwhile writes nothing of it); `liveProjects`: the projects there
     /// are (a deleted one's notes aren't written).
     @discardableResult
+    /// `mood`: the one its messages showed, kept with the rest -- only while
+    /// the batch is still queued and the chat may be learned from.
     public mutating func commit(batch id: Int, changes: [MemoryChange], since: Int, settings: MemorySettings,
-                                liveProjects: Set<UUID>, now: Date) -> [String] {
+                                liveProjects: Set<UUID>, now: Date, mood: MemoryMood? = nil) -> [String] {
         guard let batch = queue.first(where: { $0.id == id }) else { return [] }
         queue.removeAll { $0.id == id }
         var touched: [String] = []
@@ -435,6 +451,7 @@ extension MemoryFile {
         let writable: MemorySubject? = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
         let mayWrite = settings.learns(inProject: batch.project) && (settings.shareLearned || writable != nil)
         if settings.enabled, mayWrite, !optedOut.contains(batch.chat) {
+            if let mood, mood.chat == batch.chat, mood.isFresh(now: now, hours: settings.moodHours) { setMood(mood) }
             // Whether the user changed a note since the pass began, as the
             // store was before this write: a note changed by an earlier
             // change of this batch is still the batch's to change.
