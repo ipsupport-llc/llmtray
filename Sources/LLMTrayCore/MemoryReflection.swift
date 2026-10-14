@@ -324,35 +324,37 @@ public enum MemoryReflection {
         if let exact = batch.messages.first(where: { MemoryText.normalizedQuote(typedText($0.text)).contains(q) }) { return exact }
         // A quote with a word or two left out ("коротко, без воды" of
         // "коротко и по-русски, без воды"): still the user's own words, in
-        // their order, within one message -- three words at least.
         // their order, within one message -- three words at least, at most
-        // two left out, and never a negation ("I do not live in Berlin"
-        // isn't "I live in Berlin").
+        // two left out, and never a negation left out or just before it
+        // ("I do not live in Berlin" isn't "I live in Berlin").
         let words = Self.words(q)
         guard words.count >= 3 else { return nil }
         return batch.messages.first { message in
             let all = Self.words(MemoryText.normalizedQuote(typedText(message.text)))
-            guard let start = all.firstIndex(of: words[0]) else { return false }
-            var i = start
-            var skipped = 0
-            for word in words.dropFirst() {
-                i += 1
-                while i < all.count, all[i] != word {
-                    if Self.negations.contains(all[i]) { return false }
-                    skipped += 1
+            return all.indices.contains { start in
+                guard all[start] == words[0], start == 0 || !Self.negations.contains(all[start - 1]) else { return false }
+                var i = start
+                var skipped = 0
+                for word in words.dropFirst() {
                     i += 1
+                    while i < all.count, all[i] != word {
+                        if Self.negations.contains(all[i]) { return false }
+                        skipped += 1
+                        i += 1
+                    }
+                    guard i < all.count, skipped <= 2 else { return false }
                 }
-                guard i < all.count, skipped <= 2 else { return false }
+                return true
             }
-            return true
         }
     }
 
-    static let negations: Set<String> = ["not", "no", "never", "don't", "doesn't", "didn't", "isn't", "aren't", "won't", "can't",
+    static let negations: Set<String> = ["not", "no", "never", "cannot", "don't", "doesn't", "didn't", "isn't", "aren't", "won't", "can't",
                                          "не", "нет", "ни", "никогда", "ніколи", "ні", "nicht", "kein", "nie", "pas", "jamais", "nunca"]
 
     static func words(_ text: String) -> [String] {
-        text.split { !$0.isLetter && !$0.isNumber && $0 != "-" }.map(String.init)
+        // Apostrophes kept: "don't" is one word, a negation.
+        text.replacingOccurrences(of: "’", with: "'").split { !$0.isLetter && !$0.isNumber && $0 != "-" && $0 != "'" }.map(String.init)
     }
 
     // MARK: Vectors

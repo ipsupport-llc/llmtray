@@ -570,6 +570,12 @@ extension MemoryReflectionTests {
         XCTAssertNil(MemoryReflection.source(of: "I live in Berlin", in: batch))
         XCTAssertEqual(MemoryReflection.source(of: "Отвечай мне, пожалуйста, коротко, без воды", in: batch)?.seq, 2, "two words left out")
         XCTAssertNil(MemoryReflection.source(of: "Отвечай без воды", in: batch), "too many left out")
+        let more = MemoryBatch(id: 2, chat: chat, project: nil, created: t0, messages: [
+            MemoryBatchMessage(seq: 3, date: t0, text: "I don't live in Berlin", before: nil),
+            MemoryBatchMessage(seq: 4, date: t0, text: "I work on compilers. I prefer very short answers", before: nil),
+        ])
+        XCTAssertNil(MemoryReflection.source(of: "I live in Berlin", in: more), "don't is a negation")
+        XCTAssertEqual(MemoryReflection.source(of: "I prefer short answers", in: more)?.seq, 4, "the second I")
         XCTAssertNil(MemoryReflection.parseOperations(#"{"op":"add","text":"a [b] c","quote":"x y"]}"#)?.first, "a line with [ isn't repaired")
     }
 }
