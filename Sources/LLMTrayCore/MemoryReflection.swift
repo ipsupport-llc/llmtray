@@ -353,8 +353,10 @@ public enum MemoryReflection {
                                          "не", "нет", "ни", "никогда", "ніколи", "ні", "nicht", "kein", "nie", "pas", "jamais", "nunca"]
 
     static func words(_ text: String) -> [String] {
-        // Apostrophes kept: "don't" is one word, a negation.
-        text.replacingOccurrences(of: "’", with: "'").split { !$0.isLetter && !$0.isNumber && $0 != "-" && $0 != "'" }.map(String.init)
+        // Apostrophes kept inside a word ("don't" is one word, a negation),
+        // not around it ('not' is not).
+        text.replacingOccurrences(of: "’", with: "'").split { !$0.isLetter && !$0.isNumber && $0 != "-" && $0 != "'" }
+            .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "'")) }.filter { !$0.isEmpty }
     }
 
     // MARK: Vectors
