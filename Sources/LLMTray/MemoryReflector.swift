@@ -307,7 +307,7 @@ final class MemoryReflector: ObservableObject {
         // The notes it may change: kept apart, only its own place's; shared,
         // every one this chat sees. Never pinned ones (the user's alone).
         let touchable = memory.file.notes.filter { note in
-            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project)
+            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project, candidates: true)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -320,19 +320,33 @@ final class MemoryReflector: ObservableObject {
             guard candidates.count < Self.candidatesAtMost else { break }
             candidates.append(note)
         }
-        let shown = Dictionary(uniqueKeysWithValues: candidates.map { ($0.id, $0) })
+        // What the model may name: the candidates, and every manner note (MemoryExtraction's toneNotes).
+        let shown = Dictionary((candidates + touchable.filter { $0.kind == .observation && $0.topic == "tone" }).map { ($0.id, $0) },
+                               uniquingKeysWith: { a, _ in a })
 
-        // Reflect.
+        // Read it: triage, then the targeted steps (MemoryExtraction).
         let topicList = Array(Set(MemoryTopics.builtIn + memory.file.notes.map(\.topic))).sorted()
-        let reflectReply: String
-        switch await ask(MemoryReflection.reflectMessages(batch: batch, candidates: candidates, topics: topicList,
-                                                          language: Self.languageName(), kinds: settings.kinds,
-                                                          inProject: settings.shareLearned && project != nil),
-                         maxTokens: 1500, modelPath: modelPath) {
-        case .success(let reply): reflectReply = reply
-        case .failure(let error): return error.outcome
+        let operations: [MemoryReflection.Operation]
+        var mood: MemoryMood?
+        do {
+            guard let reading = try await MemoryExtraction.reading(
+                batch: batch, candidates: candidates,
+                toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
+                topics: topicList, language: Self.languageName(), kinds: settings.kinds,
+                inProject: settings.shareLearned && project != nil,
+                moodSince: settings.moodHours > 0 ? Date().addingTimeInterval(-Double(settings.moodHours) * 3600) : nil,
+                ask: { messages, maxTokens in try await self.ask(messages, maxTokens: maxTokens, modelPath: modelPath).get() }
+            ) else { return .failed("unreadable reply") }
+            operations = reading.operations
+            // Kept with the batch's commit (only while it's still queued).
+            mood = reading.mood.map {
+                MemoryMood(observed: $0.observed, text: $0.text, date: $0.message.date, chat: batch.chat, quote: $0.quote)
+            }
+        } catch let error as OutcomeError {
+            return error.outcome
+        } catch {
+            return .failed(error.localizedDescription)
         }
-        guard let operations = MemoryReflection.parseOperations(reflectReply) else { return .failed("unreadable reflect reply") }
 
         // What survives the code's checks: the user's own words, ids it was
         // shown, kinds that are on, texts a note may hold.
@@ -350,15 +364,15 @@ final class MemoryReflector: ObservableObject {
             let statement: String
             switch op.action {
             case .add:
-                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryText.problem(text) == nil else { continue }
+                guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryReflection.mayLearn(op) else { continue }
                 subject = fixedSubject ?? (op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user)
                 statement = kind == .observation ? (op.observed ?? text) : text
             case .confirm:
                 guard let note else { continue }
                 subject = note.subject
-                statement = note.text
+                statement = MemoryReflection.confirmStatement(note)
             case .update, .supersede:
-                guard let note, let text = op.text, MemoryText.problem(text) == nil else { continue }
+                guard let note, let text = op.text, MemoryReflection.mayLearn(op, kind: note.kind) else { continue }
                 subject = note.subject
                 statement = text
             case .forget:
@@ -369,10 +383,10 @@ final class MemoryReflector: ObservableObject {
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                                  message: message.text, quote: op.quote, before: message.before,
-                                                                 isObservation: op.action == .add && op.kind == .observation)))
+                                                                 isObservation: MemoryReflection.isShown(op, note: note))))
         }
         guard !pending.isEmpty else {
-            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
+            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:], mood: mood)
         }
 
         // Verify: only claims the user, speaking for themselves, makes.
@@ -383,6 +397,11 @@ final class MemoryReflector: ObservableObject {
         case .failure(let error):
             return error.outcome
         }
+        // At most a few new notes from one part of a chat: what the user
+        // asked for first, then facts, then observations.
+        let adds = pending.indices.filter { pending[$0].op.action == .add }
+        let kept = Set(MemoryReflection.keptAdds(adds.map { pending[$0].op.kind }).map { adds[$0] })
+        pending = pending.indices.filter { pending[$0].op.action != .add || kept.contains($0) }.map { pending[$0] }
 
         // New and changed texts' vectors.
         let newTexts = Array(Set(pending.compactMap { p -> String? in p.op.action == .confirm || p.op.action == .forget ? nil : p.op.text }))
@@ -399,6 +418,7 @@ final class MemoryReflector: ObservableObject {
         enum Target { case note(MemoryNote), earlierAdd(Int), own(MemoryNote) }
         var pairs: [(new: String, old: String)] = []
         var owners: [(item: Int, target: Target)] = []
+        var similarities: [Float?] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
             // An update: only notes the batch may change (a pinned one, or a
@@ -412,16 +432,17 @@ final class MemoryReflector: ObservableObject {
             let close = memory.file.notes
                 .filter { note in
                     guard note.id != p.op.id, settings.kinds.contains(note.kind) || memory.file.isAbout(note) else { return false }
-                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project) }
+                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project, candidates: true) }
                     return note.subject == p.subject && !note.pinned
                 }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
                 .prefix(3)
-            for (note, _) in close {
+            for (note, similarity) in close {
                 pairs.append((new: text, old: note.text))
                 owners.append((i, .note(note)))
+                similarities.append(similarity)
             }
             // An update against its own note: one that says less than the
             // note did isn't an update ("short answers" after "short
@@ -429,12 +450,14 @@ final class MemoryReflector: ObservableObject {
             if p.op.action == .update, let own = p.op.id.flatMap({ shown[$0] }) {
                 pairs.append((new: text, old: own.text))
                 owners.append((i, .own(own)))
+                similarities.append(nil)
             }
             guard p.op.action == .add else { continue }
             for j in 0..<i where pending[j].op.action == .add && pending[j].subject == p.subject {
                 guard let earlier = pending[j].op.text, let w = newVectors[earlier], MemoryReflection.cosine(v, w) >= Self.reconcileFloor else { continue }
                 pairs.append((new: text, old: earlier))
                 owners.append((i, .earlierAdd(j)))
+                similarities.append(MemoryReflection.cosine(v, w))
             }
         }
         var relations: [MemoryReflection.Relation] = []
@@ -442,7 +465,7 @@ final class MemoryReflector: ObservableObject {
             switch await ask(MemoryReflection.classifyMessages(pairs), maxTokens: 40 + 12 * pairs.count, modelPath: modelPath) {
             case .success(let reply):
                 guard let parsed = MemoryReflection.parseRelations(reply, count: pairs.count) else { return .failed("unreadable classify reply") }
-                relations = parsed
+                relations = MemoryReflection.settled(parsed, similarities: similarities)
             case .failure(let error):
                 return error.outcome
             }
@@ -503,20 +526,20 @@ final class MemoryReflector: ObservableObject {
                 changes.append(.forget(id: p.op.id!, vector: note.flatMap { vectors.vector(for: $0) }))
             }
         }
-        return commit(batch, changes: changes, since: since, vectors: vectors, newVectors: newVectors)
+        return commit(batch, changes: changes, since: since, vectors: vectors, newVectors: newVectors, mood: mood)
     }
 
     /// One write: the changes (checked again against the store, the
     /// settings and the projects as they are now, tombstones included), and
     /// the batch out of the queue. The vectors are a cache written after.
     private func commit(_ batch: MemoryBatch, changes: [MemoryChange], since: Int, vectors: MemoryVectors,
-                        newVectors: [String: [Float]]) -> Outcome {
+                        newVectors: [String: [Float]], mood: MemoryMood? = nil) -> Outcome {
         let memory = MemoryManager.shared
         let settings = memory.settings
         let projects = Set(ChatLibraryStore.shared.library.projects.map(\.id))
         var touched: [String] = []
         guard memory.change({ touched = $0.commit(batch: batch.id, changes: changes, since: since, settings: settings,
-                                                  liveProjects: projects, now: Date()) }) else {
+                                                  liveProjects: projects, now: Date(), mood: mood) }) else {
             return .stored(NSLocalizedString("The notes couldn't be saved.", comment: "memory status"))
         }
         var vectors = vectors
