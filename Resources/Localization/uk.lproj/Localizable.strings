@@ -169,6 +169,8 @@
 "Anything else chats should know" = "Що ще чатам варто знати";
 "Apache License 2.0" = "Ліцензія Apache 2.0";
 "App language" = "Мова застосунку";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple не вказує %@ для своєї моделі: вона читає й пише нею, але не так добре, як мовами, які вказано.";
+"Apple's model took too long." = "Модель Apple працювала надто довго.";
 "Apply to profile" = "Застосувати до профілю";
 "Approve" = "Схвалити";
 "Approve Selected" = "Підтвердити вибране";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Збалансовано (Default)";
 "Barely fits the GPU memory" = "Майже поміщається в пам’ять GPU";
 "Be the first to be listed here." = "Станьте першим, кого тут зазначено.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Перш ніж Чат буде прочитано, кожне повідомлення сортується: як ви хочете отримувати відповіді, щось із «Про вас», ваш настрій або нічого. Apple (на цьому Mac): власна модель системи сортує на Neural Engine, перш ніж знадобиться ваша модель — частина Чату, у якій нічого не треба вивчати, виконується там, без завантаження вашої моделі й без використання GPU; ваша модель читає лише те, що було відсортовано.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Перед створенням зображення чи пісні показує підказку й налаштування для зміни. Після зворотного відліку продовжить, якщо ви не торкнетесь.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Перед створенням зображення або пісні показує, що попросив модель — prompt, модель, налаштування — щоб змінити їх першочергово. Після відліку воно виконається автоматично, якщо ви не втрутитеся.";
 "Benchmark" = "Бенчмарк";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Більше за рекомендований: кращі відповіді, але повільніше й менше пам’яті лишається для інших програм.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Імпортує чати, проєкти, профілі, моделі для зображень, музики, голосу та ембедингів і налаштування з версії з ipsupport.us (завершіть її спочатку). Чати й моделі тут збережено; її налаштування замінять ці. Моделі не займають додаткового місця на диску. Моделі чатів лишаються в папці моделей: виберіть її в Settings › Models.";
 "Browse Hugging Face…" = "Відкрити Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "Вбудовано в macOS · лише для Чату LLMTray";
 "Cached" = "У кеші";
 "Calculator" = "Калькулятор";
 "Calls" = "Виклики";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "Чати проєкту %@";
 "Chats outside projects" = "Чати поза проєктами";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Чати починаються з коротких нотаток про вас і вашу роботу: які відповіді вам подобаються, над чим ви працюєте, що ви виправляли раніше. Надсилаються лише нотатки, що вкладаються в бюджет, і лише у власних чатах LLMTray — ніколи в програми, що використовують API, і ніколи в тимчасові чати. Усе залишається на цьому комп’ютері.";
-"Chats won't get them any more. This can't be undone." = "Чати більше їх не отримуватимуть. Цю дію неможливо скасувати.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Чати більше їх не отримуватимуть. Це не можна скасувати. «Про вас» лишається (щоб прибрати, очистьте його поля). Якщо прочитати знову, ваші чати буде вивчено заново; забувається лише це, а прочитане раніше не читається знову.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Чати, проєкти, профілі та моделі зображень, музики, голосу й ембедингів із версії з ipsupport.us тепер тут. Папки, яким ви надали доступ цій версії, та ваша папка з моделями чатів потребують повторного підтвердження.";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Кожен запит, на який відповів сервер, — з чату та від інших застосунків і агентів через API — зберігається на цьому Mac. Медіани за моделлю й налаштуваннями.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Кожен збережений чат читається від початку для нотаток, використовуючи те, що ви там написали. Це виконується у фоновому режимі й може тривати певний час.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Кожен збережений чат знову читається від початку. Нотатки, які вже є, підтверджуються, а не дублюються.";
 "Everything in that folder is here already." = "Усе з цієї папки вже тут.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Точний вміст, який LLMTray надсилає на ipsupport.us — поле за полем. Нічого іншого не покидає ваш Mac.";
 "Experimental — English only" = "Експериментальна — тільки англійська";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "Для швидших відповідей (спекулятивне декодування)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Для моделей із опублікованим drafter (Gemma 4 26B) або власною MTP-головою (наші Qwen 3.5, завантажені разом): він передбачає токени наперед, а основна модель перевіряє їх за один прохід. Та сама відповідь, швидше. Запит отримує це, коли він один; при кількох одночасно вони ділять пакет без нього.";
 "Forget" = "Забути";
-"Forget Everything" = "Забути все";
 "Forget Everything…" = "Забути все…";
 "Forget What Was Learned…" = "Забути вивчене…";
 "Forget and Read All Chats Again" = "Забути й перечитати всі чати";
@@ -888,6 +892,8 @@
 "Re-index %@" = "Переіндексувати %@";
 "Re-index this file" = "Переіндексувати цей файл";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Проникає в %1$lld підпапок (%2$@): їхні файли витягуються.";
+"Read All Chats Again" = "Прочитати всі чати знову";
+"Read All Chats Again…" = "Прочитати всі чати знову…";
 "Read It Too" = "Прочитати також";
 "Read Them" = "Прочитати їх";
 "Read a chat after %lld quiet minutes" = "Читати чат після %lld хвилин тиші";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "Деякі налаштування не вдалося змінити:";
 "Something went wrong?" = "Щось пішло не так?";
 "Sort by" = "Сортування";
+"Sorts messages with" = "Сортує повідомлення за допомогою";
 "Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
 "Speakers work with echo cancellation; headphones are still best." = "Динаміки працюють із поглинанням ехо; навушники все ще кращі.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Рuntime моделі ще не встановлено — запустіть модель один раз, а потім спробуйте знову.";
 "The model sees them with your next message." = "Модель побачить їх у наступному повідомленні.";
 "The model server no longer goes online when it starts." = "Сервер моделі більше не виходить в інтернет під час запуску.";
+"The model that reads them" = "Модель, яка їх читає";
 "The model's license, from its card." = "Ліцензія моделі з її картки.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка models недоступна — чи підключено її диск? Виберіть папку заново в Налаштування → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Максимальна пам’ять, яку може займати кеш попередніх підказок (розмір Prompt cache у профілі також встановлює обмеження). Більше пришвидшує довгі розмови та агентів; занадто багато залишає замало місця для підказки, що читається.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "Що ви виправляли раніше, щоб це не повторювалося.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Що ви зробили, окремо від можливого значення. Надсилається як припущення.";
 "What you do" = "Чим ви займаєтеся";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "Що вам відомо про користувача з попередніх чатів. Це може бути застарілим: пріоритет має те, що користувач каже зараз.\n- Відповідь коротко, російською\n- Робить колонку на ESP32-S3 з OTA-оновленнями\nЗараз (припущення з останніх повідомлень користувача): злий: компонувальник постійно завершується з помилкою. Тож: коротко, відразу до виправлення";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Що ви робили, чого очікували та що бачили натомість. Ваші чати ніколи не включаються.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "Написане вами в чаті читається для Нотаток після такої тривалості тиші, коли ви залишаєте чат або коли LLMTray завершує роботу — у фоновому режимі, лише коли модель більше нічого не робить. Враховуються лише ваші власні слова, ніколи — відповіді, файли чи вебсторінки. Тимчасові чати й чати, позначені «Не запам’ятовувати», ніколи не читаються.";
 "What's New" = "Що нового";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "Яка модель генерує нові зображення.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Під час мовлення моделі звук з мікрофона тихіший за це сприймається як тиша: слід власного голосу, який лишає придушення ехо, ігнорується, проте інший голос усе одно перериває. Підвищте, якщо модель чує себе, зменшіть, якщо не помічає вашого перебивання. Набирає чинності при наступному запуску.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "Із нотатками це має такий вигляд:";
 "Words only" = "Тільки слова";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Робоча пам’ять для поетапного читання підказки; менше означає, що довгі підказки читаються дрібнішими, повільнішими кроками. Якщо разом з кешем підказок не більше 90%, решта тримає підказку, що читається.";
 "Works offline" = "Працює автономно";

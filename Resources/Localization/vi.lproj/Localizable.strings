@@ -169,6 +169,8 @@
 "Anything else chats should know" = "Điều gì khác Trò chuyện nên biết";
 "Apache License 2.0" = "Giấy phép Apache 2.0";
 "App language" = "Ngôn ngữ ứng dụng";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple không liệt kê %@ cho mô hình của mình: mô hình vẫn đọc và viết được ngôn ngữ đó, nhưng không tốt bằng các ngôn ngữ mà Apple có liệt kê.";
+"Apple's model took too long." = "Mô hình của Apple mất quá nhiều thời gian.";
 "Apply to profile" = "Áp dụng cho hồ sơ";
 "Approve" = "Phê duyệt";
 "Approve Selected" = "Phê duyệt mục đã chọn";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Cân bằng (Default)";
 "Barely fits the GPU memory" = "Vừa đủ bộ nhớ GPU";
 "Be the first to be listed here." = "Hãy là người đầu tiên được liệt kê ở đây.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Trước khi một cuộc trò chuyện được đọc, mỗi tin nhắn sẽ được phân loại: cách bạn muốn nhận câu trả lời, điều gì đó về bạn, tâm trạng của bạn hoặc không có gì. Apple (trên máy Mac này): chính mô hình của hệ thống sẽ phân loại trên Neural Engine, trước khi cần đến mô hình của bạn -- một phần của cuộc trò chuyện không có gì để học sẽ được xử lý ở đó, không cần tải mô hình của bạn hoặc dùng GPU; mô hình của bạn chỉ đọc những gì đã được phân loại vào.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Trước khi tạo ảnh hoặc nhạc, hiển thị prompt và các cài đặt để chỉnh trước. Nó sẽ tiếp tục sau đếm ngược trừ khi bạn can thiệp.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Trước khi tạo ảnh hoặc bài hát, hiển thị những gì mô hình được yêu cầu — prompt, mô hình, các tuỳ chỉnh — để bạn thay đổi trước. Nó sẽ tự chạy sau thời gian đếm ngược trừ khi bạn can thiệp.";
 "Benchmark" = "Đo hiệu năng";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Lớn hơn khuyến nghị: câu trả lời tốt hơn nhưng chậm hơn và để lại ít bộ nhớ cho ứng dụng khác.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Sao chép cuộc trò chuyện, dự án, hồ sơ, các mô hình ảnh, nhạc, giọng nói và embedding cùng cài đặt từ phiên bản trên ipsupport.us (đóng nó trước). Cuộc trò chuyện và mô hình tại đây được giữ; cài đặt của nó sẽ thay thế. Các mô hình không chiếm thêm dung lượng đĩa. Mô hình chat vẫn nằm trong thư mục models của bạn: chọn nó trong Settings › Models.";
 "Browse Hugging Face…" = "Duyệt Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "Tích hợp sẵn trong macOS · Chỉ trong Trò chuyện của LLMTray";
 "Cached" = "Đã lưu trong bộ nhớ đệm";
 "Calculator" = "Máy tính";
 "Calls" = "Lượt gọi";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "Trò chuyện của Dự án %@";
 "Chats outside projects" = "Trò chuyện ngoài Dự án";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Trò chuyện bắt đầu bằng các ghi chú ngắn về bạn và công việc của bạn: cách bạn muốn được trả lời, bạn đang làm gì, những gì bạn đã sửa trước đây. Chỉ các ghi chú nằm trong giới hạn mới được gửi, và chỉ trong Trò chuyện của riêng LLMTray -- không bao giờ gửi đến ứng dụng dùng API, không bao giờ trong Trò chuyện tạm. Mọi thứ vẫn ở trên máy tính này.";
-"Chats won't get them any more. This can't be undone." = "Trò chuyện sẽ không nhận các ghi chú đó nữa. Không thể hoàn tác thao tác này.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Trò chuyện sẽ không còn nhận các mục này nữa. Không thể hoàn tác. Về bạn vẫn được giữ lại (xóa các trường của mục này để xóa). Khi đọc lại, các trò chuyện của bạn được học lại từ đầu; chỉ những gì đã quên, đã đọc trước đó thì không được đọc lại.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Cuộc trò chuyện, dự án, hồ sơ và các mô hình hình ảnh, nhạc, giọng nói và nhúng từ phiên bản trên ipsupport.us đã có ở đây. Những thư mục bạn đã cấp quyền cho nó, và thư mục mô hình chat của bạn, cần sự đồng ý của bạn một lần nữa.";
 "Check Again" = "Kiểm tra lại";
 "Check Now" = "Kiểm tra ngay";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ văn bản; tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi một tệp được ghim.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Mọi yêu cầu máy chủ trả lời, từ cuộc trò chuyện và từ ứng dụng, agent khác qua API, được lưu trên máy Mac này. Trung vị theo mô hình và cài đặt.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Mọi Trò chuyện đã lưu sẽ được đọc từ đầu để ghi chú, dùng những gì bạn đã viết trong đó. Tác vụ chạy trong nền và có thể mất một lúc.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Mỗi trò chuyện đã lưu sẽ được đọc lại từ đầu thêm một lần nữa. Các ghi chú đã có sẽ được xác nhận, không bị nhân đôi.";
 "Everything in that folder is here already." = "Mọi thứ trong thư mục đó đã có ở đây rồi.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Đây là chính xác những gì LLMTray gửi tới ipsupport.us, trường từng trường. Không gì khác rời khỏi máy Mac của bạn.";
 "Experimental — English only" = "Thử nghiệm — chỉ tiếng Anh";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "Để trả lời nhanh hơn (giải mã suy đoán)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Đối với các mô hình có drafter công bố (Gemma 4 26B) hoặc đầu MTP riêng (các mô hình Qwen 3.5 của chúng tôi, tải về cùng chúng): nó dự đoán token trước và mô hình chính kiểm tra trong một lần duyệt. Kết quả như nhau, nhanh hơn. Một yêu cầu khi chạy độc lập sẽ dùng tính năng này; khi có nhiều yêu cầu cùng lúc thì chúng chia sẻ batch mà không dùng tính năng này.";
 "Forget" = "Quên";
-"Forget Everything" = "Quên tất cả";
 "Forget Everything…" = "Quên tất cả…";
 "Forget What Was Learned…" = "Quên nội dung đã học…";
 "Forget and Read All Chats Again" = "Quên và đọc lại Tất cả Trò chuyện";
@@ -888,6 +892,8 @@
 "Re-index %@" = "Lập chỉ mục lại %@";
 "Re-index this file" = "Lập chỉ mục lại tệp này";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Tìm trong %1$lld thư mục con (%2$@): các tệp bên trong được đưa ra ngoài.";
+"Read All Chats Again" = "Đọc lại tất cả Trò chuyện";
+"Read All Chats Again…" = "Đọc lại tất cả Trò chuyện…";
 "Read It Too" = "Cũng đọc nội dung đó";
 "Read Them" = "Đọc";
 "Read a chat after %lld quiet minutes" = "Đọc Trò chuyện sau %lld phút không hoạt động";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "Một số cài đặt không thể thay đổi:";
 "Something went wrong?" = "Có gì đó sai?";
 "Sort by" = "Sắp xếp theo";
+"Sorts messages with" = "Phân loại tin nhắn bằng";
 "Source on GitHub" = "Mã nguồn trên GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
 "Speakers work with echo cancellation; headphones are still best." = "Loa hoạt động với hủy tiếng vọng; tai nghe vẫn là lựa chọn tốt nhất.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Chưa cài runtime mô hình — khởi chạy một mô hình rồi thử lại.";
 "The model sees them with your next message." = "Mô hình sẽ thấy chúng cùng với tin nhắn tiếp theo của bạn.";
 "The model server no longer goes online when it starts." = "Máy chủ mô hình không còn tự động lên mạng khi khởi động.";
+"The model that reads them" = "Mô hình đọc chúng";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Thư mục models không khả dụng — đĩa của nó đã được kết nối chưa? Chọn lại trong Cài đặt → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Dung lượng tối đa bộ nhớ đệm cho các prompt trước (kích thước Prompt cache của cấu hình cũng là giới hạn). Nhiều hơn làm các cuộc trò chuyện dài và agents nhanh hơn; quá nhiều sẽ không còn chỗ cho prompt đang được đọc.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "Những gì bạn đã sửa trước đây để không bị lặp lại.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Những gì bạn đã làm, được tách riêng khỏi ý nghĩa có thể có của việc đó. Được gửi như một phỏng đoán.";
 "What you do" = "Bạn làm gì";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "Những gì bạn biết về người dùng từ các trò chuyện trước đó. Thông tin này có thể đã lỗi thời: những gì người dùng nói bây giờ sẽ được ưu tiên.\n- Trả lời ngắn gọn, bằng tiếng Nga\n- Đang làm loa ESP32-S3 có cập nhật OTA\nNgay lúc này (đoán từ các tin nhắn gần nhất của người dùng): Đang bực: trình liên kết cứ tiếp tục lỗi. Vì vậy: Ngắn gọn, đi thẳng vào cách khắc phục";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Bạn đang làm gì, bạn mong đợi gì, và bạn thấy gì thay vì mong đợi. Các cuộc trò chuyện của bạn không bao giờ được đính kèm.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "Nội dung bạn viết trong Trò chuyện được đọc để tạo Ghi chú sau khi không hoạt động trong khoảng thời gian này, khi bạn rời khỏi Trò chuyện đó hoặc khi LLMTray thoát -- ở chế độ nền, chỉ khi mô hình không có việc khác để làm. Chỉ tính lời của chính bạn, không bao giờ tính câu trả lời, tệp hoặc trang web. Trò chuyện tạm và Trò chuyện được đánh dấu “Không nhớ” sẽ không bao giờ được đọc.";
 "What's New" = "Có gì mới";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "Mô hình dùng để tạo ảnh mới.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Khi mô hình đang nói, âm thanh từ micro nhỏ hơn mức này sẽ được coi là im lặng: dấu vết giọng nói của chính mô hình do khử vọng vẫn được bỏ, nhưng giọng nói khác vẫn có thể chen vào. Tăng nếu mô hình nghe thấy chính nó, giảm nếu nó bỏ lỡ khi bạn chen ngang. Có hiệu lực ở lần khởi động tiếp theo.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "Có ghi chú thì sẽ đọc như sau:";
 "Words only" = "Chỉ văn bản";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Bộ nhớ làm việc để đọc prompt theo đoạn; ít hơn sẽ đọc các prompt dài từng đoạn nhỏ hơn và chậm hơn. Khi bộ nhớ đệm prompt tối đa 90% tổng cộng: phần còn lại chứa prompt đang được đọc.";
 "Works offline" = "Hoạt động ngoại tuyến";

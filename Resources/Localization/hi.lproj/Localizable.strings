@@ -169,6 +169,8 @@
 "Anything else chats should know" = "चैट को और क्या पता होना चाहिए";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "ऐप की भाषा";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple अपने मॉडल के लिए %@ को सूचीबद्ध नहीं करता: यह उसे पढ़ और लिख तो लेता है, लेकिन उतनी अच्छी तरह नहीं जितनी सूचीबद्ध भाषाओं को।";
+"Apple's model took too long." = "Apple के मॉडल ने बहुत देर लगा दी।";
 "Apply to profile" = "प्रोफ़ाइल पर लागू करें";
 "Approve" = "मंज़ूर करें";
 "Approve Selected" = "चुने हुए मंज़ूर करें";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Balanced (Default)";
 "Barely fits the GPU memory" = "GPU मेमोरी में मुश्किल से फिट होता है";
 "Be the first to be listed here." = "यहाँ सूचीबद्ध पहला व्यक्ति बनें।";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "किसी चैट को पढ़ने से पहले, हर संदेश को छाँटा जाता है: आप उत्तर कैसे चाहते हैं, आपके बारे में कुछ, आपका मूड, या कुछ नहीं। Apple (इस Mac पर): सिस्टम का अपना मॉडल, आपके मॉडल की ज़रूरत पड़ने से पहले, Neural Engine पर छँटाई करता है -- चैट का वह हिस्सा जिसमें सीखने लायक कुछ नहीं होता, वहीं पूरा हो जाता है; इसमें आपका मॉडल लोड नहीं होता और न ही GPU का उपयोग होता है। आपका मॉडल केवल वही पढ़ता है जो इसमें छाँटा गया हो।";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "चित्र या गीत बनने से पहले, यह पहले प्रॉम्प्ट और बदलने योग्य सेटिंग दिखाता है। काउंटडाउन के बाद बिना छुए आगे बढ़ जाएगा।";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "छवि या गीत बनने से पहले दिखाता है कि मॉडल ने क्या माँगा — prompt, मॉडल, और नॉब्स — ताकि आप पहले बदल सकें। काउंटडाउन के बाद यह स्वतः आगे बढ़ेगा जब तक आप हस्तक्षेप न करें।";
 "Benchmark" = "बेंचमार्क";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "सुझावित से बड़ा: उत्तर बेहतर, पर धीमा, और अन्य ऐप्स के लिए कम मेमोरी बचती है।";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us से आए संस्करण के चैट, प्रोजेक्ट, प्रोफ़ाइल, छवि, संगीत, वॉइस और एम्बेडिंग मॉडल तथा सेटिंग्स लाता है (पहले उसे बंद करें)। यहाँ के चैट और मॉडल बने रहते हैं; उसकी सेटिंग्स इन्हें बदल देंगी। मॉडल अतिरिक्त डिस्क स्थान नहीं लेते। चैट मॉडल आपके models फ़ोल्डर में रहते हैं: Settings › Models में चुनें।";
 "Browse Hugging Face…" = "Hugging Face ब्राउज़ करें…";
+"Built into macOS · LLMTray's chat only" = "macOS में शामिल · केवल LLMTray की चैट";
 "Cached" = "कैश्ड";
 "Calculator" = "कैलकुलेटर";
 "Calls" = "कॉल";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "प्रोजेक्ट %@ की चैट";
 "Chats outside projects" = "प्रोजेक्ट के बाहर की चैट";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "चैट की शुरुआत आपके और आपके काम के बारे में छोटे नोट से होती है: आपको उत्तर कैसे पसंद हैं, आप किस पर काम कर रहे हैं, आपने पहले क्या सुधारा था। केवल वे नोट भेजे जाते हैं जो बजट में फिट होते हैं, और केवल LLMTray की अपनी चैट में — API इस्तेमाल करने वाले ऐप्स को कभी नहीं, अस्थायी चैट में कभी नहीं। सब कुछ इसी कंप्यूटर पर रहता है।";
-"Chats won't get them any more. This can't be undone." = "चैट को वे अब नहीं मिलेंगे। इसे पूर्ववत नहीं किया जा सकता।";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "चैट को वे अब और नहीं मिलेंगी। इसे पूर्ववत नहीं किया जा सकता। \"आपके बारे में\" बना रहता है (इसे हटाने के लिए उसके फ़ील्ड खाली करें)। फिर से पढ़ने पर, आपकी चैट को नए सिरे से सीखा जाता है; बस भुलाया जाता है, पहले जो पढ़ा गया था उसे फिर नहीं पढ़ा जाता।";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us से आए संस्करण के चैट, प्रोजेक्ट, प्रोफाइल और छवि, संगीत, वॉयस तथा एम्बेडिंग मॉडल अब यहाँ हैं। जिन फोल्डरों को आपने उसे एक्सेस दिया था और आपका चैट मॉडल्स फ़ोल्डर—इनके लिए आपकी अनुमति फिर से चाहिए।";
 "Check Again" = "फिर से जाँचें";
 "Check Now" = "अभी जाँचें";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "प्रोजेक्ट की हर चैट को पूरी फ़ाइल का पाठ मिल जाएगा; फ़ाइल पिन की होने पर उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद हो जाएगा।";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "सर्वर जिस भी अनुरोध का उत्तर देता है — चैट का और API के ज़रिए दूसरे ऐप्स और एजेंटों का — इस Mac पर रखा जाता है। हर मॉडल और सेटिंग के लिए माध्यिका।";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "हर सहेजी गई चैट को नोट्स के लिए शुरुआत से पढ़ा जाता है, उसमें आपने जो लिखा है उसका उपयोग करके। यह बैकग्राउंड में चलता है और इसमें समय लग सकता है।";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "हर सहेजी गई चैट को उसके शुरू से फिर एक बार पढ़ा जाता है। जो नोट पहले से हैं, उनकी पुष्टि की जाती है, उन्हें दोहराया नहीं जाता।";
 "Everything in that folder is here already." = "उस फ़ोल्डर की हर चीज़ पहले से ही यहाँ मौजूद है।";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray द्वारा ipsupport.us को भेजे जाने वाले बिल्कुल वही डेटा, फ़ील्ड दर फ़ील्ड। कुछ भी आपका Mac नहीं छोड़ता।";
 "Experimental — English only" = "प्रायोगिक — केवल अंग्रेज़ी";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "तेज़ उत्तरों के लिए (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "जिन मॉडलों के पास प्रकाशित drafter है (Gemma 4 26B) या अपनी MTP head है (हमारे Qwen 3.5 मॉडल, उनके साथ डाउनलोड किए गए): यह आगे टोकन अनुमान लगाता है और मुख्य मॉडल उन्हें एक ही पास में सत्यापित करता है। आउटपुट वही, पर तेज़। जब एक अनुरोध अकेला चलता है तो इसे मिलता है; कई एक साथ होने पर वे बिना इसके बैच साझा करते हैं।";
 "Forget" = "भूलें";
-"Forget Everything" = "सब कुछ भूलें";
 "Forget Everything…" = "सब कुछ भूलें…";
 "Forget What Was Learned…" = "सीखी गई चीज़ें भूलें…";
 "Forget and Read All Chats Again" = "भूलें और सभी चैट फिर से पढ़ें";
@@ -888,6 +892,8 @@
 "Re-index %@" = "फिर से इंडेक्स करें %@";
 "Re-index this file" = "इस फाइल का फिर से इंडेक्स बनाएं";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "यह %1$lld सबफ़ोल्डर (%2$@) में भी जाता है: उनकी फाइलें बाहर निकाली जाती हैं।";
+"Read All Chats Again" = "सभी चैट फिर से पढ़ें";
+"Read All Chats Again…" = "सभी चैट फिर से पढ़ें…";
 "Read It Too" = "इसे भी पढ़ें";
 "Read Them" = "इन्हें पढ़ें";
 "Read a chat after %lld quiet minutes" = "%lld शांत मिनटों के बाद चैट पढ़ें";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "कुछ सेटिंग्स बदली नहीं जा सकीं:";
 "Something went wrong?" = "कुछ गलत हुआ?";
 "Sort by" = "इसके अनुसार क्रमित करें";
+"Sorts messages with" = "संदेशों को इससे छाँटें";
 "Source on GitHub" = "GitHub पर स्रोत";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";
 "Speakers work with echo cancellation; headphones are still best." = "स्पीकर इको रद्दीकरण के साथ काम करते हैं; हेडफोन अभी भी श्रेष्ठ हैं।";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "मॉडल runtime अभी स्थापित नहीं है — एक बार मॉडल प्रारंभ करें, फिर पुनः प्रयास करें।";
 "The model sees them with your next message." = "मॉडल उन्हें आपके अगले संदेश के साथ देखेगा।";
 "The model server no longer goes online when it starts." = "मॉडल सर्वर अब शुरू होते समय ऑनलाइन नहीं जाता।";
+"The model that reads them" = "वह मॉडल जो उन्हें पढ़ता है";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models फ़ोल्डर उपलब्ध नहीं है — क्या इसका डिस्क जुड़ा हुआ है? Settings → Models में जाकर फिर चुनें।";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "पहले के प्रॉम्प्ट्स का कैश अधिकतम कितना ले सकता है (प्रोफ़ाइल का Prompt cache size भी सीमा है)। अधिक रखने से लंबे चैट और एजेंट तेज़ होते हैं; बहुत ज्यादा रखने से वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए जगह नहीं बचती।";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "आपने पहले जो सुधारा था, ताकि वह दोहराया न जाए।";
 "What you did, kept apart from what it may mean. Sent as a guess." = "आपने क्या किया, इसे उसके संभावित अर्थ से अलग रखा गया है। अनुमान के रूप में भेजा जाता है।";
 "What you do" = "आप क्या करते हैं";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "पहले की चैट से आप उपयोगकर्ता के बारे में जो जानते हैं। यह पुराना हो सकता है: उपयोगकर्ता अभी जो कहता है, वही मान्य है।\n- संक्षेप में, रूसी में उत्तर दें\n- OTA updates वाला ESP32-S3 स्पीकर बनाता है\nअभी (उपयोगकर्ता के हाल के संदेशों से, एक अनुमान): गुस्से में: linker बार-बार विफल हो रहा है। इसलिए: संक्षेप में, सीधे समाधान पर";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "आप क्या कर रहे थे, आपने क्या उम्मीद की थी, और इसके बजाय आपने क्या देखा। आपकी चैट कभी शामिल नहीं की जातीं।";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "चैट में आपने जो लिखा है, उसे नोट के लिए तब पढ़ा जाता है जब यह इतनी देर शांत रही हो, जब आप इसे छोड़ते हैं, या जब LLMTray बंद होता है -- पृष्ठभूमि में, केवल तब जब मॉडल के पास करने के लिए और कुछ न हो। केवल आपके अपने शब्द गिने जाते हैं, कभी भी उत्तर, फ़ाइलें या वेब पृष्ठ नहीं। अस्थायी चैट और “याद न रखें” चिह्नित चैट कभी नहीं पढ़ी जातीं।";
 "What's New" = "क्या नया है";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "जब मॉडल बोल रहा होता है, तो माइक्रोफोन की यह सीमा से quieter ध्वनि उसे सन्नाटा (silence) के रूप में दिखेगी: इको कैंसलेशन द्वारा छोड़ी अपनी आवाज़ का निशान बाहर रहेगा, उसके ऊपर दूसरी आवाज़ फिर भी काटती है। यदि मॉडल खुद की आवाज़ सुनता है तो इसे बढ़ाएँ, यदि वह आपकी बाधा (interrupt) नहीं पकड़ता तो घटाएँ। परिवर्तन अगले स्टार्ट पर लागू होंगे।";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "नोट के साथ, यह ऐसा पढ़ता है:";
 "Words only" = "केवल शब्द";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "प्रॉम्प्ट को भागों में पढ़ने के लिए वर्किंग मेमोरी; कम होने पर लंबे प्रॉम्प्ट छोटे, धीमे चरणों में पढ़े जाते हैं। यदि प्रॉम्प्ट कैश कुल मिलाकर अधिकतम 90% है तो बाकी भाग वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए सुरक्षित रहता है।";
 "Works offline" = "ऑफ़लाइन काम करता है";

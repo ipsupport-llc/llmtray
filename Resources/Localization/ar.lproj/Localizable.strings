@@ -169,6 +169,8 @@
 "Anything else chats should know" = "أي شيء آخر يجب أن تعرفه الدردشات";
 "Apache License 2.0" = "رخصة Apache 2.0";
 "App language" = "لغة التطبيق";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "لا تُدرِج Apple اللغة %@ ضمن اللغات المتاحة لنموذجها: يمكنه قراءتها وكتابتها، لكن ليس بمستوى اللغات التي تُدرجها.";
+"Apple's model took too long." = "استغرق نموذج Apple وقتًا أطول من اللازم.";
 "Apply to profile" = "تطبيق على ملف التعريف";
 "Approve" = "موافقة";
 "Approve Selected" = "الموافقة على المحدد";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "متوازن (Default)";
 "Barely fits the GPU memory" = "يكاد يناسب ذاكرة GPU";
 "Be the first to be listed here." = "كن أول من يظهر هنا.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "قبل أن تُقرأ الدردشة، تُصنَّف كل رسالة: كيف تريد الإجابات، أو شيء عنك، أو حالتك المزاجية، أو لا شيء. Apple (على هذا الـ Mac): يُجري نموذج النظام نفسه التصنيف على Neural Engine قبل الحاجة إلى نموذجك -- فيُنجَز هناك جزء من الدردشة لا يحتاج إلى تعلُّم، من دون تحميل نموذجك أو استخدام GPU؛ ولا يقرأ نموذجك إلا ما أُدرِج بعد التصنيف.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "قبل إنشاء صورة أو أغنية، يعرض المطالبة والإعدادات لتغييرها أولًا. يستمر بعد العد التنازلي ما لم تتدخل.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "قبل إنشاء صورة أو أغنية، يعرض ما طُلب من النموذج — الموجه، النموذج، الضوابط — لتغيّرها أولًا. يتابع التنفيذ تلقائيًا بعد العد التنازلي ما لم تتدخل.";
 "Benchmark" = "اختبار الأداء";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "أكبر من الموصى به: إجابات أفضل، لكن أبطأ ويترك ذاكرة أقل للتطبيقات الأخرى.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ينقل المحادثات والمشاريع والملفات الشخصية ونماذج الصورة والموسيقى والصوت والتضمين وإعدادات النسخة من ipsupport.us (أغلقها أولاً). تبقى المحادثات والنماذج الموجودة هنا؛ إعداداته هي التي سيتم استبدالها. النماذج لا تتطلب مساحة قرص إضافية. تظل نماذج المحادثة في مجلد النماذج الخاص بك: اختره في الإعدادات › Models.";
 "Browse Hugging Face…" = "تصفّح Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "مضمّن في macOS · للدردشة في LLMTray فقط";
 "Cached" = "مخزّن مؤقتًا";
 "Calculator" = "آلة حاسبة";
 "Calls" = "الاستدعاءات";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "دردشات المشروع %@";
 "Chats outside projects" = "الدردشات خارج المشاريع";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "تبدأ الدردشات بملاحظات قصيرة عنك وعن عملك: كيف تفضّل الإجابات، وما تعمل عليه، وما صححته سابقًا. تُرسل فقط الملاحظات التي تناسب الميزانية، وفقط في دردشات LLMTray نفسها -- ولا تُرسل أبدًا إلى التطبيقات التي تستخدم API، ولا في دردشة مؤقتة. يبقى كل شيء على هذا الكمبيوتر.";
-"Chats won't get them any more. This can't be undone." = "لن تتلقاها الدردشات بعد الآن. لا يمكن التراجع عن ذلك.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "لن تعود «الدردشات» تحصل عليها. لا يمكن التراجع عن هذا. يبقى «عنك» (امسح حقوله لإزالته). عند القراءة من جديد، يُعاد التعلّم من «الدردشات» من البداية؛ وإلا فسيجري النسيان فقط، وما قُرئ من قبل لن يُقرأ مرة أخرى.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "المحادثات والمشاريع والملفات الشخصية ونماذج الصورة والموسيقى والصوت والتضمين من النسخة من ipsupport.us موجودة هنا الآن. المجلدات التي منحتها إذناً لها، ومجلد نماذج الدردشة لديك، تحتاج موافقتك مرة أخرى.";
 "Check Again" = "تحقق مجددًا";
 "Check Now" = "تحقق الآن";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "تحصل كل محادثة في المشروع على كامل نص الملف؛ البحث على الويب وتوليد الصور أو الموسيقى متوقفان في تلك المحادثات طالما الملف مثبت.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "كل طلب يجيب عنه الخادم، من الدردشة ومن التطبيقات والوكلاء الأخرى عبر الواجهة البرمجية، محفوظ على هذا الـ Mac. الوسيط لكل نموذج وإعدادات.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "تُقرأ كل دردشة محفوظة من بدايتها للملاحظات، باستخدام ما كتبته فيها. تعمل في الخلفية وقد تستغرق بعض الوقت.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "تُقرأ كل دردشة محفوظة مرة أخرى من بدايتها. وتُؤكَّد «الملاحظات» الموجودة بالفعل، ولا تُكرَّر.";
 "Everything in that folder is here already." = "كل شيء في ذلك المجلد موجود هنا بالفعل.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "بالضبط ما يرسله LLMTray إلى ipsupport.us، حقلًا بحقل. لا شيء آخر يغادر جهاز Mac الخاص بك.";
 "Experimental — English only" = "تجريبي — الإنجليزية فقط";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "لإجابات أسرع (توقّع فك التشفير)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "للنماذج التي لديها مُولد مسودات منشور (Gemma 4 26B) أو رأس MTP خاص بها (نماذج Qwen 3.5 الخاصة بنا التي تم تنزيلها معها): يتوقع الرموز مقدمًا ويتحقّق النموذج الرئيسي منها في مرور واحد. نفس المخرجات، أسرع. الطلب الواحد يحصل عليه عندما يكون وحيدًا؛ مع عدة طلبات في آن واحد يشاركون الدفعة دون الحاجة إليه.";
 "Forget" = "نسيان";
-"Forget Everything" = "نسيان كل شيء";
 "Forget Everything…" = "نسيان كل شيء…";
 "Forget What Was Learned…" = "نسيان ما تم تعلّمه…";
 "Forget and Read All Chats Again" = "نسيان وقراءة كل الدردشات مجددًا";
@@ -888,6 +892,8 @@
 "Re-index %@" = "أعِد فهرسة %@";
 "Re-index this file" = "أعد فهرسة هذا الملف";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "يتعمق في %1$lld مجلدًا فرعيًا (%2$@): تُستخرج ملفاتها.";
+"Read All Chats Again" = "إعادة قراءة كل الدردشات";
+"Read All Chats Again…" = "إعادة قراءة كل الدردشات…";
 "Read It Too" = "اقرأه أيضًا";
 "Read Them" = "اقرأها";
 "Read a chat after %lld quiet minutes" = "قراءة الدردشة بعد %lld دقائق من الهدوء";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "تعذر تغيير بعض الإعدادات:";
 "Something went wrong?" = "هل حدث خطأ؟";
 "Sort by" = "فرز حسب";
+"Sorts messages with" = "فرز الرسائل باستخدام";
 "Source on GitHub" = "المصدر على GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";
 "Speakers work with echo cancellation; headphones are still best." = "تعمل السماعات مع إلغاء الصدى؛ لكن سماعات الرأس لا تزال الأفضل.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "بيئة تشغيل النموذج غير مثبتة بعد — شغّل نموذجًا مرة واحدة ثم أعد المحاولة.";
 "The model sees them with your next message." = "سيطلع النموذج عليها مع رسالتك التالية.";
 "The model server no longer goes online when it starts." = "لم يعد خادم النموذج يتصل بالإنترنت عند بدء التشغيل.";
+"The model that reads them" = "النموذج الذي يقرؤها";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "مجلد النماذج غير متاح — هل تم توصيل قرصه؟ حدده مجدداً في الإعدادات → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "الحد الأقصى الذي قد تشغله ذاكرة التخزين المؤقت للمطالبات السابقة (حجم ذاكرة التخزين المؤقت للمطالبة في الملف الشخصي هو أيضاً حد أعلى). المزيد يجعل المحادثات الطويلة والوكيلات أسرع؛ الكثير يترك دون مساحة للمطالبة الجاري قراءتها.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "ما صححته سابقًا، حتى لا يتكرر.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "ما فعلته، مع إبقائه منفصلًا عما قد يعنيه. يُرسل كتخمين.";
 "What you do" = "ما تفعله";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "ما تعرفه عن المستخدم من الدردشات السابقة. قد يكون هذا قديمًا: ما يقوله المستخدم الآن هو المعتمد.\n- أجب بإيجاز، بالروسية\n- يصنع مكبر صوت ESP32-S3 مع تحديثات OTA\nالآن (تخمينًا من آخر رسائل المستخدم): غاضب: ما زال linker يفشل. لذا: بإيجاز، واتجه مباشرة إلى الحل";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "ما الذي كنت تفعله، ماذا توقعت، وماذا رأيت بدلاً من ذلك. المحادثات الخاصة بك لا تُضمَّن أبداً.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "يُقرأ ما كتبته في الدردشة للملاحظات بعد أن تبقى هادئة لهذه المدة، أو عند مغادرتها، أو عند إنهاء LLMTray -- في الخلفية، وفقط عندما لا يكون لدى النموذج ما يفعله. تُحتسب كلماتك أنت فقط، وليس الإجابات أو الملفات أو صفحات الويب أبدًا. لا تُقرأ الدردشات المؤقتة والدردشات المعلّمة بـ «عدم التذكّر» أبدًا.";
 "What's New" = "الجديد";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "أثناء حديث النموذج، أي صوت من الميكروفون أضعف من هذا يُعامل كصمت: أثر صوته الذي يتركه إلغاء الصدى يبقى خارجًا، لكن صوت أعلى منه لا يزال يقاطع. ارفعه إذا كان النموذج يسمع نفسه، اخفضه إذا كان يفشل في سماع مقاطعتك. يسري عند البدء التالي.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "مع الملاحظات، يُقرأ هكذا:";
 "Words only" = "كلمات فقط";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "ذاكرة العمل لقراءة المطالبة على أجزاء؛ القليل يقرأ المطالبات الطويلة بخطوات أصغر وأبطأ. عندما يكون مجموع ذاكرة التخزين المؤقت للمطالبات في حد أقصى 90%: الباقي يحتفظ بالمطالبة الجاري قراءتها.";
 "Works offline" = "يعمل دون اتصال";

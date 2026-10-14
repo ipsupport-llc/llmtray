@@ -169,6 +169,8 @@
 "Anything else chats should know" = "Hal lain yang perlu diketahui obrolan";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "Bahasa app";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple tidak mencantumkan %@ untuk modelnya: model itu dapat membaca dan menulisnya, tetapi tidak sebaik bahasa yang dicantumkannya.";
+"Apple's model took too long." = "Model Apple memerlukan waktu terlalu lama.";
 "Apply to profile" = "Terapkan ke profil";
 "Approve" = "Setujui";
 "Approve Selected" = "Setujui yang Dipilih";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "Seimbang (Default)";
 "Barely fits the GPU memory" = "Hampir melebihi memori GPU";
 "Be the first to be listed here." = "Jadilah yang pertama tercantum di sini.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Sebelum obrolan dibaca, setiap pesan diurutkan: cara Anda menginginkan jawaban, sesuatu tentang Anda, suasana hati Anda, atau tidak ada. Apple (di Mac ini): model bawaan sistem mengurutkan di Neural Engine, sebelum model Anda diperlukan -- bagian obrolan yang tidak berisi hal untuk dipelajari diselesaikan di sana, tanpa memuat model Anda atau menggunakan GPU; model Anda hanya membaca yang dimasukkan oleh pengurutan.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Sebelum gambar atau lagu dibuat, menampilkan prompt dan pengaturan untuk diubah dulu. Proses berlanjut setelah hitung mundur kecuali Anda membatalkannya.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Sebelum gambar atau lagu dibuat, menampilkan apa yang diminta model — prompt, model, pengaturan — agar dapat diubah terlebih dulu. Akan berjalan otomatis setelah hitungan mundur kecuali Anda mengintervensi.";
 "Benchmark" = "Tolok ukur";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Lebih besar dari yang disarankan: jawaban lebih baik, tetapi lebih lambat dan menyisakan lebih sedikit memori untuk aplikasi lain.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Mentransfer obrolan, proyek, profil, serta model gambar, musik, suara, dan embedding beserta pengaturan dari versi di ipsupport.us (tutup terlebih dahulu). Obrolan dan model di sini tetap ada; pengaturannya yang akan menggantikan. Model tidak memerlukan ruang disk tambahan. Model obrolan tetap berada di folder model Anda: pilih di Pengaturan › Models.";
 "Browse Hugging Face…" = "Telusuri Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "Bawaan macOS · hanya Obrolan LLMTray";
 "Cached" = "Tersimpan";
 "Calculator" = "Kalkulator";
 "Calls" = "Panggilan";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "Chat proyek %@";
 "Chats outside projects" = "Chat di luar proyek";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chat dimulai dengan catatan singkat tentang Anda dan pekerjaan Anda: jawaban seperti apa yang Anda sukai, apa yang sedang Anda kerjakan, apa yang pernah Anda koreksi. Hanya catatan yang muat dalam batas yang dikirim, dan hanya di chat milik LLMTray sendiri -- tidak pernah ke app yang menggunakan API, tidak pernah dalam Chat sementara. Semuanya tetap di komputer ini.";
-"Chats won't get them any more. This can't be undone." = "Chat tidak akan menerimanya lagi. Tindakan ini tidak dapat diurungkan.";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Chat tidak akan mendapatkannya lagi. Ini tidak dapat dibatalkan. Tentang Anda tetap ada (kosongkan kolomnya untuk menghapusnya). Jika dibaca lagi, chat Anda dipelajari lagi dari awal; hanya dilupakan, yang dibaca sebelumnya tidak dibaca lagi.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chat, proyek, profil, serta model gambar, musik, suara, dan embedding dari versi di ipsupport.us sekarang ada di sini. Folder yang pernah Anda beri akses, dan folder model chat Anda, memerlukan konfirmasi Anda lagi.";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Setiap permintaan yang dijawab server, dari chat dan dari aplikasi serta agen lain lewat API, disimpan di Mac ini. Median per model dan pengaturan.";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Setiap obrolan tersimpan dibaca dari awal untuk catatan, menggunakan yang Anda tulis di sana. Ini berjalan di latar belakang dan mungkin memerlukan waktu.";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Setiap chat yang disimpan dibaca lagi dari awal. Catatan yang sudah ada dikonfirmasi, bukan digandakan.";
 "Everything in that folder is here already." = "Semua di folder itu sudah ada di sini.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Persis apa yang dikirim LLMTray ke ipsupport.us, per bidang. Tidak ada yang lain keluar dari Mac Anda.";
 "Experimental — English only" = "Eksperimental — hanya Bahasa Inggris";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "Untuk jawaban lebih cepat (spekulatif decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Untuk model dengan drafter terbitan (Gemma 4 26B) atau kepala MTP sendiri (mis. Qwen 3.5 kami, diunduh bersamaan): komponen tersebut menebak token ke depan dan model utama memeriksanya dalam satu kali proses. Keluaran sama, lebih cepat. Satu permintaan mendapatkannya sendiri; jika beberapa sekaligus mereka berbagi batch tanpa drafter.";
 "Forget" = "Lupakan";
-"Forget Everything" = "Lupakan Semuanya";
 "Forget Everything…" = "Lupakan Semuanya…";
 "Forget What Was Learned…" = "Lupakan yang Dipelajari…";
 "Forget and Read All Chats Again" = "Lupakan dan Baca Semua obrolan Lagi";
@@ -888,6 +892,8 @@
 "Re-index %@" = "Indeks ulang %@";
 "Re-index this file" = "Indeks ulang berkas ini";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Mencakup %1$lld subfolder (%2$@): file‑filenya dikeluarkan dari sana.";
+"Read All Chats Again" = "Baca Semua obrolan Lagi";
+"Read All Chats Again…" = "Baca Semua obrolan Lagi…";
 "Read It Too" = "Baca Juga";
 "Read Them" = "Baca Semuanya";
 "Read a chat after %lld quiet minutes" = "Baca obrolan setelah %lld menit tanpa aktivitas";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "Beberapa pengaturan tidak dapat diubah:";
 "Something went wrong?" = "Ada yang salah?";
 "Sort by" = "Urutkan menurut";
+"Sorts messages with" = "Mengurutkan pesan dengan";
 "Source on GitHub" = "Sumber di GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
 "Speakers work with echo cancellation; headphones are still best." = "Speaker berfungsi dengan pembatalan gema; tetap disarankan menggunakan headphone.";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Runtime model belum terpasang — jalankan satu model, lalu coba lagi.";
 "The model sees them with your next message." = "Model akan melihatnya pada pesan Anda berikutnya.";
 "The model server no longer goes online when it starts." = "Server model tidak lagi online saat dimulai.";
+"The model that reads them" = "Model yang membacanya";
 "The model's license, from its card." = "Lisensi model, dari model card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Folder models tidak tersedia — apakah disknya terhubung? Pilih kembali di Pengaturan → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Maksimum yang boleh digunakan cache prompt sebelumnya (ukuran Prompt cache pada profil juga menjadi batas). Lebih besar mempercepat percakapan panjang dan agen; terlalu besar membuat tidak ada ruang untuk prompt yang sedang dibaca.";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "Hal yang pernah Anda koreksi, agar tidak terulang.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Apa yang Anda lakukan, dipisahkan dari kemungkinan maknanya. Dikirim sebagai dugaan.";
 "What you do" = "Yang Anda lakukan";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "Yang Anda ketahui tentang pengguna dari chat sebelumnya. Ini mungkin sudah kedaluwarsa: yang dikatakan pengguna sekarang lebih diutamakan.\n- Jawab singkat, dalam bahasa Rusia\n- Membuat speaker ESP32-S3 dengan pembaruan OTA\nSaat ini (dari pesan terakhir pengguna, perkiraan): Marah: linker terus gagal. Jadi: Singkat, langsung ke perbaikan";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Apa yang Anda lakukan, apa yang Anda harapkan, dan apa yang Anda lihat sebaliknya. Obrolan Anda tidak pernah disertakan.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "Yang Anda tulis dalam obrolan dibaca untuk catatan setelah tidak ada aktivitas selama durasi ini, saat Anda meninggalkannya, atau saat LLMTray berhenti -- di latar belakang, hanya saat model tidak punya tugas lain. Hanya kata-kata Anda sendiri yang dihitung, bukan jawaban, file, atau halaman web. Chat sementara dan obrolan yang ditandai “Jangan Ingat” tidak pernah dibaca.";
 "What's New" = "Apa yang Baru";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Saat model berbicara, suara mikrofon yang lebih pelan dari ambang ini diterima sebagai sunyi: jejak suaranya yang tersisa dari pembatalan gema tidak masuk, tetapi suara di atasnya tetap mengganggu. Naikkan jika model mendengar suaranya sendiri, turunkan jika model melewatkan interupsi Anda. Berlaku pada permulaan berikutnya.";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "Dengan catatan, bunyinya seperti ini:";
 "Words only" = "Hanya kata";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memori kerja untuk membaca prompt secara bertahap; lebih sedikit membaca prompt panjang dalam langkah lebih kecil dan lebih lambat. Jika cache prompt dan ini bersama-sama paling banyak 90%: sisanya memuat prompt yang sedang dibaca.";
 "Works offline" = "Bekerja secara offline";

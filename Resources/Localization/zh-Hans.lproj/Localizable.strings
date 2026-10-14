@@ -169,6 +169,8 @@
 "Anything else chats should know" = "聊天还应知道的其他内容";
 "Apache License 2.0" = "Apache 许可证 2.0";
 "App language" = "App 语言";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple 未将 %@ 列为其模型支持的语言：它能读写这种语言，但不如它列出的语言那么好。";
+"Apple's model took too long." = "Apple 的模型耗时过长。";
 "Apply to profile" = "应用到配置";
 "Approve" = "批准";
 "Approve Selected" = "批准所选";
@@ -201,6 +203,7 @@
 "Balanced (default)" = "平衡（默认）";
 "Barely fits the GPU memory" = "几乎占满 GPU 内存";
 "Be the first to be listed here." = "成为首位列在此的人。";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "在读取聊天前，每条消息都会先分类：你希望如何回答、关于你、你的心情，或无。Apple（在这台 Mac 上）：系统自带的模型会先在 Neural Engine 上分类，然后才会用到你的模型——聊天中没有可学习内容的部分会在那里完成，无需载入你的模型，也不会使用 GPU；你的模型只会读取被分入的内容。";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "在生成图像或歌曲前，会先显示提示词与可修改的设置。倒计时结束后会继续，除非你进行操作。";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "在生成图像或歌曲之前，显示模型的请求内容——提示词、模型和参数——以便先行修改。倒计时结束后会自动继续，除非你进行操作。";
 "Benchmark" = "基准测试";
@@ -211,6 +214,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "比推荐的更大：回答更好，但更慢，会占用更多内存，留给其他应用的内存更少。";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "从 ipsupport.us 的版本导入对话、项目、配置文件、图像、音乐、语音与向量（embedding）模型以及设置（请先退出该版本）。此处的对话与模型将保留；其设置会替换为此处设置。模型不会占用额外磁盘空间。聊天模型保存在你的模型文件夹：在“设置 › Models”中选择。";
 "Browse Hugging Face…" = "浏览 Hugging Face…";
+"Built into macOS · LLMTray's chat only" = "macOS 内建 · 仅限 LLMTray 的聊天";
 "Cached" = "已缓存";
 "Calculator" = "计算器";
 "Calls" = "调用";
@@ -245,7 +249,7 @@
 "Chats of project %@" = "项目 %@ 的对话";
 "Chats outside projects" = "项目外的对话";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "对话会以关于你和你工作的简短笔记开始：你偏好的回答方式、正在处理的内容、之前纠正过的内容。只会发送符合预算的笔记，并且仅用于 LLMTray 自己的对话——绝不会发送给使用 API 的 App，也绝不会用于临时对话。所有内容都会留在这台电脑上。";
-"Chats won't get them any more. This can't be undone." = "对话将不再获取这些内容。此操作无法撤销。";
+"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "对话将不再获得这些内容。此操作无法撤销。“关于你”会保留（清空其中的字段即可移除）。再次读取后，将从头重新学习你的对话；只会遗忘内容，之前读过的内容不会再次读取。";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "来自 ipsupport.us 版本的聊天、项目、配置档及图像、音乐、语音和嵌入模型已导入。此前授予该版本的文件夹访问权限，以及你的聊天模型文件夹，需要你重新授权。";
 "Check Again" = "再次检查";
 "Check Now" = "立即检查";
@@ -414,6 +418,7 @@
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "当文件被置顶时，项目的每个对话都会获取该文件的全部文本；这些对话中的网页搜索和图像或音乐生成功能被禁用。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "服务器回答的每个请求（聊天，以及通过 API 的其他应用和智能体）都保存在这台 Mac 上。按模型和设置取中位数。";
 "Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "每个已存储的聊天都会从开头读取以生成笔记，使用你在其中写下的内容。它会在后台运行，可能需要一段时间。";
+"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "每个已存储的聊天都会从开头再读取一遍。已有的笔记会被确认，不会重复添加。";
 "Everything in that folder is here already." = "该文件夹中的内容已全部存在于此。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray 向 ipsupport.us 发送的完整内容，逐字段列出。你的 Mac 不会发送其他任何内容。";
 "Experimental — English only" = "试验性功能 — 仅限英语";
@@ -457,7 +462,6 @@
 "For faster answers (speculative decoding)" = "用于更快的回答（猜测解码）";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "对于有公开 drafter（Gemma 4 26B）或自带 MTP head（如我们随模型下载的 Qwen 3.5 系列）的模型：它会提前预测若干 token，主模型在一次处理内校验这些 token。输出相同，但更快。单个请求时会使用它；多个并发时则共享批次，而不使用它。";
 "Forget" = "忘记";
-"Forget Everything" = "全部忘记";
 "Forget Everything…" = "全部忘记…";
 "Forget What Was Learned…" = "忘记已学习的内容…";
 "Forget and Read All Chats Again" = "忘记并重新读取所有聊天";
@@ -888,6 +892,8 @@
 "Re-index %@" = "重新建立 %@ 索引";
 "Re-index this file" = "为此文件重新建立索引";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "将进入 %1$lld 个子文件夹（%2$@）：其文件将被移出。";
+"Read All Chats Again" = "再次读取所有聊天";
+"Read All Chats Again…" = "再次读取所有聊天…";
 "Read It Too" = "也读取它";
 "Read Them" = "读取它们";
 "Read a chat after %lld quiet minutes" = "聊天静默 %lld 分钟后读取";
@@ -1040,6 +1046,7 @@
 "Some settings couldn't be changed:" = "部分设置无法更改：";
 "Something went wrong?" = "发生了问题？";
 "Sort by" = "排序方式";
+"Sorts messages with" = "使用以下方式分类消息";
 "Source on GitHub" = "在 GitHub 上查看源码";
 "Space the models in this folder take, and what's still free on its disk." = "该文件夹中模型占用的空间及磁盘剩余可用空间。";
 "Speakers work with echo cancellation; headphones are still best." = "使用回声消除时扬声器可用，但耳机仍是最佳选择。";
@@ -1180,6 +1187,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型运行时尚未安装——先启动一次模型，然后重试。";
 "The model sees them with your next message." = "模型会在你下一条消息中看到它们。";
 "The model server no longer goes online when it starts." = "模型服务器启动时不再自动联网。";
+"The model that reads them" = "读取这些消息的模型";
 "The model's license, from its card." = "来自模型卡的许可。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 文件夹不可用——其磁盘已连接吗？请在 设置 → Models 中重新选择。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示缓存最多可占用的空间（配置文件中的提示缓存大小同样是上限）。更多缓存可加速长对话与代理；但过多会挤占正在读取的提示空间。";
@@ -1372,6 +1380,7 @@
 "What you corrected before, so it isn't repeated." = "你之前纠正过的内容，避免再次重复。";
 "What you did, kept apart from what it may mean. Sent as a guess." = "你做过的事，会与其可能含义分开保存。会作为猜测发送。";
 "What you do" = "你的职业";
+"What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "你从先前聊天中了解到的关于用户的信息。它可能已过时：以用户现在所说的为准。\n- 简短地用俄语回答\n- 正在制作支持 OTA 更新的 ESP32-S3 扬声器\n当前（根据用户最近几条消息的推测）：很生气：链接器一直失败。所以：简短，直接给出修复方法";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "你当时在做什么、你的预期以及实际看到的情况。不会包含你的聊天记录。";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "你在聊天中写下的内容会在静默达到此时长、你离开聊天或 LLMTray 退出时，在后台读取以生成笔记；仅在模型没有其他任务时进行。只会计入你自己的文字，绝不会计入回答、文件或网页。临时对话以及标记为“不记住”的聊天永远不会被读取。";
 "What's New" = "新功能";
@@ -1391,6 +1400,7 @@
 "Which model generates new images." = "用于生成新图像的模型。";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "当模型说话时，低于此阈值的麦克风声音将被视为静音：回声消除留下的自身声音痕迹会被滤除，但其它声音仍会中断它。若模型能听到自己的声音请调高，若它错过你打断时的声音请调低。更改将在下次启动生效。";
 "Wikipedia" = "Wikipedia";
+"With notes, it reads like this:" = "加上笔记后，内容如下：";
 "Words only" = "仅文字";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "分块读取提示时的工作内存；数值较小会以更小、更慢的步长读取长提示。当提示缓存与此合计最多为 90% 时：其余部分用于保存正在读取的提示。";
 "Works offline" = "支持离线使用";
