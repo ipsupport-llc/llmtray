@@ -54,18 +54,19 @@ final class AppleModelResponder {
             return
         }
         server.beginRequest()
+        // Held from now (waiting its turn too): a switch drains it.
+        server.beginServingApple()
         let wire = AppleChatWire()
         let state = Progress()
         let key = UUID()
         let generation = Task { @MainActor in
             defer { self.running[key] = nil }
             guard await self.acquire() else {
-                server.endRequest(forwarded: false)
+                server.endRequest(forwarded: true)
                 state.done = true
                 connection.cancel()
                 return
             }
-            server.beginServingApple()
             defer {
                 self.release()
                 server.endRequest(forwarded: true)

@@ -320,6 +320,18 @@ final class ServerManager: ObservableObject {
             }
             try self.checkAutoLoadAllowed()
             if let target, target != self.currentModelPath {
+                // A picture or song holds the GPU (Apple's model answering
+                // meanwhile): no MLX model loads next to it -- this waits.
+                if self.suspendedForImageGeneration, target != AppleSystemModel.id {
+                    throw NSError(domain: "ServerManager", code: 7, userInfo: [NSLocalizedDescriptionKey: "a picture or song is being made -- the model loads after it"])
+                }
+                // From Apple's model the runtime may never have been set up
+                // (a first run that started with it): before anything changes,
+                // so a failed setup leaves Apple's model answering.
+                if target != AppleSystemModel.id {
+                    try await self.installer.ensureReady()
+                    try self.checkNotStopped(epoch)
+                }
                 await self.waitForForwardsToDrain()
                 try self.checkNotStopped(epoch)
                 await self.terminateAndWaitForExit()
@@ -328,12 +340,6 @@ final class ServerManager: ObservableObject {
                 self.currentAlias = alias
                 // Another model's restarts say nothing about this one.
                 self.threadDeathRestarts = RestartBudget()
-                // From Apple's model the runtime may never have been set up
-                // (a first run that started with it).
-                if target != AppleSystemModel.id {
-                    try await self.installer.ensureReady()
-                    try self.checkNotStopped(epoch)
-                }
                 try await self.launchAndWaitReady(modelPath: target, alias: alias, epoch: epoch)
             } else {
                 try await self.loadIfNeeded(epoch: epoch)
@@ -523,8 +529,9 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    /// An Apple generation begins (adr/0025): counted like a forward, so a
-    /// switch waits for it to finish. Paired with endRequest(forwarded: true).
+    /// An Apple request arrives (adr/0025): counted like a forward from then
+    /// on -- queued ones too -- so a switch waits for every one of them.
+    /// Paired with endRequest(forwarded: true).
     func beginServingApple() { forwardingCount += 1 }
 
     private func forwardEnded() {
