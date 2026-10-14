@@ -131,9 +131,49 @@ public enum AppleSystemModel {
         throw Failure.unavailable("")
     }
 
+    /// A streamed answer: `onText` gets each new piece as it comes (the
+    /// framework streams the whole text so far; this sends what's new).
+    /// Returns the whole answer and its token counts when the system can
+    /// count them. Cancelling the calling task stops the generation.
+    public static func stream(messages: [[String: Any]], maxTokens: Int?, temperature: Double?,
+                              onText: @escaping @Sendable (String) async -> Void) async throws -> (text: String, usage: Usage?) {
+        guard let conversation = AppleConversation(messages: messages) else { throw Failure.failed("no user message") }
+        if case .unavailable(let why) = availability { throw Failure.unavailable(why) }
+        #if canImport(FoundationModels)
+        if #available(macOS 26, *) {
+            let session = LanguageModelSession(model: .default, tools: [], transcript: transcript(conversation))
+            let options = GenerationOptions(temperature: temperature, maximumResponseTokens: maxTokens)
+            var sent = ""
+            do {
+                for try await snapshot in session.streamResponse(to: conversation.prompt, options: options) {
+                    try Task.checkCancellation()
+                    let whole = snapshot.content
+                    // Normally the text so far grows; should it ever be
+                    // rewritten, only what follows the common start is new.
+                    let common = whole.commonPrefix(with: sent)
+                    if whole.count > common.count {
+                        await onText(String(whole.dropFirst(common.count)))
+                    }
+                    sent = whole
+                }
+            } catch {
+                throw classify(error)
+            }
+            return (sent, await usage(conversation, answer: sent))
+        }
+        #endif
+        throw Failure.unavailable("")
+    }
+
+    /// Tokens in and out, as OpenAI's `usage` reports them.
+    public struct Usage: Equatable, Sendable {
+        public var prompt: Int
+        public var completion: Int
+    }
+
     #if canImport(FoundationModels)
     @available(macOS 26, *)
-    static func respond(_ conversation: AppleConversation, maxTokens: Int?, temperature: Double?, shape: ReplyShape?) async throws -> String {
+    static func transcript(_ conversation: AppleConversation) -> Transcript {
         var entries: [Transcript.Entry] = []
         if !conversation.instructions.isEmpty {
             entries.append(.instructions(Transcript.Instructions(
@@ -146,7 +186,22 @@ public enum AppleSystemModel {
             case .assistant: entries.append(.response(Transcript.Response(assetIDs: [], segments: [segment])))
             }
         }
-        let session = LanguageModelSession(model: .default, tools: [], transcript: Transcript(entries: entries))
+        return Transcript(entries: entries)
+    }
+
+    @available(macOS 26, *)
+    static func usage(_ conversation: AppleConversation, answer: String) async -> Usage? {
+        guard #available(macOS 26.4, *) else { return nil }
+        let model = SystemLanguageModel.default
+        let input = [conversation.instructions] + conversation.turns.map(\.text) + [conversation.prompt]
+        guard let prompt = try? await model.tokenCount(for: input.joined(separator: "\n")),
+              let completion = try? await model.tokenCount(for: answer) else { return nil }
+        return Usage(prompt: prompt, completion: completion)
+    }
+
+    @available(macOS 26, *)
+    static func respond(_ conversation: AppleConversation, maxTokens: Int?, temperature: Double?, shape: ReplyShape?) async throws -> String {
+        let session = LanguageModelSession(model: .default, tools: [], transcript: transcript(conversation))
         let options = GenerationOptions(temperature: temperature, maximumResponseTokens: maxTokens)
         do {
             if let shape {

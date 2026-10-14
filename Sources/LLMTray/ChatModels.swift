@@ -325,6 +325,8 @@ extension ChatSettings {
     /// The model's trained context ceiling (max_position_embeddings);
     /// 32768 only when its config.json doesn't say.
     static func maxContext(forModel modelID: String?) -> Int {
-        max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
+        // Apple's model: its context holds the input and the answer both.
+        if modelID == AppleSystemModel.id { return AppleSystemModel.contextSize ?? 4096 }
+        return max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
     }
 }

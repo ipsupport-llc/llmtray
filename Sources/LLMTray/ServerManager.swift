@@ -236,7 +236,8 @@ final class ServerManager: ObservableObject {
                     self.currentAlias = alias
                     self.threadDeathRestarts = RestartBudget()
                     self.state = .starting
-                    try await self.installer.ensureReady()
+                    // Apple's model needs no runtime (adr/0025).
+                    if modelPath != AppleSystemModel.id { try await self.installer.ensureReady() }
                     try self.checkNotStopped(epoch)
                     try await self.launchAndWaitReady(modelPath: modelPath, alias: alias, epoch: epoch)
                 }
@@ -400,7 +401,7 @@ final class ServerManager: ObservableObject {
         if case .running = state { return }
         try checkAutoLoadAllowed()
         guard let modelPath = currentModelPath else { return }
-        try await installer.ensureReady()
+        if modelPath != AppleSystemModel.id { try await installer.ensureReady() }
         try checkNotStopped(epoch)
         try await launchAndWaitReady(modelPath: modelPath, alias: currentAlias, epoch: epoch)
     }
@@ -493,6 +494,11 @@ final class ServerManager: ObservableObject {
     /// internal port.
     private func launchAndWaitReady(modelPath: String, alias: String, epoch: Int) async throws {
         if let old = process { await old.waitForExit() }
+        if modelPath == AppleSystemModel.id {
+            try checkNotStopped(epoch)
+            try await startAppleListener()
+            return
+        }
         try checkNotStopped(epoch)
         await reapOrphans()
         try checkNotStopped(epoch)
@@ -1126,6 +1132,42 @@ final class ServerManager: ObservableObject {
         }
     }
 
+    /// Apple's on-device model (adr/0025): no process to launch -- the proxy
+    /// answers its requests itself, so "running" is the public listener
+    /// listening (bind failure: failed, as for a model).
+    private func startAppleListener() async throws {
+        if case .unavailable(let why) = AppleSystemModel.availability {
+            throw NSError(domain: "ServerManager", code: 10, userInfo: [NSLocalizedDescriptionKey: why])
+        }
+        // Background work binds to what answers now (adr/0024).
+        processGeneration += 1
+        let publicPort = currentPublicPort ?? 8765
+        let name = AppleSystemModel.displayName
+        if proxy.publicPort != nil {
+            markRunning(port: publicPort, model: name)
+            return
+        }
+        state = .starting
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            startContinuation = continuation
+            proxyStartPending = true
+            proxy.start(publicPort: publicPort, internalPort: internalPort) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .success:
+                    guard self.proxyStartPending, self.currentModelPath == AppleSystemModel.id else { return }
+                    self.proxyStartPending = false
+                    self.markRunning(port: publicPort, model: name)
+                case .failure(let error):
+                    self.proxyFailed(port: publicPort, error: error)
+                }
+            }
+        }
+    }
+
+    /// Apple's model is the one answering (no process: nothing to unload).
+    var servesAppleModel: Bool { currentModelPath == AppleSystemModel.id }
+
     private func markRunning(port: Int, model: String) {
         state = .running(port: port, model: model)
         ModelCatalog.shared.recordUse(currentModelPath)
@@ -1179,7 +1221,8 @@ final class ServerManager: ObservableObject {
     /// leaving a big model loaded and forgotten doesn't just sit there
     /// holding memory/battery indefinitely.
     private func checkIdleStop() {
-        guard case .running = state, activeRequestCount == 0 else { return }
+        // Apple's model holds no memory of LLMTray's to free.
+        guard case .running = state, activeRequestCount == 0, !servesAppleModel else { return }
         let minutes = UserDefaults.standard[Pref.autoStopIdleMinutes]
         guard minutes > 0, Date().timeIntervalSince(lastActivityAt) >= TimeInterval(minutes * 60) else { return }
         appendLog("--- unloading model after \(minutes) min idle (reloads automatically on the next request) ---\n")
@@ -1208,6 +1251,9 @@ final class ServerManager: ObservableObject {
         let epoch = stopEpoch
         try? await serialized(epoch: epoch) {
             guard case .running = self.state else { return }
+            // Apple's model runs on the Neural Engine, in the system: it
+            // isn't in a picture's or a song's way, and stays answerable.
+            guard !self.servesAppleModel else { return }
             // A request that arrived since the idle check is already
             // counted -- don't unload the model out from under it.
             guard !onlyIfIdle || self.activeRequestCount == 0 else { return }
@@ -1247,6 +1293,8 @@ final class ServerManager: ObservableObject {
             throw giveUp(NSLocalizedString("The chat model is still loading -- try Voice Lab again once it's up.", comment: ""))
         }
         guard case .running = state else { return false }
+        // Apple's model doesn't hold the GPU: nothing to reload after.
+        if servesAppleModel { return false }
         await unloadModel()
         // A Stop meanwhile ended the suspension: nothing to reload after.
         guard suspendedForVoice else { return false }

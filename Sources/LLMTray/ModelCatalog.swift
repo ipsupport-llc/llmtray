@@ -59,7 +59,10 @@ final class ModelCatalog: ObservableObject {
     /// same models doesn't re-render every view observing the catalog.
     func rescan() {
         root = ModelDiscovery.currentModelsRoot()
-        let scanned = ModelDiscovery.scanModels(root: root, downloading: DownloadQueue.fetchingChatModel)
+        var scanned = ModelDiscovery.scanModels(root: root, downloading: DownloadQueue.fetchingChatModel)
+        // Apple's on-device model, when this Mac has it (adr/0025): listed
+        // with the folders, never one of them.
+        if AppleSystemModel.isAvailable { scanned.append(LocalModel(path: AppleSystemModel.id)) }
         let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
         if scanned != models { models = scanned }
         if scannedAliases != aliases { aliases = scannedAliases }
@@ -75,7 +78,7 @@ final class ModelCatalog: ObservableObject {
     /// Recomputes model sizes and free space off the main thread.
     func refreshUsage() {
         usageTask?.cancel()
-        let paths = models.map(\.path)
+        let paths = models.filter { !$0.isAppleSystem }.map(\.path)
         let media = MediaModels.all.filter(MediaModels.isInstalled).map { ($0.repo, MediaModels.path($0)) }
         let root = root
         usageTask = Task.detached(priority: .utility) { [weak self] in
@@ -115,6 +118,7 @@ final class ModelCatalog: ObservableObject {
     /// profile assignment, last use, and the chat's selection of it. The
     /// caller makes sure it isn't loaded.
     func remove(_ model: LocalModel) throws {
+        guard !model.isAppleSystem else { return }
         let download = HFModelBrowser.activeDownload.map { root + "/" + $0 }
         if let download, ModelRemoval.isSameOrInside(download, model.path) {
             throw ModelRemoval.Refusal.downloading
@@ -184,12 +188,17 @@ final class ModelCatalog: ObservableObject {
     /// The `model` name requests use for a model: its alias, or its folder
     /// name when the alias was cleared.
     func requestName(for modelID: String) -> String {
+        if modelID == AppleSystemModel.id { return AppleSystemModel.id }
         let alias = alias(for: modelID)
         return alias.isEmpty ? (modelID as NSString).lastPathComponent : alias
     }
 
-    /// The name each model is requested by, for the proxy's /v1/models.
-    var servedNames: [String] { models.map { requestName(for: $0.id) } }
+    /// The name each model is requested by, for the proxy's /v1/models
+    /// (`app`: the app's own requests; Apple's model is only theirs).
+    var servedNames: [String] { servedNames(app: false) }
+    func servedNames(app: Bool) -> [String] {
+        models.filter { app || !$0.isAppleSystem }.map { requestName(for: $0.id) }
+    }
 
     func model(id: String?) -> LocalModel? {
         guard let id else { return nil }
@@ -197,7 +206,8 @@ final class ModelCatalog: ObservableObject {
     }
 
     func alias(for modelID: String) -> String {
-        aliases[modelID] ?? ModelAliasStore.alias(for: modelID)
+        if modelID == AppleSystemModel.id { return "" }
+        return aliases[modelID] ?? ModelAliasStore.alias(for: modelID)
     }
 
     func setAlias(_ alias: String, for modelID: String) {
@@ -208,7 +218,9 @@ final class ModelCatalog: ObservableObject {
     /// Another installed model already answers to this alias -- then only
     /// one of them is reachable by name.
     func isAliasTaken(_ alias: String, excluding modelID: String) -> Bool {
-        models.contains { $0.id != modelID && self.alias(for: $0.id) == alias }
+        // Reserved: requests for it mean Apple's model.
+        if alias == AppleSystemModel.id { return true }
+        return models.contains { $0.id != modelID && self.alias(for: $0.id) == alias }
     }
 
     /// The model a request's `model` field names: an alias first (the
@@ -220,6 +232,7 @@ final class ModelCatalog: ObservableObject {
     /// always sends some other name ("gpt-4o") mustn't rescan per request.
     func resolve(modelName: String) -> String? {
         guard !modelName.isEmpty else { return nil }
+        if modelName == AppleSystemModel.id { return AppleSystemModel.isAvailable ? AppleSystemModel.id : nil }
         if let path = lookup(modelName) {
             if FileManager.default.fileExists(atPath: path + "/config.json") { return path }
             rescan()
@@ -233,7 +246,7 @@ final class ModelCatalog: ObservableObject {
 
     private func lookup(_ name: String) -> String? {
         // An alias set in Settings wins over another model's folder name.
-        if let byAlias = models.first(where: { alias(for: $0.id) == name }) {
+        if let byAlias = models.first(where: { !$0.isAppleSystem && alias(for: $0.id) == name }) {
             return byAlias.path
         }
         // A full path ("/Users/.../publisher/model", "~/..."): only a model

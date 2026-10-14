@@ -2,15 +2,21 @@ import Foundation
 import LLMTrayCore
 
 struct LocalModel: Identifiable, Hashable {
-    let id: String        // full path, unique
+    let id: String        // full path, unique; AppleSystemModel.id for Apple's model
     let displayName: String  // "publisher/model-name"
     let path: String
+
+    /// Apple's on-device model (adr/0025): no folder -- nothing on disk to
+    /// size, read, alias or delete.
+    var isAppleSystem: Bool { path == AppleSystemModel.id }
 
     init(path: String) {
         self.path = path
         self.id = path
         let comps = path.split(separator: "/")
-        if comps.count >= 2 {
+        if path == AppleSystemModel.id {
+            self.displayName = AppleSystemModel.displayName
+        } else if comps.count >= 2 {
             self.displayName = comps.suffix(2).joined(separator: "/")
         } else {
             self.displayName = path
