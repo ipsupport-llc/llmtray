@@ -727,24 +727,30 @@ final class ChatClient: ObservableObject {
         guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return true }
         // The answer to a message memory never read (before it met the
         // chat: opted out, memory off) isn't context either.
-        let met = MemoryManager.shared.file.met(session) ?? .max
-        var items: [MemoryBatchMessage] = []
-        var lastAnswer: String?
-        var previousSeq = 0
-        for message in messages {
-            if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
-                lastAnswer = previousSeq > met ? message.content : nil
-            } else if message.role == "user", !message.isToolContext, let seq = message.seq {
-                // The model it was sent to: by default the one that reads it.
-                items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer,
-                                                model: message.modelPath))
-                lastAnswer = nil
-                previousSeq = seq
-            }
-        }
+        let items = memoryReading(readFrom: MemoryManager.shared.file.met(session) ?? .max, date: Date())
         guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return true }
         let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
         return MemoryManager.shared.change { $0.enqueue(chat: session, project: project, messages: items, now: Date()) }
+    }
+
+    /// "Learn from past chats now": what this chat said before memory met
+    /// it is queued too, then what's new. True when anything was queued.
+    @discardableResult
+    func queuePastForMemory() -> Bool {
+        guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return false }
+        let items = memoryReading(readFrom: 0, date: sessionCreatedAt ?? Date())
+        let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
+        var queued = false
+        MemoryManager.shared.change { queued = $0.enqueuePast(chat: session, project: project, messages: items, now: Date()) }
+        let before = MemoryManager.shared.file.queue.count
+        queueForMemory()
+        return queued || MemoryManager.shared.file.queue.count > before
+    }
+
+    private func memoryReading(readFrom: Int, date: Date) -> [MemoryBatchMessage] {
+        MemoryBatchMessage.reading(messages.filter { !$0.isToolContext }.map {
+            MemoryBatchMessage.Turn(role: $0.role, text: $0.content, isSummary: $0.isSummary, seq: $0.seq, date: $0.sentAt, model: $0.modelPath)
+        }, readFrom: readFrom, date: date)
     }
 
     /// Quiet for the settings' minutes after its last change: queued.

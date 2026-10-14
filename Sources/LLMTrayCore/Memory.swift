@@ -551,6 +551,39 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         let fresh = messages.filter { $0.seq > mark && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .sorted { $0.seq < $1.seq }
         guard let last = fresh.last else { return false }
+        appendBatches(fresh, chat: chat, project: project, now: now)
+        watermarks[chat.uuidString] = last.seq
+        return true
+    }
+
+    /// "Learn from past chats now": what a chat said before memory met it
+    /// (all of it, for a chat memory never met) is queued too, and the
+    /// chat is met from its start. What was queued or read already isn't
+    /// again; what's after the watermark is left to `enqueue`. Nothing for
+    /// an opted-out chat, or one put aside while memory was off (the user
+    /// chooses for those first). True when anything was queued.
+    @discardableResult
+    public mutating func enqueuePast(chat: UUID, project: UUID?, messages: [MemoryBatchMessage], now: Date) -> Bool {
+        let key = chat.uuidString
+        guard !optedOut.contains(chat), pausedWatermarks[key] == nil else { return false }
+        let past = messages.filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.sorted { $0.seq < $1.seq }
+        let upTo: Int
+        if let met = metFrom[key] {
+            upTo = met
+        } else {
+            guard let last = past.last else { return false }
+            upTo = last.seq
+            watermarks[key] = upTo
+        }
+        metFrom[key] = 0
+        let unread = past.filter { $0.seq <= upTo }
+        guard !unread.isEmpty else { return false }
+        appendBatches(unread, chat: chat, project: project, now: now)
+        return true
+    }
+
+    /// `messages` (in order) as batches of at most `MemoryBatch.maxBytes`.
+    private mutating func appendBatches(_ messages: [MemoryBatchMessage], chat: UUID, project: UUID?, now: Date) {
         var batch: [MemoryBatchMessage] = []
         var bytes = 0
         func flush() {
@@ -560,15 +593,13 @@ public struct MemoryFile: Codable, Equatable, Sendable {
             batch = []
             bytes = 0
         }
-        for message in fresh {
+        for message in messages {
             let size = message.text.utf8.count + (message.before?.utf8.count ?? 0)
             if bytes + size > MemoryBatch.maxBytes { flush() }
             batch.append(message.clipped)
             bytes += min(size, MemoryBatch.maxBytes)
         }
         flush()
-        watermarks[chat.uuidString] = last.seq
-        return true
     }
 
     /// "Don't remember this chat": nothing more is learned from it, and
@@ -692,6 +723,45 @@ public struct MemoryBatchMessage: Codable, Equatable, Sendable {
 
     /// At most this much of the answer before a message is kept.
     public static let maxBefore = 300
+
+    /// One message of a chat, as memory reads chats.
+    public struct Turn: Sendable {
+        public var role: String
+        public var text: String
+        public var isSummary: Bool
+        public var seq: Int?
+        public var date: Date?
+        public var model: String?
+
+        public init(role: String, text: String, isSummary: Bool = false, seq: Int?, date: Date?, model: String?) {
+            self.role = role
+            self.text = text
+            self.isSummary = isSummary
+            self.seq = seq
+            self.date = date
+            self.model = model
+        }
+    }
+
+    /// A chat's user messages (those with a seq), each with the answer
+    /// before it -- unless that answers a message memory never read (at or
+    /// before `readFrom`). `date` for a message from before dates were kept.
+    public static func reading(_ turns: [Turn], readFrom: Int, date: Date) -> [MemoryBatchMessage] {
+        var items: [MemoryBatchMessage] = []
+        var lastAnswer: String?
+        var previousSeq = 0
+        for turn in turns {
+            if turn.role == "assistant", !turn.text.isEmpty, !turn.isSummary {
+                lastAnswer = previousSeq > readFrom ? turn.text : nil
+            } else if turn.role == "user", let seq = turn.seq {
+                // The model it was sent to: by default the one that reads it.
+                items.append(MemoryBatchMessage(seq: seq, date: turn.date ?? date, text: turn.text, before: lastAnswer, model: turn.model))
+                lastAnswer = nil
+                previousSeq = seq
+            }
+        }
+        return items
+    }
 
     public init(seq: Int, date: Date, text: String, before: String?, model: String? = nil) {
         self.seq = seq

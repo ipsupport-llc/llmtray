@@ -87,6 +87,47 @@ final class MemoryManager: ObservableObject {
         change { $0.forget(id, vector: vector) }
     }
 
+    /// "Learn from past chats now": every saved chat's messages from before
+    /// memory met it are queued (adr/0024), open ones through their tab.
+    /// Messages from before seqs get them, saved with the chat, so later
+    /// loads number them alike. Returns how many chats got anything queued.
+    func learnFromPastChats() -> Int {
+        guard isEnabled, !unreadable else { return 0 }
+        var count = 0
+        var open = Set<UUID>()
+        for tab in ChatTabs.shared.tabs {
+            guard let id = tab.currentSessionID else { continue }
+            open.insert(id)
+            if tab.queuePastForMemory() { count += 1 }
+        }
+        for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
+            let key = id.uuidString
+            // Read from its start already, opted out, or waiting for the
+            // user's answer about while memory was off: nothing to do.
+            guard file.metFrom[key] != 0, !file.optedOut.contains(id), file.pausedWatermarks[key] == nil,
+                  var chat = ChatSessionStore.load(id: id) else { continue }
+            var last = max(chat.lastSeq ?? 0, chat.messages.compactMap(\.seq).max() ?? 0, file.watermark(id) ?? 0)
+            var numbered = false
+            for i in chat.messages.indices where chat.messages[i].role == "user" && chat.messages[i].seq == nil {
+                last += 1
+                chat.messages[i].seq = last
+                numbered = true
+            }
+            if numbered {
+                chat.lastSeq = last
+                guard ChatSessionStore.save(chat) else { continue }
+            }
+            let items = MemoryBatchMessage.reading(chat.messages.map {
+                MemoryBatchMessage.Turn(role: $0.role, text: $0.content, isSummary: $0.isSummary, seq: $0.seq, date: $0.sentAt, model: $0.model)
+            }, readFrom: 0, date: chat.createdAt)
+            let project = ChatLibraryStore.shared.library.projectContext(forChat: id)?.id
+            var queued = false
+            change { queued = $0.enqueuePast(chat: id, project: project, messages: items, now: Date()) }
+            if queued { count += 1 }
+        }
+        return count
+    }
+
     /// Expiry: at most once an hour as chats start, and at once when the
     /// settings it depends on changed.
     private var lastSweep: (date: Date, settings: MemorySettings)?
