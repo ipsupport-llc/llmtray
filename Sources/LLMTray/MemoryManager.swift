@@ -147,16 +147,26 @@ final class MemoryManager: ObservableObject {
     @discardableResult
     func forgetLearned(readAgain: Bool) -> Bool {
         pastRun += 1
-        return change { $0.forgetUnreviewed(readAgain: readAgain) }
+        return change { $0.forgetUnreviewed(readAgain: readAgain && !$0.hasPaused) }
     }
 
     /// Every chat read again from its start: where memory read each is
     /// forgotten, then they're all queued. The notes stay; reading them
     /// again confirms what they say.
+    /// Not while memory waits for the user's answer about what was said
+    /// while it was off (that answer decides those chats first).
     func readAllAgain() -> (queued: Int, waiting: Int) {
-        pastRun += 1
-        guard change({ $0.resetReading() }) else { return (0, 0) }
+        guard !file.hasPaused, change({ $0.resetReading() }) else { return (0, 0) }
         return learnFromPastChats()
+    }
+
+    /// "Forget Everything" (MemoryFile.forgetAll): chats still waiting to
+    /// be read from the past aren't, after it. Reading again isn't offered
+    /// while the "memory was off" answer is pending.
+    @discardableResult
+    func forgetEverything(readAgain: Bool) -> Bool {
+        pastRun += 1
+        return change { $0.forgetAll(readAgain: readAgain && !$0.hasPaused) }
     }
 
     /// Chats answering when "Learn from past chats now" was pressed: theirs

@@ -190,6 +190,7 @@ struct MemoryPane: View {
                             if nothingLeft {
                                 Spacer()
                                 Button("Read All Chats Again…") { confirmReadAgain = true }
+                                    .disabled(memory.unreadable || memory.file.hasPaused)
                             }
                         }
                     }
@@ -239,10 +240,17 @@ struct MemoryPane: View {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
         }
         .confirmationDialog("Forget what was learned?", isPresented: $confirmForgetLearned) {
-            Button("Forget and Read All Chats Again") {
-                if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
+            if !memory.file.hasPaused {
+                Button("Forget and Read All Chats Again") {
+                    if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
+                }
             }
-            Button("Only Forget", role: .destructive) { memory.forgetLearned(readAgain: false) }
+            Button("Only Forget", role: .destructive) {
+                if memory.forgetLearned(readAgain: false) {
+                    learnPastResult = nil
+                    nothingLeft = false
+                }
+            }
         } message: {
             Text("\(memory.file.unreviewedCount) learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.")
         }
@@ -268,13 +276,20 @@ struct MemoryPane: View {
             } onCancel: { draft = nil }
         }
         .confirmationDialog("Forget every note?", isPresented: $confirmForgetAll) {
-            Button("Forget and Read All Chats Again", role: .destructive) {
-                if memory.change({ $0.forgetAll(readAgain: true) }) { learnFromPastChats() }
-                loadAbout()
+            if !memory.file.hasPaused {
+                Button("Forget and Read All Chats Again", role: .destructive) {
+                    if memory.forgetEverything(readAgain: true) {
+                        loadAbout()
+                        learnFromPastChats()
+                    }
+                }
             }
             Button("Only Forget", role: .destructive) {
-                memory.change { $0.forgetAll() }
-                loadAbout()
+                if memory.forgetEverything(readAgain: false) {
+                    loadAbout()
+                    learnPastResult = nil
+                    nothingLeft = false
+                }
             }
         } message: {
             Text("Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again.")
