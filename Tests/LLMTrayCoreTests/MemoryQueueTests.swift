@@ -279,4 +279,28 @@ extension MemoryQueueTests {
         XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 4, 5], "2-3 were read; 6 is enqueue's")
         XCTAssertNil(file.readBefore[chat.uuidString])
     }
+
+    func testOptingOutWithThePastStillQueuedKeepsWhatWasRead() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(3, "three")], now: t0))
+        file.queue = []   // 3 read
+        let all = (1...4).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))   // 1-2 queued
+        file.setOptedOut(chat, true)
+        file.setOptedOut(chat, false, readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2, 4], "3 was read; 1-2 never were")
+    }
+
+    func testMemoryOffWithThePastQueuedDoesntQueueItTwice() {
+        var file = MemoryFile()
+        file.meet(chat, from: 2)
+        let all = (1...3).map { message($0, "m\($0)") }
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))   // 1-2 queued, kept
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        XCTAssertTrue(file.enqueuePast(chat: chat, project: nil, messages: all, now: t0))
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [1, 2, 3])
+    }
 }

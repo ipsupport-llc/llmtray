@@ -95,11 +95,13 @@ final class MemoryManager: ObservableObject {
         guard isEnabled, !unreadable else { return 0 }
         var count = 0
         var open = Set<UUID>()
+        var busy: [(tab: ChatClient, chat: UUID)] = []
         for tab in ChatTabs.shared.tabs {
             guard let id = tab.currentSessionID else { continue }
             open.insert(id)
-            if tab.queuePastForMemory() { count += 1 }
+            if tab.isBusy { busy.append((tab, id)) } else if tab.queuePastForMemory() { count += 1 }
         }
+        if !busy.isEmpty { learnFromPast(busy, tries: 360) }
         for id in ChatSessionStore.ids() ?? [] where !open.contains(id) {
             let key = id.uuidString
             // Opted out, or waiting for the user's answer about while memory
@@ -130,6 +132,26 @@ final class MemoryManager: ObservableObject {
             if queued { count += 1 }
         }
         return count
+    }
+
+    /// Chats answering when "Learn from past chats now" was pressed: theirs
+    /// is queued once they're done (looked at every 5 s, half an hour at most).
+    /// A chat left meanwhile (another one in its tab, the tab closed) waits
+    /// for the button again.
+    private func learnFromPast(_ chats: [(tab: ChatClient, chat: UUID)], tries: Int) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.isEnabled else { return }
+                let open = chats.filter { c in ChatTabs.shared.tabs.contains { $0 === c.tab } && c.tab.currentSessionID == c.chat }
+                var queued = false
+                for c in open where !c.tab.isBusy {
+                    if c.tab.queuePastForMemory() { queued = true }
+                }
+                if queued { MemoryReflector.shared.poke(after: 1) }
+                let waiting = open.filter { $0.tab.isBusy }
+                if !waiting.isEmpty, tries > 1 { self.learnFromPast(waiting, tries: tries - 1) }
+            }
+        }
     }
 
     /// Expiry: at most once an hour as chats start, and at once when the

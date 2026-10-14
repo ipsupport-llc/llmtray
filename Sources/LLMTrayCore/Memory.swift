@@ -480,7 +480,11 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// met until it's on again and the user has chosen (`resume`). What's
     /// queued stays.
     public mutating func pauseAll() {
-        for (chat, mark) in watermarks { pausedWatermarks[chat] = min(pausedWatermarks[chat] ?? mark, mark) }
+        for (chat, mark) in watermarks {
+            // What's queued stays and is still read.
+            if let id = UUID(uuidString: chat) { noteRead(id, queuedToo: true) }
+            pausedWatermarks[chat] = min(pausedWatermarks[chat] ?? mark, mark)
+        }
         watermarks = [:]
     }
 
@@ -508,7 +512,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         } else {
             watermarks.removeValue(forKey: chat)
             if let from = metFrom.removeValue(forKey: chat), mark > from {
-                readBefore[chat, default: []].append((from + 1)...mark)
+                addRead(Array((from + 1)...mark), to: chat)
             }
         }
     }
@@ -589,6 +593,32 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         return true
     }
 
+    /// Keeps which of a chat's messages were read since memory met it (and
+    /// those `queuedToo`, still to be read) before its watermark goes, so
+    /// "Learn from past chats" doesn't read them again.
+    private mutating func noteRead(_ chat: UUID, queuedToo: Bool) {
+        let key = chat.uuidString
+        guard let mark = watermarks[key] else { return }
+        let from = metFrom[key] ?? mark
+        let queued = Set(queue.filter { $0.chat == chat }.flatMap { $0.messages.map(\.seq) })
+        var seqs = Set(mark > from ? Array((from + 1)...mark) : [])
+        if queuedToo { seqs.formUnion(queued) } else { seqs.subtract(queued) }
+        addRead(Array(seqs), to: key)
+    }
+
+    private mutating func addRead(_ seqs: [Int], to key: String) {
+        let all = Set(seqs + (readBefore[key] ?? []).flatMap { Array($0) }).sorted()
+        var ranges: [ClosedRange<Int>] = []
+        for seq in all {
+            if let last = ranges.last, last.upperBound + 1 == seq {
+                ranges[ranges.count - 1] = last.lowerBound...seq
+            } else {
+                ranges.append(seq...seq)
+            }
+        }
+        readBefore[key] = ranges.isEmpty ? nil : ranges
+    }
+
     /// `messages` (in order) as batches of at most `MemoryBatch.maxBytes`.
     private mutating func appendBatches(_ messages: [MemoryBatchMessage], chat: UUID, project: UUID?, now: Date) {
         var batch: [MemoryBatchMessage] = []
@@ -618,6 +648,8 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public mutating func setOptedOut(_ chat: UUID, _ out: Bool, readMeanwhile: Bool = false) {
         let key = chat.uuidString
         if out {
+            // What's queued goes (below), so it doesn't count as read.
+            noteRead(chat, queuedToo: false)
             optedOut.insert(chat)
             // Put aside from before what was queued, which goes: read again
             // only if the user asks for it when remembering the chat.
