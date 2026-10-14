@@ -366,7 +366,10 @@ changes in nearly every chat with memory on.
   - the memory generation goes up, and a queued batch started under an older
     generation re-checks before commit.
 - **Forget everything:**
-  - deletes notes, vectors, the queue and tombstones;
+  - deletes notes (not About you: the user's own fields, cleared there),
+    vectors, the queue and tombstones; "and read all chats again" also forgets
+    where each chat was read (otherwise what was read stays read, and "Learn
+    from Past Chats" offers "Read All Chats Again" when nothing is left);
   - raises the generation;
   - clears every chat's snapshot.
 - **Deleting a chat** removes its evidence entries and queue items. A note left

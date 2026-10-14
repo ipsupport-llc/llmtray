@@ -480,4 +480,13 @@ extension MemoryTests {
         file.forgetLearned(fromChat: chat, keepState: true)
         XCTAssertNil(file.mood, "the chat's lessons go, its mood too")
     }
+
+    func testForgettingEverythingKeepsAboutYou() {
+        var file = MemoryFile()
+        XCTAssertTrue(file.setAbout(.name, "Roman", now: t0))
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Short answers", now: t0)
+        file.forgetAll()
+        XCTAssertEqual(file.notes.count, 1)
+        XCTAssertEqual(file.about(.name).map { MemoryAboutField.name.value(of: $0) }, "Roman")
+    }
 }

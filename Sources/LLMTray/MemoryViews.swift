@@ -35,6 +35,9 @@ struct MemoryPane: View {
     @State private var confirmLearnPast = false
     @State private var confirmForgetLearned = false
     @State private var showPreview = false
+    @State private var confirmReadAgain = false
+    /// The last "Learn from Past Chats Now" found nothing left to read.
+    @State private var nothingLeft = false
     /// What "Learn from Past Chats Now" did, shown under it.
     @State private var learnPastResult: String?
     @State private var about: [MemoryAboutField: String] = [:]
@@ -61,6 +64,12 @@ struct MemoryPane: View {
                 } icon: {
                     Image(systemName: "lock.shield")
                 }
+                HStack {
+                    Text("The exact text a new chat gets, before your first message.").font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Show What Chats Get…") { showPreview = true }
+                        .disabled(memory.unreadable || !enabled)
+                }
             }
             Section("Memory") {
                 Toggle(isOn: $enabled) {
@@ -80,12 +89,6 @@ struct MemoryPane: View {
                 notesSection
                 if !expiredNotes.isEmpty { expiredSection }
                 Section("What chats get") {
-                    HStack {
-                        Text("The exact text a new chat gets, before your first message.").font(.caption).foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Show What Chats Get…") { showPreview = true }
-                            .disabled(memory.unreadable)
-                    }
                     Toggle(isOn: kindBinding(.preference)) {
                         SettingLabel(title: "Preferences", help: "How you like things: language, length, tone, formatting.")
                     }
@@ -199,7 +202,14 @@ struct MemoryPane: View {
                                      help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
                     }
                     if let learnPastResult {
-                        Text(learnPastResult).font(.caption).foregroundStyle(.secondary)
+                        HStack {
+                            Text(learnPastResult).font(.caption).foregroundStyle(.secondary)
+                            if nothingLeft {
+                                Spacer()
+                                Button("Read All Chats Again…") { confirmReadAgain = true }
+                                    .disabled(memory.unreadable || memory.file.hasPaused)
+                            }
+                        }
                     }
                     if !memory.file.queue.isEmpty {
                         Text("\(memory.file.queue.count) parts of chats wait to be read.")
@@ -247,10 +257,17 @@ struct MemoryPane: View {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
         }
         .confirmationDialog("Forget what was learned?", isPresented: $confirmForgetLearned) {
-            Button("Forget and Read All Chats Again") {
-                if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
+            if !memory.file.hasPaused {
+                Button("Forget and Read All Chats Again") {
+                    if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
+                }
             }
-            Button("Only Forget", role: .destructive) { memory.forgetLearned(readAgain: false) }
+            Button("Only Forget", role: .destructive) {
+                if memory.forgetLearned(readAgain: false) {
+                    learnPastResult = nil
+                    nothingLeft = false
+                }
+            }
         } message: {
             Text("\(memory.file.unreviewedCount) learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.")
         }
@@ -277,15 +294,39 @@ struct MemoryPane: View {
             } onCancel: { draft = nil }
         }
         .confirmationDialog("Forget every note?", isPresented: $confirmForgetAll) {
-            Button("Forget Everything", role: .destructive) { memory.change { $0.forgetAll() } }
+            if !memory.file.hasPaused {
+                Button("Forget and Read All Chats Again", role: .destructive) {
+                    if memory.forgetEverything(readAgain: true) {
+                        loadAbout()
+                        learnFromPastChats()
+                    }
+                }
+            }
+            Button("Only Forget", role: .destructive) {
+                if memory.forgetEverything(readAgain: false) {
+                    loadAbout()
+                    learnPastResult = nil
+                    nothingLeft = false
+                }
+            }
         } message: {
-            Text("Chats won't get them any more. This can't be undone.")
+            Text("Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again.")
+        }
+        .confirmationDialog("Read all your chats again?", isPresented: $confirmReadAgain) {
+            Button("Read All Chats Again") { show(memory.readAllAgain()) }
+        } message: {
+            Text("Every saved chat is read from its start once more. Notes already there are confirmed, not doubled.")
         }
     }
 
     /// Every saved chat queued from its start; what it did, under the button.
     private func learnFromPastChats() {
-        let (queued, waiting) = memory.learnFromPastChats()
+        show(memory.learnFromPastChats())
+    }
+
+    private func show(_ result: (queued: Int, waiting: Int)) {
+        let (queued, waiting) = result
+        nothingLeft = queued == 0 && waiting == 0
         var lines: [String] = []
         if queued > 0 {
             lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
@@ -713,6 +754,10 @@ struct MemoryPreviewSheet: View {
                     .font(.caption).foregroundStyle(.secondary)
             } else {
                 Text("Nothing: no note is sent to these chats now.").foregroundStyle(.secondary)
+                Text("With notes, it reads like this:").font(.caption).foregroundStyle(.secondary)
+                Text("What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix")
+                    .font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                    .textSelection(.enabled)
             }
             HStack {
                 Spacer()
@@ -720,6 +765,6 @@ struct MemoryPreviewSheet: View {
             }
         }
         .padding(20)
-        .frame(width: 560, height: 460)
+        .frame(width: 560, height: snapshot?.text.isEmpty == false ? 460 : nil)
     }
 }

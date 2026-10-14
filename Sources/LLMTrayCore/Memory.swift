@@ -633,10 +633,13 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// Where memory met a chat (see `metFrom`); nil: not met.
     public func met(_ chat: UUID) -> Int? { metFrom[chat.uuidString] }
 
-    /// Everything: notes, what's queued, tombstones. The watermarks stay,
-    /// so what was already said isn't learned again; the opt-outs stay.
-    public mutating func forgetAll() {
-        notes = []
+    /// Everything: notes, what's queued, tombstones -- not About you (the
+    /// user's own fields, cleared there). The watermarks stay, so what was
+    /// already said isn't learned again -- unless `readAgain`, then every
+    /// chat can be read anew; the opt-outs stay.
+    public mutating func forgetAll(readAgain: Bool = false) {
+        if readAgain { resetReading() }
+        notes = notes.filter { isAbout($0) }
         queue = []
         tombstones = []
         mood = nil
@@ -655,12 +658,19 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         notes.removeAll { !$0.reviewed && !$0.pinned }
         queue = []
         mood = nil
-        if readAgain {
-            watermarks = [:]
-            metFrom = [:]
-            readBefore = [:]
-        }
+        if readAgain { resetReading() }
         _ = bump()
+    }
+
+    /// Where memory read each chat is forgotten: "Learn from past chats"
+    /// reads every chat from its start again (what's queued goes, or it'd
+    /// be read twice). Opt-outs and the choice waiting after memory was off
+    /// stay.
+    public mutating func resetReading() {
+        queue = []
+        watermarks = [:]
+        metFrom = [:]
+        readBefore = [:]
     }
 
     // MARK: Chats
