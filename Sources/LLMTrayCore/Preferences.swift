@@ -151,6 +151,10 @@ public enum Pref {
     /// The model memory reads chats with: a model's path, or "" (each
     /// chat's own: the model that answered in it).
     public static let memoryModel = PrefKey("llmtray.memory.model", default: "")
+    /// What sorts a chat's messages before they're read (adr/0025): "" the
+    /// reading model, or Apple's on-device model ("apple-system"), which
+    /// sorts on the Neural Engine before the reading model is needed.
+    public static let memorySorter = PrefKey("llmtray.memory.sorter", default: "")
     /// Minutes LLMTray is idle before memory may load its model itself; 0: never.
     public static let memorySwitchIdleMinutes = PrefKey("llmtray.memory.switchIdleMinutes", default: 0)
     /// What's learned is seen in every chat (off: each project keeps its own).

@@ -167,6 +167,8 @@
 "Anything else chats should know" = "Anything else chats should know";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
+"Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists." = "Apple doesn't list %@ for its model: it reads and writes it, but not as well as the languages it lists.";
+"Apple's model took too long." = "Apple's model took too long.";
 "Apply to profile" = "Apply to profile";
 "Approve" = "Approve";
 "Approve Selected" = "Approve Selected";
@@ -199,6 +201,7 @@
 "Balanced (default)" = "Balanced (default)";
 "Barely fits the GPU memory" = "Barely fits the GPU memory";
 "Be the first to be listed here." = "Be the first to be listed here.";
+"Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in." = "Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it.";
 "Benchmark" = "Benchmark";
@@ -1040,6 +1043,7 @@
 "Some settings couldn't be changed:" = "Some settings couldn't be changed:";
 "Something went wrong?" = "Something went wrong?";
 "Sort by" = "Sort by";
+"Sorts messages with" = "Sorts messages with";
 "Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
 "Speakers work with echo cancellation; headphones are still best." = "Speakers work with echo cancellation; headphones are still best.";
@@ -1180,6 +1184,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
 "The model sees them with your next message." = "The model sees them with your next message.";
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
+"The model that reads them" = "The model that reads them";
 "The model's license, from its card." = "The model's license, from its card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";

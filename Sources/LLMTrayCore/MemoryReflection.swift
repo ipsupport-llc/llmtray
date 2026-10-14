@@ -170,7 +170,15 @@ public enum MemoryReflection {
         }
     }
 
-    public enum Verdict: String, Sendable { case yes, no, unclear }
+    public enum Verdict: String, Sendable, CaseIterable { case yes, no, unclear }
+
+    /// verify's and classify's replies, for a model held to a shape.
+    public static func verdictShape(_ count: Int) -> ReplyShape {
+        .choices(key: "verdicts", count: count, choices: Verdict.allCases.map(\.rawValue))
+    }
+    public static func relationShape(_ count: Int) -> ReplyShape {
+        .choices(key: "relations", count: count, choices: Relation.allCases.map(\.rawValue))
+    }
 
     /// A claim for the verify call: what it says, about whom, and the
     /// whole message its quote is in.
@@ -234,7 +242,7 @@ public enum MemoryReflection {
         return list.map { ($0 as? String).flatMap { Verdict(rawValue: $0.lowercased()) } ?? .unclear }
     }
 
-    public enum Relation: String, Sendable { case same, opposite, narrower, broader, different }
+    public enum Relation: String, Sendable, CaseIterable { case same, opposite, narrower, broader, different }
 
     public static func classifyMessages(_ pairs: [(new: String, old: String)]) -> [[String: Any]] {
         let system = """

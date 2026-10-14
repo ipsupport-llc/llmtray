@@ -7,8 +7,10 @@ import XCTest
 /// commit) on fixture chats and prints the notes it ends with. Run it on the
 /// user's Mac only on their say-so:
 ///
-///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3|4 \
+///   MEMORY_EVAL_PORT=8791 MEMORY_EVAL_MODEL=<model folder> MEMORY_EVAL_SET=1|2|3|4|5 \
 ///   MEMORY_EVAL_STATE=/tmp/memory-eval.json swift test --filter MemoryLiveEval
+///
+/// MEMORY_EVAL_MODEL=apple-system (no port): Apple's on-device model, in-process.
 ///
 /// with an mlx_lm.server of that model on the port. The state file carries
 /// the notes from one set (one model) to the next (another model). It's the
@@ -95,6 +97,24 @@ final class MemoryLiveEval: XCTestCase {
                 ("Давай разберёмся: что в логе?", "просто скажи, что делать, без длинных объяснений"),
             ]),
         ],
+        // Nothing to learn: questions and tasks only. With Apple as the
+        // sorter, every batch should be done without the reading model.
+        5: [
+            Chat(project: nil, messages: [
+                (nil, "как поднять nginx reverse proxy для двух доменов?"),
+                ("Вот конфиг...", "а с https через certbot?"),
+                ("Добавь блок...", "спасибо, а как проверить, что сертификат продлевается?"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "Translate to German: the meeting is moved to Friday."),
+                ("Das Meeting wird auf Freitag verschoben.", "and to French?"),
+            ]),
+            Chat(project: nil, messages: [
+                (nil, "напиши функцию на python, которая считает медиану списка"),
+                ("def median(xs): ...", "добавь тесты"),
+                ("Вот тесты...", "ок, работает"),
+            ]),
+        ],
     ]
 
     var port = 0
@@ -103,8 +123,9 @@ final class MemoryLiveEval: XCTestCase {
 
     func testLiveEval() async throws {
         let env = ProcessInfo.processInfo.environment
-        guard let portText = env["MEMORY_EVAL_PORT"], let port = Int(portText) else {
-            throw XCTSkip("MEMORY_EVAL_PORT not set")
+        let apple = env["MEMORY_EVAL_MODEL"] == AppleSystemModel.id
+        guard let portText = env["MEMORY_EVAL_PORT"] ?? (apple ? "0" : nil), let port = Int(portText) else {
+            throw XCTSkip("MEMORY_EVAL_PORT not set (or MEMORY_EVAL_MODEL=\(AppleSystemModel.id))")
         }
         self.port = port
         // Line by line, so a redirected run's log has it all.
@@ -185,13 +206,25 @@ final class MemoryLiveEval: XCTestCase {
         let topics = Array(Set(MemoryTopics.builtIn + file.notes.map(\.topic))).sorted()
 
         let debug = ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1"
+        // MEMORY_EVAL_SORTER=apple-system: Apple's model sorts first (adr/0025).
+        if ProcessInfo.processInfo.environment["MEMORY_EVAL_SORTER"] == AppleSystemModel.id {
+            let anything = try await MemoryExtraction.gate(batch) { messages, maxTokens, shape in
+                try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape)
+            }
+            print("  ⇢ Apple: anything? \(anything.map(String.init(describing:)) ?? "unreadable")")
+            if anything == false {
+                file.dropBatch(batch.id)
+                print("commit: nothing to read (sorted by Apple)")
+                return
+            }
+        }
         guard let reading = try await MemoryExtraction.reading(
             batch: batch, candidates: candidates, toneNotes: touchable.filter { $0.kind == .observation && $0.topic == "tone" },
             topics: topics, language: "Russian", kinds: settings.kinds,
             inProject: settings.shareLearned && project != nil,
             moodSince: Date().addingTimeInterval(-Double(settings.moodHours) * 3600),
-            ask: { messages, maxTokens in
-                let reply = try await self.ask(messages, maxTokens)
+            ask: { messages, maxTokens, shape in
+                let reply = try await self.ask(messages, maxTokens, shape)
                 if debug { print("  [\((messages[0]["content"] as? String ?? "").prefix(40))…] → \(reply.prefix(400))") }
                 return reply
             }) else {
@@ -237,7 +270,8 @@ final class MemoryLiveEval: XCTestCase {
                                                 isObservation: MemoryReflection.isShown(op, note: note))))
         }
         if !pending.isEmpty {
-            let reply = try await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), 40 + 12 * pending.count)
+            let reply = try await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), 40 + 12 * pending.count,
+                                      MemoryReflection.verdictShape(pending.count))
             guard let verdicts = MemoryReflection.parseVerdicts(reply, count: pending.count) else {
                 print("!! unreadable verify reply: \(reply.prefix(300))")
                 file.dropBatch(batch.id)
@@ -278,7 +312,8 @@ final class MemoryLiveEval: XCTestCase {
         }
         var relations: [MemoryReflection.Relation] = []
         if !pairs.isEmpty {
-            let reply = try await ask(MemoryReflection.classifyMessages(pairs), 40 + 12 * pairs.count)
+            let reply = try await ask(MemoryReflection.classifyMessages(pairs), 40 + 12 * pairs.count,
+                                      MemoryReflection.relationShape(pairs.count))
             relations = MemoryReflection.settled(MemoryReflection.parseRelations(reply, count: pairs.count)
                                                      ?? Array(repeating: .different, count: pairs.count), similarities: similarities)
             print("  classify: \(relations.map(\.rawValue))")
@@ -323,7 +358,11 @@ final class MemoryLiveEval: XCTestCase {
 
     // MARK: Model and embedder
 
-    func ask(_ messages: [[String: Any]], _ maxTokens: Int) async throws -> String {
+    func ask(_ messages: [[String: Any]], _ maxTokens: Int, _ shape: ReplyShape? = nil) async throws -> String {
+        // Apple's on-device model, in-process (adr/0025): no server.
+        if modelPath == AppleSystemModel.id {
+            return try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape)
+        }
         var body: [String: Any] = ["model": "default_model", "messages": messages, "max_tokens": maxTokens, "temperature": 0.2]
         body.merge(thinking) { $1 }
         var request = URLRequest(url: URL(string: "http://127.0.0.1:\(port)/v1/chat/completions")!)
