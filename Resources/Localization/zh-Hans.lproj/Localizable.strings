@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld 个文件无法建立索引";
 "%lld interrupted: look at them in Finder" = "%lld 项已中断：在 Finder 中查看";
 "%lld items put back under their names." = "%lld 项按原名已恢复。";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld 条你尚未批准的已学习笔记会被移除。你撰写、编辑、置顶或批准的笔记会保留。";
 "%lld more" = "还剩 %lld";
 "%lld more…" = "还有 %lld…";
 "%lld need a look: see the list." = "%lld 项需要查看：请查看列表。";
@@ -80,6 +81,7 @@
 "A chat model" = "聊天模型";
 "A client" = "客户端";
 "A deleted project" = "已删除的项目";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "从一个聊天中学习到的事实或观察会先等待，直到另一个聊天也出现（或你批准）：一个问题并不代表你是谁。你主动提出的内容——偏好、纠正——会立即使用。";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "更饱满、更成品感的混音；歌词听得不那么清晰。制作约需 30 秒音乐的 20 秒。";
 "A model is a tool, not an authority" = "模型是工具，不是权威";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "笔记在这么久未被确认后权重减半，并在约三倍时长后过期。已固定的笔记永不过期。";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 清晰人声，GPTQ 4-bit（更省内存）";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — 清晰人声，全精度";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — 更饱满的音色";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "约 %d 个 token，位于配置文件的系统提示词之后。上下文较小的模型会获得更少内容（内存最多占其 5%%）。已打开的对话会保留开始时使用的块，直到其中某条笔记发生变化。";
 "About LLMTray" = "关于 LLMTray";
 "About you" = "关于你";
 "About you and your work: what you do, what you use." = "关于你和你的工作：你做什么、使用什么。";
@@ -456,6 +459,9 @@
 "Forget" = "忘记";
 "Forget Everything" = "全部忘记";
 "Forget Everything…" = "全部忘记…";
+"Forget What Was Learned…" = "忘记已学习的内容…";
+"Forget and Read All Chats Again" = "忘记并重新读取所有聊天";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "忘记所有并非由你撰写、编辑、置顶或批准的已学习笔记，以及等待读取的内容。之后可按当前规则重新读取你的聊天——但不会读取标记为“不要记住”的聊天；内存关闭期间的内容，也要等你回答是否读取这期间所说内容后才会读取。";
 "Found after an interruption" = "中断后发现";
 "Founding Supporters" = "创始赞助者";
 "Free disk space" = "可用磁盘空间";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "歌曲的保存与共享方式。AAC 256 kbit/s：约每 30 秒 1 MB，在大多数听感下不可区分。未压缩 WAV：约每 30 秒 6 MB。";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "音乐遵循模型所述风格的严格程度。数值越高：越贴近；越低：越自由。";
 "How you like things: language, length, tone, formatting." = "你的偏好：语言、长度、语气和格式。";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "从你最近的消息中读取你现在看起来的状态（因构建失败而生气、疲惫、赶时间）：新聊天会在这段时间内获得它，之后即会消失。它永远不会成为笔记。0：不读取。";
 "How?" = "如何做？";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face 返回了 HTTP %d（%@）。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒绝了 %@（HTTP %d）：该模型可能受限、私有或不存在。若受限，请在 huggingface.co/%@ 接受许可，并在“设置 → 模型”中检查令牌。";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "内存不会再从中学习任何内容。它已教过的笔记也可一并移除，但你编辑、置顶或批准过的除外。";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "内存只会从遇到某个聊天后的第一条消息开始读取该聊天。此操作也会在后台、模型空闲时，从开头读取每个已存储的聊天——也就是你在内存开启前写下的内容。标记为“不要记住”的聊天会被跳过。";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "内存会保留在这台 Mac 上：笔记保存在本地文件中，绝不会上传或共享。它们只会进入你的 LLMTray 聊天提示词——不会发送给使用 API 的 App，也不会进入临时对话。";
 "Memory was off. Read what was said meanwhile?" = "内存已关闭。要读取期间说过的内容吗？";
 "Memory: %d" = "内存：%d";
 "Message…" = "消息…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "与 %@ 不相同：不是重复项。";
 "Not indexed" = "未索引";
 "Not sent any more. Bring one back, or it's deleted later." = "不再发送。请恢复其中一条，否则稍后会被删除。";
+"Not sent yet: waits for another chat to show it, or your approval." = "尚未发送：等待另一个聊天也出现，或等待你批准。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "暂不支持：%@。此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods），并保留图片（png、jpg、heic、webp、tiff、gif）。";
 "Notes" = "笔记";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "无论聊天使用什么语言，笔记都会用这种语言写入，因此同一件事不会变成两种语言的两条笔记。";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
 "Nothing to pin until the file has been read" = "在文件被读取之前无法置顶任何内容";
+"Nothing: no note is sent to these chats now." = "无：现在不会向这些聊天发送任何笔记。";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "现在导入其设置：选择 %@（已选），然后点击“导入”。点击“取消”将保留当前设置。";
+"Now: %@ → %@ (until %@)" = "现在：%@ → %@（直到 %@）";
 "OK" = "好";
 "Observation" = "观察";
 "Observations" = "观察";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "关闭：仅限此 Mac。打开：局域网内任何人可用，仅在你信任的网络上开启。";
 "Older" = "更早";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一次性：咖啡 $5，专业赞助者 $25，创始赞助者 $150。";
+"Only Forget" = "仅忘记";
 "Only From Now On" = "仅从现在开始";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "仅在你需要时填写：聊天会优先获取这些内容，它永不过期，且学习永远不会更改它。它会留在这台电脑上。";
@@ -791,6 +803,7 @@
 "Opens at login" = "登录时打开";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "其他应用通过此 Mac 上与 OpenAI 兼容的 API 访问你的模型。";
 "Other devices on your network can use the server" = "网络上的其他设备可使用服务器";
+"Outside projects" = "项目外";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "超过此数量后，最弱的笔记（最旧、最不确定）会过期。已固定的笔记会保留。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
 "PDF · %lld pages" = "PDF · %lld 页";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "显示下一个标签页";
 "Show Previous Tab" = "显示上一个标签页";
 "Show Reports…" = "显示报告…";
+"Show What Chats Get…" = "显示聊天会获得什么…";
 "Show in Finder" = "在 Finder 中显示";
 "Show model controls in the chat window" = "在对话窗口显示模型控件";
 "Show more" = "显示更多";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "登录这台 Mac 时自动打开 LLMTray。";
 "Start Server" = "启动服务器";
 "Start a new saved chat (⌘N) to add files to a project." = "开始新的已保存聊天（⌘N）以将文件添加到项目。";
+"Start over" = "重新开始";
 "Start server" = "启动服务器。";
 "Start talking" = "开始说话";
 "Start the server first." = "请先启动服务器。";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "无法下载嵌入模型";
 "The embedding model failed: %@" = "嵌入模型失败：%@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray 发送的精确 JSON：待发送的报告、今日已生成的报告以及最后一次发送的报告。";
+"The exact text a new chat gets, before your first message." = "新建对话在你发送第一条消息前获得的确切文本。";
 "The families of the models used that day (such as qwen or flux), never their names." = "当天使用的模型系列（例如 qwen 或 flux），不包含具体模型名称。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "首次使用时，这会立即将 %@（%@）下载到这台 Mac，而不是等到聊天过程中下载。";
 "The full chat window, with projects and every chat (⌘⇧O)" = "完整聊天窗口，侧栏显示项目和所有对话（⌘⇧O）";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "使用文件夹";
 "Use LM Studio's folder" = "使用 LM Studio 的文件夹";
 "Use This Port" = "使用此端口";
+"Use a learned fact at once" = "立即使用已学习的事实";
+"Use a learned fact once %lld chats show it" = "当 %lld 个聊天出现后使用已学习的事实";
 "Use headphones: the model hears its own voice from the speakers." = "使用耳机：模型会从扬声器听到自身声音。";
 "Used" = "已使用";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "供图像生成、音乐和 Voice Lab 使用，它们会下载这些模型。模型也保存在 models 文件夹中，按其 Hugging Face 名称存放。";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "你的 Mac";
 "Your files" = "你的文件";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "你的邮件应用无法接受该附件：报告已在 Finder 中显示，请将其附加到邮件中。";
+"Your mood: for %lld hours" = "你的心情：保留 %lld 小时";
+"Your mood: not read" = "你的心情：不读取";
 "Your name (optional)" = "您的姓名（可选）";
 "Your site or profile (optional, https://…)" = "您的网站或个人资料（可选，https://…）";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

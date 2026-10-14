@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "تعذر فهرسة %lld ملفًا";
 "%lld interrupted: look at them in Finder" = "%lld مقطوعة: راجعها في Finder";
 "%lld items put back under their names." = "أُعيد وضع %lld عناصر تحت أسمائها.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "تُحذف %lld من الملاحظات المتعلّمة التي لم توافق عليها. وتبقى الملاحظات التي كتبتها أو عدّلتها أو ثبّتّها أو وافقت عليها.";
 "%lld more" = "المزيد: %lld";
 "%lld more…" = "المزيد: %lld…";
 "%lld need a look: see the list." = "%lld تحتاج إلى معاينة: راجع القائمة.";
@@ -80,6 +81,7 @@
 "A chat model" = "نموذج دردشة";
 "A client" = "عميل";
 "A deleted project" = "مشروع محذوف";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "أي حقيقة أو ملاحظة متعلّمة من دردشة واحدة تنتظر حتى تظهر في دردشة أخرى أيضًا (أو توافق عليها): سؤال واحد لا يحدد من أنت. أما ما تطلبه — مثل التفضيلات والتصحيحات — فيُستخدم فورًا.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "مكس أكثر امتلاءً ومظهرًا مكتملًا؛ كلمات الأغنية تبدو أقل وضوحًا. حوالي 20 s لمقطع موسيقي مدته 30 s.";
 "A model is a tool, not an authority" = "النموذج أداة، وليس سلطةً";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "تُحسب الملاحظة بنصف أهميتها بعد هذه المدة من دون تأكيدها، وتنتهي صلاحيتها بعد نحو ثلاثة أضعاف هذه المدة. لا تنتهي صلاحية الملاحظات المثبّتة أبدًا.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — غناء واضح، GPTQ 4-bit (استخدام ذاكرة أقل)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — غناء واضح، دقة كاملة";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — صوت أكثر امتلاءً";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "حوالي %d رموز، بعد موجه النظام للملف الشخصي. يحصل النموذج ذو السياق الصغير على أقل من ذلك (تأخذ الذاكرة 5%% منه كحد أقصى). تحتفظ الدردشات المفتوحة بالفعل بالكتلة التي بدأت بها حتى تتغير إحدى ملاحظاتها.";
 "About LLMTray" = "حول LLMTray";
 "About you" = "عنك";
 "About you and your work: what you do, what you use." = "عنك وعن عملك: ما تفعله وما تستخدمه.";
@@ -456,6 +459,9 @@
 "Forget" = "نسيان";
 "Forget Everything" = "نسيان كل شيء";
 "Forget Everything…" = "نسيان كل شيء…";
+"Forget What Was Learned…" = "نسيان ما تم تعلّمه…";
+"Forget and Read All Chats Again" = "نسيان وقراءة كل الدردشات مجددًا";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "ينسى كل ملاحظة متعلّمة لم تكتبها أو تعدّلها أو تثبّتها أو توافق عليها، وما ينتظر القراءة. بعد ذلك يمكن قراءة دردشاتك مجددًا بالقواعد الحالية — باستثناء ما تم تعليمه «عدم التذكّر»، وكذلك، أثناء إيقاف الذاكرة، قبل أن تجيب عمّا إذا كان يجب قراءة ما قيل في تلك الأثناء.";
 "Found after an interruption" = "تم العثور عليها بعد انقطاع";
 "Founding Supporters" = "الراعون المؤسسون";
 "Free disk space" = "مساحة القرص الحرة";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "كيف تُحفظ وتُشارك الأغاني وتُخزن. AAC 256 كيلوبت/ث: حوالي 1 ميغابايت لكل 30 ثانية، لا يمكن تمييزه لمعظم المستمعين. WAV غير مضغوط: حوالي 6 ميغابايت لكل 30 ثانية.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "مدى التزام الموسيقى بالأسلوب الذي وصفه النموذج. أعلى: أقرب إليه؛ أقل: أكثر حرية.";
 "How you like things: language, length, tone, formatting." = "كيف تفضّل الأشياء: اللغة والطول والنبرة والتنسيق.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "كيف تبدو الآن (غاضبًا من بناء يفشل، متعبًا، على عجلة)، يُقرأ من رسائلك الأخيرة: تحصل عليه الدردشات الجديدة لهذه المدة، ثم يختفي. لا يكون ملاحظة أبدًا. 0: لا يُقرأ.";
 "How?" = "كيف؟";
 "Hugging Face answered HTTP %d for %@." = "أجاب Hugging Face برمز HTTP %d بالنسبة إلى %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "رفض Hugging Face %@ (HTTP %d): قد يكون مقيَّدًا أو خاصًا أو غير موجود. إذا كان مقيَّدًا، اقبل ترخيصه على huggingface.co/%@ وتحقق من الرمز في الإعدادات → Models.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "لن تتعلم الذاكرة أي شيء آخر منها. ويمكن أن تُزال الملاحظات التي علّمتها سابقًا أيضًا، باستثناء ما عدّلته أو ثبّته أو وافقت عليه.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "تقرأ الذاكرة الدردشة فقط من أول رسالة بعد أن تعرّفت عليها. يقرأ هذا أيضًا كل دردشة محفوظة من بدايتها — ما كتبته قبل تفعيل الذاكرة — في الخلفية، عندما يكون النموذج متاحًا. تُتخطى الدردشات المحددة بـ «لا تتذكر».";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "تبقى الذاكرة على هذا الـ Mac: تُحفظ الملاحظات في ملف هنا ولا تُرفع أو تُشارك أبدًا. ولا تُضاف إلا إلى موجه دردشات LLMTray — وليس إلى التطبيقات التي تستخدم API، ولا إلى الدردشات المؤقتة.";
 "Memory was off. Read what was said meanwhile?" = "كانت الذاكرة متوقفة. هل تريد قراءة ما قيل في هذه الأثناء؟";
 "Memory: %d" = "الذاكرة: %d";
 "Message…" = "رسالة…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "ليس مطابقًا لـ %@: ليس مكررًا.";
 "Not indexed" = "غير مفهرَس";
 "Not sent any more. Bring one back, or it's deleted later." = "لم تعد تُرسل. أعد واحدة، وإلا فستُحذف لاحقًا.";
+"Not sent yet: waits for another chat to show it, or your approval." = "لم تُرسل بعد: تنتظر أن تُظهرها دردشة أخرى، أو موافقتك.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "غير مدعوم بعد: %@. هذه النسخة تفهرس النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)، وتحتفظ بالصور (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "الملاحظات";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "تُكتب الملاحظات بهذه اللغة أيًا كانت لغة الدردشة، حتى لا يصبح الشيء الواحد ملاحظتين بلغتين مختلفتين.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
 "Nothing to pin until the file has been read" = "لا شيء لتثبيته حتى يتم قراءة الملف";
+"Nothing: no note is sent to these chats now." = "لا شيء: لا تُرسل أي ملاحظة إلى هذه الدردشات الآن.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "الآن إعداداته: اختر %@ (محدد بالفعل)، ثم استيراد. إلغاء يحتفظ بالإعدادات هنا.";
+"Now: %@ → %@ (until %@)" = "الآن: %@ ← %@ (حتى %@)";
 "OK" = "موافق";
 "Observation" = "ملاحظة";
 "Observations" = "الملاحظات";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "متوقف: هذا الـ Mac فقط. مفعل: أي شخص على شبكتك، لذا فعّله فقط على الشبكات التي تثق بها.";
 "Older" = "أقدم";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "مرة واحدة: قهوة $5، راعٍ محترف $25، راعٍ مؤسس $150.";
+"Only Forget" = "نسيان فقط";
 "Only From Now On" = "من الآن فصاعدًا فقط";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "خاص بالنماذج المقيَّدة فقط (Llama، بعض مستودعات Gemma وFLUX): اقبل ترخيص النموذج في صفحته على Hugging Face، ثم ألصق رمز قراءة هنا. يُخزَّن في Keychain ويُرسل فقط إلى huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "اختياري فقط: تحصل عليه الدردشات أولًا، ولا تنتهي صلاحيته أبدًا، ولا يغيّره التعلم أبدًا. يبقى على هذا الكمبيوتر.";
@@ -791,6 +803,7 @@
 "Opens at login" = "يفتح عند تسجيل الدخول";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "تصل التطبيقات الأخرى إلى نماذجك عبر API متوافق مع OpenAI على هذا الـ Mac.";
 "Other devices on your network can use the server" = "الأجهزة الأخرى على شبكتك يمكنها استخدام الخادم";
+"Outside projects" = "خارج المشاريع";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "بعد هذا الحد، تنتهي صلاحية أضعف الملاحظات (الأقدم والأقل يقينًا). يتم الاحتفاظ بالملاحظات المثبّتة.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
 "PDF · %lld pages" = "PDF · %lld صفحة";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "عرض التبويب التالي";
 "Show Previous Tab" = "عرض التبويب السابق";
 "Show Reports…" = "إظهار التقارير…";
+"Show What Chats Get…" = "إظهار ما تتلقاه الدردشات…";
 "Show in Finder" = "عرض في Finder";
 "Show model controls in the chat window" = "إظهار عناصر تحكم النموذج في نافذة الدردشة";
 "Show more" = "إظهار المزيد";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "شغّل LLMTray تلقائيًا عند تسجيل الدخول إلى هذا الـ Mac.";
 "Start Server" = "بدء الخادم";
 "Start a new saved chat (⌘N) to add files to a project." = "ابدأ محادثة محفوظة جديدة (⌘N) لإضافة ملفات إلى مشروع.";
+"Start over" = "ابدأ من جديد";
 "Start server" = "ابدأ الخادم.";
 "Start talking" = "ابدأ التحدّث";
 "Start the server first." = "ابدأ الخادم أولًا.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "لم يتمكّن تنزيل نموذج التضمين";
 "The embedding model failed: %@" = "فشل نموذج التضمين: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "الـ JSON الدقيق الذي يرسله LLMTray: التقارير التي تنتظر الإرسال، ما تم اليوم حتى الآن، وآخر تقرير مُرسل.";
+"The exact text a new chat gets, before your first message." = "النص الدقيق الذي تتلقاه دردشة جديدة قبل رسالتك الأولى.";
 "The families of the models used that day (such as qwen or flux), never their names." = "عائلات النماذج المستخدمة في ذلك اليوم (مثل qwen أو flux)، دون أسماء النماذج.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "في المرة الأولى، يؤدي هذا إلى تنزيل %@ (%@) إلى هذا الـ Mac الآن، بدلًا من أثناء الدردشة.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "نافذة المحادثة الكاملة، مع المشاريع وكل المحادثات (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "استخدام المجلد";
 "Use LM Studio's folder" = "استخدام مجلد LM Studio";
 "Use This Port" = "استخدم هذا المنفذ";
+"Use a learned fact at once" = "استخدام حقيقة متعلّمة فورًا";
+"Use a learned fact once %lld chats show it" = "استخدام حقيقة متعلّمة عندما تُظهرها %lld من الدردشات";
 "Use headphones: the model hears its own voice from the speakers." = "استخدم سماعات رأس: النموذج يسمع صوته من مكبرات الصوت.";
 "Used" = "المستخدم";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "تُستخدم في توليد الصور والموسيقى وVoice Lab التي تقوم بتنزيلها. تُخزن أيضاً في مجلد النماذج تحت أسمائها على Hugging Face.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "جهاز Mac الخاص بك";
 "Your files" = "ملفاتك";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "تطبيق البريد لا يقبل المرفق: يظهر التقرير في Finder، أرفقه بالرسالة.";
+"Your mood: for %lld hours" = "حالتك المزاجية: لمدة %lld ساعات";
+"Your mood: not read" = "حالتك المزاجية: لا تُقرأ";
 "Your name (optional)" = "اسمك (اختياري)";
 "Your site or profile (optional, https://…)" = "موقعك أو ملفك الشخصي (اختياري، https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";

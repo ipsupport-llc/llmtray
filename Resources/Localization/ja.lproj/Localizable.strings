@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld 件をインデックスできませんでした";
 "%lld interrupted: look at them in Finder" = "%lld 件が中断されました：Finder で確認してください";
 "%lld items put back under their names." = "%lld 項目が元の名前の下に戻されました。";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "承認していない学習済みノート %lld 件は削除されます。自分で書いた、編集した、ピン留めした、または承認したノートは残ります。";
 "%lld more" = "あと %lld";
 "%lld more…" = "あと%lld件…";
 "%lld need a look: see the list." = "%lld 件を確認してください：リストを参照してください。";
@@ -80,6 +81,7 @@
 "A chat model" = "チャット用モデル";
 "A client" = "クライアント";
 "A deleted project" = "削除されたプロジェクト";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "1つのチャットから学習した事実や観察は、別のチャットにも現れる（またはあなたが承認する）まで待機します。1つの質問だけで、あなたがどういう人かは決めません。あなたが依頼した内容（好みや修正）はすぐに使用されます。";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
 "A model is a tool, not an authority" = "モデルはツールであり、権威ではありません";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "ノートは、この期間確認されないと重要度が半分になり、その約3倍の期間で期限切れになります。ピン留め済みのノートは期限切れになりません。";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 歌声が明瞭、GPTQ 4-bit（メモリ節約）";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — 歌声が明瞭、フル精度";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — より豊かな音";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "プロファイルのシステムプロンプトの後に、約 %d トークン。コンテキストが小さいモデルでは少なくなります（メモリはその最大 5%% まで）。すでに開いているチャットは、そのノートのいずれかが変更されるまで、開始時のブロックを保持します。";
 "About LLMTray" = "LLMTrayについて";
 "About you" = "あなたについて";
 "About you and your work: what you do, what you use." = "あなたと仕事について：していること、使っているもの。";
@@ -456,6 +459,9 @@
 "Forget" = "忘れる";
 "Forget Everything" = "すべて忘れる";
 "Forget Everything…" = "すべて忘れる…";
+"Forget What Was Learned…" = "学習した内容を忘れる…";
+"Forget and Read All Chats Again" = "忘れてすべてのチャットを再度読み込む";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "あなたが書いた、編集した、ピン留めした、または承認したもの以外のすべての学習済みノートと、読み込み待ちの内容を忘れます。その後、現在のルールでチャットを再度読み込めます。ただし、「記憶しない」とマークされたものは対象外です。また、メモリがオフの間に話された内容を読み込むかどうかに答えるまでは、その期間の内容も対象外です。";
 "Found after an interruption" = "中断後に見つかった項目";
 "Founding Supporters" = "創設支援者";
 "Free disk space" = "空きディスク容量";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "曲の保存・共有方法。AAC 256 kbit/s: 約30秒で1 MB、ほとんどのリスニングでは違いが分かりません。非圧縮 WAV: 約30秒で6 MB。";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "モデルが指定したスタイルにどれだけ厳密に従うか。高いほど近く、低いほど自由になります。";
 "How you like things: language, length, tone, formatting." = "好み：言語、長さ、口調、書式。";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "直近のメッセージから読み取った、今のあなたの様子（ビルド失敗に怒っている、疲れている、急いでいるなど）です。新しいチャットにはこの時間だけ送信され、その後は消えます。ノートにはなりません。0：読み取らない。";
 "How?" = "方法";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face が %2$@ に対して HTTP %1$d を返しました。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "メモリはこのチャットからこれ以上学習しません。すでに教えたノートも削除できます。ただし、編集、ピン留め、または承認したものは除きます。";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "メモリは、そのチャットに出会った後の最初のメッセージからのみチャットを読み取ります。これは、メモリがオンになる前に書いた内容も含め、保存済みのすべてのチャットを先頭からバックグラウンドで読み取ります（モデルが空いている間）。「Don't Remember」とマークされたチャットはスキップされます。";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "メモリはこのMac内に留まります。ノートはここにあるファイルに保存され、アップロードまたは共有されることはありません。ノートはLLMTrayのチャットのプロンプトにのみ入ります。APIを使用するアプリには送信されず、一時チャットにも入りません。";
 "Memory was off. Read what was said meanwhile?" = "メモリがオフでした。その間の内容を読み取りますか？";
 "Memory: %d" = "メモリ：%d";
 "Message…" = "メッセージ…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "%@ と同一ではないため、重複ではありません。";
 "Not indexed" = "未インデックス";
 "Not sent any more. Bring one back, or it's deleted later." = "もう送信されません。戻さない場合、後で削除されます。";
+"Not sent yet: waits for another chat to show it, or your approval." = "まだ送信されていません。別のチャットにも現れるか、あなたが承認するまで待機します。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "未対応: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化し、画像 (png, jpg, heic, webp, tiff, gif) は保存します。";
 "Notes" = "ノート";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "チャットの言語に関係なく、ノートはこの言語で書かれます。これにより、1つの内容が2つの言語の2つのノートになることを防ぎます。";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
 "Nothing to pin until the file has been read" = "ファイルが読み取られるまでピン留めできません";
+"Nothing: no note is sent to these chats now." = "なし：現在、これらのチャットにはノートは送信されません。";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "取り込まれる設定：%@ を選択（すでに選択されています）、次に「Import」。「Cancel」を押すとこちらの設定が保持されます。";
+"Now: %@ → %@ (until %@)" = "現在：%@ → %@（%@まで）";
 "OK" = "OK";
 "Observation" = "観察";
 "Observations" = "観察";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "オフ：この Mac のみ。オン：ネットワーク上の全員が利用可能になるため、信頼できるネットワークでのみ有効にしてください。";
 "Older" = "以前";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一回限り：Coffee $5、Pro Supporter $25、Founding Supporter $150。";
+"Only Forget" = "忘れるだけ";
 "Only From Now On" = "今後のみ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "制限付きモデルのみ (Llama、一部の Gemma と FLUX リポジトリ): Hugging Face ページでライセンスを承諾し、読み取り用トークンをここに貼り付けてください。トークンは Keychain に保存され、huggingface.co にのみ送信されます。";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "必要な場合のみ入力してください。チャットではこの内容が最初に使用され、有効期限はなく、学習によって変更されることもありません。このコンピュータ上に保持されます。";
@@ -791,6 +803,7 @@
 "Opens at login" = "ログイン時に開く";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "他のアプリはこの Mac 上の OpenAI 互換 API を通じてモデルにアクセスします。";
 "Other devices on your network can use the server" = "ネットワーク上の他のデバイスがサーバーを利用可能";
+"Outside projects" = "プロジェクト外";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "これを超えると、最も弱いノート（最も古い、または確度が最も低いもの）が期限切れになります。ピン留め済みのノートは保持されます。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
 "PDF · %lld pages" = "PDF · %lldページ";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "次のタブを表示";
 "Show Previous Tab" = "前のタブを表示";
 "Show Reports…" = "レポートを表示…";
+"Show What Chats Get…" = "チャットに送信される内容を表示…";
 "Show in Finder" = "Finder で表示";
 "Show model controls in the chat window" = "チャットウインドウにモデルコントロールを表示";
 "Show more" = "詳細を表示";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "この Mac にログインしたときに LLMTray を自動的に起動します。";
 "Start Server" = "サーバを起動";
 "Start a new saved chat (⌘N) to add files to a project." = "プロジェクトにファイルを追加するには、新しい保存済みチャット（⌘N）を開始してください。";
+"Start over" = "最初からやり直す";
 "Start server" = "サーバを起動します。";
 "Start talking" = "話し始める";
 "Start the server first." = "先にサーバを起動してください。";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "埋め込みモデルをダウンロードできませんでした";
 "The embedding model failed: %@" = "埋め込みモデルでエラーが発生しました: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray が送信する正確な JSON：送信待ちのレポート、本日の分、および最後に送信されたレポートを表示します。";
+"The exact text a new chat gets, before your first message." = "最初のメッセージの前に、新しいチャットに送信される正確なテキストです。";
 "The families of the models used that day (such as qwen or flux), never their names." = "その日に使われたモデルのファミリ（例：qwenやflux）。モデル名自体は含みません。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "初回は、チャットの途中ではなく今、%@（%@）をこのMacにダウンロードします。";
 "The full chat window, with projects and every chat (⌘⇧O)" = "プロジェクトとすべてのチャットを含むフルチャットウインドウ（⌘⇧O）";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "フォルダを使用";
 "Use LM Studio's folder" = "LM Studioのフォルダを使用";
 "Use This Port" = "このポートを使用";
+"Use a learned fact at once" = "学習した事実をすぐに使用";
+"Use a learned fact once %lld chats show it" = "%lld 件のチャットに現れたら学習した事実を使用";
 "Use headphones: the model hears its own voice from the speakers." = "ヘッドフォンを使用してください：モデルはスピーカーの自声を聞きます。";
 "Used" = "使用済み";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "画像生成、音楽、Voice Lab で使用され、これらはダウンロードされます。Hugging Face の名前のままでモデルフォルダに保存されます。";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "あなたの Mac";
 "Your files" = "あなたのファイル";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "メールアプリが添付ファイルを受け取れませんでした。レポートは Finder に表示されていますので、メールに添付してください。";
+"Your mood: for %lld hours" = "あなたの気分：%lld 時間";
+"Your mood: not read" = "あなたの気分：読み取らない";
 "Your name (optional)" = "お名前（任意）";
 "Your site or profile (optional, https://…)" = "サイトまたはプロフィール（任意、https://…）";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
