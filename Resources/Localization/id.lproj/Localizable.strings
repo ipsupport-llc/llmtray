@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld berkas tidak dapat diindeks";
 "%lld interrupted: look at them in Finder" = "%lld terhenti: lihat di Finder";
 "%lld items put back under their names." = "%lld item dikembalikan ke nama aslinya.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld catatan yang dipelajari dan belum Anda setujui akan dihapus. Catatan yang Anda tulis, edit, sematkan, atau setujui tetap disimpan.";
 "%lld more" = "%lld lagi";
 "%lld more…" = "%lld lagi…";
 "%lld need a look: see the list." = "%lld perlu diperiksa: lihat daftarnya.";
@@ -80,6 +81,7 @@
 "A chat model" = "Model obrolan";
 "A client" = "Klien";
 "A deleted project" = "Proyek yang dihapus";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Fakta atau pengamatan yang dipelajari dari satu obrolan menunggu hingga obrolan lain menunjukkannya juga (atau Anda menyetujuinya): satu pertanyaan tidak menentukan siapa Anda. Hal yang Anda minta -- preferensi, koreksi -- langsung digunakan.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix yang lebih penuh dan terdengar matang; lirik kurang jelas. Sekitar 20 s untuk 30 s musik.";
 "A model is a tool, not an authority" = "Model adalah alat, bukan otoritas";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Catatan bernilai setengah setelah selama ini tanpa dikonfirmasi, dan kedaluwarsa setelah kira-kira tiga kali lebih lama. Catatan Tersemat tidak pernah kedaluwarsa.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — vokal jelas, GPTQ 4-bit (lebih hemat memori)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — vokal jelas, presisi penuh";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — suara lebih penuh";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Sekitar %d token, setelah prompt sistem profil. Model dengan konteks kecil mendapat lebih sedikit (memori memakai paling banyak 5%% darinya). Chat yang sudah terbuka mempertahankan blok awalnya hingga salah satu catatannya berubah.";
 "About LLMTray" = "Mengenai LLMTray";
 "About you" = "Tentang Anda";
 "About you and your work: what you do, what you use." = "Tentang Anda dan pekerjaan Anda: apa yang Anda lakukan, apa yang Anda gunakan.";
@@ -456,6 +459,9 @@
 "Forget" = "Lupakan";
 "Forget Everything" = "Lupakan Semuanya";
 "Forget Everything…" = "Lupakan Semuanya…";
+"Forget What Was Learned…" = "Lupakan yang Dipelajari…";
+"Forget and Read All Chats Again" = "Lupakan dan Baca Semua obrolan Lagi";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Melupakan setiap catatan yang dipelajari yang belum Anda tulis, edit, sematkan, atau setujui, serta yang menunggu untuk dibaca. Setelah itu, obrolan Anda dapat dibaca lagi dengan aturan saat ini -- bukan yang ditandai “Jangan Ingat”, dan saat memori nonaktif, tidak sebelum Anda menjawab apakah ingin membaca hal yang dikatakan sementara itu.";
 "Found after an interruption" = "Ditemukan setelah terhenti";
 "Founding Supporters" = "Penyokong Pendiri";
 "Free disk space" = "Ruang disk tersedia";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Bagaimana lagu disimpan, dicadangkan, dan dibagikan. AAC 256 kbit/s: ~1 MB per 30 s, tidak bisa dibedakan pada sebagian besar pendengaran. WAV tak terkompresi: ~6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Seberapa ketat musik mengikuti gaya yang dideskripsikan model. Lebih tinggi: lebih mendekati; lebih rendah: lebih bebas.";
 "How you like things: language, length, tone, formatting." = "Preferensi Anda: bahasa, panjang, nada, pemformatan.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "Keadaan Anda saat ini (marah karena build gagal, lelah, terburu-buru), dibaca dari pesan terakhir Anda: obrolan baru menerimanya selama ini, lalu hilang. Ini tidak pernah menjadi catatan. 0: tidak dibaca.";
 "How?" = "Bagaimana?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face merespons HTTP %d untuk %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face menolak %@ (HTTP %d): model dibatasi, privat, atau tidak ada. Jika dibatasi, terima lisensinya di huggingface.co/%@ dan periksa token di Pengaturan → Models.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memori tidak akan mempelajari apa pun lagi darinya. Catatan yang sudah diajarkannya juga dapat dihapus, kecuali yang Anda edit, sematkan, atau setujui.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memori membaca obrolan hanya mulai pesan pertama setelah mengenalinya. Ini juga membaca setiap obrolan tersimpan dari awalnya -- yang Anda tulis sebelum memori dinyalakan -- di latar belakang, saat model bebas. Obrolan yang ditandai “Jangan Ingat” dilewati.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Memori tetap berada di Mac ini: catatan disimpan dalam file di sini dan tidak pernah diunggah atau dibagikan. Catatan hanya masuk ke prompt obrolan LLMTray Anda -- bukan ke app yang menggunakan API, bukan ke chat sementara.";
 "Memory was off. Read what was said meanwhile?" = "Memori mati. Baca yang dikatakan sementara itu?";
 "Memory: %d" = "Memori: %d";
 "Message…" = "Pesan…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
 "Not indexed" = "Belum diindeks";
 "Not sent any more. Bring one back, or it's deleted later." = "Tidak dikirim lagi. Kembalikan salah satu, atau akan dihapus nanti.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Belum dikirim: menunggu obrolan lain menunjukkannya, atau persetujuan Anda.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods), serta menyimpan gambar (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Catatan";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Catatan ditulis dalam bahasa ini, apa pun bahasa obrolannya, agar satu hal tidak menjadi dua catatan dalam dua bahasa.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
 "Nothing to pin until the file has been read" = "Tidak ada yang dapat dipin sampai berkas dibaca";
+"Nothing: no note is sent to these chats now." = "Tidak ada: tidak ada catatan yang dikirim ke obrolan ini sekarang.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Sekarang pengaturannya: pilih %@ (sudah dipilih), lalu Impor. Batal mempertahankan pengaturan di sini.";
+"Now: %@ → %@ (until %@)" = "Sekarang: %@ → %@ (hingga %@)";
 "OK" = "OK";
 "Observation" = "Pengamatan";
 "Observations" = "Pengamatan";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Mati: hanya Mac ini. Aktif: siapa pun di jaringan Anda, jadi hanya pada jaringan yang Anda percaya.";
 "Older" = "Lebih lama";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Sekali bayar: Kopi $5, Penyokong Pro $25, Penyokong Pendiri $150.";
+"Only Forget" = "Hanya Lupakan";
 "Only From Now On" = "Hanya Mulai Sekarang";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Hanya jika Anda mau: obrolan mendapatkannya lebih dulu, tidak pernah kedaluwarsa, dan pembelajaran tidak pernah mengubahnya. Tetap berada di komputer ini.";
@@ -791,6 +803,7 @@
 "Opens at login" = "Membuka saat masuk";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Aplikasi lain mengakses model Anda melalui API kompatibel OpenAI di Mac ini.";
 "Other devices on your network can use the server" = "Perangkat lain di jaringan Anda dapat menggunakan server";
+"Outside projects" = "Di luar proyek";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Jika melebihi ini, catatan terlemah (paling lama, paling tidak pasti) kedaluwarsa. Catatan Tersemat dipertahankan.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
 "PDF · %lld pages" = "PDF · %lld halaman";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "Tampilkan Tab Berikutnya";
 "Show Previous Tab" = "Tampilkan Tab Sebelumnya";
 "Show Reports…" = "Tampilkan Laporan…";
+"Show What Chats Get…" = "Tampilkan Yang diterima obrolan…";
 "Show in Finder" = "Tampilkan di Finder";
 "Show model controls in the chat window" = "Tampilkan kontrol model di jendela obrolan";
 "Show more" = "Tampilkan lebih banyak";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Mulai LLMTray secara otomatis saat Anda masuk ke Mac ini.";
 "Start Server" = "Mulai Server";
 "Start a new saved chat (⌘N) to add files to a project." = "Mulai obrolan tersimpan baru (⌘N) untuk menambahkan berkas ke proyek.";
+"Start over" = "Mulai lagi";
 "Start server" = "Mulai server.";
 "Start talking" = "Mulai berbicara";
 "Start the server first." = "Mulai server terlebih dahulu.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "Model embedding gagal diunduh";
 "The embedding model failed: %@" = "Model embedding gagal: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "JSON persis yang dikirim LLMTray: laporan yang menunggu, yang terkumpul hari ini, dan yang terakhir dikirim.";
+"The exact text a new chat gets, before your first message." = "Teks persis yang diterima obrolan baru, sebelum pesan pertama Anda.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Keluarga model yang digunakan hari itu (mis. qwen atau flux), bukan nama model.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Untuk pertama kali, ini mengunduh %@ (%@) ke Mac ini sekarang, bukan di tengah obrolan.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Jendela obrolan penuh, dengan proyek dan tiap obrolan (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "Gunakan Folder";
 "Use LM Studio's folder" = "Gunakan folder LM Studio";
 "Use This Port" = "Gunakan Port Ini";
+"Use a learned fact at once" = "Gunakan fakta yang dipelajari seketika";
+"Use a learned fact once %lld chats show it" = "Gunakan fakta yang dipelajari setelah ditunjukkan oleh %lld obrolan";
 "Use headphones: the model hears its own voice from the speakers." = "Gunakan headphone: model mendengar suaranya dari speaker.";
 "Used" = "Digunakan";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Digunakan oleh pembuatan gambar, musik, dan Voice Lab, yang mengunduhnya. Mereka juga disimpan di folder models dengan nama Hugging Face mereka.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "Mac Anda";
 "Your files" = "File Anda";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Aplikasi email Anda tidak dapat menerima lampiran: laporan ditampilkan di Finder, lampirkan ke email.";
+"Your mood: for %lld hours" = "Suasana hati Anda: selama %lld jam";
+"Your mood: not read" = "Suasana hati Anda: tidak dibaca";
 "Your name (optional)" = "Nama Anda (opsional)";
 "Your site or profile (optional, https://…)" = "Situs atau profil Anda (opsional, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

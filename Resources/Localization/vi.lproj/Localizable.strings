@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld tệp không thể được lập chỉ mục";
 "%lld interrupted: look at them in Finder" = "%lld bị gián đoạn: xem chúng trong Finder";
 "%lld items put back under their names." = "%lld mục được đặt lại theo tên của chúng.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld ghi chú đã học mà bạn chưa phê duyệt sẽ bị xóa. Ghi chú bạn đã viết, sửa, ghim hoặc phê duyệt sẽ được giữ lại.";
 "%lld more" = "còn %lld";
 "%lld more…" = "%lld nữa…";
 "%lld need a look: see the list." = "%lld cần xem: xem danh sách.";
@@ -80,6 +81,7 @@
 "A chat model" = "Mô hình trò chuyện";
 "A client" = "Một client";
 "A deleted project" = "Một dự án đã xóa";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Một sự kiện hoặc quan sát học được từ một Trò chuyện sẽ chờ đến khi một Trò chuyện khác cũng cho thấy điều đó (hoặc bạn phê duyệt): một câu hỏi không nói lên bạn là ai. Những gì bạn yêu cầu -- tùy chọn, chỉnh sửa -- được dùng ngay.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
 "A model is a tool, not an authority" = "Mô hình là công cụ, không phải nguồn có thẩm quyền";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Sau khoảng thời gian này nếu chưa được xác nhận, ghi chú chỉ còn được tính một nửa và sẽ hết hạn sau khoảng gấp ba lần thời gian đó. Ghi chú Đã ghim không bao giờ hết hạn.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — giọng rõ, GPTQ 4-bit (tiết kiệm bộ nhớ)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — giọng rõ, độ chính xác đầy đủ";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — âm thanh dày hơn";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Khoảng %d token, sau Lời nhắc hệ thống của hồ sơ. Mô hình có ngữ cảnh nhỏ sẽ nhận ít hơn (Bộ nhớ chiếm tối đa 5%% ngữ cảnh). Trò chuyện đã mở giữ khối ban đầu cho đến khi một ghi chú trong đó thay đổi.";
 "About LLMTray" = "Giới thiệu về LLMTray";
 "About you" = "Về bạn";
 "About you and your work: what you do, what you use." = "Về bạn và công việc của bạn: bạn làm gì, dùng gì.";
@@ -456,6 +459,9 @@
 "Forget" = "Quên";
 "Forget Everything" = "Quên tất cả";
 "Forget Everything…" = "Quên tất cả…";
+"Forget What Was Learned…" = "Quên nội dung đã học…";
+"Forget and Read All Chats Again" = "Quên và đọc lại Tất cả Trò chuyện";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Quên mọi ghi chú đã học mà bạn chưa viết, sửa, ghim hoặc phê duyệt, cùng những nội dung đang chờ đọc. Sau đó, các Trò chuyện của bạn có thể được đọc lại theo quy tắc hiện tại -- không gồm các Trò chuyện được đánh dấu “Không nhớ”, và khi Bộ nhớ đang tắt, không đọc trước khi bạn trả lời có đọc những gì đã nói trong thời gian đó hay không.";
 "Found after an interruption" = "Tìm thấy sau khi gián đoạn";
 "Founding Supporters" = "Những người ủng hộ sáng lập";
 "Free disk space" = "Dung lượng đĩa trống";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Cách bài hát được lưu, ghi và chia sẻ. AAC 256 kbit/s: khoảng 1 MB cho mỗi 30 giây, không phân biệt được với đa số người nghe. WAV không nén: khoảng 6 MB cho mỗi 30 giây.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Mức độ nhạc bám sát phong cách mô hình mô tả. Cao hơn: càng giống; thấp hơn: càng tự do.";
 "How you like things: language, length, tone, formatting." = "Cách bạn muốn nội dung: ngôn ngữ, độ dài, giọng điệu, định dạng.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "Trạng thái hiện tại của bạn (bực vì bản dựng lỗi, mệt, đang vội), được đọc từ các tin nhắn gần đây: Trò chuyện mới nhận thông tin này trong khoảng thời gian này, rồi thông tin sẽ biến mất. Đây không bao giờ là ghi chú. 0: không đọc.";
 "How?" = "Cách làm?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face trả về HTTP %d cho %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face từ chối %@ (HTTP %d): mô hình bị hạn chế hoặc riêng tư, hoặc không tồn tại. Nếu bị hạn chế, chấp nhận giấy phép trên huggingface.co/%@ và kiểm tra token trong Cài đặt → Models.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bộ nhớ sẽ không học thêm gì từ Trò chuyện này. Các Ghi chú đã học từ đó cũng có thể bị xóa, trừ những ghi chú bạn đã sửa, ghim hoặc phê duyệt.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bộ nhớ chỉ đọc một Trò chuyện từ tin nhắn đầu tiên sau khi gặp Trò chuyện đó. Mục này cũng đọc mọi Trò chuyện đã lưu từ đầu — những gì bạn đã viết trước khi bật Bộ nhớ — trong nền, khi mô hình đang rảnh. Các Trò chuyện được đánh dấu “Đừng ghi nhớ” sẽ bị bỏ qua.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bộ nhớ chỉ ở trên máy Mac này: ghi chú được giữ trong một tệp tại đây và không bao giờ được tải lên hoặc chia sẻ. Chúng chỉ được đưa vào lời nhắc của Trò chuyện LLMTray -- không gửi đến các ứng dụng dùng API, không đưa vào Trò chuyện tạm.";
 "Memory was off. Read what was said meanwhile?" = "Bộ nhớ đã tắt. Đọc những gì đã nói trong lúc đó?";
 "Memory: %d" = "Bộ nhớ: %d";
 "Message…" = "Tin nhắn…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "Không giống %@: không phải bản trùng lặp.";
 "Not indexed" = "Chưa lập chỉ mục";
 "Not sent any more. Bring one back, or it's deleted later." = "Không được gửi nữa. Khôi phục ghi chú, nếu không ghi chú sẽ bị xóa sau.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Chưa gửi: chờ một Trò chuyện khác cho thấy điều đó, hoặc chờ bạn phê duyệt.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods), và giữ ảnh (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Ghi chú";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Ghi chú được viết bằng ngôn ngữ này bất kể Trò chuyện dùng ngôn ngữ nào, để một nội dung không trở thành hai Ghi chú bằng hai ngôn ngữ.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "Chưa gửi gì.";
 "Nothing to change." = "Không có gì để thay đổi.";
 "Nothing to pin until the file has been read" = "Không có gì để ghim cho đến khi tệp được đọc";
+"Nothing: no note is sent to these chats now." = "Không có gì: hiện không gửi ghi chú nào đến các Trò chuyện này.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Bây giờ cài đặt của nó: chọn %@ (đã được chọn sẵn), rồi nhấn Import. Hủy sẽ giữ nguyên cài đặt ở đây.";
+"Now: %@ → %@ (until %@)" = "Hiện tại: %@ → %@ (đến %@)";
 "OK" = "OK";
 "Observation" = "Quan sát";
 "Observations" = "Các quan sát";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Tắt: chỉ Mac này. Bật: bất kỳ ai trên mạng của bạn, chỉ bật trên mạng bạn tin tưởng.";
 "Older" = "Cũ hơn";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Một lần: Cà phê $5, Pro Supporter $25, Founding Supporter $150.";
+"Only Forget" = "Chỉ quên";
 "Only From Now On" = "Chỉ từ bây giờ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Chỉ khi bạn muốn: Trò chuyện nhận thông tin này trước, thông tin này không bao giờ hết hạn và việc học không bao giờ thay đổi thông tin này. Thông tin này vẫn ở trên máy tính này.";
@@ -791,6 +803,7 @@
 "Opens at login" = "Mở khi đăng nhập";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Các app khác truy cập mô hình của bạn qua API tương thích OpenAI trên Mac này.";
 "Other devices on your network can use the server" = "Thiết bị khác trên mạng của bạn có thể dùng server";
+"Outside projects" = "Ngoài Dự án";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Vượt quá mức này, các ghi chú yếu nhất (cũ nhất, ít chắc chắn nhất) sẽ hết hạn. Ghi chú Đã ghim được giữ lại.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "PDF · %lld pages" = "PDF · %lld trang";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "Hiện tab tiếp";
 "Show Previous Tab" = "Hiện tab trước";
 "Show Reports…" = "Hiện Báo cáo…";
+"Show What Chats Get…" = "Hiển thị Nội dung Trò chuyện nhận…";
 "Show in Finder" = "Hiện trong Finder";
 "Show model controls in the chat window" = "Hiện điều khiển mô hình trong cửa sổ trò chuyện";
 "Show more" = "Hiện thêm";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Tự động mở LLMTray khi bạn đăng nhập vào máy Mac này.";
 "Start Server" = "Khởi động máy chủ";
 "Start a new saved chat (⌘N) to add files to a project." = "Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm tệp vào dự án.";
+"Start over" = "Bắt đầu lại";
 "Start server" = "Khởi động máy chủ.";
 "Start talking" = "Bắt đầu nói";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "Không thể tải xuống mô hình embedding";
 "The embedding model failed: %@" = "Mô hình embedding bị lỗi: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "JSON chính xác mà LLMTray gửi: các báo cáo đang chờ gửi, những báo cáo hôm nay đến giờ, và báo cáo cuối cùng đã gửi.";
+"The exact text a new chat gets, before your first message." = "Văn bản chính xác mà Trò chuyện mới nhận, trước tin nhắn đầu tiên của bạn.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Họ các mô hình được dùng trong ngày đó (ví dụ qwen hoặc flux), không bao giờ tên cụ thể.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Lần đầu, thao tác này tải %@ (%@) xuống máy Mac này ngay bây giờ, thay vì giữa lúc trò chuyện.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Cửa sổ trò chuyện đầy đủ, có dự án và mọi cuộc trò chuyện (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "Dùng thư mục";
 "Use LM Studio's folder" = "Dùng thư mục của LM Studio";
 "Use This Port" = "Dùng cổng này";
+"Use a learned fact at once" = "Sử dụng sự kiện đã học ngay";
+"Use a learned fact once %lld chats show it" = "Sử dụng sự kiện đã học khi %lld Trò chuyện cho thấy điều đó";
 "Use headphones: the model hears its own voice from the speakers." = "Dùng tai nghe: mô hình sẽ nghe tiếng mình từ loa.";
 "Used" = "Đã dùng";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Được sử dụng cho tạo ảnh, nhạc và Voice Lab, nơi tải chúng về. Chúng cũng được lưu trong thư mục models, theo tên trên Hugging Face.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "Mac của bạn";
 "Your files" = "Tệp của bạn";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ứng dụng mail của bạn không thể nhận tệp đính kèm: báo cáo được hiển thị trong Finder, hãy đính kèm nó vào email.";
+"Your mood: for %lld hours" = "Tâm trạng của bạn: trong %lld giờ";
+"Your mood: not read" = "Tâm trạng của bạn: không đọc";
 "Your name (optional)" = "Tên của bạn (không bắt buộc)";
 "Your site or profile (optional, https://…)" = "Trang web hoặc hồ sơ của bạn (không bắt buộc, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

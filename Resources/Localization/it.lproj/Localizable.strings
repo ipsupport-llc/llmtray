@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "Impossibile indicizzare %lld file";
 "%lld interrupted: look at them in Finder" = "%lld interrotte: visualizzale in Finder";
 "%lld items put back under their names." = "%lld elementi ripristinati con i loro nomi.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld note apprese che non hai approvato verranno eliminate. Le note che hai scritto, modificato, fissato o approvato restano.";
 "%lld more" = "%lld in più";
 "%lld more…" = "%lld in più…";
 "%lld need a look: see the list." = "%lld richiedono attenzione: vedi l’elenco.";
@@ -80,6 +81,7 @@
 "A chat model" = "Un modello per chat";
 "A client" = "Un client";
 "A deleted project" = "Un progetto eliminato";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Un fatto o un'osservazione appresi da una Chat restano in attesa finché non compaiono anche in un'altra Chat (o finché non li approvi): una domanda non definisce chi sei. Le tue richieste (preferenze, correzioni) vengono usate subito.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Un mix più pieno e rifinito; il testo risulta meno chiaro. Circa 20 s per 30 s di musica.";
 "A model is a tool, not an authority" = "Un modello è uno strumento, non un’autorità";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Una nota vale la metà dopo questo tempo senza essere confermata e scade dopo circa il triplo. Le note fissate non scadono mai.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — voce chiara, GPTQ 4-bit (meno memoria)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — voce chiara, precisione completa";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — suono più pieno";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Circa %d token, dopo il prompt di sistema del profilo. Un modello con un contesto ridotto ne riceve meno (la memoria ne usa al massimo il 5%%). Le Chat già aperte mantengono il blocco con cui sono iniziate finché una delle sue note non cambia.";
 "About LLMTray" = "Informazioni su LLMTray";
 "About you" = "Su di te";
 "About you and your work: what you do, what you use." = "Su di te e sul tuo lavoro: cosa fai, cosa usi.";
@@ -456,6 +459,9 @@
 "Forget" = "Dimentica";
 "Forget Everything" = "Dimentica tutto";
 "Forget Everything…" = "Dimentica tutto…";
+"Forget What Was Learned…" = "Dimentica ciò che è stato appreso…";
+"Forget and Read All Chats Again" = "Dimentica e rileggi tutte le chat";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Dimentica ogni nota appresa che non hai scritto, modificato, fissato o approvato, e ciò che è in attesa di essere letto. Poi le tue Chat possono essere rilette con le regole attuali, tranne quelle contrassegnate come “Non ricordare” e, se la memoria era disattivata, non prima che tu abbia risposto se leggere ciò che è stato detto nel frattempo.";
 "Found after an interruption" = "Trovate dopo un’interruzione";
 "Founding Supporters" = "Sostenitori fondatori";
 "Free disk space" = "Spazio libero su disco";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Come vengono conservate, salvate e condivise le tracce. AAC 256 kbit/s: circa 1 MB ogni 30 s, indistinguibile per la maggior parte degli ascolti. WAV non compresso: circa 6 MB ogni 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Quanto rigidamente la musica segue lo stile descritto dal modello. Più alto: più fedele; più basso: più libera.";
 "How you like things: language, length, tone, formatting." = "Come preferisci le cose: lingua, lunghezza, tono, formattazione.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "Come sembri in questo momento (arrabbiato per una build non riuscita, stanco, di fretta), letto dai tuoi ultimi messaggi: le nuove Chat lo ricevono per questa durata, poi viene eliminato. Non è mai una nota. 0: non letto.";
 "How?" = "Come?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face ha risposto HTTP %d per %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ha rifiutato %@ (HTTP %d): è protetto, privato o non esiste. Se è protetto, accetta la licenza su huggingface.co/%@ e verifica il token in Impostazioni → Models.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memoria conservata per riutilizzare il contesto delle conversazioni precedenti, così una chat continuata non deve rileggere tutta la cronologia. Ha un limite per evitare che cresca fino a esaurire la memoria del server.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memoria non imparerà più nulla da questa chat. Possono essere rimosse anche le Note che ha già insegnato, tranne quelle che hai modificato, fissato o approvato.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memoria legge una chat solo dal primo messaggio successivo a quando l’ha incontrata. Questa opzione legge anche ogni chat salvata dall’inizio, cioè ciò che hai scritto prima che Memoria fosse attiva, in background, mentre il modello è libero. Le chat contrassegnate come “Non ricordare” vengono ignorate.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "La memoria resta su questo Mac: le note sono conservate in un file qui e non vengono mai caricate o condivise. Vanno solo nel prompt delle tue Chat di LLMTray, non alle app che usano l'API, né nelle Chat temporanee.";
 "Memory was off. Read what was said meanwhile?" = "Memoria era disattivata. Leggere cosa è stato detto nel frattempo?";
 "Memory: %d" = "Memoria: %d";
 "Message…" = "Messaggio…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "Non identico a %@: non è un duplicato.";
 "Not indexed" = "Non indicizzati";
 "Not sent any more. Bring one back, or it's deleted later." = "Non più inviata. Ripristinala, altrimenti verrà eliminata in seguito.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Non ancora inviata: attende che compaia in un'altra Chat o che tu la approvi.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Non ancora supportato: %@. Questa versione indicizza testo, Markdown, codice, PDF, Word (docx, doc), ODT, RTF, HTML e fogli di calcolo (xlsx, ods), e conserva le immagini (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Note";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Le note vengono scritte in questa lingua, indipendentemente dalla lingua della chat, così la stessa cosa non diventa due note in due lingue.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "Niente inviato ancora.";
 "Nothing to change." = "Niente da modificare.";
 "Nothing to pin until the file has been read" = "Nessun elemento da appuntare finché il file non è stato letto";
+"Nothing: no note is sent to these chats now." = "Niente: al momento nessuna nota viene inviata a queste Chat.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Ora le sue impostazioni: scegli %@ (è già selezionato), quindi Importa. Annulla mantiene le impostazioni attuali.";
+"Now: %@ → %@ (until %@)" = "Ora: %@ → %@ (fino a %@)";
 "OK" = "OK";
 "Observation" = "Osservazione";
 "Observations" = "Osservazioni";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Disattivato: solo questo Mac. Attivato: chiunque sulla tua rete, quindi solo su reti di fiducia.";
 "Older" = "Più vecchie";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Una tantum: Caffè $5, Pro Supporter $25, Founding Supporter $150.";
+"Only Forget" = "Dimentica soltanto";
 "Only From Now On" = "Solo da ora in poi";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Solo per modelli protetti (Llama, alcuni repo Gemma e FLUX): accetta la licenza sulla pagina Hugging Face del modello, poi incolla qui un token in sola lettura. Salvato nel Keychain, inviato solo a huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Solo se vuoi: le chat lo ricevono per prime, non scade mai e l’apprendimento non lo modifica mai. Rimane su questo computer.";
@@ -791,6 +803,7 @@
 "Opens at login" = "Si apre all'accesso";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Altre app accedono ai tuoi modelli tramite un'API compatibile con OpenAI su questo Mac.";
 "Other devices on your network can use the server" = "Altri dispositivi sulla rete possono usare il server";
+"Outside projects" = "Fuori dai progetti";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Oltre questo limite, le note più deboli (più vecchie, meno certe) scadono. Le note fissate vengono mantenute.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Sostituisce la lingua di macOS solo per LLMTray. Ha effetto dopo il riavvio di LLMTray. Il testo non tradotto viene mostrato in inglese.";
 "PDF · %lld pages" = "PDF · %lld pagine";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "Mostra scheda successiva";
 "Show Previous Tab" = "Mostra scheda precedente";
 "Show Reports…" = "Mostra rapporti…";
+"Show What Chats Get…" = "Mostra cosa ricevono le chat…";
 "Show in Finder" = "Mostra in Finder";
 "Show model controls in the chat window" = "Mostra i controlli del modello nella finestra della conversazione";
 "Show more" = "Mostra altro";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Avvia LLMTray automaticamente quando accedi a questo Mac.";
 "Start Server" = "Avvia server";
 "Start a new saved chat (⌘N) to add files to a project." = "Avvia una nuova chat salvata (⌘N) per aggiungere file a un progetto.";
+"Start over" = "Ricomincia";
 "Start server" = "Avvia il server.";
 "Start talking" = "Inizia a parlare";
 "Start the server first." = "Avvia prima il server.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "Impossibile scaricare il modello di embedding";
 "The embedding model failed: %@" = "Il modello di embedding non è riuscito: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "Il JSON esatto che LLMTray invia: i rapporti in attesa, quelli di oggi finora e l'ultimo inviato.";
+"The exact text a new chat gets, before your first message." = "Il testo esatto che una nuova Chat riceve prima del tuo primo messaggio.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Le famiglie dei modelli usati quel giorno (per es. qwen o flux), mai i nomi specifici.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "La prima volta, scarica %@ (%@) su questo Mac ora, invece che nel mezzo di una chat.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Finestra chat completa, con progetti e tutte le chat (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "Usa cartella";
 "Use LM Studio's folder" = "Usa la cartella di LM Studio";
 "Use This Port" = "Usa questa porta";
+"Use a learned fact at once" = "Usa subito un fatto appreso";
+"Use a learned fact once %lld chats show it" = "Usa un fatto appreso quando compare in %lld Chat";
 "Use headphones: the model hears its own voice from the speakers." = "Usa le cuffie: il modello sente la propria voce dagli altoparlanti.";
 "Used" = "Usato";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Usati per la generazione di immagini, la musica e Voice Lab, che li scarica. Sono conservati nella cartella Models con i loro nomi Hugging Face.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "Il tuo Mac";
 "Your files" = "I tuoi file";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "La tua app di posta non ha potuto gestire l'allegato: il rapporto è mostrato in Finder, allegalo all'email.";
+"Your mood: for %lld hours" = "Il tuo umore: per %lld ore";
+"Your mood: not read" = "Il tuo umore: non letto";
 "Your name (optional)" = "Il tuo nome (opzionale)";
 "Your site or profile (optional, https://…)" = "Il tuo sito o profilo (opzionale, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

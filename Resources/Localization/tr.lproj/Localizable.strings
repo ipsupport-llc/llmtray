@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld dosya dizine eklenemedi";
 "%lld interrupted: look at them in Finder" = "%lld işlem kesildi: bunlara Finder'da bakın";
 "%lld items put back under their names." = "%lld öğe adlarıyla birlikte geri kondu.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "Onaylamadığınız %lld öğrenilen not silinir. Yazdığınız, düzenlediğiniz, sabitlediğiniz veya onayladığınız notlar kalır.";
 "%lld more" = "%lld daha";
 "%lld more…" = "%lld daha…";
 "%lld need a look: see the list." = "%lld öğe incelenmeli: listeye bakın.";
@@ -80,6 +81,7 @@
 "A chat model" = "Sohbet modeli";
 "A client" = "Bir istemci";
 "A deleted project" = "Silinmiş bir proje";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Bir sohbetten öğrenilen olgu veya gözlem, başka bir sohbet de bunu gösterene kadar (veya siz onaylayana kadar) bekler: tek bir soru kim olduğunuzu belirlemez. İstedikleriniz — tercihler, düzeltmeler — hemen kullanılır.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
 "A model is a tool, not an authority" = "Model bir araçtır, otorite değil";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Bir not bu süre boyunca doğrulanmazsa yarı ağırlıkta sayılır ve yaklaşık üç katı süre sonra geçerliliğini yitirir. Sabitlenen notların süresi hiçbir zaman dolmaz.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — net vokaller, GPTQ 4-bit (daha az bellek)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — net vokaller, tam hassasiyet";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — daha dolu ses";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Profilin sistem isteminden sonra yaklaşık %d token. Küçük bağlama sahip bir model daha az alır (bellek bunun en fazla 5%%’ini kullanır). Zaten açık olan sohbetler, notlarından biri değişene kadar başladıkları bloğu korur.";
 "About LLMTray" = "LLMTray Hakkında";
 "About you" = "Sizin hakkınızda";
 "About you and your work: what you do, what you use." = "Sizin ve işiniz hakkında: ne yaptığınız, ne kullandığınız.";
@@ -456,6 +459,9 @@
 "Forget" = "Unut";
 "Forget Everything" = "Her Şeyi Unut";
 "Forget Everything…" = "Her Şeyi Unut…";
+"Forget What Was Learned…" = "Öğrenilenleri Unut…";
+"Forget and Read All Chats Again" = "Unut ve Tüm Sohbetleri Yeniden Oku";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Yazmadığınız, düzenlemediğiniz, sabitlemediğiniz veya onaylamadığınız tüm öğrenilen notları ve okunmayı bekleyenleri unutur. Ardından sohbetleriniz geçerli kurallarla yeniden okunabilir — “Hatırlama” olarak işaretlenenler değil; bellek kapalıyken söylenenler de, bu arada söylenenlerin okunup okunmayacağını yanıtlamadan önce okunmaz.";
 "Found after an interruption" = "Kesintiden sonra bulunanlar";
 "Founding Supporters" = "Kurucu Destekçiler";
 "Free disk space" = "Boş disk alanı";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Şarkıların nasıl saklandığı, kaydedildiği ve paylaşıldığı. AAC 256 kbit/s: yaklaşık 30 s için 1 MB, çoğu dinleme için farkedilmez. Sıkıştırılmamış WAV: yaklaşık 30 s için 6 MB.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Müziğin modelin tanımladığı stile ne kadar sıkı uyduğu. Yüksek: daha yakın; düşük: daha serbest.";
 "How you like things: language, length, tone, formatting." = "Tercihleriniz: dil, uzunluk, ton, biçimlendirme.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "Şu anda nasıl göründüğünüz (başarısız bir derlemeden dolayı kızgın, yorgun, aceleci) son iletilerinizden okunur: yeni sohbetler bunu bu süre boyunca alır, sonra silinir. Asla not değildir. 0: okunmaz.";
 "How?" = "Nasıl?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face %2$@ için HTTP %1$d döndü.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bellek bundan artık hiçbir şey öğrenmez. Daha önce öğrettiği Notlar da gidebilir; düzenlediğiniz, sabitlediğiniz veya onayladıklarınız hariç.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bellek, bir sohbeti yalnızca o sohbetle karşılaştıktan sonraki ilk iletiden itibaren okur. Bu, kaydedilen her sohbeti başından itibaren de okur — Bellek açık değilken yazdıklarınızı — model boştayken arka planda işler. “Hatırlama” olarak işaretlenen Sohbetler atlanır.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bellek bu Mac’te kalır: notlar burada bir dosyada tutulur ve asla yüklenmez veya paylaşılmaz. Yalnızca LLMTray sohbetlerinizin istemine gider — API kullanan uygulamalara gitmez, geçici sohbetlere eklenmez.";
 "Memory was off. Read what was said meanwhile?" = "Bellek kapalıydı. Bu arada söylenenler okunsun mu?";
 "Memory: %d" = "Bellek: %d";
 "Message…" = "Mesaj…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "%@ ile aynı değil: yinelenen değil.";
 "Not indexed" = "Dizine eklenmedi";
 "Not sent any more. Bring one back, or it's deleted later." = "Artık gönderilmez. Birini geri getirin; yoksa daha sonra silinir.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Henüz gönderilmedi: başka bir sohbetin bunu göstermesini veya sizin onayınızı bekler.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tabloları (xlsx, ods) dizinler ve resimleri (png, jpg, heic, webp, tiff, gif) saklar.";
 "Notes" = "Notlar";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Sohbet hangi dilde olursa olsun notlar bu dilde yazılır; böylece bir şey iki dilde iki nota dönüşmez.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "Henüz gönderilen yok.";
 "Nothing to change." = "Değiştirilecek bir şey yok.";
 "Nothing to pin until the file has been read" = "Dosya okunana kadar sabitlenecek bir şey yok";
+"Nothing: no note is sent to these chats now." = "Hiçbir şey: şu anda bu sohbetlere not gönderilmez.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Şimdi onun ayarları: %@ seçin (zaten seçili), sonra Import. İptal buradaki ayarları korur.";
+"Now: %@ → %@ (until %@)" = "Şimdi: %@ → %@ (%@ tarihine kadar)";
 "OK" = "Tamam";
 "Observation" = "Gözlem";
 "Observations" = "Gözlemler";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Kapalı: yalnızca bu Mac. Açık: ağınızdaki herkes — yalnızca güvendiğiniz ağlarda kullanın.";
 "Older" = "Daha eski";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Tek seferlik: Kahve $5, Pro Destekçi $25, Kurucu Destekçi $150.";
+"Only Forget" = "Yalnızca Unut";
 "Only From Now On" = "Yalnızca Bundan Sonra";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Sadece kısıtlı modeller için (Llama, bazı Gemma ve FLUX depoları): Hugging Face sayfasında modelin lisansını kabul edin, sonra buraya bir read token yapıştırın. Keychain'inizde saklanır, yalnızca huggingface.co'ya gönderilir.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Yalnızca isterseniz: Sohbetler bunu önce alır, süresi hiç dolmaz ve öğrenme bunu hiç değiştirmez. Bu bilgisayarda kalır.";
@@ -791,6 +803,7 @@
 "Opens at login" = "Girişte açılır";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Diğer uygulamalar modellere bu Mac'te OpenAI uyumlu bir API aracılığıyla erişir.";
 "Other devices on your network can use the server" = "Ağınızdaki diğer cihazlar sunucuyu kullanabilir";
+"Outside projects" = "Projelerin dışında";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Bunun üzerinde, en zayıf notların (en eski, kesinliği en düşük) süresi dolar. Sabitlenen notlar tutulur.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "PDF · %lld pages" = "PDF · %lld sayfa";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "Sonraki Sekmeyi Göster";
 "Show Previous Tab" = "Önceki Sekmeyi Göster";
 "Show Reports…" = "Raporları Göster…";
+"Show What Chats Get…" = "Sohbetlere Gidenleri Göster…";
 "Show in Finder" = "Finder’da Göster";
 "Show model controls in the chat window" = "Sohbet penceresinde model denetimlerini göster";
 "Show more" = "Daha fazla göster";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Bu Mac’e giriş yaptığınızda LLMTray’i otomatik olarak başlatır.";
 "Start Server" = "Sunucuyu başlat";
 "Start a new saved chat (⌘N) to add files to a project." = "Dosyaları bir projeye eklemek için yeni bir kaydedilmiş sohbet başlatın (⌘N).";
+"Start over" = "Baştan başla";
 "Start server" = "Sunucuyu başlat.";
 "Start talking" = "Konuşmaya başla";
 "Start the server first." = "Önce sunucuyu başlatın.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "Gömmelenme modeli indirilemedi";
 "The embedding model failed: %@" = "Gömü modeli başarısız oldu: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray'nin gönderdiği tam JSON: gönderilmeyi bekleyen raporlar, bugüne kadar olanlar ve en son gönderilen.";
+"The exact text a new chat gets, before your first message." = "İlk iletinizden önce yeni bir sohbetin aldığı tam metin.";
 "The families of the models used that day (such as qwen or flux), never their names." = "O gün kullanılan model aileleri (ör. qwen veya flux), model adları asla.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "İlk seferinde %@ (%@) bu Mac’e sohbet sırasında değil, şimdi indirilir.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Projeler ve tüm sohbetlerle tam sohbet penceresi (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "Klasörü Kullan";
 "Use LM Studio's folder" = "LM Studio’nun klasörünü kullan";
 "Use This Port" = "Bu Portu Kullan";
+"Use a learned fact at once" = "Öğrenilen bir olguyu hemen kullan";
+"Use a learned fact once %lld chats show it" = "%lld sohbet gösterdiğinde öğrenilen bir olguyu kullan";
 "Use headphones: the model hears its own voice from the speakers." = "Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
 "Used" = "Kullanıldı";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Görüntü oluşturma, müzik ve Voice Lab tarafından kullanılır; bunlar tarafından indirilir. Hugging Face adlarıyla models klasöründe saklanırlar.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "Mac'iniz";
 "Your files" = "Dosyalarınız";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "E‑posta uygulamanız eki kabul edemedi: rapor Finder’da gösteriliyor, e‑postaya ekleyin.";
+"Your mood: for %lld hours" = "Ruh hâliniz: %lld saat boyunca";
+"Your mood: not read" = "Ruh hâliniz: okunmaz";
 "Your name (optional)" = "Adınız (isteğe bağlı)";
 "Your site or profile (optional, https://…)" = "Web siteniz veya profiliniz (isteğe bağlı, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

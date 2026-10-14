@@ -53,6 +53,7 @@
 "%lld files couldn't be indexed" = "%lld файлів не вдалося індексувати";
 "%lld interrupted: look at them in Finder" = "%lld перервано: перегляньте їх у Finder";
 "%lld items put back under their names." = "%lld елементів повернуто під їхні імена.";
+"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld вивчені нотатки, які ви не схвалили, буде видалено. Нотатки, які ви написали, відредагували, закріпили або схвалили, залишаться.";
 "%lld more" = "ще %lld";
 "%lld more…" = "Ще %lld…";
 "%lld need a look: see the list." = "%lld потребують перегляду: див. список.";
@@ -80,6 +81,7 @@
 "A chat model" = "Модель для чату";
 "A client" = "Клієнт";
 "A deleted project" = "Видалений проєкт";
+"A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Факт або спостереження, вивчені з одного чату, чекатимуть, доки це з’явиться ще в одному чаті (або доки ви це схвалите): одне запитання — це ще не ви. Те, що ви просите — уподобання, виправлення — використовується одразу.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Більш насичена, завершеніша мікс‑версія; слова менше виділяються. Приблизно 20 с для 30 с музики.";
 "A model is a tool, not an authority" = "Модель — інструмент, а не авторитет";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Нотатка має вдвічі меншу вагу, якщо її не підтверджено протягом цього часу, і спливає приблизно за втричі довший час. Закріплені нотатки ніколи не спливають.";
@@ -99,6 +101,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чіткі вокали, GPTQ 4‑bit (менше пам’яті)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — чіткі вокали, повна точність";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — більш насичене звучання";
+"About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Близько %d токенів після системного промпту профілю. Модель із малим контекстом отримує менше (пам’ять займає щонайбільше 5%% контексту). Уже відкриті чати зберігають блок, із яким почали, доки не зміниться одна з його нотаток.";
 "About LLMTray" = "Про LLMTray";
 "About you" = "Про вас";
 "About you and your work: what you do, what you use." = "Про вас і вашу роботу: що ви робите й чим користуєтеся.";
@@ -456,6 +459,9 @@
 "Forget" = "Забути";
 "Forget Everything" = "Забути все";
 "Forget Everything…" = "Забути все…";
+"Forget What Was Learned…" = "Забути вивчене…";
+"Forget and Read All Chats Again" = "Забути й перечитати всі чати";
+"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Забуває кожну вивчену нотатку, яку ви не написали, не відредагували, не закріпили або не схвалили, а також те, що очікує на читання. Потім ваші чати можна перечитати за поточними правилами — крім позначених «Не запам’ятовувати» і, якщо пам’ять була вимкнена, не раніше ніж ви відповісте, чи читати сказане за цей час.";
 "Found after an interruption" = "Знайдено після перерви";
 "Founding Supporters" = "Засновники-спонсори";
 "Free disk space" = "Вільне місце на диску";
@@ -512,6 +518,7 @@
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Як зберігаються, зберігаються й передаються пісні. AAC 256 кбіт/с: приблизно 1 МБ за 30 с, для більшості слухачів не відрізняється. Нестиснений WAV: приблизно 6 МБ за 30 с.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Наскільки строго музика відповідає стилю, описаному моделлю. Вище — ближче до нього; нижче — вільніше.";
 "How you like things: language, length, tone, formatting." = "Ваші вподобання: мова, довжина, тон, форматування.";
+"How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "Який у вас зараз стан (злість через збій збірки, втома, поспіх), зчитаний з останніх повідомлень: нові чати отримують це на такий час, потім воно зникає. Це ніколи не нотатка. 0: не зчитувати.";
 "How?" = "Як?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face відповів HTTP %d для %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face відхилив %@ (HTTP %d): модель обмежена, приватна або не існує. Якщо вона обмежена, прийміть ліцензію на huggingface.co/%@ і перевірте токен у Налаштування → Models.";
@@ -648,6 +655,7 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Пам'ять під контекст попередніх розмов, щоб продовжений чат не перечитував усю історію. Обмежена, щоб не зростати, доки в сервера не скінчиться пам'ять.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Пам’ять більше нічого з нього не засвоює. Нотатки, яких він уже навчив, також можуть зникнути, крім тих, які ви відредагували, закріпили або схвалили.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Пам’ять читає чат лише з першого повідомлення після того, як натрапила на нього. Це також читає кожен збережений чат від початку — те, що ви написали до ввімкнення пам’яті, — у фоновому режимі, коли модель вільна. Чати, позначені «Не запам’ятовувати», пропускаються.";
+"Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Пам’ять залишається на цьому Mac: нотатки зберігаються у файлі тут і ніколи не вивантажуються й не поширюються. Вони потрапляють лише в промпт ваших чатів LLMTray — не в програми, що використовують API, і не в тимчасові чати.";
 "Memory was off. Read what was said meanwhile?" = "Пам’ять була вимкнена. Прочитати сказане за цей час?";
 "Memory: %d" = "Пам’ять: %d";
 "Message…" = "Повідомлення…";
@@ -744,6 +752,7 @@
 "Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
 "Not indexed" = "Не проіндексовано";
 "Not sent any more. Bring one back, or it's deleted later." = "Більше не надсилається. Відновіть нотатку, інакше її буде видалено пізніше.";
+"Not sent yet: waits for another chat to show it, or your approval." = "Ще не надіслано: очікує, доки це з’явиться в іншому чаті або ви схвалите.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Поки не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods) і зберігає зображення (png, jpg, heic, webp, tiff, gif).";
 "Notes" = "Нотатки";
 "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages." = "Нотатки записуються цією мовою незалежно від мови чату, щоб одне й те саме не ставало двома нотатками двома мовами.";
@@ -756,7 +765,9 @@
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
 "Nothing to pin until the file has been read" = "Нічого закріплювати, поки файл не буде прочитано";
+"Nothing: no note is sent to these chats now." = "Нічого: зараз до цих чатів не надсилається жодна нотатка.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Наразі її налаштування: виберіть %@ (вже обрано), а потім натисніть Import. Скасування збереже поточні налаштування.";
+"Now: %@ → %@ (until %@)" = "Зараз: %@ → %@ (до %@)";
 "OK" = "OK";
 "Observation" = "Спостереження";
 "Observations" = "Спостереження";
@@ -768,6 +779,7 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Вимкнено: лише цей Mac. Увімкнено: будь‑хто в мережі — тож лише в мережах, яким ви довіряєте.";
 "Older" = "Старіші";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Разовий внесок: Кава $5, Pro Supporter $25, Founding Supporter $150.";
+"Only Forget" = "Лише забути";
 "Only From Now On" = "Лише відтепер";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Лише для обмежених моделей (Llama, деякі Gemma і репозиторії FLUX): прийміть ліцензію на сторінці моделі на Hugging Face, потім вставте тут токен для читання. Зберігається в Keychain, надсилається лише на huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Лише якщо хочете: чати отримують це насамперед, воно ніколи не спливає, і навчання ніколи його не змінює. Воно залишається на цьому комп’ютері.";
@@ -791,6 +803,7 @@
 "Opens at login" = "Відкривається при вході";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Інші додатки отримують доступ до ваших моделей через сумісний з OpenAI API на цьому Mac.";
 "Other devices on your network can use the server" = "Інші пристрої в мережі можуть використовувати сервер";
+"Outside projects" = "Поза проєктами";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Понад це найслабші нотатки (найстаріші, найменш певні) спливають. Закріплені нотатки зберігаються.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "PDF · %lld pages" = "PDF · %lld сторінок";
@@ -1003,6 +1016,7 @@
 "Show Next Tab" = "Показати наступну вкладку";
 "Show Previous Tab" = "Показати попередню вкладку";
 "Show Reports…" = "Показати звіти…";
+"Show What Chats Get…" = "Показати, що отримують чати…";
 "Show in Finder" = "Показати у Finder";
 "Show model controls in the chat window" = "Показувати елементи керування моделлю у вікні чату";
 "Show more" = "Показати ще";
@@ -1038,6 +1052,7 @@
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
 "Start a new saved chat (⌘N) to add files to a project." = "Почніть новий збережений чат (⌘N), щоб додати файли до проєкту.";
+"Start over" = "Почати знову";
 "Start server" = "Запустити сервер";
 "Start talking" = "Почніть говорити";
 "Start the server first." = "Спершу запустіть сервер.";
@@ -1132,6 +1147,7 @@
 "The embedding model couldn't be downloaded" = "Не вдалося завантажити модель embedding";
 "The embedding model failed: %@" = "Помилка моделі вбудовування: %@";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "Точний JSON, який надсилає LLMTray: звіти в черзі, сьогоднішні до цього моменту та останній надісланий.";
+"The exact text a new chat gets, before your first message." = "Точний текст, який отримує новий чат перед вашим першим повідомленням.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Сімейства моделей, використаних того дня (наприклад qwen або flux), ніколи їхні назви.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Першого разу на цей Mac завантажиться %@ (%@) — зараз, а не посеред розмови.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Повне вікно чату з проєктами та всіма розмовами (⌘⇧O)";
@@ -1303,6 +1319,8 @@
 "Use Folder" = "Вибрати теку";
 "Use LM Studio's folder" = "Тека LM Studio";
 "Use This Port" = "Використати цей порт";
+"Use a learned fact at once" = "Використовувати вивчений факт одразу";
+"Use a learned fact once %lld chats show it" = "Використовувати вивчений факт, коли він з’явиться в %lld чатах";
 "Use headphones: the model hears its own voice from the speakers." = "Використовуйте навушники: модель чує власний голос із динаміків.";
 "Used" = "Використано";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Використовуються для генерації зображень, музики та Voice Lab, які їх завантажують. Також зберігаються в папці models під їхніми іменами на Hugging Face.";
@@ -1385,6 +1403,8 @@
 "Your Mac" = "Ваш Mac";
 "Your files" = "Ваші файли";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ваша поштова програма не змогла взяти вкладення: звіт показано у Finder, додайте його до листа.";
+"Your mood: for %lld hours" = "Ваш настрій: на %lld год";
+"Your mood: not read" = "Ваш настрій: не зчитувати";
 "Your name (optional)" = "Ваше ім’я (необов’язково)";
 "Your site or profile (optional, https://…)" = "Ваш сайт або профіль (необов’язково, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
