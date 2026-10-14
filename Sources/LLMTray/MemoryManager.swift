@@ -150,6 +150,15 @@ final class MemoryManager: ObservableObject {
         return change { $0.forgetUnreviewed(readAgain: readAgain) }
     }
 
+    /// Every chat read again from its start: where memory read each is
+    /// forgotten, then they're all queued. The notes stay; reading them
+    /// again confirms what they say.
+    func readAllAgain() -> (queued: Int, waiting: Int) {
+        pastRun += 1
+        guard change({ $0.resetReading() }) else { return (0, 0) }
+        return learnFromPastChats()
+    }
+
     /// Chats answering when "Learn from past chats now" was pressed: theirs
     /// is queued once they're done (looked at every 5 s, half an hour at most).
     /// A chat left meanwhile (another one in its tab, the tab closed) waits
