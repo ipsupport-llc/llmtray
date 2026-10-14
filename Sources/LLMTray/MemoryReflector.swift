@@ -166,22 +166,30 @@ final class MemoryReflector: ObservableObject {
         guard UserDefaults.standard[Pref.memorySorter] == AppleSystemModel.id, AppleSystemModel.isAvailable else { return false }
         sorted = sorted.filter { id in memory.file.queue.contains { $0.id == id } }
         var changed = false
-        for batch in memory.file.queue where !sorted.contains(batch.id) {
-            guard memory.isEnabled else { break }
+        for queued in memory.file.queue where !sorted.contains(queued.id) {
+            // The queue as it is now (each call awaits): a batch removed
+            // meanwhile (opted out, deleted, forgotten) isn't sent anywhere,
+            // nor anything once the settings no longer want it.
+            let settings = memory.settings
+            guard !Task.isCancelled, memory.isEnabled, !memory.unreadable, !settings.kinds.isEmpty,
+                  UserDefaults.standard[Pref.memorySorter] == AppleSystemModel.id else { break }
+            guard let batch = memory.file.queue.first(where: { $0.id == queued.id }),
+                  !memory.file.optedOut.contains(batch.chat), settings.learns(inProject: batch.project) else { continue }
+            let since = memory.file.generation
             // Only whether there's anything: a small model mixes up which
             // kind (a wish labelled a fact), so the reading model sorts what's
             // kept itself.
             let anything = try? await MemoryExtraction.gate(batch) { messages, maxTokens, shape in
                 try await AppleSystemModel.complete(messages: messages, maxTokens: maxTokens, temperature: 0.2, shape: shape)
             }
-            guard let anything else { continue }
-            if anything {
+            // Something there, or the reply unreadable: the reading model
+            // sorts it (not asked again here).
+            guard anything == false else {
                 sorted.insert(batch.id)
                 continue
             }
-            let settings = memory.settings
             let projects = Set(ChatLibraryStore.shared.library.projects.map(\.id))
-            guard memory.change({ _ = $0.commit(batch: batch.id, changes: [], since: $0.generation, settings: settings,
+            guard memory.change({ _ = $0.commit(batch: batch.id, changes: [], since: since, settings: settings,
                                                 liveProjects: projects, now: Date()) }) else { return changed }
             NSLog("LLMTray memory: batch %d sorted by Apple's model: nothing to read", batch.id)
             changed = true
@@ -635,7 +643,8 @@ final class MemoryReflector: ObservableObject {
                 switch failure {
                 case .unavailable(let why): return .failure(OutcomeError(.later(why.isEmpty ? AppleSystemModel.displayName : why)))
                 case .timedOut: return .failure(OutcomeError(.later(NSLocalizedString("Apple's model took too long.", comment: "memory status"))))
-                case .refused(let why): return .failure(OutcomeError(.failed("refused: \(why)")))
+                // Not the framework's text: it may quote the user's words.
+                case .refused: return .failure(OutcomeError(.failed("refused by Apple's guardrails")))
                 case .contextExceeded: return .failure(OutcomeError(.failed("context exceeded")))
                 case .failed(let why): return .failure(OutcomeError(.failed(why)))
                 }

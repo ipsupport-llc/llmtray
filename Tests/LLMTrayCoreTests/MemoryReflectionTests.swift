@@ -601,5 +601,9 @@ extension MemoryReflectionTests {
         XCTAssertEqual(no, false)
         let unreadable = try await MemoryExtraction.gate(batch) { _, _, _ in "sure" }
         XCTAssertNil(unreadable)
+        let partial = try await MemoryExtraction.gate(batch) { _, _, _ in #"{"message1": ["no"]}"# }
+        XCTAssertNil(partial, "a message unanswered isn't a no")
+        let odd = try await MemoryExtraction.gate(batch) { _, _, _ in #"{"message1": ["no"], "message2": ["maybe"]}"# }
+        XCTAssertNil(odd)
     }
 }
