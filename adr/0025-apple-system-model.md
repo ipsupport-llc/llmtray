@@ -1,6 +1,6 @@
 # 0025 — Apple's on-device model: memory's reader and a chat model, nothing to download
 
-**Status: proposed** (2026-10-14, asked for by the user: "connect the local
+**Status: accepted** (2026-10-14: the user went ahead with "do part A" and "do part B"; proposed the same day, asked for by the user: "connect the local
 model, if it's there, and for choosing in the main models menu too"; earlier:
 "bring it everywhere, including memory -- works without downloading models at
 all"; its point: "it runs on the ANE").
