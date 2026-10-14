@@ -239,12 +239,18 @@ public enum MemoryExtraction {
         let count = batch.messages.count
         guard count > 0 else { return false }
         let reply = try await ask(gateMessages(batch), 20 + 8 * count, .labels(count: count, choices: ["yes", "no"]))
-        guard let object = MemoryReflection.object(reply), object["message1"] != nil else { return nil }
-        return (1...count).contains { n in
+        // Every message answered, each "yes" or "no": anything less isn't a
+        // reason to close a batch (nil: the reading model sorts it).
+        guard let object = MemoryReflection.object(reply) else { return nil }
+        var anything = false
+        for n in 1...count {
             let item = object["message\(n)"]
-            let answers = (item as? [Any])?.compactMap { $0 as? String } ?? [(item as? String) ?? "no"]
-            return answers.contains { $0.lowercased() == "yes" }
+            let answers = ((item as? [Any])?.compactMap { $0 as? String } ?? (item as? String).map { [$0] } ?? [])
+                .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+            guard !answers.isEmpty, answers.allSatisfy({ $0 == "yes" || $0 == "no" }) else { return nil }
+            if answers.contains("yes") { anything = true }
         }
+        return anything
     }
 
     /// Whether triage found anything to read: a batch whose messages are all

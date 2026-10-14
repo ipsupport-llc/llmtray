@@ -209,6 +209,7 @@ public enum AppleSystemModel {
         if error is CancellationError { return .timedOut }
         let name = String(describing: error).lowercased()
         if name.contains("guardrail") || name.contains("refusal") { return .refused(String(describing: error)) }
+        if name.contains("timeout") || name.contains("timedout") { return .timedOut }
         if name.contains("context") && (name.contains("exceed") || name.contains("size")) { return .contextExceeded }
         if name.contains("assetsunavailable") || name.contains("ratelimited") || name.contains("concurrent") {
             return .unavailable(String(describing: error))
