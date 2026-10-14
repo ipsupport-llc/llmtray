@@ -30,5 +30,6 @@ here; this is where the history lives.
 | [0022](0022-thinking-effort.md) | Thinking effort: Off / Low / Medium / High, one setting for every chat, from the model's chat template; Low and Medium as a server-side thinking budget |
 | [0023](0023-spoken-messages.md) | Spoken messages for models that hear: click for a clip, hold to talk; WAV to the runtime's `input_audio` |
 | [0024](0024-memory.md) | Memory between chats: notes learned only from the user's own words, reconciled into one note per claim across languages and models, injected within a budget, aging by kind; opt-in, all local |
+| [0025](0025-apple-system-model.md) | Apple's on-device model (FoundationModels): memory's reader in-process, then a chat model served by the proxy itself; app only, no cloud, nothing to download |
 
 New ADR: next number, one topic, the decision first, then why.
