@@ -139,6 +139,9 @@ private final class ChatStream: NSObject, URLSessionDataDelegate, @unchecked Sen
                 if options.json { emit(["tool_call": ["name": name, "arguments": arguments]]) }
             case .image:
                 break
+            case .error(let message):
+                if options.json { emit(["error": message]); continue }
+                Output.err("error: \(message)")
             }
         }
     }

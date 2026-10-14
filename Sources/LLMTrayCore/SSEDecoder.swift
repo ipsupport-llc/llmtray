@@ -12,6 +12,8 @@ public enum SSEEvent: Equatable {
     /// the token estimate; the cached part of the prompt and the reasoning
     /// part of the completion when the server reports them.
     case usage(completionTokens: Int, promptTokens: Int? = nil, cachedTokens: Int? = nil, reasoningTokens: Int? = nil)
+    /// The server failed mid-answer ({"error": "…"} or {"error": {"message": …}}).
+    case error(String)
 }
 
 /// Turns an OpenAI-style `text/event-stream` chat-completion response into
@@ -44,6 +46,10 @@ public struct SSEDecoder {
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [] }
 
         var events: [SSEEvent] = []
+        if let error = obj["error"] {
+            let message = (error as? String) ?? ((error as? [String: Any])?["message"] as? String) ?? "the model failed"
+            return [.error(message)]
+        }
         // The usage chunk has an empty (or absent) choices array and a
         // top-level "usage" -- the accurate completion_tokens for tok/s.
         if let usage = obj["usage"] as? [String: Any], let tokens = usage["completion_tokens"] as? Int {

@@ -2047,6 +2047,9 @@ final class ChatClient: ObservableObject {
                 appendToAssistant(image: data)
             case .toolCall(let id, let name, let argumentsJSON):
                 appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
+            case .error(let message):
+                // Failed mid-answer: shown, not taken for a finished answer.
+                errorText = message
             case .usage(let completionTokens, let promptTokens, let cachedTokens, let reasoningTokens):
                 usageCompletionTokens = completionTokens
                 requestStats.completionTokens = completionTokens

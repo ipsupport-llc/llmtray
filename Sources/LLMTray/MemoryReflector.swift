@@ -240,7 +240,9 @@ final class MemoryReflector: ObservableObject {
         // isn't available memory waits for it, not for another model.
         if fixed == AppleSystemModel.id { return fixed }
         if !fixed.isEmpty, installed.contains(fixed) { return fixed }
-        return batch.model.flatMap { installed.contains($0) ? $0 : nil }
+        // A chat with Apple's model is read by any model: it misses too
+        // much as a reader (adr/0025).
+        return batch.model.flatMap { $0 != AppleSystemModel.id && installed.contains($0) ? $0 : nil }
     }
 
     static func displayName(_ path: String) -> String {

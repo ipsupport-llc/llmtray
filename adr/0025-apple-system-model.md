@@ -103,6 +103,32 @@ The eval (`MemoryLiveEval`, sets 1-5, `MEMORY_EVAL_MODEL=apple-system` and
   still doesn't fit fails with the model's "context exceeded" as an error the
   chat shows.
 
+### Part B as built (2026-10-14)
+
+- `LocalModel.isAppleSystem`; the catalog appends Apple's model when it's
+  available; folder work (sizes, weights, remove, aliases) skips it;
+  `apple-system` is its request name and a reserved alias; `/v1/models` lists
+  it only with the app token; Settings › Models shows "Built into macOS ·
+  LLMTray's chat only" instead of alias, profile and Trash.
+- `ServerManager`: for Apple, launch = the public listener only (no runtime,
+  no process; `processGeneration` bumped); idle unload, image and voice
+  suspension don't touch it (it stays answerable); switching to and from it
+  goes through the same serialized transitions.
+- `ModelProxyServer.route`: a request naming Apple, or naming none while
+  Apple answers, is handled before any switch or load: 403 without the app
+  token; `AppleModelResponder` otherwise (switching to Apple first if another
+  model is up). One generation at a time in arrival order; a client that
+  closes cancels its own; a minute without new text cancels it.
+- `AppleChatWire`: OpenAI chunks (role, text, finish, usage with
+  `tokenCount` on macOS 26.4+), `[DONE]`, a whole completion for
+  `stream: false`, errors before the stream as `{"error": "…"}` with an HTTP
+  status, during it as an error chunk -- `SSEDecoder` now has `.error`, and the
+  chat shows it instead of taking a cut answer for a finished one.
+- `max_tokens` at most half the context (it holds the input and the answer).
+- A chat with Apple's model is read for memory by any loaded model, not
+  Apple's.
+- Not yet: tools, images, the first-run wizard's "use Apple's model" choice.
+
 ### What the review added (codex, muse, 2026-10-14)
 
 - **A model has a source.** `LocalModel` gains `source: .folder(path) |

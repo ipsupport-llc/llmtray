@@ -259,7 +259,7 @@ public enum AppleSystemModel {
 
     /// The framework's errors as LLMTray handles them. Matched by name, so
     /// macOS 26's GenerationError and 27's LanguageModelError both fit.
-    static func classify(_ error: Error) -> Failure {
+    public static func classify(_ error: Error) -> Failure {
         if let failure = error as? Failure { return failure }
         if error is CancellationError { return .timedOut }
         let name = String(describing: error).lowercased()

@@ -459,6 +459,11 @@ struct ModelsPane: View {
         let taken = catalog.isAliasTaken(catalog.alias(for: m.id), excluding: m.id)
         return LabeledContent {
             HStack {
+                if m.isAppleSystem {
+                    // Apple's model (adr/0025): part of macOS -- no alias (its
+                    // name is fixed), nothing to delete; LLMTray's chat only.
+                    Text("Built into macOS · LLMTray's chat only").font(.caption).foregroundStyle(.secondary)
+                } else {
                 TextField("alias", text: Binding(
                     get: { catalog.alias(for: m.id) },
                     set: { catalog.setAlias($0, for: m.id) }
@@ -486,6 +491,7 @@ struct ModelsPane: View {
                     .disabled(!canRemove)
                     .help(Text(canRemove ? "Move this model to the Trash…" : "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle."))
                     .accessibilityLabel(Text("Delete model"))
+                }
             }
         } label: {
             VStack(alignment: .leading) {

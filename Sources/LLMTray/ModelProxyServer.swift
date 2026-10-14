@@ -263,6 +263,40 @@ final class ModelProxyServer {
         // An outside client asking for another model than the one loaded:
         // the user's Settings → Server → Model switching decides.
         let fromApp = headers[AppRequestToken.header.lowercased()] == AppRequestToken.value
+        // Apple's on-device model (adr/0025): named, or the one answering
+        // when the request names none. Answered here, before any switch or
+        // load moves -- and only for the app (Apple's terms make LLMTray
+        // answerable for what others would do with it).
+        let answering: String? = { if case .running = server.state { return server.loadedModelPath } else { return nil } }()
+        if targetPath == AppleSystemModel.id || (modelName == nil && answering == AppleSystemModel.id && !bodyData.isEmpty) {
+            guard fromApp else {
+                sendJSON(connection: connection, status: "403 Forbidden", ["error": [
+                    "message": "Apple's on-device model is only for LLMTray's own chat.",
+                    "type": "model_not_available", "code": "model_not_available",
+                ] as [String: Any]])
+                return
+            }
+            guard route == "/v1/chat/completions", !bodyData.isEmpty else {
+                sendError(connection: connection, status: "404 Not Found", message: "Apple's model answers /v1/chat/completions only")
+                return
+            }
+            guard answering == AppleSystemModel.id else {
+                // Selected but the server is on another model: switch first,
+                // the way a request for any model does (the chat's own path).
+                Task {
+                    do {
+                        try await self.server.switchLoadedModel(to: AppleSystemModel.id, alias: "")
+                        AppleModelResponder.shared.serve(body: bodyData, connection: connection, server: self.server)
+                    } catch {
+                        self.sendError(connection: connection, status: "503 Service Unavailable",
+                                       message: "Apple's model couldn't be selected: \(error.localizedDescription)")
+                    }
+                }
+                return
+            }
+            AppleModelResponder.shared.serve(body: bodyData, connection: connection, server: server)
+            return
+        }
         // The app's background work: only with the app's token.
         if fromApp, headers[BackgroundRequest.header.lowercased()] == BackgroundRequest.value, !bodyData.isEmpty {
             routeBackground(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
@@ -554,7 +588,8 @@ final class ModelProxyServer {
             sendJSON(connection: connection, status: "405 Method Not Allowed", ["error": ["message": "use GET", "type": "invalid_request_error"] as [String: Any]])
             return
         }
-        let names = ModelCatalog.shared.servedNames
+        // Apple's model is the app's own (adr/0025): not listed to others.
+        let names = ModelCatalog.shared.servedNames(app: headers[AppRequestToken.header.lowercased()] == AppRequestToken.value)
         let prefix = route.hasPrefix("/v1/models") ? "/v1/models" : "/api/v0/models"
         let id = String(route.dropFirst(prefix.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/")).removingPercentEncoding ?? ""
         if id.isEmpty {
