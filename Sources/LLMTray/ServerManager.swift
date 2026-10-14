@@ -334,6 +334,11 @@ final class ServerManager: ObservableObject {
                 }
                 await self.waitForForwardsToDrain()
                 try self.checkNotStopped(epoch)
+                // Again after those waits: a picture, song or Voice Lab may
+                // have started meanwhile (Apple's model let it go ahead).
+                if self.suspendedForImageGeneration, target != AppleSystemModel.id {
+                    throw NSError(domain: "ServerManager", code: 7, userInfo: [NSLocalizedDescriptionKey: "a picture, song or voice is being made -- the model loads after it"])
+                }
                 await self.terminateAndWaitForExit()
                 try self.checkNotStopped(epoch)
                 self.currentModelPath = target
