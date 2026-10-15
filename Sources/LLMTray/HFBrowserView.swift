@@ -366,9 +366,14 @@ private struct DrafterControl: View {
             }
         }
         .onAppear(perform: refresh)
+        // Fetched elsewhere meanwhile (a server start, the download queue),
+        // or its model added or removed: the row follows.
+        .onChange(of: catalog.models) { _, _ in refresh() }
+        .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in refresh() }
     }
 
     private func refresh() {
-        installed = HFHubCache.localSnapshot(repo: repo) != nil
+        let now = HFHubCache.localSnapshot(repo: repo) != nil
+        if now != installed { installed = now }
     }
 }
