@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Cài đặt › Chung › Set Up LLMTray… sẽ mở lại cửa sổ này.";
 "Coding agents" = "Tác nhân lập trình";
 "Coffee" = "Cà phê";
+"Comes with %@" = "Đi kèm với %@";
 "Command-line tool" = "Công cụ dòng lệnh";
 "Compact" = "Thu gọn";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Thu gọn sẽ thay phần giữa của cuộc trò chuyện dài bằng một bản tóm tắt do mô hình viết. Số tin nhắn này ở đầu sẽ được giữ nguyên từng chữ.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "Không thể chuyển “%@” vào Thùng Rác: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Không liên lạc được với ipsupport.us. Đánh giá của bạn được lưu: thử lại sau.";
 "Couldn't reach the server -- please try again later." = "Không thể kết nối đến máy chủ — vui lòng thử lại sau.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Không thể đọc một số phần của các cuộc trò chuyện; sẽ thử lại lúc %@ (lý do: Cài đặt › Máy chủ › Nhật ký).";
 "Couldn't start the voice runner: %@" = "Không thể khởi động voice runner: %@";
 "Countdown" = "Đếm ngược";
 "Countdown: %lld s" = "Đếm ngược: %lld s";
@@ -488,11 +490,13 @@
 "Generating image…" = "Đang tạo ảnh…";
 "Generating music…" = "Đang tạo nhạc…";
 "Generation" = "Tạo";
+"Get" = "Tải";
 "Get Started" = "Bắt đầu";
 "Get a Model…" = "Nhận mô hình…";
 "Get one" = "Lấy token";
 "Getting Started" = "Bắt đầu";
 "Getting started" = "Bắt đầu";
+"Getting…" = "Đang tải…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Cung cấp cho mô hình công cụ generate_music: bài hát có ca từ hoặc nhạc cụ, dựa trên mô tả (ACE‑Step 1.5, giấy phép MIT; khoảng 20 giây để tạo 30 giây nhạc). Lần đầu tiên, mô hình sẽ được tải về.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Cung cấp cho mô hình công cụ edit_image: thay đổi ảnh từ cuộc trò chuyện — ảnh bạn đính kèm hoặc ảnh tạo tại đây. Yêu cầu bật tạo ảnh. Là một mô hình riêng, tải xuống khi bạn chọn.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "Trong iCloud Drive hoặc dịch vụ đám mây khác: chuyển vào Trash cũng sẽ xóa nó khỏi các thiết bị khác của bạn.";
 "In project %@" = "Trong dự án %@";
 "In real use" = "Khi dùng thực tế";
+"In the Hugging Face cache; used once a %@ model is installed." = "Trong bộ nhớ đệm Hugging Face; được dùng sau khi cài đặt mô hình %@.";
 "In the queue: %lld ahead…" = "Trong hàng chờ: %lld người phía trước…";
 "Include LLMTray crash reports from the last two weeks" = "Bao gồm báo cáo sự cố LLMTray trong hai tuần gần đây";
 "Include the server log" = "Bao gồm nhật ký máy chủ";
@@ -595,6 +600,7 @@
 "Kind" = "Loại";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Hướng dẫn LLMTray";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray tải mục này cùng với mô hình mà nó tăng tốc: hãy tải mô hình đó.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray không được phép dùng micro.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray không được phép sử dụng micrô. Cho phép trong Cài đặt Hệ thống › Quyền riêng tư & Bảo mật › Micrô.";
 "LLMTray restarts now to load them." = "LLMTray sẽ khởi động lại ngay để nạp chúng.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "Đầu ra trực tiếp của tiến trình mô hình: tải, lỗi, yêu cầu.";
 "Load %@" = "Tải %@";
 "Load it itself" = "Tự tải nó";
+"Load it yourself, or let memory do it (Load it itself, below)." = "Tự tải nó, hoặc để bộ nhớ làm việc đó (“Tự tải nó”, bên dưới).";
 "Loaded: %1$@ · selected: %2$@" = "Đang tải: %1$@ · đã chọn: %2$@";
 "Loading %@…" = "Đang tải %@…";
 "Loading the voice model…" = "Đang tải mô hình giọng nói…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Cuộc trò chuyện dài và tệp đã ghim lấy từ bộ đệm (cache) thay vì đọc lại mỗi lượt.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Các cuộc trò chuyện dài thuận tiện hơn trong cửa sổ: dự án, tệp và mọi cuộc trò chuyện trong thanh bên.";
+"MTP drafter: speeds up %@, same answers" = "Bộ nháp MTP: tăng tốc %@, cùng câu trả lời";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dành cho lập trình và agent: công cụ lập trình và OpenAI API.";
 "Maintenance" = "Bảo trì";
 "Make a 30-second calm lo-fi instrumental for studying" = "Tạo nhạc nền lo-fi 30 giây, nhẹ nhàng để học";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Bộ nhớ có thể học từ những gì bạn đã viết trong Trò chuyện khi tính năng này tắt, hoặc chỉ từ những gì bạn viết từ bây giờ.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bộ nhớ sẽ không học thêm gì từ Trò chuyện này. Các Ghi chú đã học từ đó cũng có thể bị xóa, trừ những ghi chú bạn đã sửa, ghim hoặc phê duyệt.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "Bộ nhớ sẽ tự tải nó khi LLMTray không hoạt động trong %d phút.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bộ nhớ chỉ đọc một Trò chuyện từ tin nhắn đầu tiên sau khi gặp Trò chuyện đó. Mục này cũng đọc mọi Trò chuyện đã lưu từ đầu — những gì bạn đã viết trước khi bật Bộ nhớ — trong nền, khi mô hình đang rảnh. Các Trò chuyện được đánh dấu “Đừng ghi nhớ” sẽ bị bỏ qua.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bộ nhớ chỉ ở trên máy Mac này: ghi chú được giữ trong một tệp tại đây và không bao giờ được tải lên hoặc chia sẻ. Chúng chỉ được đưa vào lời nhắc của Trò chuyện LLMTray -- không gửi đến các ứng dụng dùng API, không đưa vào Trò chuyện tạm.";
 "Memory was off. Read what was said meanwhile?" = "Bộ nhớ đã tắt. Đọc những gì đã nói trong lúc đó?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "Đang nói…";
 "Speculative decoding (MTP)" = "Giải mã suy đoán (MTP)";
 "Speed" = "Tốc độ";
+"Speeds up %@: fetched where LLMTray loads it from." = "Tăng tốc %@: được tải về từ nơi LLMTray tải nó.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Thời gian chờ khi ngưng phản hồi: %lld giây";
 "Start" = "Bắt đầu";
@@ -1063,6 +1073,7 @@
 "Start server" = "Khởi động máy chủ.";
 "Start talking" = "Bắt đầu nói";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
+"Start the server to read your chats." = "Hãy khởi động máy chủ để đọc các cuộc trò chuyện của bạn.";
 "Start the server when LLMTray opens" = "Khởi động máy chủ khi mở LLMTray";
 "Starting in %.0f s…" = "Bắt đầu sau %.0f giây…";
 "Starting…" = "Đang khởi động…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "Sử dụng sự kiện đã học khi %lld Trò chuyện cho thấy điều đó";
 "Use headphones: the model hears its own voice from the speakers." = "Dùng tai nghe: mô hình sẽ nghe tiếng mình từ loa.";
 "Used" = "Đã dùng";
+"Used by %@." = "Được %@ dùng.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Được sử dụng cho tạo ảnh, nhạc và Voice Lab, nơi tải chúng về. Chúng cũng được lưu trong thư mục models, theo tên trên Hugging Face.";
 "Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "Đang chờ cuộc trò chuyện hoặc bộ sinh hoàn tất";
 "Waiting to be sent: %@" = "Đang chờ gửi: %@";
 "Waits for %@ to be loaded." = "Chờ %@ được tải.";
-"Waits for a model to be loaded." = "Chờ một mô hình được tải.";
+"Waits for a model: start one to read your chats." = "Đang chờ mô hình: hãy khởi động một mô hình để đọc các cuộc trò chuyện của bạn.";
 "Waits for a picture or song to finish." = "Chờ ảnh hoặc bài hát hoàn tất.";
 "Waits for the model to be free." = "Chờ mô hình rảnh.";
 "Waits for the model to be loaded." = "Chờ mô hình được tải.";

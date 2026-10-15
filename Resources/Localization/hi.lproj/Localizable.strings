@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "यह विंडो बंद करता है। सेटिंग्स › सामान्य › LLMTray सेट अप करें… इसे फिर से खोलता है।";
 "Coding agents" = "कोडिंग एजेंट";
 "Coffee" = "कॉफ़ी";
+"Comes with %@" = "%@ के साथ आता है";
 "Command-line tool" = "कमांड‑लाइन टूल";
 "Compact" = "कॉम्पैक्ट";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "संकुचन लंबी चैट के बीच के हिस्से को मॉडल द्वारा लिखे गए एक सारांश से बदल देता है। शुरुआत के इतने संदेश शब्दशः रखे जाते हैं।";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "“%@” को ट्रैश में नहीं भेजा जा सका: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us से संपर्क नहीं हो सका। आपकी समीक्षा सुरक्षित रखी गई है: बाद में फिर कोशिश करें।";
 "Couldn't reach the server -- please try again later." = "सर्वर तक पहुंच नहीं हो पाई — कृपया बाद में पुन: प्रयास करें।";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "चैट के कुछ हिस्से पढ़े नहीं जा सके; %@ पर फिर से कोशिश करेगा (क्यों: सेटिंग्स › सर्वर › Log)।";
 "Couldn't start the voice runner: %@" = "वॉइस रनर शुरू नहीं हो सका: %@";
 "Countdown" = "काउंटडाउन";
 "Countdown: %lld s" = "काउंटडाउन: %lld स";
@@ -488,11 +490,13 @@
 "Generating image…" = "इमेज जनरेट हो रही है…";
 "Generating music…" = "संगीत बनाया जा रहा है…";
 "Generation" = "जनरेशन";
+"Get" = "पाएँ";
 "Get Started" = "शुरू करें";
 "Get a Model…" = "मॉडल लें…";
 "Get one" = "एक प्राप्त करें";
 "Getting Started" = "प्रारंभ करें";
 "Getting started" = "शुरू करें";
+"Getting…" = "प्राप्त किया जा रहा है…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "मॉडल को generate_music टूल देता है: वर्णन से गाना (गाये हुए बोल) या साधनात्मक आउटपुट (ACE-Step 1.5, MIT लाइसेंस; 30 सेकंड के संगीत के लिए लगभग 20 सेकंड)। पहली बार मॉडल डाउनलोड होगा।";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "मॉडल को एक edit_image टूल देता है: यह चैट की एक छवि बदलता है — जिसे आपने जोड़ा हो या यहाँ जनरेट की गई हो। इसके लिए image generation चालू होना चाहिए। इसका अपना मॉडल है, जिसे चुनने पर डाउनलोड किया जाता है।";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "iCloud Drive या किसी अन्य क्लाउड में: उसे Trash में भेजने से वह आपके अन्य उपकरणों से भी हट जाएगा।";
 "In project %@" = "प्रोजेक्ट %@ में";
 "In real use" = "असल इस्तेमाल में";
+"In the Hugging Face cache; used once a %@ model is installed." = "Hugging Face कैश में; %@ मॉडल इंस्टॉल होने पर उपयोग किया जाता है।";
 "In the queue: %lld ahead…" = "कतार में: %lld पहले…";
 "Include LLMTray crash reports from the last two weeks" = "पिछले दो हफ्तों की LLMTray क्रैश रिपोर्टें शामिल करें";
 "Include the server log" = "सर्वर लॉग शामिल करें";
@@ -595,6 +600,7 @@
 "Kind" = "प्रकार";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray मार्गदर्शिका";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray इसे उस मॉडल के साथ लाता है, जिसे यह तेज़ करता है: वह मॉडल डाउनलोड करें।";
 "LLMTray isn't allowed to use the microphone." = "LLMTray को माइक्रोफ़ोन उपयोग करने की अनुमति नहीं है।";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray को माइक्रोफ़ोन का उपयोग करने की अनुमति नहीं है। इसे सिस्टम सेटिंग्स › गोपनीयता और सुरक्षा › माइक्रोफ़ोन में अनुमत करें।";
 "LLMTray restarts now to load them." = "इन्हें लोड करने के लिए LLMTray अब रीस्टार्ट होगा।";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "मॉडल प्रोसेस का लाइव आउटपुट: लोडिंग, त्रुटियाँ, अनुरोध।";
 "Load %@" = "%@ लोड करें";
 "Load it itself" = "इसे अपने-आप लोड करें";
+"Load it yourself, or let memory do it (Load it itself, below)." = "इसे खुद लोड करें, या मेमोरी को करने दें (नीचे, \"इसे अपने-आप लोड करें\")।";
 "Loaded: %1$@ · selected: %2$@" = "लोड हुआ: %1$@ · चयनित: %2$@";
 "Loading %@…" = "लोड हो रहा है %@…";
 "Loading the voice model…" = "वॉइस मॉडल लोड हो रहा है…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "लंबी बातचीत और पिन की गई फ़ाइलें हर बार फिर से पढ़ी जाने के बजाय कैश से आती हैं।";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "लंबी बातचीत विंडो में आसान होती है: प्रोजेक्ट, फ़ाइलें और हर चैट साइडबार में।";
+"MTP drafter: speeds up %@, same answers" = "MTP drafter: %@ को तेज़ करता है, उत्तर वही";
 "Made for programming and agents: coding tools and the OpenAI API." = "प्रोग्रामिंग और एजेंट्स के लिए बनाया गया: कोडिंग टूल और OpenAI API।";
 "Maintenance" = "रखरखाव";
 "Make a 30-second calm lo-fi instrumental for studying" = "पढ़ाई के लिए 30-सेकंड का शांत लो-फाइ इन्स्ट्रुमेंटल बनाएं";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "मेमोरी आपकी चैट में तब लिखी बातों से सीख सकती है जब वह बंद थी, या केवल अब से आपके लिखे से।";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "पहले की बातचीत का संदर्भ फिर से इस्तेमाल करने के लिए रखी गई मेमोरी, ताकि जारी चैट अपना पूरा इतिहास दोबारा न पढ़े। इसकी सीमा तय है, ताकि यह इतनी न बढ़े कि सर्वर की मेमोरी खत्म हो जाए।";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "मेमोरी इससे और कुछ नहीं सीखेगी। इससे पहले सीखे गए नोट भी जा सकते हैं, सिवाय उन नोट के जिन्हें आपने संपादित, पिन या स्वीकृत किया है।";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "जब LLMTray %d मिनट तक निष्क्रिय रहता है, तो मेमोरी इसे अपने-आप लोड करती है।";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "मेमोरी किसी चैट को केवल उस पहले संदेश से पढ़ती है जो उसे वह चैट मिलने के बाद आया। यह हर सहेजी गई चैट को शुरुआत से भी पढ़ता है — मेमोरी चालू होने से पहले आपने जो लिखा था — बैकग्राउंड में, जब मॉडल खाली हो। “याद न रखें” चिह्नित चैट छोड़ दी जाती हैं।";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "मेमोरी इसी Mac पर रहती है: नोट यहाँ एक फ़ाइल में रखे जाते हैं और कभी अपलोड या साझा नहीं किए जाते। वे केवल आपकी LLMTray चैट के प्रॉम्प्ट में जाते हैं -- API का उपयोग करने वाले ऐप्स में नहीं, अस्थायी चैट में नहीं।";
 "Memory was off. Read what was said meanwhile?" = "मेमोरी बंद थी। इस बीच कही गई बातें पढ़ें?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "बोल रहा है…";
 "Speculative decoding (MTP)" = "स्पेक्युलेटिव डिकोडिंग (MTP)";
 "Speed" = "गति";
+"Speeds up %@: fetched where LLMTray loads it from." = "%@ को तेज़ करता है: जहाँ से LLMTray इसे लोड करता है, वहीं से लाया जाता है।";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "रुकावट टाइमआउट: %lld सेकंड";
 "Start" = "आरंभ";
@@ -1063,6 +1073,7 @@
 "Start server" = "सर्वर शुरू करें।";
 "Start talking" = "बोलना शुरू करें";
 "Start the server first." = "पहले सर्वर शुरू करें।";
+"Start the server to read your chats." = "अपनी चैट पढ़ने के लिए सर्वर आरंभ करें।";
 "Start the server when LLMTray opens" = "LLMTray खुलने पर सर्वर शुरू करें";
 "Starting in %.0f s…" = "शुरू होगा %.0f s में…";
 "Starting…" = "शुरू हो रहा है…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "%lld चैट में दिखने के बाद सीखे हुए तथ्य का उपयोग करें";
 "Use headphones: the model hears its own voice from the speakers." = "हेडफ़ोन का उपयोग करें: मॉडल स्पीकर्स से अपनी ही आवाज़ सुनता है।";
 "Used" = "उपयोग किया गया";
+"Used by %@." = "%@ द्वारा उपयोग किया जाता है।";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "इन्हें इमेज जेनरेशन, म्यूजिक और Voice Lab उपयोग करते हैं, जो इन्हें डाउनलोड करते हैं। इन्हें उनके Hugging Face नामों के साथ models फ़ोल्डर में भी रखा जाता है।";
 "Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "चैट या जनरेटर के समाप्त होने की प्रतीक्षा";
 "Waiting to be sent: %@" = "भेजने के लिए प्रतीक्षित: %@";
 "Waits for %@ to be loaded." = "%@ के लोड होने की प्रतीक्षा करता है।";
-"Waits for a model to be loaded." = "किसी मॉडल के लोड होने की प्रतीक्षा करता है।";
+"Waits for a model: start one to read your chats." = "मॉडल का इंतज़ार है: अपनी चैट पढ़ने के लिए एक आरंभ करें।";
 "Waits for a picture or song to finish." = "चित्र या गीत पूरा होने की प्रतीक्षा करता है।";
 "Waits for the model to be free." = "मॉडल के खाली होने की प्रतीक्षा करता है।";
 "Waits for the model to be loaded." = "मॉडल लोड होने की प्रतीक्षा करता है।";

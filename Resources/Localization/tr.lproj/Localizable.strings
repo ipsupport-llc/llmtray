@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Ayarlar › Genel › LLMTray'ı Kur… öğesi yeniden açar.";
 "Coding agents" = "Kodlama ajanları";
 "Coffee" = "Kahve";
+"Comes with %@" = "%@ ile gelir";
 "Command-line tool" = "Komut satırı aracı";
 "Compact" = "Kompakt";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Sıkıştırma, uzun bir sohbetin ortasını modelin yazdığı tek bir özetle değiştirir. Baştaki bu sayıda mesaj kelimesi kelimesine korunur.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "“%@” Çöp Kutusu'na taşınamadı: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us adresine ulaşılamadı. Değerlendirmeniz saklandı: daha sonra tekrar deneyin.";
 "Couldn't reach the server -- please try again later." = "Sunucuya ulaşılamadı — lütfen daha sonra tekrar deneyin.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Sohbetlerin bazı bölümleri okunamadı; %@ zamanında yeniden denenecek (neden: Ayarlar › Sunucu › Günlük).";
 "Couldn't start the voice runner: %@" = "Ses çalıştırıcısı başlatılamadı: %@";
 "Countdown" = "Geri sayım";
 "Countdown: %lld s" = "Geri sayım: %lld sn";
@@ -488,11 +490,13 @@
 "Generating image…" = "Görüntü oluşturuluyor…";
 "Generating music…" = "Müzik üretiliyor…";
 "Generation" = "Oluşturma";
+"Get" = "Al";
 "Get Started" = "Başlayın";
 "Get a Model…" = "Model Al…";
 "Get one" = "Al";
 "Getting Started" = "Başlarken";
 "Getting started" = "Başlarken";
+"Getting…" = "Alınıyor…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Modele generate_music aracını ekler: tanıma dayalı şarkı (sözlü) veya enstrümantal parça üretir (ACE-Step 1.5, MIT lisansı; yaklaşık 30 saniye için 20 saniye). İlk kullanımda model indirilir.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Modele edit_image aracını sağlar: sohbetten alınan, eklediğiniz veya burada oluşturulan bir resmi değiştirir. Resim oluşturma açık olmalı. Kendi modeli vardır; seçtiğinizde indirilir.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "iCloud Drive veya başka bir bulutta: Çöp'e taşımak diğer cihazlardan da kaldırır.";
 "In project %@" = "%@ projesinde";
 "In real use" = "Gerçek kullanımda";
+"In the Hugging Face cache; used once a %@ model is installed." = "Hugging Face önbelleğinde; bir %@ modeli yüklendikten sonra kullanılır.";
 "In the queue: %lld ahead…" = "Sırada: %lld kişi önce…";
 "Include LLMTray crash reports from the last two weeks" = "Son iki haftanın LLMTray çökme raporlarını ekle";
 "Include the server log" = "Sunucu kaydını ekle";
@@ -595,6 +600,7 @@
 "Kind" = "Tür";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Kılavuzu";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray bunu hızlandırdığı modelle birlikte alır: o modeli indirin.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray'ın mikrofonu kullanmasına izin verilmiyor.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray’in mikrofonu kullanmasına izin verilmiyor. Sistem Ayarları › Gizlilik ve Güvenlik › Mikrofon’da izin verin.";
 "LLMTray restarts now to load them." = "LLMTray şimdi bunları yüklemek için yeniden başlıyor.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "Model işleminin canlı çıktısı: yükleme, hatalar, istekler.";
 "Load %@" = "%@'ı yükle";
 "Load it itself" = "Kendisi yüklesin";
+"Load it yourself, or let memory do it (Load it itself, below)." = "Kendiniz yükleyin veya belleğin yüklemesine izin verin (aşağıda: “Kendisi yüklesin”).";
 "Loaded: %1$@ · selected: %2$@" = "Yüklü: %1$@ · seçili: %2$@";
 "Loading %@…" = "%@ yükleniyor…";
 "Loading the voice model…" = "Ses modeli yükleniyor…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Üretilen her token’ı günlüğe yazar (DEBUG). Yalnızca model işleminde sorun gidermek içindir — işleri yavaşlatır. Bir sonraki sunucu başlangıcında etkili olur.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Uzun konuşmalar ve sabitlenmiş dosyalar her turda yeniden okunmak yerine önbellekten sunulur.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Uzun sohbetler pencereye daha uygun: projeler, dosyalar ve tüm sohbetler bir kenar çubuğunda.";
+"MTP drafter: speeds up %@, same answers" = "MTP taslaklayıcı: %@’yi hızlandırır, yanıtlar aynı";
 "Made for programming and agents: coding tools and the OpenAI API." = "Programlama ve ajanlar için hazırlanmıştır: kodlama araçları ve OpenAI API.";
 "Maintenance" = "Bakım";
 "Make a 30-second calm lo-fi instrumental for studying" = "Çalışma için 30 saniyelik sakin bir lo‑fi enstrümantal yapın";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Bellek, kapalıyken sohbetlerinizde yazdıklarınızdan ya da yalnızca bundan sonra yazacaklarınızdan öğrenebilir.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bellek bundan artık hiçbir şey öğrenmez. Daha önce öğrettiği Notlar da gidebilir; düzenlediğiniz, sabitlediğiniz veya onayladıklarınız hariç.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTray %d dakika boşta kaldığında Bellek bunu kendisi yükler.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bellek, bir sohbeti yalnızca o sohbetle karşılaştıktan sonraki ilk iletiden itibaren okur. Bu, kaydedilen her sohbeti başından itibaren de okur — Bellek açık değilken yazdıklarınızı — model boştayken arka planda işler. “Hatırlama” olarak işaretlenen Sohbetler atlanır.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bellek bu Mac’te kalır: notlar burada bir dosyada tutulur ve asla yüklenmez veya paylaşılmaz. Yalnızca LLMTray sohbetlerinizin istemine gider — API kullanan uygulamalara gitmez, geçici sohbetlere eklenmez.";
 "Memory was off. Read what was said meanwhile?" = "Bellek kapalıydı. Bu arada söylenenler okunsun mu?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "Konuşuluyor…";
 "Speculative decoding (MTP)" = "Spekülatif kod çözme (MTP)";
 "Speed" = "Hız";
+"Speeds up %@: fetched where LLMTray loads it from." = "%@’yi hızlandırır: LLMTray’in onu yüklediği yerden alınır.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Takılma zaman aşımı: %lld sn";
 "Start" = "Başlat";
@@ -1063,6 +1073,7 @@
 "Start server" = "Sunucuyu başlat.";
 "Start talking" = "Konuşmaya başla";
 "Start the server first." = "Önce sunucuyu başlatın.";
+"Start the server to read your chats." = "Sohbetlerinizi okumak için sunucuyu başlatın.";
 "Start the server when LLMTray opens" = "LLMTray açıldığında sunucuyu başlat";
 "Starting in %.0f s…" = "%.0f sn içinde başlıyor…";
 "Starting…" = "Başlatılıyor…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "%lld sohbet gösterdiğinde öğrenilen bir olguyu kullan";
 "Use headphones: the model hears its own voice from the speakers." = "Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
 "Used" = "Kullanıldı";
+"Used by %@." = "%@ tarafından kullanılır.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Görüntü oluşturma, müzik ve Voice Lab tarafından kullanılır; bunlar tarafından indirilir. Hugging Face adlarıyla models klasöründe saklanırlar.";
 "Uses the internet" = "İnterneti kullanır";
 "Verbose server logging" = "Ayrıntılı sunucu günlüklemesi";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "Sohbetin veya bir oluşturucunun bitmesi bekleniyor";
 "Waiting to be sent: %@" = "Gönderilmeyi bekleyen: %@";
 "Waits for %@ to be loaded." = "%@ yüklenene kadar bekler.";
-"Waits for a model to be loaded." = "Bir model yüklenene kadar bekler.";
+"Waits for a model: start one to read your chats." = "Bir model bekleniyor: sohbetlerinizi okumak için bir model başlatın.";
 "Waits for a picture or song to finish." = "Bir resmin veya parçanın tamamlanmasını bekler.";
 "Waits for the model to be free." = "Modelin boşa çıkmasını bekler.";
 "Waits for the model to be loaded." = "Modelin yüklenmesini bekler.";

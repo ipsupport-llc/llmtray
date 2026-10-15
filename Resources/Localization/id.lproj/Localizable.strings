@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Menutup jendela ini. Pengaturan › Umum › Set Up LLMTray… akan membukanya lagi.";
 "Coding agents" = "Agen kode";
 "Coffee" = "Kopi";
+"Comes with %@" = "Disertakan dengan %@";
 "Command-line tool" = "Alat baris perintah";
 "Compact" = "Ringkas";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Pemadatan mengganti bagian tengah obrolan panjang dengan satu ringkasan yang ditulis model. Sebanyak ini pesan di awal dipertahankan kata demi kata.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "Tidak dapat memindahkan “%@” ke Sampah: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Tidak dapat menghubungi ipsupport.us. Ulasan Anda disimpan: coba lagi nanti.";
 "Couldn't reach the server -- please try again later." = "Tidak dapat menghubungi server — coba lagi nanti.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Tidak dapat membaca beberapa bagian obrolan; akan mencoba lagi pada %@ (alasannya: Pengaturan › Server › Log).";
 "Couldn't start the voice runner: %@" = "Gagal memulai voice runner: %@";
 "Countdown" = "Hitungan mundur";
 "Countdown: %lld s" = "Hitung mundur: %lld dtk";
@@ -488,11 +490,13 @@
 "Generating image…" = "Membuat gambar…";
 "Generating music…" = "Menghasilkan musik…";
 "Generation" = "Generasi";
+"Get" = "Dapatkan";
 "Get Started" = "Memulai";
 "Get a Model…" = "Dapatkan Model…";
 "Get one" = "Dapatkan";
 "Getting Started" = "Memulai";
 "Getting started" = "Memulai";
+"Getting…" = "Mengambil…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Memberi model alat generate_music: lagu dengan lirik bernyanyi, atau instrumental, dari deskripsi (ACE-Step 1.5, lisensi MIT; sekitar 20 detik untuk 30 detik musik). Pada percobaan pertama, model akan diunduh.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Memberi model alat edit_image: mengubah gambar dari obrolan — yang Anda lampirkan atau yang dibuat di sini. Membutuhkan fitur pembuatan gambar aktif. Model tersendiri, diunduh saat Anda memilihnya.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "Di iCloud Drive atau layanan cloud lain: memindahkannya ke Trash juga menghapusnya dari perangkat lain Anda.";
 "In project %@" = "Di proyek %@";
 "In real use" = "Dalam pemakaian nyata";
+"In the Hugging Face cache; used once a %@ model is installed." = "Di cache Hugging Face; digunakan setelah model %@ diinstal.";
 "In the queue: %lld ahead…" = "Dalam antrean: %lld lagi…";
 "Include LLMTray crash reports from the last two weeks" = "Sertakan laporan crash LLMTray dari dua minggu terakhir";
 "Include the server log" = "Sertakan log server";
@@ -595,6 +600,7 @@
 "Kind" = "Jenis";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Panduan LLMTray";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray mengambilnya bersama model yang dipercepatnya: unduh model tersebut.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray tidak diizinkan menggunakan mikrofon.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray tidak diizinkan menggunakan mikrofon. Izinkan di Pengaturan Sistem › Privasi & Keamanan › Mikrofon.";
 "LLMTray restarts now to load them." = "LLMTray akan memulai ulang sekarang untuk memuatnya.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "Output langsung dari proses model: pemuatan, kesalahan, permintaan.";
 "Load %@" = "Muat %@";
 "Load it itself" = "Muat sendiri";
+"Load it yourself, or let memory do it (Load it itself, below)." = "Muat sendiri, atau biarkan memori yang melakukannya (“Muat sendiri”, di bawah).";
 "Loaded: %1$@ · selected: %2$@" = "Dimuat: %1$@ · dipilih: %2$@";
 "Loading %@…" = "Memuat %@…";
 "Loading the voice model…" = "Memuat model suara…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Percakapan panjang dan file yang disematkan diambil dari cache sehingga tidak dibaca ulang setiap giliran.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Obrolan panjang lebih mudah di jendela: proyek, file, dan tiap obrolan di sidebar.";
+"MTP drafter: speeds up %@, same answers" = "Penyusun MTP: mempercepat %@, jawaban tetap sama";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dibuat untuk pemrograman dan agen: alat pengkodean dan OpenAI API.";
 "Maintenance" = "Pemeliharaan";
 "Make a 30-second calm lo-fi instrumental for studying" = "Buat instrumental lo-fi tenang 30 detik untuk belajar";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Memori dapat belajar dari apa yang Anda tulis di obrolan saat mati, atau hanya dari yang Anda tulis mulai sekarang.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memori tidak akan mempelajari apa pun lagi darinya. Catatan yang sudah diajarkannya juga dapat dihapus, kecuali yang Anda edit, sematkan, atau setujui.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "Memori memuatnya sendiri setelah LLMTray tidak aktif selama %d menit.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memori membaca obrolan hanya mulai pesan pertama setelah mengenalinya. Ini juga membaca setiap obrolan tersimpan dari awalnya -- yang Anda tulis sebelum memori dinyalakan -- di latar belakang, saat model bebas. Obrolan yang ditandai “Jangan Ingat” dilewati.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Memori tetap berada di Mac ini: catatan disimpan dalam file di sini dan tidak pernah diunggah atau dibagikan. Catatan hanya masuk ke prompt obrolan LLMTray Anda -- bukan ke app yang menggunakan API, bukan ke chat sementara.";
 "Memory was off. Read what was said meanwhile?" = "Memori mati. Baca yang dikatakan sementara itu?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "Berbicara…";
 "Speculative decoding (MTP)" = "Decoding spekulatif (MTP)";
 "Speed" = "Kecepatan";
+"Speeds up %@: fetched where LLMTray loads it from." = "Mempercepat %@: diambil dari tempat LLMTray memuatnya.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Waktu tunggu mandek: %lld dtk";
 "Start" = "Mulai";
@@ -1063,6 +1073,7 @@
 "Start server" = "Mulai server.";
 "Start talking" = "Mulai berbicara";
 "Start the server first." = "Mulai server terlebih dahulu.";
+"Start the server to read your chats." = "Mulai server untuk membaca obrolan Anda.";
 "Start the server when LLMTray opens" = "Mulai server saat LLMTray dibuka";
 "Starting in %.0f s…" = "Mulai dalam %.0f s…";
 "Starting…" = "Memulai…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "Gunakan fakta yang dipelajari setelah ditunjukkan oleh %lld obrolan";
 "Use headphones: the model hears its own voice from the speakers." = "Gunakan headphone: model mendengar suaranya dari speaker.";
 "Used" = "Digunakan";
+"Used by %@." = "Digunakan oleh %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Digunakan oleh pembuatan gambar, musik, dan Voice Lab, yang mengunduhnya. Mereka juga disimpan di folder models dengan nama Hugging Face mereka.";
 "Uses the internet" = "Menggunakan internet";
 "Verbose server logging" = "Pencatatan log server mendetail";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "Menunggu obrolan atau generator selesai";
 "Waiting to be sent: %@" = "Menunggu dikirim: %@";
 "Waits for %@ to be loaded." = "Menunggu %@ dimuat.";
-"Waits for a model to be loaded." = "Menunggu model dimuat.";
+"Waits for a model: start one to read your chats." = "Menunggu model: mulai satu model untuk membaca obrolan Anda.";
 "Waits for a picture or song to finish." = "Menunggu gambar atau lagu selesai.";
 "Waits for the model to be free." = "Menunggu model tersedia.";
 "Waits for the model to be loaded." = "Menunggu model dimuat.";

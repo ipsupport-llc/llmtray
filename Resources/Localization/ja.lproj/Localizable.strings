@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "このウインドウを閉じます。設定 › 一般 › Set Up LLMTray… で再度開けます。";
 "Coding agents" = "コーディングエージェント";
 "Coffee" = "コーヒー";
+"Comes with %@" = "%@に付属";
 "Command-line tool" = "コマンドラインツール";
 "Compact" = "コンパクト";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "圧縮では、長いチャットの中間部分がモデルの作成した1つの要約に置き換えられます。冒頭のこの数のメッセージは一字一句そのまま保持されます。";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "「%@」をゴミ箱に移動できませんでした：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.usに接続できませんでした。レビューは保存されています。後で再試行してください。";
 "Couldn't reach the server -- please try again later." = "サーバーに接続できませんでした — 後で再試行してください。";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "チャットの一部を読み込めませんでした。%@ に再試行します（理由: 設定 › サーバ › ログ）。";
 "Couldn't start the voice runner: %@" = "音声ランナーを起動できませんでした：%@";
 "Countdown" = "カウントダウン";
 "Countdown: %lld s" = "カウントダウン: %lld 秒";
@@ -488,11 +490,13 @@
 "Generating image…" = "画像を生成中…";
 "Generating music…" = "音楽を生成中…";
 "Generation" = "生成";
+"Get" = "入手";
 "Get Started" = "はじめる";
 "Get a Model…" = "モデルを入手…";
 "Get one" = "入手";
 "Getting Started" = "はじめに";
 "Getting started" = "はじめに";
+"Getting…" = "入手中…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "モデルに generate_music ツールを追加します：歌詞付きの曲またはインストゥルメンタルを説明から生成します（ACE-Step 1.5, MIT license；30秒の音楽で約20秒）。初回はモデルがダウンロードされます。";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "モデルにedit_imageツールを追加します：チャット内の画像（添付したものまたはここで生成したもの）を変更します。画像生成を有効にする必要があります。専用モデルで、選択時にダウンロードされます。";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "iCloud Drive や他のクラウド上にある場合：ゴミ箱に移動すると他のデバイスからも削除されます。";
 "In project %@" = "プロジェクト %@ にて";
 "In real use" = "実際の使用";
+"In the Hugging Face cache; used once a %@ model is installed." = "Hugging Faceキャッシュ内にあり、%@モデルがインストールされると使用されます。";
 "In the queue: %lld ahead…" = "キュー内: %lld 件前…";
 "Include LLMTray crash reports from the last two weeks" = "過去2週間の LLMTray クラッシュレポートを含める";
 "Include the server log" = "サーバーログを含める";
@@ -595,6 +600,7 @@
 "Kind" = "種類";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray ガイド";
+"LLMTray fetches it with the model it speeds up: download that model." = "高速化するモデルと一緒にLLMTrayが取得します。そのモデルをダウンロードしてください。";
 "LLMTray isn't allowed to use the microphone." = "LLMTray にマイク使用の許可がありません。";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTrayにはマイクの使用が許可されていません。「システム設定」＞「プライバシーとセキュリティ」＞「マイク」で許可してください。";
 "LLMTray restarts now to load them." = "LLMTray を再起動して読み込みます。";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "モデルプロセスのライブ出力です: 読み込み、エラー、リクエスト。";
 "Load %@" = "%@ を読み込む";
 "Load it itself" = "自動的に読み込む";
+"Load it yourself, or let memory do it (Load it itself, below)." = "自分で読み込むか、メモリに任せてください（下の「自動的に読み込む」）。";
 "Loaded: %1$@ · selected: %2$@" = "読み込み済み: %1$@ · 選択: %2$@";
 "Loading %@…" = "読み込み中 %@…";
 "Loading the voice model…" = "音声モデルを読み込み中…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "長い会話とピン留めファイルは毎ターン読み直されず、キャッシュから取得されます。";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "長いチャットはウインドウで管理すると便利です：サイドバーにプロジェクト、ファイル、すべてのチャットを表示します。";
+"MTP drafter: speeds up %@, same answers" = "MTP drafter：%@を高速化、回答は同じ";
 "Made for programming and agents: coding tools and the OpenAI API." = "プログラミングとエージェント向け：コーディングツールと the OpenAI API。";
 "Maintenance" = "メンテナンス";
 "Make a 30-second calm lo-fi instrumental for studying" = "勉強用の落ち着いた30秒のローファイ・インストゥルメンタルを作る";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "メモリは、オフの間にチャットに書いた内容から学習することも、今後書く内容からだけ学習することもできます。";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "メモリはこのチャットからこれ以上学習しません。すでに教えたノートも削除できます。ただし、編集、ピン留め、または承認したものは除きます。";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTrayが%d分間アイドル状態になると、メモリが自動的に読み込みます。";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "メモリは、そのチャットに出会った後の最初のメッセージからのみチャットを読み取ります。これは、メモリがオンになる前に書いた内容も含め、保存済みのすべてのチャットを先頭からバックグラウンドで読み取ります（モデルが空いている間）。「Don't Remember」とマークされたチャットはスキップされます。";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "メモリはこのMac内に留まります。ノートはここにあるファイルに保存され、アップロードまたは共有されることはありません。ノートはLLMTrayのチャットのプロンプトにのみ入ります。APIを使用するアプリには送信されず、一時チャットにも入りません。";
 "Memory was off. Read what was said meanwhile?" = "メモリがオフでした。その間の内容を読み取りますか？";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "発話中…";
 "Speculative decoding (MTP)" = "投機的デコード（MTP）";
 "Speed" = "速度";
+"Speeds up %@: fetched where LLMTray loads it from." = "%@を高速化します。LLMTrayがそれを読み込む場所から取得されます。";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "ストールタイムアウト: %lld秒";
 "Start" = "開始";
@@ -1063,6 +1073,7 @@
 "Start server" = "サーバを起動します。";
 "Start talking" = "話し始める";
 "Start the server first." = "先にサーバを起動してください。";
+"Start the server to read your chats." = "チャットを読むには、サーバを開始してください。";
 "Start the server when LLMTray opens" = "LLMTray の起動時にサーバを起動";
 "Starting in %.0f s…" = "あと %.0f 秒で開始…";
 "Starting…" = "起動中…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "%lld 件のチャットに現れたら学習した事実を使用";
 "Use headphones: the model hears its own voice from the speakers." = "ヘッドフォンを使用してください：モデルはスピーカーの自声を聞きます。";
 "Used" = "使用済み";
+"Used by %@." = "%@で使用されます。";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "画像生成、音楽、Voice Lab で使用され、これらはダウンロードされます。Hugging Face の名前のままでモデルフォルダに保存されます。";
 "Uses the internet" = "インターネットを使用";
 "Verbose server logging" = "詳細なサーバログ";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "チャットまたはジェネレータの完了を待機中";
 "Waiting to be sent: %@" = "送信待ち: %@";
 "Waits for %@ to be loaded." = "%@が読み込まれるまで待機します。";
-"Waits for a model to be loaded." = "モデルが読み込まれるまで待機します。";
+"Waits for a model: start one to read your chats." = "モデルを待機中です。チャットを読むにはモデルを開始してください。";
 "Waits for a picture or song to finish." = "画像または曲の生成が終わるまで待機します。";
 "Waits for the model to be free." = "モデルが空くまで待機します。";
 "Waits for the model to be loaded." = "モデルが読み込まれるまで待機します。";

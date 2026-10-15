@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. الإعدادات › عام › إعداد LLMTray… يفتحها من جديد.";
 "Coding agents" = "وكلاء الترميز";
 "Coffee" = "قهوة";
+"Comes with %@" = "يأتي مع %@";
 "Command-line tool" = "أداة سطر الأوامر";
 "Compact" = "مضغوط";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "يستبدل الضغط وسط دردشة طويلة بملخص واحد يكتبه النموذج. يُحتفظ بهذا العدد من الرسائل في البداية كما هي حرفيًا.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "تعذر نقل «%@» إلى سلة المحذوفات: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "تعذّر الوصول إلى ipsupport.us. تم الاحتفاظ بمراجعتك؛ حاول لاحقًا.";
 "Couldn't reach the server -- please try again later." = "تعذر الوصول إلى الخادم — حاول مرة أخرى لاحقاً.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "تعذّرت قراءة بعض أجزاء الدردشات؛ ستتم إعادة المحاولة في %@ (السبب: الإعدادات › الخادم › السجل).";
 "Couldn't start the voice runner: %@" = "تعذر بدء مشغّل الصوت: %@";
 "Countdown" = "العد التنازلي";
 "Countdown: %lld s" = "العد التنازلي: %lld ث";
@@ -488,11 +490,13 @@
 "Generating image…" = "جارٍ إنشاء الصورة…";
 "Generating music…" = "جارٍ توليد الموسيقى…";
 "Generation" = "الإنشاء";
+"Get" = "تنزيل";
 "Get Started" = "البدء";
 "Get a Model…" = "الحصول على نموذج…";
 "Get one" = "الحصول على واحد";
 "Getting Started" = "البدء";
 "Getting started" = "البدء";
+"Getting…" = "جارٍ التنزيل…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "يمنح النموذج أداة generate_image (يتطلب نموذجًا يستدعي الأدوات). في المرة الأولى، يتم تنزيل نموذج الصور.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "يوفر للنموذج أداة generate_music: أغنية بكلمات مغناة أو مقطوعة موسيقية بناءً على وصف (ACE-Step 1.5، رخصة MIT؛ تقريبًا 20 ثانية من الوقت لتوليد 30 ثانية من الموسيقى). عند الاستخدام الأول، يتم تنزيل النموذج.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "يوفر للنموذج أداة edit_image: تُغيّر صورة من المحادثة — إما واحدة أرفقتها أو تم إنشاؤها هنا. يتطلب تشغيل توليد الصور. النموذج الخاص به يُحمّل عند اختيارك له.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "في iCloud Drive أو سحابة أخرى: نقلها إلى Trash يزيلها من أجهزتك الأخرى أيضاً.";
 "In project %@" = "في المشروع %@";
 "In real use" = "في الاستخدام الفعلي";
+"In the Hugging Face cache; used once a %@ model is installed." = "في ذاكرة التخزين المؤقت لـ Hugging Face؛ يُستخدم بمجرد تثبيت نموذج %@.";
 "In the queue: %lld ahead…" = "في الطابور: %lld قبل…";
 "Include LLMTray crash reports from the last two weeks" = "تضمين تقارير أعطال LLMTray خلال الأسبوعين الماضيين";
 "Include the server log" = "تضمين سجل الخادم";
@@ -595,6 +600,7 @@
 "Kind" = "النوع";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "دليل LLMTray";
+"LLMTray fetches it with the model it speeds up: download that model." = "يجلبه LLMTray مع النموذج الذي يسرّعه: نزّل ذلك النموذج.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray غير مسموح له باستخدام الميكروفون.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "لا يُسمح لـ LLMTray باستخدام الميكروفون. اسمح له من إعدادات النظام › الخصوصية والأمان › الميكروفون.";
 "LLMTray restarts now to load them." = "يعيد LLMTray التشغيل الآن لتحميلها.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "الإخراج المباشر لعملية النموذج: التحميل والأخطاء والطلبات.";
 "Load %@" = "تحميل %@";
 "Load it itself" = "تحميله تلقائيًا";
+"Load it yourself, or let memory do it (Load it itself, below)." = "حمّله بنفسك، أو دع الذاكرة تقوم بذلك («تحميله تلقائيًا» أدناه).";
 "Loaded: %1$@ · selected: %2$@" = "محمل: %1$@ · مختار: %2$@";
 "Loading %@…" = "جارٍ تحميل %@…";
 "Loading the voice model…" = "جاري تحميل نموذج الصوت…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "يسجّل كل رمز يتم إنشاؤه (DEBUG). مخصص فقط لاستكشاف أخطاء عملية النموذج وإصلاحها -- فهو يبطئ الأداء. يسري عند بدء تشغيل الخادم التالي.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "المحادثات الطويلة والملفات المثبتة تُستَخدم من ذاكرة التخزين المؤقت بدل قراءتها في كل مرة.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "المحادثات الأطول أسهل في النافذة: المشاريع والملفات وكل محادثة في الشريط الجانبي.";
+"MTP drafter: speeds up %@, same answers" = "مُسودِّد MTP: يسرّع %@، مع نفس الإجابات";
 "Made for programming and agents: coding tools and the OpenAI API." = "مصمم للبرمجة والوكيلات: أدوات برمجية وOpenAI API.";
 "Maintenance" = "الصيانة";
 "Make a 30-second calm lo-fi instrumental for studying" = "أنشئ مقطعًا هادئًا lo-fi مدته 30 ثانية للمذاكرة";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "يمكن أن تتعلم الذاكرة مما كتبته في دردشاتك أثناء إيقافها، أو مما تكتبه من الآن فصاعدًا فقط.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "لن تتعلم الذاكرة أي شيء آخر منها. ويمكن أن تُزال الملاحظات التي علّمتها سابقًا أيضًا، باستثناء ما عدّلته أو ثبّته أو وافقت عليه.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "تقوم الذاكرة بتحميله تلقائيًا بعد أن يبقى LLMTray بدون نشاط لمدة %d دقيقة.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "تقرأ الذاكرة الدردشة فقط من أول رسالة بعد أن تعرّفت عليها. يقرأ هذا أيضًا كل دردشة محفوظة من بدايتها — ما كتبته قبل تفعيل الذاكرة — في الخلفية، عندما يكون النموذج متاحًا. تُتخطى الدردشات المحددة بـ «لا تتذكر».";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "تبقى الذاكرة على هذا الـ Mac: تُحفظ الملاحظات في ملف هنا ولا تُرفع أو تُشارك أبدًا. ولا تُضاف إلا إلى موجه دردشات LLMTray — وليس إلى التطبيقات التي تستخدم API، ولا إلى الدردشات المؤقتة.";
 "Memory was off. Read what was said meanwhile?" = "كانت الذاكرة متوقفة. هل تريد قراءة ما قيل في هذه الأثناء؟";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "قيد التحدُّث…";
 "Speculative decoding (MTP)" = "فك الترميز التخميني (MTP)";
 "Speed" = "السرعة";
+"Speeds up %@: fetched where LLMTray loads it from." = "يسرّع %@: يُجلب من المكان الذي يحمّله منه LLMTray.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "مهلة التوقف: %lld ث";
 "Start" = "ابدأ";
@@ -1063,6 +1073,7 @@
 "Start server" = "ابدأ الخادم.";
 "Start talking" = "ابدأ التحدّث";
 "Start the server first." = "ابدأ الخادم أولًا.";
+"Start the server to read your chats." = "ابدأ الخادم لقراءة دردشاتك.";
 "Start the server when LLMTray opens" = "بدء الخادم عند فتح LLMTray";
 "Starting in %.0f s…" = "يبدأ خلال %.0f s…";
 "Starting…" = "جارٍ البدء…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "استخدام حقيقة متعلّمة عندما تُظهرها %lld من الدردشات";
 "Use headphones: the model hears its own voice from the speakers." = "استخدم سماعات رأس: النموذج يسمع صوته من مكبرات الصوت.";
 "Used" = "المستخدم";
+"Used by %@." = "يستخدمه %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "تُستخدم في توليد الصور والموسيقى وVoice Lab التي تقوم بتنزيلها. تُخزن أيضاً في مجلد النماذج تحت أسمائها على Hugging Face.";
 "Uses the internet" = "يستخدم الإنترنت";
 "Verbose server logging" = "تسجيل مفصّل للخادم";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "انتظار انتهاء المحادثة أو المولِّد";
 "Waiting to be sent: %@" = "في انتظار الإرسال: %@";
 "Waits for %@ to be loaded." = "ينتظر تحميل %@.";
-"Waits for a model to be loaded." = "ينتظر تحميل نموذج.";
+"Waits for a model: start one to read your chats." = "ينتظر نموذجًا: ابدأ واحدًا لقراءة دردشاتك.";
 "Waits for a picture or song to finish." = "ينتظر اكتمال صورة أو أغنية.";
 "Waits for the model to be free." = "ينتظر حتى يصبح النموذج متاحًا.";
 "Waits for the model to be loaded." = "ينتظر حتى يتم تحميل النموذج.";
