@@ -171,9 +171,16 @@ final class MemoryReflector: ObservableObject {
                 }()
                 if let target {
                     let waits = String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName(target))
-                    status = .waiting(waits + " " + (minutes > 0 && mayLoad
-                        ? String(format: NSLocalizedString("Memory loads it itself once LLMTray has been idle %d minutes.", comment: "memory status"), minutes)
-                        : NSLocalizedString("Load it yourself, or let memory do it (Load it itself, below).", comment: "memory status")))
+                    let how: String
+                    if !mayLoad {
+                        // Stopped by the user: memory never starts the server.
+                        how = NSLocalizedString("Start the server to read your chats.", comment: "memory status")
+                    } else if minutes > 0 {
+                        how = String(format: NSLocalizedString("Memory loads it itself once LLMTray has been idle %d minutes.", comment: "memory status"), minutes)
+                    } else {
+                        how = NSLocalizedString("Load it yourself, or let memory do it (Load it itself, below).", comment: "memory status")
+                    }
+                    status = .waiting(waits + " " + how)
                     switchWhenIdle(to: target)
                 } else {
                     status = .waiting(NSLocalizedString("Waits for a model: start one to read your chats.", comment: "memory status"))

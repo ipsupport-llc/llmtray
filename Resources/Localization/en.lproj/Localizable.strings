@@ -1071,6 +1071,7 @@
 "Start server" = "Start server";
 "Start talking" = "Start talking";
 "Start the server first." = "Start the server first.";
+"Start the server to read your chats." = "Start the server to read your chats.";
 "Start the server when LLMTray opens" = "Start the server when LLMTray opens";
 "Starting in %.0f s…" = "Starting in %.0f s…";
 "Starting…" = "Starting…";
