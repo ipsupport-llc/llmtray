@@ -23,6 +23,8 @@ final class MemoryReflector: ObservableObject {
     }
 
     @Published private(set) var status: Status = .idle
+    /// Batches put off or failed: not read again before then.
+    private var notBefore: [Int: Date] = [:]
     /// Batches Apple's model found something in (adr/0025): the reading
     /// model sorts and reads them as usual; not sorted by Apple again.
     private var sorted: Set<Int> = []
@@ -97,7 +99,18 @@ final class MemoryReflector: ObservableObject {
 
     private func runQueue() async {
         let memory = MemoryManager.shared
-        while let head = memory.file.queue.first {
+        while true {
+            // A batch that failed or was put off waits its time, however
+            // often the queue is looked at (every request pokes it): a
+            // failing batch was read again and again, back to back.
+            let now = Date()
+            let ready = memory.file.queue.filter { (notBefore[$0.id] ?? .distantPast) <= now }
+            guard let head = ready.first else {
+                if let next = memory.file.queue.compactMap({ notBefore[$0.id] }).min() {
+                    poke(after: max(5, next.timeIntervalSince(now)))
+                }
+                break
+            }
             guard memory.isEnabled, !memory.unreadable, !memory.settings.kinds.isEmpty else {
                 status = .idle
                 return
@@ -134,14 +147,14 @@ final class MemoryReflector: ObservableObject {
                 return server.loadedModelPath
             }()
             guard let model = loaded,
-                  let batch = memory.file.queue.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
+                  let batch = ready.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
                 let wanted = Self.reader(for: head)
                 status = .waiting(wanted.map {
                     String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName($0))
                 } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status"))
                 // The first waiting batch whose model is installed: a
                 // deleted model's batch doesn't hold the others.
-                if let next = memory.file.queue.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
+                if let next = ready.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
                 poke(after: 300)
                 return
             }
@@ -211,11 +224,14 @@ final class MemoryReflector: ObservableObject {
         let saving = NSLocalizedString("The notes couldn't be saved.", comment: "memory status")
         switch outcome {
         case .done:
+            notBefore[batch.id] = nil
             return true
         case .later(let reason):
             status = .waiting(reason)
             guard memory.change({ $0.deferBatch(batch.id) }) else { waitForStorage(saving); return false }
-            poke(after: min(30 * 60, 120 * Double(batch.attempts + 1)))
+            let wait = min(30 * 60, 120 * Double(batch.attempts + 1))
+            notBefore[batch.id] = Date().addingTimeInterval(wait)
+            poke(after: wait)
             return false
         case .stored(let reason):
             waitForStorage(reason)
@@ -224,13 +240,17 @@ final class MemoryReflector: ObservableObject {
             NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
             var failures = 0
             guard memory.change({ failures = $0.failBatch(batch.id) }) else { waitForStorage(saving); return false }
+            // In the server log, where it can be seen (not the chat's words).
+            server?.appendLog("--- memory: a part of a chat couldn't be read (\(reason)); "
+                + (failures >= Self.maxAttempts ? "given up after \(failures) tries ---\n" : "tried again later ---\n"))
             if failures >= Self.maxAttempts {
                 guard memory.change({ $0.dropBatch(batch.id) }) else { waitForStorage(saving); return false }
+                notBefore[batch.id] = nil
                 return true
             }
-            poke(after: 300)
-            status = .idle
-            return false
+            // Later; the other batches go on meanwhile.
+            notBefore[batch.id] = Date().addingTimeInterval(300 * Double(failures))
+            return true
         }
     }
 

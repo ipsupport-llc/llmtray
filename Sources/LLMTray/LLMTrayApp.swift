@@ -204,6 +204,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var cancellables: Set<AnyCancellable> = []
     private var sigtermSource: DispatchSourceSignal?
     private var pulseTimer: Timer?
+    /// When the work behind the pulse ended (nil: still going).
+    private var pulseStopAsked: Date?
+    /// How long the pulse lingers after the work ends, for the next request.
+    private static let pulseLinger: TimeInterval = 2
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if APP_STORE
@@ -1006,11 +1010,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// color the icon currently has.
     private func updatePulse(isStreaming: Bool) {
         guard isStreaming else {
-            pulseTimer?.invalidate()
-            pulseTimer = nil
-            statusItem.button?.alphaValue = 1.0
+            // Not cut off: short requests one after another (memory's, an
+            // agent's) restarted it mid-cycle and the icon flickered. It
+            // keeps going a moment in case another comes, then ends at the
+            // top of a cycle.
+            if pulseTimer == nil {
+                statusItem.button?.alphaValue = 1.0
+            } else if pulseStopAsked == nil {
+                pulseStopAsked = Date()
+            }
             return
         }
+        pulseStopAsked = nil
         guard pulseTimer == nil else { return }
         let start = Date()
         let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
@@ -1020,8 +1031,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 guard let self, let button = self.statusItem.button else { return }
                 let period = 1.2
+                // From full brightness (cos), so starting and stopping at the
+                // top of a cycle don't jump.
                 let phase = (2 * Double.pi / period) * Date().timeIntervalSince(start)
-                button.alphaValue = 0.55 + 0.45 * (0.5 + 0.5 * sin(phase))
+                let alpha = 0.55 + 0.45 * (0.5 + 0.5 * cos(phase))
+                if let asked = self.pulseStopAsked, Date().timeIntervalSince(asked) >= Self.pulseLinger, alpha > 0.985 {
+                    self.pulseTimer?.invalidate()
+                    self.pulseTimer = nil
+                    self.pulseStopAsked = nil
+                    button.alphaValue = 1.0
+                    return
+                }
+                button.alphaValue = alpha
             }
         }
         // .common so the pulse keeps animating even while a menu/popover is
