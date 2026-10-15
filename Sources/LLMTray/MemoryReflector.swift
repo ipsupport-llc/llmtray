@@ -154,7 +154,7 @@ final class MemoryReflector: ObservableObject {
                 } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status"))
                 // The first waiting batch whose model is installed: a
                 // deleted model's batch doesn't hold the others.
-                if let next = memory.file.queue.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
+                if let next = ready.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
                 poke(after: 300)
                 return
             }
@@ -224,6 +224,7 @@ final class MemoryReflector: ObservableObject {
         let saving = NSLocalizedString("The notes couldn't be saved.", comment: "memory status")
         switch outcome {
         case .done:
+            notBefore[batch.id] = nil
             return true
         case .later(let reason):
             status = .waiting(reason)
