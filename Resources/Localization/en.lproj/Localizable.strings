@@ -280,6 +280,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
 "Coding agents" = "Coding agents";
 "Coffee" = "Coffee";
+"Comes with %@" = "Comes with %@";
 "Command-line tool" = "Command-line tool";
 "Compact" = "Compact";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word.";
@@ -486,11 +487,13 @@
 "Generating image…" = "Generating image…";
 "Generating music…" = "Generating music…";
 "Generation" = "Generation";
+"Get" = "Get";
 "Get Started" = "Get Started";
 "Get a Model…" = "Get a Model…";
 "Get one" = "Get one";
 "Getting Started" = "Getting Started";
 "Getting started" = "Getting started";
+"Getting…" = "Getting…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
@@ -547,6 +550,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too.";
 "In project %@" = "In project %@";
 "In real use" = "In real use";
+"In the Hugging Face cache; used once a %@ model is installed." = "In the Hugging Face cache; used once a %@ model is installed.";
 "In the queue: %lld ahead…" = "In the queue: %lld ahead…";
 "Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
 "Include the server log" = "Include the server log";
@@ -593,6 +597,7 @@
 "Kind" = "Kind";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray fetches it with the model it speeds up: download that model.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
@@ -635,6 +640,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Long conversations and pinned files come from the cache instead of being read again every turn.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Longer chats are easier in the window: projects, files and every chat in a sidebar.";
+"MTP drafter: speeds up %@, same answers" = "MTP drafter: speeds up %@, same answers";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
@@ -1051,6 +1057,7 @@
 "Speaking…" = "Speaking…";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
 "Speed" = "Speed";
+"Speeds up %@: fetched where LLMTray loads it from." = "Speeds up %@: fetched where LLMTray loads it from.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Stall timeout: %lld s";
 "Start" = "Start";
@@ -1329,6 +1336,7 @@
 "Use a learned fact once %lld chats show it" = "Use a learned fact once %lld chats show it";
 "Use headphones: the model hears its own voice from the speakers." = "Use headphones: the model hears its own voice from the speakers.";
 "Used" = "Used";
+"Used by %@." = "Used by %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.";
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";

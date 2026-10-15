@@ -182,6 +182,13 @@ enum ModelDiscovery {
     /// rather than by folder name, so any MLX quant of the same base model
     /// gets it; the drafter only shares the tokenizer and hidden size with
     /// the main model, not its weights.
+    /// Our MTP drafters on Hugging Face, and the model family each speeds
+    /// up: not chat models (the browser shows them as what they are).
+    static let mtpDrafters: [String: String] = [
+        gemma426BDrafter: "Gemma 4 26B-A4B",
+    ]
+    static let gemma426BDrafter = "roman220220/gemma-4-26B-A4B-it-assistant-mlx-8bit"
+
     static func mtpDrafterRepo(forModelPath path: String) -> String? {
         guard let data = FileManager.default.contents(atPath: path + "/config.json"),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
@@ -192,7 +199,7 @@ enum ModelDiscovery {
         if text["hidden_size"] as? Int == 2816,
            text["num_hidden_layers"] as? Int == 30,
            text["enable_moe_block"] as? Bool == true {
-            return "roman220220/gemma-4-26B-A4B-it-assistant-mlx-8bit"
+            return gemma426BDrafter
         }
         return nil
     }
