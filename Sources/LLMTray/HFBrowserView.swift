@@ -82,6 +82,14 @@ struct HFBrowserView: View {
                                         : "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models."))
                             }
                         }
+                        if let family = ModelDiscovery.mtpDrafters[model.id] {
+                            // Not a chat model: a drafter LLMTray pairs with
+                            // its model by itself (speculative decoding).
+                            Label(String(format: NSLocalizedString("MTP drafter: speeds up %@, same answers", comment: "HF browser: a drafter model's role"), family),
+                                  systemImage: "bolt.fill")
+                                .font(.caption)
+                                .foregroundColor(.accentColor)
+                        }
                         HStack(spacing: 4) {
                             if let downloads = model.downloads {
                                 Text("\(downloads) downloads")
@@ -149,7 +157,9 @@ struct HFBrowserView: View {
 
     @ViewBuilder
     private func downloadControl(for model: HFModelSummary) -> some View {
-        if let media = MediaModels.entry(repo: model.id) {
+        if let family = ModelDiscovery.mtpDrafters[model.id] {
+            DrafterControl(repo: model.id, family: family)
+        } else if let media = MediaModels.entry(repo: model.id) {
             // An image, music or voice model: its own manager downloads it,
             // into the models folder, with what it needs to run.
             MediaDownloadControl(entry: media)
@@ -303,5 +313,62 @@ private struct MediaDownloadControl: View {
                 self.error = error.localizedDescription
             }
         }
+    }
+}
+
+/// A drafter's row (ModelDiscovery.mtpDrafters): installed in the Hugging
+/// Face cache, where the runtime takes it from -- not the models folder --
+/// with the installed models it speeds up; fetched there when one of them
+/// is installed and it isn't yet.
+private struct DrafterControl: View {
+    let repo: String
+    let family: String
+    @ObservedObject private var catalog = ModelCatalog.shared
+    @State private var fetching = false
+    @State private var error: String?
+    @State private var installed = false
+
+    private var users: [LocalModel] {
+        catalog.models.filter { !$0.isAppleSystem && ModelDiscovery.mtpDrafterRepo(forModelPath: $0.path) == repo }
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            if installed {
+                Label("Installed", systemImage: "bolt.circle.fill")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .help(Text(users.isEmpty
+                        ? String(format: NSLocalizedString("In the Hugging Face cache; used once a %@ model is installed.", comment: ""), family)
+                        : String(format: NSLocalizedString("Used by %@.", comment: "HF browser: models a drafter speeds up"),
+                                 users.map(\.displayName).joined(separator: ", "))))
+            } else if users.isEmpty {
+                Text(String(format: NSLocalizedString("Comes with %@", comment: "HF browser: a drafter without its model"), family))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .help(Text("LLMTray fetches it with the model it speeds up: download that model."))
+            } else {
+                Button(fetching ? "Getting…" : "Get") {
+                    fetching = true
+                    error = nil
+                    Task {
+                        error = await MTPDrafterDownload.fetch(repo)
+                        fetching = false
+                        refresh()
+                    }
+                }
+                .disabled(fetching)
+                .help(Text(String(format: NSLocalizedString("Speeds up %@: fetched where LLMTray loads it from.", comment: ""),
+                                  users.map(\.displayName).joined(separator: ", "))))
+            }
+            if let error {
+                Text(error).font(.caption).foregroundColor(.red).lineLimit(2)
+            }
+        }
+        .onAppear(perform: refresh)
+    }
+
+    private func refresh() {
+        installed = HFHubCache.localSnapshot(repo: repo) != nil
     }
 }
