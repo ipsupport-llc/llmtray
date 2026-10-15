@@ -159,17 +159,25 @@ final class MemoryReflector: ObservableObject {
                           last != AppleSystemModel.id, ModelCatalog.shared.model(id: last) != nil else { return nil }
                     return last
                 }()
-                let wanted = Self.reader(for: head) ?? fallback
+                // The model memory would load: the first waiting batch whose
+                // model is installed (a deleted model's batch doesn't hold the
+                // others), else the server's last one.
+                let target = ready.lazy.compactMap(Self.reader(for:)).first ?? fallback
                 let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
-                let waiting = wanted.map {
-                    String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName($0))
-                } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status")
-                status = .waiting(waiting + " " + (minutes > 0
-                    ? String(format: NSLocalizedString("Memory loads it itself once LLMTray has been idle %d minutes.", comment: "memory status"), minutes)
-                    : NSLocalizedString("Load it yourself, or let memory do it (Load it itself, below).", comment: "memory status")))
-                // The first waiting batch whose model is installed: a
-                // deleted model's batch doesn't hold the others.
-                if let next = ready.lazy.compactMap(Self.reader(for:)).first ?? fallback { switchWhenIdle(to: next) }
+                let mayLoad: Bool = {
+                    guard let server else { return false }
+                    if case .running = server.state { return true }
+                    return server.isIdleUnloaded
+                }()
+                if let target {
+                    let waits = String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName(target))
+                    status = .waiting(waits + " " + (minutes > 0 && mayLoad
+                        ? String(format: NSLocalizedString("Memory loads it itself once LLMTray has been idle %d minutes.", comment: "memory status"), minutes)
+                        : NSLocalizedString("Load it yourself, or let memory do it (Load it itself, below).", comment: "memory status")))
+                    switchWhenIdle(to: target)
+                } else {
+                    status = .waiting(NSLocalizedString("Waits for a model: start one to read your chats.", comment: "memory status"))
+                }
                 poke(after: 300)
                 return
             }

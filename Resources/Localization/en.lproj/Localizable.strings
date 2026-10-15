@@ -1365,7 +1365,7 @@
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";
 "Waiting to be sent: %@" = "Waiting to be sent: %@";
 "Waits for %@ to be loaded." = "Waits for %@ to be loaded.";
-"Waits for a model to be loaded." = "Waits for a model to be loaded.";
+"Waits for a model: start one to read your chats." = "Waits for a model: start one to read your chats.";
 "Waits for a picture or song to finish." = "Waits for a picture or song to finish.";
 "Waits for the model to be free." = "Waits for the model to be free.";
 "Waits for the model to be loaded." = "Waits for the model to be loaded.";
