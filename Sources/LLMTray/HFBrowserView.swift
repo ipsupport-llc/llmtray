@@ -366,8 +366,9 @@ private struct DrafterControl: View {
             }
         }
         .onAppear(perform: refresh)
-        // Fetched elsewhere meanwhile (a server start, the download queue),
-        // or its model added or removed: the row follows.
+        // Its model added or removed (the catalog), or the drafter fetched
+        // elsewhere meanwhile (a server start, the download queue -- only
+        // the cache shows that, looked at every few seconds).
         .onChange(of: catalog.models) { _, _ in refresh() }
         .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in refresh() }
     }
@@ -375,5 +376,6 @@ private struct DrafterControl: View {
     private func refresh() {
         let now = HFHubCache.localSnapshot(repo: repo) != nil
         if now != installed { installed = now }
+        if now { error = nil }
     }
 }
