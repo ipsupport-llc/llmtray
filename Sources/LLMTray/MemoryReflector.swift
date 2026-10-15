@@ -107,7 +107,10 @@ final class MemoryReflector: ObservableObject {
             let ready = memory.file.queue.filter { (notBefore[$0.id] ?? .distantPast) <= now }
             guard let head = ready.first else {
                 if let next = memory.file.queue.compactMap({ notBefore[$0.id] }).min() {
+                    status = .waiting(String(format: NSLocalizedString("Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log).", comment: "memory status: a time"),
+                                             next.formatted(date: .omitted, time: .shortened)))
                     poke(after: max(5, next.timeIntervalSince(now)))
+                    return
                 }
                 break
             }
@@ -148,13 +151,40 @@ final class MemoryReflector: ObservableObject {
             }()
             guard let model = loaded,
                   let batch = ready.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
-                let wanted = Self.reader(for: head)
-                status = .waiting(wanted.map {
-                    String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName($0))
-                } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status"))
-                // The first waiting batch whose model is installed: a
-                // deleted model's batch doesn't hold the others.
-                if let next = ready.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
+                // Batches of any model (chats from before models were
+                // recorded) wait for the one the server last had, unloaded
+                // after its idle minutes -- not for one never named.
+                let fallback: String? = {
+                    guard let server, server.isIdleUnloaded, let last = server.loadedModelPath,
+                          last != AppleSystemModel.id, ModelCatalog.shared.model(id: last) != nil else { return nil }
+                    return last
+                }()
+                // The model memory would load: the first waiting batch whose
+                // model is installed (a deleted model's batch doesn't hold the
+                // others), else the server's last one.
+                let target = ready.lazy.compactMap(Self.reader(for:)).first ?? fallback
+                let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
+                let mayLoad: Bool = {
+                    guard let server else { return false }
+                    if case .running = server.state { return true }
+                    return server.isIdleUnloaded
+                }()
+                if let target {
+                    let waits = String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName(target))
+                    let how: String
+                    if !mayLoad {
+                        // Stopped by the user: memory never starts the server.
+                        how = NSLocalizedString("Start the server to read your chats.", comment: "memory status")
+                    } else if minutes > 0 {
+                        how = String(format: NSLocalizedString("Memory loads it itself once LLMTray has been idle %d minutes.", comment: "memory status"), minutes)
+                    } else {
+                        how = NSLocalizedString("Load it yourself, or let memory do it (Load it itself, below).", comment: "memory status")
+                    }
+                    status = .waiting(waits + " " + how)
+                    switchWhenIdle(to: target)
+                } else {
+                    status = .waiting(NSLocalizedString("Waits for a model: start one to read your chats.", comment: "memory status"))
+                }
                 poke(after: 300)
                 return
             }

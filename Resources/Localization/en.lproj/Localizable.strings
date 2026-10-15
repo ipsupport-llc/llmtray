@@ -306,6 +306,7 @@
 "Couldn't move “%@” to the Trash: %@" = "Couldn't move “%@” to the Trash: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
 "Couldn't reach the server -- please try again later." = "Couldn't reach the server -- please try again later.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log).";
 "Couldn't start the voice runner: %@" = "Couldn't start the voice runner: %@";
 "Countdown" = "Countdown";
 "Countdown: %lld s" = "Countdown: %lld s";
@@ -633,6 +634,7 @@
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
 "Load it itself" = "Load it itself";
+"Load it yourself, or let memory do it (Load it itself, below)." = "Load it yourself, or let memory do it (Load it itself, below).";
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
 "Loading %@…" = "Loading %@…";
 "Loading the voice model…" = "Loading the voice model…";
@@ -662,6 +664,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "Memory loads it itself once LLMTray has been idle %d minutes.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats.";
 "Memory was off. Read what was said meanwhile?" = "Memory was off. Read what was said meanwhile?";
@@ -1068,6 +1071,7 @@
 "Start server" = "Start server";
 "Start talking" = "Start talking";
 "Start the server first." = "Start the server first.";
+"Start the server to read your chats." = "Start the server to read your chats.";
 "Start the server when LLMTray opens" = "Start the server when LLMTray opens";
 "Starting in %.0f s…" = "Starting in %.0f s…";
 "Starting…" = "Starting…";
@@ -1362,7 +1366,7 @@
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";
 "Waiting to be sent: %@" = "Waiting to be sent: %@";
 "Waits for %@ to be loaded." = "Waits for %@ to be loaded.";
-"Waits for a model to be loaded." = "Waits for a model to be loaded.";
+"Waits for a model: start one to read your chats." = "Waits for a model: start one to read your chats.";
 "Waits for a picture or song to finish." = "Waits for a picture or song to finish.";
 "Waits for the model to be free." = "Waits for the model to be free.";
 "Waits for the model to be loaded." = "Waits for the model to be loaded.";
