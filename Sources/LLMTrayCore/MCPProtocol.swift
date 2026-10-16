@@ -83,7 +83,7 @@ public enum MCP {
     // MARK: Tools
 
     /// One tool a server offers, as listed.
-    public struct Tool: Equatable, Sendable {
+    public struct Tool: Equatable, Sendable, Codable {
         public var name: String
         public var title: String?
         public var description: String

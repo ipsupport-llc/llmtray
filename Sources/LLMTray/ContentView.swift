@@ -440,6 +440,9 @@ struct ContentView: View {
         if let prompt = chat.folderPrompt {
             FolderPromptCard(prompt: prompt).id(prompt.id)
         }
+        if let prompt = chat.mcpPrompt {
+            MCPCallCard(prompt: prompt).id(prompt.id)
+        }
         if chat.isGeneratingMedia {
             if chat.generatingKind == .music {
                 MusicGenerationProgressView()
@@ -616,6 +619,10 @@ struct ContentView: View {
                 guard let id else { return }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
+            .onChange(of: chat.mcpPrompt?.id) { _, id in
+                guard let id else { return }
+                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+            }
             .onChange(of: chat.folderPlan?.id) { _, id in
                 guard let id else { return }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
@@ -637,7 +644,7 @@ struct ContentView: View {
     /// the showcase, or a project's drop zone.
     private var showsEmptyIntro: Bool {
         chat.messages.isEmpty && chat.draft == nil && !chat.isBusy && !chat.isGeneratingMedia
-            && chat.errorText == nil && chat.folderPlan == nil && chat.folderPrompt == nil
+            && chat.errorText == nil && chat.folderPlan == nil && chat.folderPrompt == nil && chat.mcpPrompt == nil
     }
 
     /// The top of an empty chat's intro (scrolled to when it shows).

@@ -200,6 +200,17 @@ final class ComposerModel: ObservableObject {
 struct ChatComposer: View {
     @EnvironmentObject var chat: ChatClient
     @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
+    @ObservedObject private var mcp = MCPHub.shared
+
+    /// The MCP servers' groups the + menu offers (switched on, tools reviewed).
+    private var mcpGroups: [ToolGroups.Group] {
+        _ = mcp.servers
+        return ToolGroups.all.filter { g in !ToolGroups.builtInGroups.contains { $0.name == g.name } }
+    }
+
+    private func mcpTitle(_ group: ToolGroups.Group) -> String {
+        mcp.servers.first { $0.key == group.name }?.name ?? group.name
+    }
     @ObservedObject var composer: ComposerModel
     @ObservedObject private var folders = FolderAccessManager.shared
     @ObservedObject private var library = ChatLibraryStore.shared
@@ -384,6 +395,26 @@ struct ChatComposer: View {
                         chat.loadToolGroup(ToolGroups.documents)
                         composer.showNotice(NSLocalizedString("Documents are on in this chat: ask for one (a report, a letter…).", comment: "after the + menu's Make a Document…"))
                         isFocused.wrappedValue = true
+                    }
+                }
+            }
+            // MCP servers switched on (adr/0027): each loads its tools into
+            // this saved chat.
+            if id != nil, !mcpGroups.isEmpty {
+                Divider()
+                let profile = ProfileManager.shared.resolved(for: UserDefaults.standard[Pref.selectedModelID])
+                ForEach(mcpGroups, id: \.name) { group in
+                    if profile.toolLoading[group.name] == .always || chat.loadedToolGroups.contains(group.name) {
+                        Button { } label: { Label(String(format: NSLocalizedString("%@ On in This Chat", comment: "+ menu: an MCP server's tools are loaded"),
+                                                         mcpTitle(group)), systemImage: "checkmark") }
+                            .disabled(true)
+                    } else {
+                        Button(String(format: NSLocalizedString("Use %@", comment: "+ menu: load an MCP server's tools"), mcpTitle(group))) {
+                            chat.loadToolGroup(group.name)
+                            composer.showNotice(String(format: NSLocalizedString("%@ is on in this chat: you'll be asked before each call.", comment: "after + menu's Use <server>"),
+                                                       mcpTitle(group)))
+                            isFocused.wrappedValue = true
+                        }
                     }
                 }
             }

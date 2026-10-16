@@ -27,6 +27,9 @@ enum ToolResult {
     /// request's room by ChatToolbox.fitProjectResult, its hits kept for
     /// the answer's citations.
     case projectText(ProjectToolOutput)
+    /// An MCP server's tool (adr/0027): its line under the answer, and the
+    /// tool result (a refusal when the user denied it).
+    case mcp(MCPCallRecord, text: String, refused: Bool)
 }
 
 /// What a tool gives the model of the chat's project files (adr/0012).
@@ -80,6 +83,12 @@ struct ToolContext {
     /// A `change_files` call comes after file, folder or web text in the
     /// turn: its items are flagged in the review (adr/0014, Hardening 2).
     var changeAfterRead = false
+    /// Asks the user about an MCP call (adr/0027); nil answers: Stop or
+    /// another chat -- the call doesn't run.
+    var askMCP: ((MCPCallRequest) async -> MCPCallChoice?)? = nil
+    /// The turn has outside text (file, folder, web, MCP): every MCP call is
+    /// asked, whatever the user allowed (set by ChatToolbox).
+    var outsideTextThisTurn = false
 }
 
 /// What a tool does in the user's folders (adr/0014).
@@ -125,7 +134,23 @@ final class ChatToolbox {
     let musicGeneration: MusicToolRunner
     let documents = MakeDocumentTool()
     let loader = LoadToolsTool()
-    private(set) var tools: [ChatTool] = []
+    private var builtInTools: [ChatTool] = []
+    /// The built-in tools, then the MCP servers' tools as they are now.
+    var tools: [ChatTool] { builtInTools + mcpTools }
+    /// One object per MCP tool name, kept while the name exists.
+    private var mcpToolCache: [String: MCPChatTool] = [:]
+    private var mcpTools: [ChatTool] {
+        let names = MCPHub.shared.names.keys.sorted()
+        return names.map { name in
+            if let tool = mcpToolCache[name] { return tool }
+            let tool = MCPChatTool(name: name)
+            mcpToolCache[name] = tool
+            return tool
+        }
+    }
+    /// MCP tools the user denied this turn: refused until their next message
+    /// (no consent loop: adr/0027).
+    private(set) var mcpDenied: Set<String> = []
     /// What file text this turn has had back (project files, folder
     /// listings, change proposals): network tools and the generators are off
     /// after any of it, folder changes after a read, until the user's next
@@ -187,13 +212,14 @@ final class ChatToolbox {
     init(mflux: MfluxManager? = nil, music: MusicManager? = nil) {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         musicGeneration = MusicToolRunner(music: music ?? MusicManager())
-        tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
+        builtInTools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
             + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool(), documents, loader]
         loader.toolbox = self
+        MCPHub.shared.reservedNames = Set(builtInTools.map(\.name)).union(Self.formerNames.keys)
     }
 
     func register(_ tool: ChatTool) {
-        tools.append(tool)
+        builtInTools.append(tool)
     }
 
     /// The tool a call's name means (another case, a "functions." prefix, a
@@ -213,7 +239,9 @@ final class ChatToolbox {
             prepared[call.id] = Prepared(tool: nil, arguments: ParsedToolArguments(values: [:], repairs: [], problems: []))
             return call
         }
-        var parsed = ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema)
+        // An MCP tool's arguments go to its server as written (JSON read
+        // leniently, nothing unwrapped or renamed): adr/0027.
+        var parsed = tool is MCPChatTool ? Self.rawArguments(call.argumentsJSON) : ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema)
         for (key, value) in implied where parsed.values[key] == nil { parsed.values[key] = value }
         if let nameRepair { parsed.repairs.insert(nameRepair, at: 0) }
         // Its own output read again (ChatClient prepared it, then run):
@@ -237,6 +265,7 @@ final class ChatToolbox {
     /// Read from the call itself, not the cache by id: a model may repeat ids.
     func understood(_ call: ToolCall) -> Bool {
         guard let tool = resolve(call.name)?.tool else { return true }   // unknown: runs nothing
+        if tool is MCPChatTool { return Self.rawArguments(call.argumentsJSON).isValid }
         return ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).isValid
     }
 
@@ -337,6 +366,7 @@ final class ChatToolbox {
         turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
         changeRefusedThisTurn = false
+        mcpDenied = []
         keptDeclarations = nil
         sentProjectHits = []
         prepared = [:]
@@ -362,6 +392,7 @@ final class ChatToolbox {
 
     /// Which side of the trust barrier a tool is on.
     func trustKind(_ tool: ChatTool) -> ToolTrust.Kind {
+        if tool is MCPChatTool { return .mcp }
         if tool.projectAccess != .none { return .project }
         switch tool.folderAccess {
         case .read: return .folderRead
@@ -460,6 +491,28 @@ final class ChatToolbox {
             if kind == .folderChange { changeRefusedThisTurn = true }
             return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
+        if let mcp = tool as? MCPChatTool {
+            guard tool.isOffered(context.settings) else {
+                return finish(.text("The tool \(call.name) isn't available in this chat (a temporary chat, or its server is off). Answer without it."),
+                              .error("unavailable"))
+            }
+            guard !mcpDenied.contains(tool.name) else {
+                return finish(.refused("Not run: the user didn't allow \(tool.name) in this turn. Don't call it again unless the user asks."))
+            }
+            // Arguments that aren't one JSON object never run (not as `{}`).
+            if !arguments.isValid {
+                return finish(.text("\(tool.name): the arguments must be one JSON object, as its schema describes. Nothing ran."), .error("bad_json"))
+            }
+            var context = context
+            context.outsideTextThisTurn = turnTrust.hasOutsideText
+            let result = await mcp.run(arguments.values, context: context)
+            if case .mcp(let record, _, _) = result {
+                if record.outcome == .denied { mcpDenied.insert(tool.name) }
+                // Whatever came back is outside text (a denial brought none).
+                if record.outcome != .denied && record.outcome != .notSent { turnTrust.record(.mcp) }
+            }
+            return finish(result)
+        }
         if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {
             // Whatever it answers -- file names count as file text too; only
             // content (a search, a read) stops a pin.
@@ -512,6 +565,10 @@ final class ChatToolbox {
 
     /// How a result counts.
     static func outcome(of result: ToolResult) -> ToolCallStats.Outcome {
+        if case .mcp(let record, _, let refused) = result {
+            if refused { return .refused }
+            return record.outcome == .done ? .success : .error(record.outcome.rawValue)
+        }
         switch result {
         case .refused: return .refused
         case .text(let text):
@@ -520,7 +577,22 @@ final class ChatToolbox {
             // The generators' and view_image's plain-text failures.
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success
-        case .generatedImage, .generatedAudio, .generatedDocument, .loadedTools, .imageForModel, .projectText: return .success
+        case .generatedImage, .generatedAudio, .generatedDocument, .loadedTools, .imageForModel, .projectText, .mcp: return .success
+        }
+    }
+
+    /// An MCP call's arguments: one JSON object (a fence or single quotes
+    /// forgiven), its fields untouched; empty arguments are `{}`.
+    static func rawArguments(_ json: String) -> ParsedToolArguments {
+        if json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return ParsedToolArguments(values: [:], repairs: [], problems: []) }
+        switch LenientJSON.parse(json) {
+        case .success(let parsed):
+            guard let object = parsed.value as? [String: Any] else {
+                return ParsedToolArguments(values: [:], repairs: [], problems: [.badJSON("not a JSON object")])
+            }
+            return ParsedToolArguments(values: object, repairs: parsed.repairs, problems: [])
+        case .failure(let failure):
+            return ParsedToolArguments(values: [:], repairs: [], problems: [.badJSON("\(failure)")])
         }
     }
 

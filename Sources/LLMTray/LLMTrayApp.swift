@@ -397,6 +397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
         SpeedJournalStore.shared.flush()
+        MCPHub.shared.killAllNow()
         killServerNow()
     }
 

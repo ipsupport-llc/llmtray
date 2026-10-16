@@ -22,15 +22,29 @@ public enum ToolLoading: String, Codable, Sendable, CaseIterable {
 public enum ToolGroups {
     public static let documents = "documents"
 
-    public struct Group: Sendable {
+    public struct Group: Sendable, Equatable {
         public let name: String
         public let tools: [String]
         public let phrase: String
+
+        public init(name: String, tools: [String], phrase: String) {
+            self.name = name
+            self.tools = tools
+            self.phrase = phrase
+        }
     }
 
-    public static let all: [Group] = [
+    public static let builtInGroups: [Group] = [
         Group(name: documents, tools: [DocumentSpec.schema.name], phrase: "PDF documents with tables and charts"),
     ]
+
+    /// The built-in groups, then one per MCP server switched on (adr/0027),
+    /// set by the app as servers change.
+    public static var all: [Group] { builtInGroups + extra.value }
+
+    /// MCP servers' groups (each `name` its server key).
+    public static func setExtra(_ groups: [Group]) { extra.value = groups.filter { g in !builtInGroups.contains { $0.name == g.name } } }
+    private static let extra = LockedValue<[Group]>([])
 
     public static func group(ofTool name: String) -> Group? { all.first { $0.tools.contains(name) } }
     public static func named(_ name: String) -> Group? { all.first { $0.name == name } }
@@ -91,5 +105,16 @@ public struct ToolLoadingMap: Codable, Equatable, Sendable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.singleValueContainer()
         try c.encode(groups.mapValues(\.rawValue))
+    }
+}
+
+/// A value read and written from any thread.
+final class LockedValue<T>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: T
+    init(_ value: T) { stored = value }
+    var value: T {
+        get { lock.withLock { stored } }
+        set { lock.withLock { stored = newValue } }
     }
 }

@@ -33,13 +33,53 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     /// Approval keys (`MCPApproval.key`) that run without asking, each bound
     /// to the hash it was given for.
     public var runWithoutAsking: [String: String] = [:]
+    /// The tools as last listed: declared from here without starting the
+    /// server; refreshed whenever it starts.
+    public var tools: [MCP.Tool] = []
+    /// Tool name → the name the model sees: given once, kept.
+    public var modelNames: [String: String] = [:]
     public var added = Date()
+
+    /// The tools the model may see: those whose definition is the one the
+    /// user reviewed.
+    public var visibleTools: [MCP.Tool] { tools.filter { reviewed[$0.name] == $0.definitionHash } }
+    /// Tools new or changed since the review.
+    public var unreviewedTools: [MCP.Tool] { tools.filter { reviewed[$0.name] != $0.definitionHash } }
 
     public init(id: UUID = UUID(), name: String, key: String, kind: Kind) {
         self.id = id
         self.name = name
         self.key = key
         self.kind = kind
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
+             origin, description, reviewed, runWithoutAsking, tools, modelNames, added
+    }
+
+    /// Fields added later read as their defaults: an older file still loads.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        key = try c.decode(String.self, forKey: .key)
+        kind = try c.decode(Kind.self, forKey: .kind)
+        command = try c.decodeIfPresent(String.self, forKey: .command) ?? ""
+        arguments = try c.decodeIfPresent([String].self, forKey: .arguments) ?? []
+        environment = try c.decodeIfPresent([String: String].self, forKey: .environment) ?? [:]
+        workingDirectory = try c.decodeIfPresent(String.self, forKey: .workingDirectory)
+        url = try c.decodeIfPresent(String.self, forKey: .url) ?? ""
+        headers = try c.decodeIfPresent([String: String].self, forKey: .headers) ?? [:]
+        secretNames = try c.decodeIfPresent([String].self, forKey: .secretNames) ?? []
+        enabled = try c.decodeIfPresent(Bool.self, forKey: .enabled) ?? false
+        origin = try c.decodeIfPresent(String.self, forKey: .origin)
+        description = try c.decodeIfPresent(String.self, forKey: .description)
+        reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
+        runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
+        tools = try c.decodeIfPresent([MCP.Tool].self, forKey: .tools) ?? []
+        modelNames = try c.decodeIfPresent([String: String].self, forKey: .modelNames) ?? [:]
+        added = try c.decodeIfPresent(Date.self, forKey: .added) ?? Date()
     }
 
     /// Variable or header names whose values default to secret.
@@ -150,6 +190,11 @@ public enum MCPImport {
         public var workingDirectory: String?
         /// A bundle's settings to ask the user for (`user_config`).
         public var asks: [Ask] = []
+
+        public init(name: String, kind: MCPServerConfig.Kind) {
+            self.name = name
+            self.kind = kind
+        }
     }
 
     /// One `user_config` entry of a bundle.
@@ -318,5 +363,34 @@ public enum MCPImport {
         guard let found = try? run(shell, ["-l", "-c", "command -v -- \(command)"]) else { return nil }
         let path = found.split(separator: "\n").last.map(String.init)?.trimmingCharacters(in: .whitespaces) ?? ""
         return path.hasPrefix("/") && FileManager.default.isExecutableFile(atPath: path) ? path : nil
+    }
+}
+
+/// A line under an answer for each MCP call (adr/0027): saved with the
+/// message, since saved chats keep no tool calls.
+public struct MCPCallRecord: Codable, Equatable, Sendable {
+    public enum Outcome: String, Codable, Sendable {
+        case done, failed, unknown, denied
+        /// Not sent: the server wasn't there, or the tool changed.
+        case notSent
+    }
+
+    public var server: String
+    public var tool: String
+    public var action: String?
+    /// The arguments as approved (JSON, at most 2,000 characters).
+    public var arguments: String
+    public var outcome: Outcome
+    public var date: Date
+
+    public init(server: String, tool: String, action: String?, arguments: [String: Any], outcome: Outcome, date: Date = Date()) {
+        self.server = server
+        self.tool = tool
+        self.action = action
+        let data = (try? JSONSerialization.data(withJSONObject: arguments, options: [.sortedKeys, .withoutEscapingSlashes])) ?? Data("{}".utf8)
+        let text = String(decoding: data, as: UTF8.self)
+        self.arguments = text.count > 2000 ? String(text.prefix(2000)) + "…" : text
+        self.outcome = outcome
+        self.date = date
     }
 }

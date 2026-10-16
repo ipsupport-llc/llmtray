@@ -66,6 +66,11 @@ final class ChatClient: ObservableObject {
     /// A folder grant prompt on screen (adr/0014): a folder tool's call
     /// waits for it, or the user opened it (Allow Folder…).
     @Published var folderPrompt: FolderAccessPrompt?
+    /// An MCP call waiting for the user (adr/0027).
+    @Published var mcpPrompt: MCPCallPrompt?
+    /// "Allow for This Chat": approval key → the definition hash it was
+    /// given for, per server; ends with the chat on screen.
+    private var mcpChatAllowances: [UUID: [String: String]] = [:]
     /// The chat's pending folder plan, or the last one's result.
     @Published var folderPlan: FolderPlanModel?
     /// The chat as the folder grants know it, per visit: a saved chat's
@@ -351,6 +356,7 @@ final class ChatClient: ObservableObject {
             message.citations = pm.citations ?? []
             message.answerStats = pm.answerStats
             message.projectFilesAdded = pm.projectFilesAdded ?? []
+            message.mcpCalls = pm.mcpCalls ?? []
             message.seq = pm.seq
             message.sentAt = pm.sentAt
             message.modelPath = pm.model
@@ -457,7 +463,7 @@ final class ChatClient: ObservableObject {
         let citations = ChatMessage.citationsByAnswer(messages)
         var persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
-            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, !msg.hasMedia { return nil }
+            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, !msg.hasMedia, msg.mcpCalls.isEmpty { return nil }
             // Keyed by this message's own (stable for its lifetime) id, so
             // re-persisting the same session after a later turn doesn't
             // re-derive different filenames for images already on disk.
@@ -488,6 +494,7 @@ final class ChatClient: ObservableObject {
             persisted.answerStats = msg.answerStats
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
+            persisted.mcpCalls = msg.mcpCalls.isEmpty ? nil : msg.mcpCalls
             persisted.seq = msg.seq
             persisted.sentAt = msg.sentAt
             persisted.model = msg.modelPath
@@ -705,6 +712,7 @@ final class ChatClient: ObservableObject {
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
         settings.folders = folderChat
         settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
+        settings.mcpChat = currentSessionID != nil
         settings.loadedToolGroups = loadedToolGroups
         settings.memoryBlock = memoryBlock(project: settings.project?.id, contextTokens: settings.maxTokensCap)
         return settings
@@ -799,6 +807,9 @@ final class ChatClient: ObservableObject {
     /// The chat is left (another one, a closed tab): its folder grants for
     /// the chat, denies and pending plan end, and their cards go.
     private func endFolderChat() {
+        mcpPrompt?.resolve(nil)
+        mcpPrompt = nil
+        mcpChatAllowances = [:]
         folderPrompt?.resolve(nil)
         folderPrompt = nil
         folderPlan = nil
@@ -817,6 +828,26 @@ final class ChatClient: ObservableObject {
         let answer = await prompt.decide()
         if folderPrompt === prompt { folderPrompt = nil }
         FolderAccessManager.shared.refresh()
+        return answer
+    }
+
+    /// An MCP call asks the user (adr/0027): "Allow for This Chat" given
+    /// earlier for this definition answers at once -- unless the turn has
+    /// outside text; else the card shows and the call waits (nil: Stop,
+    /// another chat).
+    func askMCP(_ request: MCPCallRequest, chatID: String, token: Int) async -> MCPCallChoice? {
+        guard folderChatID == chatID, token == turnToken else { return nil }
+        let key = MCPApproval.key(tool: request.tool.name, action: request.action)
+        if !request.afterOutsideText, request.chatAllowanceUsable,
+           mcpChatAllowances[request.server.id]?[key] == request.tool.definitionHash { return .allowOnce }
+        let prompt = MCPCallPrompt(request: request)
+        mcpPrompt?.resolve(nil)
+        mcpPrompt = prompt
+        let answer = await prompt.decide()
+        if mcpPrompt === prompt { mcpPrompt = nil }
+        if answer == .allowForChat, !request.afterOutsideText {
+            mcpChatAllowances[request.server.id, default: [:]][key] = request.tool.definitionHash
+        }
         return answer
     }
 
@@ -1497,6 +1528,7 @@ final class ChatClient: ObservableObject {
         now.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? start.documentsSession : nil
         // As loaded now: a group load_tools just loaded applies.
         now.loadedToolGroups = loadedToolGroups
+        now.mcpChat = start.mcpChat
         return now
     }
 
@@ -1844,6 +1876,7 @@ final class ChatClient: ObservableObject {
             toolContext.chatDocuments = chatDocuments
             let chatID = folderChatID
             toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }
+            toolContext.askMCP = { [weak self] request in await self?.askMCP(request, chatID: chatID, token: token) }
             if toolbox.budgetedToolNames.contains(call.name) {
                 // What the next request has room for now, the results before
                 // this one counted: the tool sizes its answer to it.
@@ -1852,7 +1885,16 @@ final class ChatClient: ObservableObject {
                     maxTokens: settings.maxTokens).map(ProjectTextBudget.bytes(forTokens:)) ?? 0
             }
             let result = await toolbox.run(call, context: toolContext)
-            guard stillCurrent() else { break }
+            // Stopped while an MCP call ran: its line stays, outcome and all
+            // (a send may have happened: adr/0027) -- in this chat only.
+            if !stillCurrent() {
+                if case .mcp(let record, _, _) = result, epoch == conversationEpoch, sourceIndex < messages.count {
+                    messages[sourceIndex].mcpCalls.append(record)
+                    hasUnsavedChanges = true
+                    persistCurrentSession()
+                }
+                break
+            }
             // A proposal went to the chat's plan: its card shows it.
             if call.name == FolderTools.changeName { refreshFolderPlan() }
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
@@ -1871,6 +1913,13 @@ final class ChatClient: ObservableObject {
             case .imageForModel(let data, let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
                 pendingModelImages.append(data)
+            case .mcp(let record, let text, let refused):
+                // Its line under the answer, saved with it (adr/0027).
+                if sourceIndex < messages.count { messages[sourceIndex].mcpCalls.append(record) }
+                turnCallResults[repeatKey] = text
+                var answer = ChatMessage(role: "tool", content: text, toolCallID: call.id)
+                answer.isRefusal = refused
+                messages.append(answer)
             case .projectText(let output):
                 // Fitted into what the next request has room for, measured
                 // with the results before it.

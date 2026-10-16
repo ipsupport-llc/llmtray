@@ -49,6 +49,8 @@ struct PersistedMessage: Codable {
     var documents: [DocumentRef]?
     // See ChatMessage.projectFilesAdded; nil, and not written, when none.
     var projectFilesAdded: [String]?
+    // See ChatMessage.mcpCalls; nil, and not written, when none.
+    var mcpCalls: [MCPCallRecord]?
     // See ChatMessage.seq and .sentAt; nil, and not written, when none.
     var seq: Int?
     var sentAt: Date?
@@ -57,7 +59,7 @@ struct PersistedMessage: Codable {
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats, documents, projectFilesAdded, seq, sentAt, model
+        case answerStats, documents, projectFilesAdded, seq, sentAt, model, mcpCalls
     }
 
     init(
@@ -97,6 +99,7 @@ struct PersistedMessage: Codable {
         answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
         documents = try c.decodeIfPresent([DocumentRef].self, forKey: .documents)
         projectFilesAdded = try c.decodeIfPresent([String].self, forKey: .projectFilesAdded)
+        mcpCalls = try c.decodeIfPresent([MCPCallRecord].self, forKey: .mcpCalls)
         seq = try c.decodeIfPresent(Int.self, forKey: .seq)
         sentAt = try c.decodeIfPresent(Date.self, forKey: .sentAt)
         model = try c.decodeIfPresent(String.self, forKey: .model)

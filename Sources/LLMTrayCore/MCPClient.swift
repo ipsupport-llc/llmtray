@@ -271,6 +271,14 @@ public final class MCPStdioTransport: MCPTransport, @unchecked Sendable {
         p.kill()
     }
 
+    /// The app is quitting: the group goes now (SIGTERM, then SIGKILL).
+    public func killNow() {
+        guard let p = lock.withLock({ () -> RunnerProcess? in defer { process = nil }; return process }) else { return }
+        p.terminate()
+        usleep(100_000)
+        p.kill()
+    }
+
     /// The environment a server gets (adr/0027): PATH, HOME, USER, LANG and
     /// TMPDIR from the app, then the server's own variables.
     public static func environment(adding own: [String: String], from app: [String: String] = ProcessInfo.processInfo.environment) -> [String: String] {
