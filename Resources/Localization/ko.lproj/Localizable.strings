@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "클릭하여 프로젝트 파일 활성화: 파일을 프로젝트에 추가하고 해당 채팅들이 검색하도록 허용합니다.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "클릭하여 클립을 녹음합니다. 길게 눌러 말한 다음 놓으면 전송됩니다(모델이 듣습니다).";
 "Click ■ to stop · Esc cancels" = "■을 클릭하여 중지 · Esc로 취소";
+"Client ID" = "클라이언트 ID";
 "Close" = "닫기";
 "Close Tab" = "탭 닫기";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "이 창을 닫습니다. 설정 › 일반 › Set Up LLMTray…에서 다시 엽니다.";
@@ -479,6 +480,7 @@
 "Files…" = "파일…";
 "Finish" = "완료";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish가 선택한 내용을 적용합니다. 이후 설정에서 언제든 변경할 수 있습니다.";
+"Finish in your browser…" = "브라우저에서 완료…";
 "First token" = "첫 토큰";
 "First-run setup" = "최초 실행 설정";
 "Fits comfortably" = "여유 있게 맞음";
@@ -750,6 +752,8 @@
 "Needs %@" = "%@ 필요";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "약 %1$@ GB가 필요합니다. 이보다 많은 %2$@ GB를 GPU가 사용할 수 있으므로 다른 앱이 열려 있으면 메모리가 부족할 수 있습니다.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "약 %1$@ GB가 필요합니다. 이 Mac에는 %2$@ GB가 있습니다.";
+"Needs sign-in" = "로그인 필요";
+"Needs sign-in." = "로그인이 필요합니다.";
 "Network" = "네트워크";
 "Never" = "안 함";
 "New Chat" = "새 채팅";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "아직 메모가 없습니다. 모든 채팅이 알아야 할 내용을 추가하세요. “러시아어로 간단히 응답”, “ESP32 스피커를 만듭니다”.";
 "No requests yet." = "아직 요청이 없습니다.";
 "No runs yet." = "아직 실행이 없습니다.";
+"No sign-in" = "로그인 안 함";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "구독 없음. 기능 잠금 없음. LLMTray가 도움이 됐다면 개발을 지원해 주세요.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "이 Mac의 메모리에 대한 권장 항목이 없습니다. Hugging Face에서 모델을 찾아보세요.";
 "No thanks" = "괜찮습니다";
@@ -973,6 +978,7 @@
 "Record" = "녹음";
 "Recording" = "녹음 중";
 "Recovery" = "복구";
+"Redirect URL to add to your app:" = "앱에 추가할 리디렉션 URL:";
 "Refused" = "거부됨";
 "Regenerate" = "다시 생성";
 "Reinstall" = "재설치";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "일시정지, 중지 및 프로젝트 파일 표시";
 "Shows the chat window" = "채팅 창 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
+"Sign In" = "로그인";
+"Sign Out" = "로그아웃";
+"Signed in at %@" = "%@에 로그인함";
+"Signing in: finish in your browser." = "로그인 중: 브라우저에서 완료하세요.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "가사를 명확히 부르고 보컬이 전면에 나옵니다. 30초 분량의 음악을 만드는 데 약 40초 소요됩니다.";
 "Size" = "크기";
 "Skip" = "건너뛰기";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "계획이 확인한 이후 변경되었습니다: 다시 검토하세요.";
 "The port and network access can change only while the server is stopped." = "포트와 네트워크 접근은 서버가 중지된 상태에서만 변경할 수 있습니다.";
 "The project's files, and Add Files…" = "프로젝트의 파일 및 파일 추가…";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "레지스트리는 코드가 하는 일이 아니라 이름을 누가 게시했는지만 확인합니다. 채팅은 각 호출 전에 확인합니다.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "레지스트리가 30초 안에 응답하지 않았습니다. 잠시 후 다시 시도하세요.";
 "The reply was cut at its length limit." = "응답이 길이 제한으로 잘렸습니다.";
 "The report" = "보고서";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "생각 강도: 모델이 답변하기 전에 생각할 수 있는 시간";
 "Thinking…" = "생각 중…";
 "Thinking… %@ s of reply ready" = "생각 중… %@초 분량의 응답 준비됨";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "IPSupport가 제공하지 않는 타사 서버입니다. 어떠한 보증도 제공되지 않으며, 설치와 사용에 따른 위험은 전적으로 사용자에게 있습니다.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "IPSupport가 제공하지 않는 타사 서버입니다. 어떠한 보증도 제공되지 않으며, 사용에 따른 위험은 전적으로 사용자에게 있습니다.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "IPSupport가 제공하지 않는 타사 서버입니다. 레지스트리는 이름을 누가 게시했는지는 확인하지만, 코드가 무엇을 하는지는 확인하지 않습니다. 어떠한 보증도 제공되지 않으며, 설치와 사용에 따른 위험은 전적으로 사용자에게 있습니다. 채팅은 호출할 때마다 먼저 확인합니다.";
 "This Mac" = "이 Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "이 Mac은 모델을 약 %@× 실시간으로 실행합니다: 말한 뒤 듣기.";
 "This can change things." = "이것은 변경할 수 있습니다.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "최소 %1$@개 항목, %2$@";
 "at least %@" = "최소 %@";
 "building %@" = "빌드 중: %@";
-"by %lld" = "작성자 %lld";
+"by %lld · third-party" = "제공: %lld · 타사";
+"by IPSupport" = "제공: IPSupport";
 "calls tools" = "도구 호출";
 "can look" = "볼 수 있음";
 "can look and propose changes" = "볼 수 있고 변경 제안 가능";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "설치된 버전이 변경되지 않았습니다";
 "the model" = "모델";
 "the model runtime isn't installed yet" = "모델 런타임이 아직 설치되어 있지 않습니다";
+"the sign-in was cancelled" = "로그인이 취소되었습니다";
 "then" = "그런 다음";
 "this call only" = "이 호출에만";
 "tight fit" = "공간 부족";

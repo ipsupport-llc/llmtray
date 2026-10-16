@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "प्रोजेक्ट फ़ाइलें सक्षम करने के लिए क्लिक करें: फ़ाइलें प्रोजेक्ट में जोड़ें और इसकी चैट उन्हें खोज सकें।";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "क्लिप रिकॉर्ड करने के लिए क्लिक करें; बोलने के लिए दबाए रखें और भेजने के लिए छोड़ें (मॉडल इसे सुनता है)।";
 "Click ■ to stop · Esc cancels" = "रोकने के लिए ■ क्लिक करें · Esc रद्द करता है";
+"Client ID" = "क्लाइंट ID";
 "Close" = "बंद करें";
 "Close Tab" = "टैब बंद करें";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "यह विंडो बंद करता है। सेटिंग्स › सामान्य › LLMTray सेट अप करें… इसे फिर से खोलता है।";
@@ -479,6 +480,7 @@
 "Files…" = "फाइलें…";
 "Finish" = "समाप्त";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish आपने जो चुना वह लागू करता है। आप बाद में Settings में सब बदल सकते हैं।";
+"Finish in your browser…" = "अपने ब्राउज़र में समाप्त करें…";
 "First token" = "पहला Token";
 "First-run setup" = "पहली बार सेटअप";
 "Fits comfortably" = "आराम से फिट होता है";
@@ -750,6 +752,8 @@
 "Needs %@" = "%@ चाहिए";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "लगभग %1$@ GB की आवश्यकता है, जो कि GPU संभवतः उपयोग कर सकने वाले %2$@ GB से अधिक है: अन्य ऐप्स खुले होने पर स्मृति समाप्त हो सकती है।";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "लगभग %1$@ GB की आवश्यकता है; इस Mac में %2$@ GB है।";
+"Needs sign-in" = "साइन इन आवश्यक है";
+"Needs sign-in." = "साइन इन आवश्यक है।";
 "Network" = "नेटवर्क";
 "Never" = "कभी नहीं";
 "New Chat" = "नया चैट";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "अभी कोई नोट नहीं है। वह जोड़ें जो हर चैट को पता होना चाहिए: “रूसी में संक्षिप्त उत्तर दें”, “मैं ESP32 स्पीकर बनाता हूँ”。";
 "No requests yet." = "अभी कोई अनुरोध नहीं।";
 "No runs yet." = "अभी तक कोई रन नहीं।";
+"No sign-in" = "साइन इन नहीं किया गया";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "कोई सब्सक्रिप्शन नहीं। कोई फीचर लॉक नहीं। अगर LLMTray आपके लिए उपयोगी है तो विकास का समर्थन करें।";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "इस Mac की मेमोरी के लिए कोई सुझाव नहीं। मॉडल के लिए Hugging Face ब्राउज़ करें।";
 "No thanks" = "नहीं, धन्यवाद";
@@ -973,6 +978,7 @@
 "Record" = "रिकॉर्ड करें";
 "Recording" = "रिकॉर्डिंग";
 "Recovery" = "रिकवरी";
+"Redirect URL to add to your app:" = "अपनी ऐप में जोड़ने के लिए Redirect URL:";
 "Refused" = "अस्वीकृत";
 "Regenerate" = "फिर से जनरेट करें";
 "Reinstall" = "पुनः इंस्टॉल करें";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "Pause, Stop और प्रोजेक्ट की फाइलें दिखाता है";
 "Shows the chat window" = "चैट विंडो दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल के उत्तर के ऊपर उसकी सोच (सिमटने वाला “विचार प्रक्रिया” ब्लॉक) दिखाता है।";
+"Sign In" = "साइन इन";
+"Sign Out" = "साइन आउट";
+"Signed in at %@" = "%@ पर साइन इन किया गया";
+"Signing in: finish in your browser." = "साइन इन हो रहा है: अपने ब्राउज़र में समाप्त करें।";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "गीत की पंक्तियाँ स्पष्ट गाता है, आवाज़ आगे रहती है। 30 s संगीत के लिए लगभग 40 s।";
 "Size" = "आकार";
 "Skip" = "Skip";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "जब से आपने योजना देखी है यह बदल गई है: इसे फिर से देखें।";
 "The port and network access can change only while the server is stopped." = "पोर्ट और नेटवर्क एक्सेस केवल सर्वर बंद होने पर ही बदल सकते हैं।";
 "The project's files, and Add Files…" = "प्रोजेक्ट की फ़ाइलें, और “फाइलें जोड़ें…”";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registry यह जाँचता है कि कोई नाम किसने प्रकाशित किया, यह नहीं कि कोड क्या करता है। हर कॉल से पहले चैट आपसे पूछती है।";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "रजिस्ट्री ने 30 सेकंड में जवाब नहीं दिया. कुछ क्षण बाद पुन: प्रयास करें.";
 "The reply was cut at its length limit." = "उत्तर उसकी लंबाई सीमा पर काट दिया गया था।";
 "The report" = "रिपोर्ट";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "सोचने का प्रयास: उत्तर देने से पहले मॉडल कितनी देर तक सोच सकता है।";
 "Thinking…" = "सोच रहा है…";
 "Thinking… %@ s of reply ready" = "सोच रहा है… %@ सैकंड का उत्तर तैयार";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "तृतीय-पक्ष सर्वर, IPSupport द्वारा नहीं। किसी भी प्रकार की कोई वारंटी नहीं: आप इसे अपने जोखिम पर इंस्टॉल और उपयोग करते हैं।";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "तृतीय-पक्ष सर्वर, IPSupport द्वारा नहीं। किसी भी प्रकार की कोई वारंटी नहीं: आप इसका उपयोग अपने जोखिम पर करते हैं।";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "तृतीय-पक्ष सर्वर, IPSupport द्वारा नहीं। रजिस्ट्री यह जाँचती है कि कोई नाम किसने प्रकाशित किया है, यह नहीं कि कोड क्या करता है। किसी भी प्रकार की कोई वारंटी नहीं: आप इन्हें अपने जोखिम पर इंस्टॉल और उपयोग करते हैं। चैट हर कॉल से पहले आपसे पूछता है।";
 "This Mac" = "यह Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "यह Mac मॉडल को ~%@× रीयल-टाइम पर चलाता है: पहले बोलें, फिर सुनें।";
 "This can change things." = "यह बदलाव कर सकता है।";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "कम से कम %1$@ आइटम, %2$@";
 "at least %@" = "कम से कम %@";
 "building %@" = "बिल्ड कर रहा है %@";
-"by %lld" = "%lld द्वारा";
+"by %lld · third-party" = "%lld द्वारा · तृतीय-पक्ष";
+"by IPSupport" = "IPSupport द्वारा";
 "calls tools" = "टूल्स कॉल करता है";
 "can look" = "देख सकता है";
 "can look and propose changes" = "देख सकता है और परिवर्तन सुझा सकता है";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "इंस्टॉल किया गया संस्करण नहीं बदला";
 "the model" = "मॉडल";
 "the model runtime isn't installed yet" = "मॉडल runtime अभी इंस्टॉल नहीं हुआ है";
+"the sign-in was cancelled" = "साइन इन रद्द कर दिया गया";
 "then" = "फिर";
 "this call only" = "केवल इस कॉल के लिए";
 "tight fit" = "सख्त फ़िट";

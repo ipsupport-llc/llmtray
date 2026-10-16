@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת קבצי פרויקט: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "לחץ כדי להקליט קטע; החזק כדי לדבר ושחרר כדי לשלוח (המודל שומע זאת)";
 "Click ■ to stop · Esc cancels" = "לחץ על ■ כדי לעצור · Esc מבטל";
+"Client ID" = "מזהה לקוח";
 "Close" = "סגור";
 "Close Tab" = "סגור כרטיסייה";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "סוגר את החלון הזה. הגדרות › כללי › הגדר את LLMTray… פותח אותו שוב.";
@@ -479,6 +480,7 @@
 "Files…" = "קבצים…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish מיישם את מה שבחרתם. אפשר לשנות הכל מאוחר יותר ב‑Settings.";
+"Finish in your browser…" = "השלימו בדפדפן…";
 "First token" = "טוקן ראשון";
 "First-run setup" = "הגדרה ראשונית";
 "Fits comfortably" = "מתאים בנוחות";
@@ -750,6 +752,8 @@
 "Needs %@" = "נדרש %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "נדרש בערך %1$@ GB, יותר מ־%2$@ GB שה‑GPU עשוי להשתמש בהם; יתכן שיחסר זיכרון אם אפליקציות אחרות פתוחות.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "נדרש בערך %1$@ GB; למכונה זו יש %2$@ GB.";
+"Needs sign-in" = "נדרשת התחברות";
+"Needs sign-in." = "נדרשת התחברות.";
 "Network" = "רשת";
 "Never" = "אף פעם";
 "New Chat" = "שיחה חדשה";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "אין עדיין הערות. הוסף מה שכל צ׳אט צריך לדעת: „תשובה ברוסית, בקצרה”, „אני בונה רמקול ESP32”.";
 "No requests yet." = "אין עדיין בקשות.";
 "No runs yet." = "עדיין אין הרצות.";
+"No sign-in" = "ללא התחברות";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "ללא מנויים. ללא חסימות תכונות. תמכו בפיתוח אם LLMTray שימושי לכם.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "אין הצעות לזיכרון של Mac זה. דפדפו ב‑Hugging Face אחרי מודל.";
 "No thanks" = "לא תודה";
@@ -973,6 +978,7 @@
 "Record" = "הקלט";
 "Recording" = "מקליט";
 "Recovery" = "התאוששות";
+"Redirect URL to add to your app:" = "URL להפניה מחדש להוספה ליישום שלכם:";
 "Refused" = "נדחו";
 "Regenerate" = "צור מחדש";
 "Reinstall" = "התקן שוב";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "מציג השהיה, עצירה וקבצי הפרויקט";
 "Shows the chat window" = "מציג את חלון הצ'אט";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
+"Sign In" = "התחברות";
+"Sign Out" = "התנתקות";
+"Signed in at %@" = "מחובר/ת ב־%@";
+"Signing in: finish in your browser." = "מתבצעת התחברות: השלימו בדפדפן.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "שרה את המילים בבירור, הקול בחזית. כ‑40 שנ׳ להכנת 30 שנ׳ מוזיקה.";
 "Size" = "גודל";
 "Skip" = "דלג";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "התכנית שונתה מאז שהסתכלת עליה: בדוק אותה שוב.";
 "The port and network access can change only while the server is stopped." = "הפורט וגישת הרשת ניתנים לשינוי רק כשהשרת עצור.";
 "The project's files, and Add Files…" = "קבצי הפרויקט, ו“הוסף קבצים…”";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "הרישום בודק מי פרסם שם, לא מה הקוד עושה. הצ׳אט מבקש ממך אישור לפני כל קריאה.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "לא התקבלה תשובה מהרישום בתוך 30 שניות. נסה שוב בעוד רגע.";
 "The reply was cut at its length limit." = "התשובה נחתכה בגלל מגבלת אורך.";
 "The report" = "הדוח";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "מאמץ חשיבה: כמה זמן המודל רשאי לחשוב לפני שהוא עונה";
 "Thinking…" = "חושב…";
 "Thinking… %@ s of reply ready" = "חושב… %@ שניות תשובה מוכנה";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "שרת של צד שלישי, לא של IPSupport. אין כל אחריות מכל סוג: ההתקנה והשימוש הם באחריותך בלבד.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "שרת של צד שלישי, לא של IPSupport. אין כל אחריות מכל סוג: השימוש הוא באחריותך בלבד.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "שרתי צד שלישי, לא של IPSupport. המרשם בודק מי פרסם שם, לא מה הקוד עושה. אין כל אחריות מכל סוג: ההתקנה והשימוש בהם הם באחריותך בלבד. הצ׳אט מבקש את אישורך לפני כל קריאה.";
 "This Mac" = "ה-Mac הזה";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "ה‑Mac הזה מריץ את המודל בקצב של כ־%@× בזמן אמת: דבר, ואז הקשב.";
 "This can change things." = "זה יכול לשנות דברים.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "לפחות %1$@ פריטים, %2$@";
 "at least %@" = "לפחות %@";
 "building %@" = "בונה %@";
-"by %lld" = "מאת %lld";
+"by %lld · third-party" = "מאת %lld · צד שלישי";
+"by IPSupport" = "מאת IPSupport";
 "calls tools" = "קורא לכלים";
 "can look" = "יכול לצפות";
 "can look and propose changes" = "יכול לצפות ולהציע שינויים";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "הגרסה המותקנת לא השתנתה";
 "the model" = "המודל";
 "the model runtime isn't installed yet" = "סביבת ההרצה של המודל עדיין לא מותקנת";
+"the sign-in was cancelled" = "ההתחברות בוטלה";
 "then" = "אז";
 "this call only" = "לקריאה זו בלבד";
 "tight fit" = "התאמה הדוקה";

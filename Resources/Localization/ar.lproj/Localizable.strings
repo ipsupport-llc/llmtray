@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "انقر لتمكين ملفات المشروع: أضِف ملفات إلى المشروع ودع محادثاته تبحث فيها.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "انقر لتسجيل مقطع؛ اضغط مطوّلًا للتحدث ثم اترك للإرسال (سيسمعه النموذج).";
 "Click ■ to stop · Esc cancels" = "انقر ■ للإيقاف · Esc للإلغاء";
+"Client ID" = "معرّف العميل";
 "Close" = "إغلاق";
 "Close Tab" = "إغلاق التبويب";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. الإعدادات › عام › إعداد LLMTray… يفتحها من جديد.";
@@ -479,6 +480,7 @@
 "Files…" = "الملفات…";
 "Finish" = "إنهاء";
 "Finish applies what you chose. You can change all of it later in Settings." = "ينفّذ Finish ما اخترتَه. يمكنك تغيير كل ذلك لاحقًا في Settings.";
+"Finish in your browser…" = "أكمل في متصفحك…";
 "First token" = "أول رمز";
 "First-run setup" = "إعداد التشغيل الأولي";
 "Fits comfortably" = "يناسب بشكل مريح";
@@ -750,6 +752,8 @@
 "Needs %@" = "يتطلب %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "يتطلب حوالي %1$@ غيغابايت، أكثر من %2$@ غيغابايت التي قد يستخدمها الـGPU: قد تنفد الذاكرة إذا كانت تطبيقات أخرى مفتوحة.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "يتطلب حوالي %1$@ غيغابايت؛ هذا الـMac يحتوي على %2$@ غيغابايت.";
+"Needs sign-in" = "يتطلب تسجيل الدخول";
+"Needs sign-in." = "يتطلب تسجيل الدخول.";
 "Network" = "الشبكة";
 "Never" = "أبدًا";
 "New Chat" = "دردشة جديدة";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "لا توجد ملاحظات بعد. أضف ما ينبغي أن تعرفه كل دردشة: «الإجابة بالروسية باختصار»، «أصنع مكبر صوت ESP32».";
 "No requests yet." = "لا طلبات بعد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
+"No sign-in" = "لا يتطلب تسجيل الدخول";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "لا اشتراكات. لا قفل للميزات. ادعم التطوير إذا كان LLMTray مفيداً لك.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "لا اقتراحات لذاكرة هذا الـ Mac. تصفح Hugging Face لعرض نموذج.";
 "No thanks" = "لا، شكراً";
@@ -973,6 +978,7 @@
 "Record" = "تسجيل";
 "Recording" = "جارٍ التسجيل";
 "Recovery" = "الاسترداد";
+"Redirect URL to add to your app:" = "URL إعادة التوجيه لإضافته إلى تطبيقك:";
 "Refused" = "مرفوضة";
 "Regenerate" = "إعادة التوليد";
 "Reinstall" = "إعادة التثبيت";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "يعرض إيقاف مؤقت، إيقاف وملفات المشروع";
 "Shows the chat window" = "يعرض نافذة الدردشة";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
+"Sign In" = "تسجيل الدخول";
+"Sign Out" = "تسجيل الخروج";
+"Signed in at %@" = "تم تسجيل الدخول في %@";
+"Signing in: finish in your browser." = "جارٍ تسجيل الدخول: أكمل في متصفحك.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "يغني الكلمات بوضوح، الصوت في المقدمة. حوالي 40 s لمقطع مدته 30 s.";
 "Size" = "الحجم";
 "Skip" = "تخطى";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "تغيرت الخطة منذ نظرت إليها: راجعها مرة أخرى.";
 "The port and network access can change only while the server is stopped." = "لا يمكن تغيير المنفذ والوصول إلى الشبكة إلا بينما يكون الخادم متوقفًا.";
 "The project's files, and Add Files…" = "ملفات المشروع، و«إضافة ملفات…»";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "يتحقق السجل ممن نشر الاسم، لا مما يفعله الرمز. تطلب الدردشة إذنك قبل كل استدعاء.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "لم يستجب السجل خلال 30 ثانية. حاول مرة أخرى بعد قليل.";
 "The reply was cut at its length limit." = "تم قطع الرد عند الحد الأقصى للطول.";
 "The report" = "التقرير";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "جهد التفكير: المدة التي يمكن أن يفكر فيها النموذج قبل أن يجيب";
 "Thinking…" = "جارٍ التفكير…";
 "Thinking… %@ s of reply ready" = "جارٍ التفكير… %@ ثٌ من الرد جاهز";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "خادم تابع لجهة خارجية، وليس من IPSupport. لا يوجد أي ضمان من أي نوع: تثبّته وتستخدمه على مسؤوليتك الخاصة.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "خادم تابع لجهة خارجية، وليس من IPSupport. لا يوجد أي ضمان من أي نوع: تستخدمه على مسؤوليتك الخاصة.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "خوادم تابعة لجهات خارجية، وليست من IPSupport. يتحقّق السجلّ ممّن نشر الاسم، لا ممّا تفعله الشفرة. لا يوجد أي ضمان من أي نوع: تثبّتها وتستخدمها على مسؤوليتك الخاصة. تسألك الدردشة قبل كل استدعاء.";
 "This Mac" = "هذا الـ Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "يشغّل هذا الـMac النموذج بسرعة ~%@× من الوقت الحقيقي: تكلّم، ثم استمع.";
 "This can change things." = "يمكن لهذا إجراء تغييرات.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "على الأقل %1$@ عناصر، %2$@";
 "at least %@" = "على الأقل %@";
 "building %@" = "جارٍ بناء %@";
-"by %lld" = "بواسطة %lld";
+"by %lld · third-party" = "من %lld · جهة خارجية";
+"by IPSupport" = "من IPSupport";
 "calls tools" = "يستدعي أدوات";
 "can look" = "يمكنه الاطلاع";
 "can look and propose changes" = "يمكنه الاطلاع واقتراح تغييرات";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "لم يتغير الإصدار المثبّت";
 "the model" = "النموذج";
 "the model runtime isn't installed yet" = "بيئة تشغيل النموذج غير مُثبتة بعد";
+"the sign-in was cancelled" = "أُلغي تسجيل الدخول";
 "then" = "ثم";
 "this call only" = "لهذا الطلب فقط";
 "tight fit" = "مناسب بإحكام";
