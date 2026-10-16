@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 請求 %2$@。切換會卸載目前載入的模型。";
 "%1$@ couldn't be updated: %2$@" = "%1$@ 無法更新：%2$@";
 "%1$@ items, %2$@" = "%1$@ 項目，%2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ 已安裝，但未啟動：%2$@";
+"%1$@ wasn't installed: %2$@." = "未安裝 %1$@：%2$@。";
 "%1$@: the command %2$@ wasn't found." = "%1$@：找不到指令 %2$@。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 個副本無法與原始檔比較，已取消勾選：%2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 個副本與原始檔不同，因此不是重複項：%2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "已載入：%1$@ · 已選擇：%2$@";
 "Loading %@…" = "正在載入 %@…";
 "Loading the voice model…" = "正在載入語音模型…";
+"Loading…" = "載入中…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即載入上次使用的模型，不必按下 Play 即可就緒。";
 "Log" = "記錄";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "記錄每個產生的 token（DEBUG）。僅用於疑難排解模型程序 — 這會拖慢速度。下次啟動伺服器時生效。";
@@ -817,6 +818,7 @@
 "Notes in" = "附註語言";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "只從已刪除聊天學到的附註會一併移除，除非你已編輯、釘選或核准它們。";
 "Nothing" = "無";
+"Nothing found for “%@”." = "找不到「%@」的結果。";
 "Nothing left to read: every chat was read from its start." = "沒有剩下要讀取的內容：每個聊天都已從頭讀取。";
 "Nothing logged yet." = "尚無記錄。";
 "Nothing new to import" = "沒有新項目可匯入";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "目前已關閉語意搜尋：%@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "語意搜尋使用 %@（%@），目前已下載到此台 Mac。若無此模型，檔案將僅以文字搜尋；日後可在此下載。";
 "Search chats" = "搜尋對話";
+"Searching the registry…" = "正在搜尋 registry…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "在草稿自動繼續前的秒數。若為 0：等你按下「生成」才繼續。";
 "Seen in" = "顯示於";
 "Select All" = "全選";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "連接埠與網路存取僅能於伺服器停止時變更。";
 "The project's files, and Add Files…" = "專案的檔案，以及「加入檔案…」";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registry 會檢查名稱是由誰發佈，而非程式碼會做什麼。聊天會在每次呼叫前先詢問你。";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "registry 在 30 秒內沒有回應。請稍後再試。";
 "The reply was cut at its length limit." = "回覆已達長度上限並被截斷。";
 "The report" = "報告檔案";
 "The reports" = "報告";

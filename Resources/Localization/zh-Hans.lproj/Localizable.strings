@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
 "%1$@ couldn't be updated: %2$@" = "无法更新 %1$@：%2$@";
 "%1$@ items, %2$@" = "%1$@ 项，%2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ 已安装，但未启动：%2$@";
+"%1$@ wasn't installed: %2$@." = "未安装 %1$@：%2$@。";
 "%1$@: the command %2$@ wasn't found." = "%1$@：找不到命令 %2$@。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 个副本无法与原件比较，已取消勾选：%2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 个副本与原件不同，因此不是重复项：%2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "已加载：%1$@ · 已选：%2$@";
 "Loading %@…" = "正在加载 %@…";
 "Loading the voice model…" = "正在加载语音模型…";
+"Loading…" = "正在载入……";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即加载上次使用的模型，无需点按 Play 即可就绪。";
 "Log" = "日志";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
@@ -817,6 +818,7 @@
 "Notes in" = "笔记语言";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "仅从已删除聊天中学到的笔记会随之移除，除非你编辑、置顶或批准过这些笔记。";
 "Nothing" = "不允许";
+"Nothing found for “%@”." = "未找到“%@”的结果。";
 "Nothing left to read: every chat was read from its start." = "没有剩余内容可读取：每个聊天都已从开头读取。";
 "Nothing logged yet." = "还没有日志。";
 "Nothing new to import" = "无可导入的新内容";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "按语义搜索暂时关闭：%@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "按语义搜索使用 %@（%@），已下载到此 Mac。没有它时，文件仅按词语搜索；你以后可以在此下载。";
 "Search chats" = "搜索对话";
+"Searching the registry…" = "正在搜索注册表……";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "草稿在其当前状态下继续前的秒数。0：等你按下“生成”。";
 "Seen in" = "可见于";
 "Select All" = "全选";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "端口和网络访问仅可在服务器停止时更改。";
 "The project's files, and Add Files…" = "项目的文件，以及“添加文件…”";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "注册表会检查名称由谁发布，而不会检查代码的作用。聊天会在每次调用前征求你的同意。";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "注册表在 30 秒内未响应。请稍后重试。";
 "The reply was cut at its length limit." = "回复因长度限制被截断。";
 "The report" = "报告";
 "The reports" = "报告";

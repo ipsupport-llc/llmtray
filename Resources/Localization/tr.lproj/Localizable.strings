@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@, %2$@ istiyor. Değiştirirseniz şu anda yüklü olan model boşaltılır.";
 "%1$@ couldn't be updated: %2$@" = "%1$@ güncellenemedi: %2$@";
 "%1$@ items, %2$@" = "%1$@ öğe, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ yüklendi ama başlatılamadı: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ yüklenmedi: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: %2$@ komutu bulunamadı.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "Orijinalleriyle karşılaştırılamayan %1$lld kopya işaretsiz bırakıldı: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "Orijinallerinden farklı olan %1$lld kopya yinelenen sayılmaz: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Yüklü: %1$@ · seçili: %2$@";
 "Loading %@…" = "%@ yükleniyor…";
 "Loading the voice model…" = "Ses modeli yükleniyor…";
+"Loading…" = "Yükleniyor…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Son kullanılan modeli hemen yükler; böylece Play’e basmadan hazır olur.";
 "Log" = "Günlük";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Üretilen her token’ı günlüğe yazar (DEBUG). Yalnızca model işleminde sorun gidermek içindir — işleri yavaşlatır. Bir sonraki sunucu başlangıcında etkili olur.";
@@ -817,6 +818,7 @@
 "Notes in" = "Notların dili";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Yalnızca silinen bir sohbetten öğrenilen Notlar, düzenlemediyseniz, sabitlemediyseniz veya onaylamadıysanız onunla birlikte gider.";
 "Nothing" = "Hiçbiri";
+"Nothing found for “%@”." = "“%@” için hiçbir şey bulunamadı.";
 "Nothing left to read: every chat was read from its start." = "Okunacak bir şey kalmadı: her sohbet başından itibaren okundu.";
 "Nothing logged yet." = "Henüz günlük yok.";
 "Nothing new to import" = "İçe aktarılacak yeni bir şey yok";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "Anlamsal arama şu anda kapalı: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Anlamsal arama %@ (%@) kullanır; şu anda bu Mac’e indirildi. Olmazsa dosyalar yalnızca kelimelerine göre aranır; daha sonra buradan indirebilirsiniz.";
 "Search chats" = "Sohbetlerde ara";
+"Searching the registry…" = "Kayıt aranıyor…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Taslağın olduğu gibi devam etmeden önceki saniye. 0: Oluştur’a basana kadar bekle.";
 "Seen in" = "Görüldüğü yer";
 "Select All" = "Tümünü Seç";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "Port ve ağ erişimi yalnızca sunucu dururken değiştirilebilir.";
 "The project's files, and Add Files…" = "Projenin dosyaları ve Dosya Ekle…";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Kayıt defteri, kodun ne yaptığını değil, bir adı kimin yayımladığını denetler. Sohbet her çağrıdan önce size sorar.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "Kayıt 30 saniye içinde yanıt vermedi. Birazdan tekrar deneyin.";
 "The reply was cut at its length limit." = "Yanıt, uzunluk sınırında kesildi.";
 "The report" = "Rapor";
 "The reports" = "Raporlar";

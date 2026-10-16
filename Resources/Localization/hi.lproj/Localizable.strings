@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ ने %2$@ मांगा है। स्विच करने से अभी लोड किया गया मॉडल अनलोड हो जाएगा।";
 "%1$@ couldn't be updated: %2$@" = "%1$@ अपडेट नहीं हो सका: %2$@";
 "%1$@ items, %2$@" = "%1$@ आइटम, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ इंस्टॉल हो गया, लेकिन शुरू नहीं हुआ: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ इंस्टॉल नहीं हुआ: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: कमांड %2$@ नहीं मिला.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld कॉपीज़ की मूल फ़ाइलों से तुलना नहीं हो सकी, इसलिए वे अनचेक्ड कर दी गईं: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld कॉपीज़ उनकी मूल फ़ाइलों से भिन्न हैं, इसलिए वे डुप्लिकेट नहीं हैं: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "लोड हुआ: %1$@ · चयनित: %2$@";
 "Loading %@…" = "लोड हो रहा है %@…";
 "Loading the voice model…" = "वॉइस मॉडल लोड हो रहा है…";
+"Loading…" = "लोड हो रहा है…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "पिछली बार उपयोग किया गया मॉडल तुरंत लोड करता है, ताकि Play दबाए बिना यह तैयार हो।";
 "Log" = "लॉग";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
@@ -817,6 +818,7 @@
 "Notes in" = "नोट की भाषा";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "केवल हटाई गई चैट से सीखे गए नोट उसके साथ चले जाते हैं, जब तक कि आपने उन्हें संपादित, पिन या स्वीकृत न किया हो।";
 "Nothing" = "कुछ नहीं";
+"Nothing found for “%@”." = "“%@” के लिए कुछ नहीं मिला.";
 "Nothing left to read: every chat was read from its start." = "पढ़ने के लिए कुछ बाकी नहीं: हर चैट शुरुआत से पढ़ी जा चुकी है।";
 "Nothing logged yet." = "अभी तक कुछ भी लॉग नहीं हुआ है।";
 "Nothing new to import" = "इम्पोर्ट करने के लिए कुछ नया नहीं है";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "अभी अर्थ से खोज बंद है: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "अर्थ से खोज %@ (%@) का उपयोग करती है, जो अब इस Mac पर डाउनलोड हो चुका है। इसके बिना फ़ाइलें केवल उनके शब्दों से ही खोजी जाएँगी; आप इसे बाद में यहाँ डाउनलोड कर सकते हैं।";
 "Search chats" = "चैट खोजें";
+"Searching the registry…" = "रजिस्ट्री में खोजा जा रहा है…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "यहां दिए गए सेकंड के बाद ड्राफ्ट जैसा है वैसा ही आगे बढ़ जाएगा। 0: Generate दबाने तक प्रतीक्षा करें।";
 "Seen in" = "इसमें दिखता है";
 "Select All" = "सभी चुनें";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "पोर्ट और नेटवर्क एक्सेस केवल सर्वर बंद होने पर ही बदल सकते हैं।";
 "The project's files, and Add Files…" = "प्रोजेक्ट की फ़ाइलें, और “फाइलें जोड़ें…”";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registry यह जाँचता है कि कोई नाम किसने प्रकाशित किया, यह नहीं कि कोड क्या करता है। हर कॉल से पहले चैट आपसे पूछती है।";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "रजिस्ट्री ने 30 सेकंड में जवाब नहीं दिया. कुछ क्षण बाद पुन: प्रयास करें.";
 "The reply was cut at its length limit." = "उत्तर उसकी लंबाई सीमा पर काट दिया गया था।";
 "The report" = "रिपोर्ट";
 "The reports" = "रिपोर्टें";

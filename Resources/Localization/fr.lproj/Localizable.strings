@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ demande %2$@. Le changement décharge le modèle actuellement chargé.";
 "%1$@ couldn't be updated: %2$@" = "Impossible de mettre à jour %1$@ : %2$@";
 "%1$@ items, %2$@" = "%1$@ éléments, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ a été installé, mais n’a pas démarré : %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ n’a pas été installé : %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@ : la commande %2$@ est introuvable.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld copies n'ont pas pu être comparées à leurs originaux, elles sont décochées : %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld copies diffèrent de leurs originaux, elles ne sont donc pas des doublons : %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Chargé : %1$@ · sélectionné : %2$@";
 "Loading %@…" = "Chargement de %@…";
 "Loading the voice model…" = "Chargement du modèle vocal…";
+"Loading…" = "Chargement…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Charge immédiatement le dernier modèle utilisé, afin qu’il soit prêt sans appuyer sur Play.";
 "Log" = "Journal";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Consigne chaque token généré (DEBUG). À utiliser uniquement pour dépanner le processus du modèle — cela ralentit l’exécution. Prend effet au prochain démarrage du serveur.";
@@ -817,6 +818,7 @@
 "Notes in" = "Notes en";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Les Notes apprises uniquement à partir d’un Chat supprimé sont supprimées avec lui, sauf si vous les avez modifiées, épinglées ou approuvées.";
 "Nothing" = "Rien";
+"Nothing found for “%@”." = "Rien trouvé pour « %@ ».";
 "Nothing left to read: every chat was read from its start." = "Plus rien à lire : chaque Chat a été lu depuis le début.";
 "Nothing logged yet." = "Rien dans le journal pour le moment.";
 "Nothing new to import" = "Rien de nouveau à importer";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "Recherche par sens désactivée pour l’instant : %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "La recherche par sens utilise %@ (%@), téléchargé sur ce Mac. Sans lui, les fichiers ne sont recherchés que par leurs mots ; vous pouvez le télécharger ici ultérieurement.";
 "Search chats" = "Rechercher des conversations";
+"Searching the registry…" = "Recherche dans le registre…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Secondes avant que le brouillon ne soit exécuté tel quel. 0 : attend que vous appuyiez sur Générer.";
 "Seen in" = "Visible dans";
 "Select All" = "Tout sélectionner";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "Le port et l’accès réseau ne peuvent être modifiés que lorsque le serveur est arrêté.";
 "The project's files, and Add Files…" = "Les fichiers du projet, et Ajouter des fichiers…";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Le registre vérifie qui a publié un nom, pas ce que fait le code. Le Chat vous demande votre autorisation avant chaque appel.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "Le registre n’a pas répondu en 30 secondes. Réessayez dans un instant.";
 "The reply was cut at its length limit." = "La réponse a été tronquée à la limite de longueur.";
 "The report" = "Le rapport";
 "The reports" = "Les rapports";

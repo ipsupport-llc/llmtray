@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ が %2$@ を要求しています。切り替えると現在読み込まれているモデルはアンロードされます。";
 "%1$@ couldn't be updated: %2$@" = "%1$@をアップデートできませんでした: %2$@";
 "%1$@ items, %2$@" = "%1$@ 個、%2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@はインストールされましたが、起動しませんでした: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@はインストールされませんでした: %2$@。";
 "%1$@: the command %2$@ wasn't found." = "%1$@：コマンド %2$@ が見つかりませんでした。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "元のファイルと比較できなかったものが %1$lld 個あるため、選択解除されました: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "元と異なるコピーが %1$lld 個あるため、重複として扱われません: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "読み込み済み: %1$@ · 選択: %2$@";
 "Loading %@…" = "読み込み中 %@…";
 "Loading the voice model…" = "音声モデルを読み込み中…";
+"Loading…" = "読み込み中…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "最後に使用したモデルをすぐに読み込み、Play を押さなくても使用できる状態にします。";
 "Log" = "ログ";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
@@ -817,6 +818,7 @@
 "Notes in" = "ノートの言語";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "削除したチャットだけから学習したノートは、そのチャットと一緒に削除されます。ただし、編集、ピン留め、または承認したものは除きます。";
 "Nothing" = "なし";
+"Nothing found for “%@”." = "「%@」の検索結果はありません。";
 "Nothing left to read: every chat was read from its start." = "読み取るものは残っていません。すべてのチャットを先頭から読み取り済みです。";
 "Nothing logged yet." = "ログはまだありません。";
 "Nothing new to import" = "新しい項目はありません";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "現在、意味による検索はオフです：%@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "意味による検索は %@（%@）を使用します。現在このMacにダウンロードされています。モデルがない場合はファイルは単語ベースでのみ検索されます。後でここからダウンロードできます。";
 "Search chats" = "チャットを検索";
+"Searching the registry…" = "レジストリを検索中…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "下書きがそのまま進行するまでの秒数。0ならGenerateを押すまで待ちます。";
 "Seen in" = "表示先";
 "Select All" = "すべて選択";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "ポートとネットワークアクセスはサーバー停止中にのみ変更できます。";
 "The project's files, and Add Files…" = "プロジェクトのファイル、及び「ファイルを追加…」";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "レジストリが確認するのは、名前の公開元であり、コードの動作ではありません。チャットは呼び出しのたびに確認します。";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "レジストリは30秒以内に応答しませんでした。しばらくしてから再試行してください。";
 "The reply was cut at its length limit." = "返信が長さの上限で切られました。";
 "The report" = "レポート";
 "The reports" = "レポート";
