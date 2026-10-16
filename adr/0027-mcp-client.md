@@ -21,9 +21,11 @@ too (rounds and calls per turn, dangling calls closed on Stop).
 - **Adding a server**, three ways:
   - **A command** (stdio): command, arguments, environment.
   - **A URL** (Streamable HTTP), with optional headers (a token).
-  - **Import**: an `.mcpb` bundle (what Claude Desktop installs with a
-    double click), or servers from Claude Desktop's
-    `claude_desktop_config.json`, picked from a list. A bundle is a zip:
+  - **From the catalog** (below).
+  - **Import**: an MCP Bundle (`.mcpb`, the open one-file format servers
+    ship in), or a pasted JSON config in the common `mcpServers` shape that
+    servers' READMEs give, its servers picked from a list. The app never
+    names or reads another app's settings. A bundle is a zip:
     unpacked into a fresh folder in the app's data, entries whose path
     leaves it or that are links refused, at most 200 MB unpacked. Its
     `manifest.json` `server.mcp_config` gives the command, with
@@ -56,6 +58,27 @@ too (rounds and calls per turn, dangling calls closed on Stop).
   characters (with how much was cut); `structuredContent` as compact JSON
   when there's no text. Images and other parts are named, not passed (v1).
   `isError` results go back as the tool's error.
+
+## The catalog
+
+No catalog of our own to run. Settings › Tools › MCP Servers › **Browse**
+reads the official MCP Registry (`registry.modelcontextprotocol.io`, open,
+vendor-neutral, a public API: `GET /v0/servers?search=…`), like the Hugging
+Face browser does for models:
+
+- **Featured first**: a short list kept in the app (our `apple-mail-mcp`
+  first), then search results.
+- **Only what can run here**, by the entry's own description: a remote
+  (`streamable-http`) URL; an `mcpb` package; an `npm` package when `npx`
+  is found, a `pypi` one when `uvx` is found (else "needs Node" / "needs
+  uv", with nothing installed for it); `oci` (Docker) isn't offered.
+  Latest version only, `active` status only.
+- **Installing is adding**: the command or URL the entry gives goes into the
+  same review as a hand-added server (shown in full, Start and Review, then
+  on). An entry's text is the publisher's, shown as theirs; the registry
+  vouches for a name's owner, not for the code.
+- The registry is read only when the user opens Browse; nothing about the
+  user is sent beyond the search words.
 
 ## Asking before a call
 
@@ -118,8 +141,8 @@ event, run a shell. The app can't know which tools are safe, so:
 ## The client
 
 - **Our own, small**, no package: JSON-RPC 2.0. Protocol versions
-  `2025-06-18`, `2025-03-26` and `2024-11-05` (what `apple-mail-mcp`
-  answers): we ask for the newest, accept one of these back, and refuse any
+  `2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05` (what
+  `apple-mail-mcp` answers): we ask for the newest, accept one of these back, and refuse any
   other; `initialize` /
   `notifications/initialized`, `tools/list` (paged), `tools/call`,
   `notifications/tools/list_changed`, `ping`, `notifications/cancelled` on
@@ -179,7 +202,8 @@ event, run a shell. The app can't know which tools are safe, so:
 
 1. Core (LLMTrayCore): `MCPMessage` (JSON-RPC types), `MCPClient` over a
    transport protocol, `StdioTransport`, `HTTPTransport`, the result-to-text
-   bound, name mangling, `.mcpb` / Claude Desktop config import; tests with a
+   bound, name mangling, `.mcpb` and pasted-config import, the registry
+   client; tests with a
    fake server (a script speaking the protocol) and fixture JSON.
 2. App: `MCPServerStore` (settings file + Keychain), the process supervisor,
    dynamic tool groups in `ToolGroups`, declaration and the call path in
@@ -193,4 +217,4 @@ event, run a shell. The app can't know which tools are safe, so:
 ## Not now
 
 OAuth for remote servers; resources, prompts, sampling, elicitation; image
-results to models that see; a server catalog to browse.
+results to models that see; Docker servers.
