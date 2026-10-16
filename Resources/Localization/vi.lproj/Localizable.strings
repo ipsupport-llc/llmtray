@@ -401,10 +401,10 @@
 "Downloading…" = "Đang tải…";
 "Downloads" = "Tải về";
 "Downloads waiting: %lld" = "Các tải chờ: %lld";
-"Drag .mcpb files here to install" = "Kéo tệp .mcpb vào đây để cài đặt";
 "Drag chats here, or use a chat's menu" = "Kéo cuộc trò chuyện vào đây, hoặc dùng menu của cuộc trò chuyện";
 "Drag chats or files here, or use a chat's menu" = "Kéo cuộc trò chuyện hoặc tệp vào đây, hoặc dùng menu cuộc trò chuyện";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Kéo tài liệu vào cuộc trò chuyện này: chúng sẽ vào dự án và mô hình trả lời dựa trên chúng.";
+"Drop .mcpb files here to install" = "Thả tệp .mcpb vào đây để cài đặt";
 "Drop chats here to move them to the project" = "Thả cuộc trò chuyện vào đây để chuyển vào dự án";
 "Drop chats or files here to add them to the project" = "Thả cuộc trò chuyện hoặc tệp vào đây để thêm vào dự án";
 "Drop files here" = "Thả tệp vào đây";
@@ -522,6 +522,7 @@
 "Getting Started" = "Bắt đầu";
 "Getting started" = "Bắt đầu";
 "Getting…" = "Đang tải…";
+"Give the chat more tools" = "Cấp thêm công cụ cho cuộc trò chuyện";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Cung cấp cho mô hình công cụ generate_music: bài hát có ca từ hoặc nhạc cụ, dựa trên mô tả (ACE‑Step 1.5, giấy phép MIT; khoảng 20 giây để tạo 30 giây nhạc). Lần đầu tiên, mô hình sẽ được tải về.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Cung cấp cho mô hình công cụ edit_image: thay đổi ảnh từ cuộc trò chuyện — ảnh bạn đính kèm hoặc ảnh tạo tại đây. Yêu cầu bật tạo ảnh. Là một mô hình riêng, tải xuống khi bạn chọn.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Các cuộc trò chuyện dài thuận tiện hơn trong cửa sổ: dự án, tệp và mọi cuộc trò chuyện trong thanh bên.";
 "MTP drafter: speeds up %@, same answers" = "Bộ nháp MTP: tăng tốc %@, cùng câu trả lời";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dành cho lập trình và agent: công cụ lập trình và OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Thư, ghi chú, lịch, tệp và dịch vụ. Cuộc trò chuyện sẽ hỏi bạn trước mỗi lần gọi.";
 "Maintenance" = "Bảo trì";
 "Make a 30-second calm lo-fi instrumental for studying" = "Tạo nhạc nền lo-fi 30 giây, nhẹ nhàng để học";
 "Make a Document…" = "Tạo Tài liệu…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Nhật ký máy chủ";
 "Server log" = "Nhật ký máy chủ";
 "Server settings changed -- restart to apply them." = "Cài đặt máy chủ đã thay đổi — hãy khởi động lại để áp dụng.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Máy chủ cung cấp thêm công cụ cho Trò chuyện: thư, ghi chú, lịch, tệp, dịch vụ. Trò chuyện sẽ hỏi bạn trước mỗi lần gọi.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Đang thiết lập tạo ảnh (chỉ lần đầu)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "không được mô hình nào dùng";
 "npx, uvx, or a full path" = "npx, uvx hoặc đường dẫn đầy đủ";
 "off" = "tắt";
+"or choose a file…" = "hoặc chọn một tệp…";
 "outcome unknown -- check before trying again" = "không rõ kết quả -- hãy kiểm tra trước khi thử lại";
 "over 50 MB" = "trên 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/giây";

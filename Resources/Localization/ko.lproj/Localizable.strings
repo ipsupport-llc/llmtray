@@ -401,10 +401,10 @@
 "Downloading…" = "다운로드 중…";
 "Downloads" = "다운로드";
 "Downloads waiting: %lld" = "대기 중인 다운로드: %lld";
-"Drag .mcpb files here to install" = "설치하려면 여기에 .mcpb 파일을 드래그하십시오";
 "Drag chats here, or use a chat's menu" = "여기에 채팅을 끌어다 놓하거나 채팅의 메뉴를 사용하세요";
 "Drag chats or files here, or use a chat's menu" = "여기에 채팅이나 파일을 끌어오거나 채팅 메뉴 사용";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "문서를 이 채팅으로 드래그하면 프로젝트에 추가되고 모델이 해당 문서에서 답변합니다.";
+"Drop .mcpb files here to install" = "설치하려면 .mcpb 파일을 여기에 놓으세요";
 "Drop chats here to move them to the project" = "여기에 채팅을 놓으면 프로젝트로 이동";
 "Drop chats or files here to add them to the project" = "여기에 채팅 또는 파일을 놓아 프로젝트에 추가";
 "Drop files here" = "여기에 파일 놓기";
@@ -522,6 +522,7 @@
 "Getting Started" = "시작하기";
 "Getting started" = "시작하기";
 "Getting…" = "받는 중…";
+"Give the chat more tools" = "채팅에 더 많은 도구 추가";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "모델에 generate_image 도구를 제공합니다(도구 호출 모델 필요). 처음 사용할 때 이미지 모델이 다운로드됩니다.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "모델에 generate_music 도구를 추가합니다: 설명으로부터 가사가 있는 노래 또는 연주곡을 생성합니다 (ACE-Step 1.5, MIT 라이선스; 30초 음악 생성에 약 20초 소요). 처음 사용 시 모델을 다운로드합니다.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "모델에 edit_image 도구를 제공합니다: 채팅의 이미지(첨부한 이미지 또는 여기서 생성한 이미지)를 변경합니다. 이미지 생성을 켜야 합니다. 선택하면 해당 모델을 내려받습니다.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "긴 대화는 창에서 더 편합니다: 프로젝트, 파일, 모든 대화를 사이드바에서 확인하세요.";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: %@ 속도 향상, 답변은 동일";
 "Made for programming and agents: coding tools and the OpenAI API." = "프로그래밍 및 에이전트를 위해 제작됨: 코딩 도구와 OpenAI API용입니다.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "메일, 메모, 캘린더, 파일 및 서비스. 채팅은 각 호출 전에 확인합니다.";
 "Maintenance" = "유지 관리";
 "Make a 30-second calm lo-fi instrumental for studying" = "공부용 30초 차분한 로파이 연주 만들기";
 "Make a Document…" = "문서 만들기…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "서버 로그";
 "Server log" = "서버 로그";
 "Server settings changed -- restart to apply them." = "서버 설정이 변경되었습니다. 적용하려면 재시동하십시오.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "서버는 채팅에 메일, 메모, 캘린더, 파일, 서비스 같은 더 많은 도구를 제공합니다. 채팅은 각 호출 전에 확인합니다.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "이미지 생성 설정 중(첫 실행 시만)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "어떤 모델에서도 사용되지 않음";
 "npx, uvx, or a full path" = "npx, uvx 또는 전체 경로";
 "off" = "끔";
+"or choose a file…" = "또는 파일 선택…";
 "outcome unknown -- check before trying again" = "결과를 알 수 없음 -- 다시 시도하기 전에 확인하십시오";
 "over 50 MB" = "50MB 초과";
 "prompt %.0f tok/s" = "프롬프트 %.0f tok/s";

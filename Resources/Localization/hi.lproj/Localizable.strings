@@ -401,10 +401,10 @@
 "Downloading…" = "डाउनलोड हो रहा है…";
 "Downloads" = "Downloads";
 "Downloads waiting: %lld" = "प्रतीक्षारत डाउनलोड: %lld";
-"Drag .mcpb files here to install" = "इंस्टॉल करने के लिए .mcpb फ़ाइलें यहाँ खींचें";
 "Drag chats here, or use a chat's menu" = "यहाँ चैट्स खींचें, या किसी चैट के मेनू का उपयोग करें";
 "Drag chats or files here, or use a chat's menu" = "यहाँ चैट्स या फाइलें खींचें, या किसी चैट के मेनू का उपयोग करें";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "दस्तावेज़ इस चैट पर खींचें: वे प्रोजेक्ट में जुड़ते हैं और मॉडल उनसे उत्तर देता है।";
+"Drop .mcpb files here to install" = "इंस्टॉल करने के लिए .mcpb फ़ाइलें यहाँ छोड़ें";
 "Drop chats here to move them to the project" = "चैट्स यहाँ छोड़ें ताकि उन्हें प्रोजेक्ट में भेजा जा सके";
 "Drop chats or files here to add them to the project" = "चैट्स या फाइलें यहाँ छोड़ें ताकि प्रोजेक्ट में जोड़ी जा सकें";
 "Drop files here" = "फाइलें यहाँ छोड़ें";
@@ -522,6 +522,7 @@
 "Getting Started" = "प्रारंभ करें";
 "Getting started" = "शुरू करें";
 "Getting…" = "प्राप्त किया जा रहा है…";
+"Give the chat more tools" = "चैट को और टूल दें";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "मॉडल को generate_music टूल देता है: वर्णन से गाना (गाये हुए बोल) या साधनात्मक आउटपुट (ACE-Step 1.5, MIT लाइसेंस; 30 सेकंड के संगीत के लिए लगभग 20 सेकंड)। पहली बार मॉडल डाउनलोड होगा।";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "मॉडल को एक edit_image टूल देता है: यह चैट की एक छवि बदलता है — जिसे आपने जोड़ा हो या यहाँ जनरेट की गई हो। इसके लिए image generation चालू होना चाहिए। इसका अपना मॉडल है, जिसे चुनने पर डाउनलोड किया जाता है।";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "लंबी बातचीत विंडो में आसान होती है: प्रोजेक्ट, फ़ाइलें और हर चैट साइडबार में।";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: %@ को तेज़ करता है, उत्तर वही";
 "Made for programming and agents: coding tools and the OpenAI API." = "प्रोग्रामिंग और एजेंट्स के लिए बनाया गया: कोडिंग टूल और OpenAI API।";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "मेल, नोट्स, कैलेंडर, फ़ाइलें और सेवाएँ। चैट हर कॉल से पहले आपसे पूछता है।";
 "Maintenance" = "रखरखाव";
 "Make a 30-second calm lo-fi instrumental for studying" = "पढ़ाई के लिए 30-सेकंड का शांत लो-फाइ इन्स्ट्रुमेंटल बनाएं";
 "Make a Document…" = "दस्तावेज़ बनाएँ…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "सर्वर लॉग";
 "Server log" = "सर्वर लॉग";
 "Server settings changed -- restart to apply them." = "सर्वर सेटिंग्स बदल गई हैं — इन्हें लागू करने के लिए रीस्टार्ट करें।";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "सर्वर चैट को और टूल देते हैं: मेल, नोट्स, कैलेंडर, फ़ाइलें, सेवाएँ। हर कॉल से पहले चैट आपसे पूछती है।";
 "Set Up LLMTray" = "LLMTray सेट अप करें";
 "Set Up LLMTray…" = "LLMTray सेट अप करें…";
 "Setting up image generation (first time only)…" = "Image generation की सेटअप कर रहा है (केवल पहली बार)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "किसी भी मॉडल द्वारा उपयोग नहीं किया गया";
 "npx, uvx, or a full path" = "npx, uvx, या पूरा path";
 "off" = "बंद";
+"or choose a file…" = "या कोई फ़ाइल चुनें…";
 "outcome unknown -- check before trying again" = "नतीजा अज्ञात है -- फिर कोशिश करने से पहले जाँचें";
 "over 50 MB" = "50 MB से बड़ा";
 "prompt %.0f tok/s" = "प्रॉम्प्ट %.0f tok/s";

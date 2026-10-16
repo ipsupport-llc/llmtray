@@ -401,10 +401,10 @@
 "Downloading…" = "מוריד/ת…";
 "Downloads" = "הורדות";
 "Downloads waiting: %lld" = "הורדות בהמתנה: %lld";
-"Drag .mcpb files here to install" = "גרור לכאן קובצי .mcpb כדי להתקין";
 "Drag chats here, or use a chat's menu" = "גרור שיחות לכאן, או השתמש בתפריט של שיחה";
 "Drag chats or files here, or use a chat's menu" = "גרור שיחות או קבצים לכאן, או השתמש בתפריט השיחה";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "גרור מסמכים לצ׳אט זה: הם יתווספו לפרויקט והמודל יענה בהתבסס עליהם.";
+"Drop .mcpb files here to install" = "יש לגרור לכאן קובצי .mcpb כדי להתקין";
 "Drop chats here to move them to the project" = "שחרר שיחות כאן כדי להעבירן לפרויקט";
 "Drop chats or files here to add them to the project" = "שחרר שיחות או קבצים כאן כדי להוסיף לפרויקט";
 "Drop files here" = "שחרר קבצים כאן";
@@ -522,6 +522,7 @@
 "Getting Started" = "התחלה";
 "Getting started" = "התחלה";
 "Getting…" = "מוריד…";
+"Give the chat more tools" = "להוסיף לצ׳אט כלים נוספים";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "מספק למודל כלי generate_music: שיר עם מילים מושרות או יצירה אינסטרומנטלית מתוך תיאור (ACE-Step 1.5, רישיון MIT; כ‑20 שנ׳ ל‑30 שנ׳ של מוזיקה). בפעם הראשונה המודל יורד.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "נותן למודל כלי edit_image: משנה תמונה מהשיחה — אחת שצירפת או שנוצרה כאן. דורש שיהיה מופעל יצור תמונות. המודל נמצא משלו, יורד כשאתה בוחר בו.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "שיחות ארוכות נוחות יותר בחלון: פרויקטים, קבצים וכל שיחה בסרגל צד.";
 "MTP drafter: speeds up %@, same answers" = "מנסח MTP: מאיץ את %@, אותן תשובות";
 "Made for programming and agents: coding tools and the OpenAI API." = "מייועד לתכנות וסוכנים: כלי קידוד ו־OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "דוא״ל, פתקים, לוחות שנה, קבצים ושירותים. הצ׳אט יבקש את אישורך לפני כל קריאה.";
 "Maintenance" = "תחזוקה";
 "Make a 30-second calm lo-fi instrumental for studying" = "הכן קטע אינסטרומנטלי שקט ל‑lo‑fi למשך 30 שניות ללמידה";
 "Make a Document…" = "צור מסמך…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "יומן השרת";
 "Server log" = "יומן השרת";
 "Server settings changed -- restart to apply them." = "הגדרות השרת השתנו -- יש להפעיל מחדש כדי להחיל אותן.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "שרתים נותנים לצ׳אט כלים נוספים: דואר, פתקים, לוחות שנה, קבצים ושירותים. הצ׳אט מבקש ממך אישור לפני כל קריאה.";
 "Set Up LLMTray" = "הגדר את LLMTray";
 "Set Up LLMTray…" = "הגדר את LLMTray…";
 "Setting up image generation (first time only)…" = "מגדיר/ה יצירת תמונות (הפעם הראשונה בלבד)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "לא בשימוש של אף מודל";
 "npx, uvx, or a full path" = "npx, uvx או נתיב מלא";
 "off" = "מכובה";
+"or choose a file…" = "או לבחור קובץ…";
 "outcome unknown -- check before trying again" = "התוצאה לא ידועה -- בדוק לפני שתנסה שוב";
 "over 50 MB" = "מעל 50 MB";
 "prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";

@@ -401,10 +401,10 @@
 "Downloading…" = "Pobieranie…";
 "Downloads" = "Pobrane";
 "Downloads waiting: %lld" = "Oczekujące pobrania: %lld";
-"Drag .mcpb files here to install" = "Przeciągnij tutaj pliki .mcpb, aby je zainstalować";
 "Drag chats here, or use a chat's menu" = "Przeciągnij czaty tutaj lub użyj menu czatu";
 "Drag chats or files here, or use a chat's menu" = "Przeciągnij rozmowy lub pliki tutaj albo użyj menu rozmowy";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Przeciągnij dokumenty na tę rozmowę — zostaną dodane do projektu, a model odpowie na ich podstawie.";
+"Drop .mcpb files here to install" = "Upuść tu pliki .mcpb, aby je zainstalować";
 "Drop chats here to move them to the project" = "Upuść rozmowy tutaj, aby przenieść je do projektu";
 "Drop chats or files here to add them to the project" = "Upuść rozmowy lub pliki tutaj, aby dodać je do projektu";
 "Drop files here" = "Upuść pliki tutaj";
@@ -522,6 +522,7 @@
 "Getting Started" = "Rozpocznij";
 "Getting started" = "Rozpocznij";
 "Getting…" = "Pobieranie…";
+"Give the chat more tools" = "Daj czatowi więcej narzędzi";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Udostępnia modelowi narzędzie generate_image (wymaga modelu obsługującego wywoływanie narzędzi). Przy pierwszym użyciu model obrazów zostanie pobrany.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Daje modelowi narzędzie generate_music: piosenkę ze śpiewanymi tekstami albo podkład instrumentalny na podstawie opisu (ACE-Step 1.5, licencja MIT; około 20 sekund pracy na 30 sekund muzyki). Przy pierwszym użyciu model jest pobierany.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Dodaje modelowi narzędzie edit_image: zmienia obraz z czatu — dołączony albo wygenerowany tutaj. Wymaga włączonej generacji obrazów. Używa własnego modelu, pobieranego po wybraniu.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Dłuższe rozmowy są wygodniejsze w oknie: projekty, pliki i każda rozmowa w pasku bocznym.";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: przyspiesza %@, te same odpowiedzi";
 "Made for programming and agents: coding tools and the OpenAI API." = "Stworzony do programowania i agentów: narzędzia do kodowania i OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Poczta, notatki, kalendarze, pliki i usługi. Czat pyta Cię przed każdym wywołaniem.";
 "Maintenance" = "Konserwacja";
 "Make a 30-second calm lo-fi instrumental for studying" = "Stwórz 30‑sekundowy spokojny lo‑fi instrumental do nauki";
 "Make a Document…" = "Utwórz dokument…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Dziennik serwera";
 "Server log" = "Dziennik serwera";
 "Server settings changed -- restart to apply them." = "Zmieniono ustawienia serwera — uruchom ponownie, aby je zastosować.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Serwery dają Czatowi więcej narzędzi: pocztę, notatki, kalendarze, pliki i usługi. Czat pyta Cię przed każdym wywołaniem.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Konfigurowanie generowania obrazów (tylko przy pierwszym uruchomieniu)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "nieużywane przez żaden model";
 "npx, uvx, or a full path" = "npx, uvx lub pełna ścieżka";
 "off" = "wyłączone";
+"or choose a file…" = "lub wybierz plik…";
 "outcome unknown -- check before trying again" = "wynik nieznany — sprawdź przed ponowną próbą";
 "over 50 MB" = "powyżej 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";

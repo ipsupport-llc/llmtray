@@ -401,10 +401,10 @@
 "Downloading…" = "Загрузка…";
 "Downloads" = "Загрузки";
 "Downloads waiting: %lld" = "Загрузок в очереди: %lld";
-"Drag .mcpb files here to install" = "Перетащите сюда файлы .mcpb для установки";
 "Drag chats here, or use a chat's menu" = "Перетащите чаты сюда или используйте меню чата";
 "Drag chats or files here, or use a chat's menu" = "Перетащите чаты или файлы сюда или используйте меню чата";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Перетащите документы в этот чат: они добавятся в проект, и модель будет отвечать на их основе.";
+"Drop .mcpb files here to install" = "Перетащите сюда файлы .mcpb для установки";
 "Drop chats here to move them to the project" = "Перетащите чаты сюда, чтобы переместить их в проект";
 "Drop chats or files here to add them to the project" = "Перетащите чаты или файлы сюда, чтобы добавить их в проект";
 "Drop files here" = "Перетащите файлы сюда";
@@ -522,6 +522,7 @@
 "Getting Started" = "Начало работы";
 "Getting started" = "Начало работы";
 "Getting…" = "Загрузка…";
+"Give the chat more tools" = "Добавьте чату инструменты";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Даёт модели инструмент generate_image (нужна модель, умеющая вызывать инструменты). В первый раз скачивается модель для картинок.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Добавляет модели инструмент generate_music: песня с пением или инструментал по описанию (ACE-Step 1.5, лицензия MIT; ~20 секунд работы на 30 секунд музыки). При первом использовании модель загружается.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Добавляет модели инструмент edit_image: изменяет изображение из чата — прикреплённое вами или сгенерированное здесь. Требует включённой генерации изображений. Использует отдельную модель, загружаемую при выборе.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Длинные беседы удобнее вести в окне: проекты, файлы и все чаты в боковой панели.";
 "MTP drafter: speeds up %@, same answers" = "Черновик MTP: ускоряет %@, ответы те же";
 "Made for programming and agents: coding tools and the OpenAI API." = "Создано для разработки и агентов: инструменты для кода и OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Почта, заметки, календари, файлы и службы. Чат спрашивает вас перед каждым вызовом.";
 "Maintenance" = "Обслуживание";
 "Make a 30-second calm lo-fi instrumental for studying" = "Сделайте 30‑секундный спокойный lo‑fi инструментал для учёбы";
 "Make a Document…" = "Создать документ…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Настройки сервера изменились — перезапустите, чтобы применить.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Серверы дают Чату больше инструментов: почта, заметки, календари, файлы, сервисы. Чат спрашивает вас перед каждым вызовом.";
 "Set Up LLMTray" = "Настройка LLMTray";
 "Set Up LLMTray…" = "Настроить LLMTray…";
 "Setting up image generation (first time only)…" = "Настройка генерации изображений (только первый запуск)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "не используется ни одной моделью";
 "npx, uvx, or a full path" = "npx, uvx или полный путь";
 "off" = "выкл.";
+"or choose a file…" = "или выберите файл…";
 "outcome unknown -- check before trying again" = "результат неизвестен — проверьте перед повторной попыткой";
 "over 50 MB" = "больше 50 МБ";
 "prompt %.0f tok/s" = "промпт %.0f ток/с";
