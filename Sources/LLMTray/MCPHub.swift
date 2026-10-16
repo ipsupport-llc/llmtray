@@ -70,6 +70,13 @@ final class MCPHub: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         servers = (try? decoder.decode([MCPServerConfig].self, from: data)) ?? []
+        // Reviewed before the hint was kept: the hints as they are for the
+        // definitions reviewed (unchanged since, by their hash).
+        for i in servers.indices where servers[i].reviewedReadOnly.isEmpty && !servers[i].reviewed.isEmpty {
+            for tool in servers[i].tools where servers[i].reviewed[tool.name] == tool.definitionHash {
+                servers[i].reviewedReadOnly[tool.name] = tool.readOnlyHint == true
+            }
+        }
     }
 
     private func save() {
@@ -144,6 +151,7 @@ final class MCPHub: ObservableObject {
     func markReviewed(_ id: UUID) {
         guard var config = server(id) else { return }
         config.reviewed = Dictionary(config.tools.map { ($0.name, $0.definitionHash) }, uniquingKeysWith: { a, _ in a })
+        config.reviewedReadOnly = Dictionary(config.tools.map { ($0.name, $0.readOnlyHint == true) }, uniquingKeysWith: { a, _ in a })
         // Allowances for definitions that changed go.
         config.runWithoutAsking = config.runWithoutAsking.filter { key, hash in
             let tool = key.components(separatedBy: "#")[0]

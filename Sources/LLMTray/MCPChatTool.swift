@@ -24,7 +24,9 @@ struct MCPCallRequest {
     /// reads comes back into the chat, its arguments go nowhere. A change, or
     /// any call to a server on the web, is asked then (adr/0027).
     var allowancesHold: Bool {
-        !afterOutsideText || (tool.readOnlyHint == true && server.kind == .command)
+        // The hint as reviewed and as listed now: a write relisted as a read
+        // doesn't pass.
+        !afterOutsideText || (tool.readOnlyHint == true && server.reviewedReadOnly[tool.name] == true && server.kind == .command)
     }
 }
 
