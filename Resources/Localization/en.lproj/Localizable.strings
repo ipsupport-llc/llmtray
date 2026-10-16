@@ -297,6 +297,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Click to record a clip; hold to talk and release to send (the model hears it)";
 "Click ■ to stop · Esc cancels" = "Click ■ to stop · Esc cancels";
+"Client ID" = "Client ID";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -477,6 +478,7 @@
 "Files…" = "Files…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
+"Finish in your browser…" = "Finish in your browser…";
 "First token" = "First token";
 "First-run setup" = "First-run setup";
 "Fits comfortably" = "Fits comfortably";
@@ -748,6 +750,8 @@
 "Needs %@" = "Needs %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Needs about %1$@ GB; this Mac has %2$@ GB.";
+"Needs sign-in" = "Needs sign-in";
+"Needs sign-in." = "Needs sign-in.";
 "Network" = "Network";
 "Never" = "Never";
 "New Chat" = "New Chat";
@@ -792,6 +796,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
+"No sign-in" = "No sign-in";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
 "No thanks" = "No thanks";
@@ -971,6 +976,7 @@
 "Record" = "Record";
 "Recording" = "Recording";
 "Recovery" = "Recovery";
+"Redirect URL to add to your app:" = "Redirect URL to add to your app:";
 "Refused" = "Refused";
 "Regenerate" = "Regenerate";
 "Reinstall" = "Reinstall";
@@ -1105,6 +1111,10 @@
 "Shows Pause, Stop and the project's files" = "Shows Pause, Stop and the project's files";
 "Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
+"Sign In" = "Sign In";
+"Sign Out" = "Sign Out";
+"Signed in at %@" = "Signed in at %@";
+"Signing in: finish in your browser." = "Signing in: finish in your browser.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music.";
 "Size" = "Size";
 "Skip" = "Skip";
@@ -1595,6 +1605,7 @@
 "the installed version didn't change" = "the installed version didn't change";
 "the model" = "the model";
 "the model runtime isn't installed yet" = "the model runtime isn't installed yet";
+"the sign-in was cancelled" = "the sign-in was cancelled";
 "then" = "then";
 "this call only" = "this call only";
 "tight fit" = "tight fit";

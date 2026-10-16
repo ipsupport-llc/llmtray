@@ -245,6 +245,7 @@ private struct ServerRow: View {
     let configure: () -> Void
     @ObservedObject private var hub = MCPHub.shared
     @ObservedObject private var installer = MCPInstaller.shared
+    @ObservedObject private var signIn = MCPSignIn.shared
 
     private var state: MCPHub.ServerState? { hub.states[server.id] }
 
@@ -269,11 +270,20 @@ private struct ServerRow: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(installer.busy.contains(server.id.uuidString))
                 }
-                Button("Configure", action: configure)
+                if server.oauth?.needsSignIn == true {
+                    Button("Sign In") { Task { installer.message = await installer.startOrSignIn(server.id) } }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(signIn.signingIn.contains(server.id))
+                } else {
+                    Button("Configure", action: configure)
+                }
                 Menu {
                     Button(server.enabled ? "Turn Off" : "Turn On") { hub.setEnabled(server.id, !server.enabled) }
                         .disabled(server.visibleTools.isEmpty || !MCPHub.runsHere(server))
                     Button("Show Log…", action: configure)
+                    if server.oauth != nil, server.oauth?.needsSignIn == false {
+                        Button("Sign Out") { Task { await signIn.signOut(server.id) } }
+                    }
                     Divider()
                     Button("Uninstall", role: .destructive) { hub.remove(server.id) }
                 } label: {
@@ -289,7 +299,7 @@ private struct ServerRow: View {
     }
 
     @ViewBuilder private var status: some View {
-        if installer.busy.contains(server.id.uuidString) || state?.status == .starting {
+        if installer.busy.contains(server.id.uuidString) || state?.status == .starting || signIn.signingIn.contains(server.id) {
             ProgressView().controlSize(.small)
         } else if problem != nil {
             Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
@@ -301,6 +311,8 @@ private struct ServerRow: View {
     }
 
     private var problem: String? {
+        if signIn.signingIn.contains(server.id) { return NSLocalizedString("Signing in: finish in your browser.", comment: "MCP server") }
+        if server.oauth?.needsSignIn == true { return NSLocalizedString("Needs sign-in.", comment: "MCP server") }
         if !MCPHub.runsHere(server) { return NSLocalizedString("Doesn't run in this version of LLMTray.", comment: "") }
         switch state?.status {
         case .failed(let why): return why
@@ -773,6 +785,9 @@ private struct ConfigureSheet: View {
                 if !server.isFromIPSupport {
                     ThirdPartyNote(text: NSLocalizedString("Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk.", comment: "MCP: no-warranty note"))
                 }
+                if server.kind == .url {
+                    SignInSection(server: server)
+                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
                         if let found = settingsFound, !found.asks.isEmpty {
@@ -971,5 +986,83 @@ private struct ThirdPartyNote: View {
             .font(.caption)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// A web server's sign-in in Configure (adr/0028): where, with what, Sign In
+/// / Sign Out, and a client id for a server that pre-registers clients.
+private struct SignInSection: View {
+    let server: MCPServerConfig
+    @ObservedObject private var signIn = MCPSignIn.shared
+    @ObservedObject private var installer = MCPInstaller.shared
+    @ObservedObject private var hub = MCPHub.shared
+    @State private var clientID = ""
+    @State private var clientSecret = ""
+    @State private var redirect: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                if let state = server.oauth, !state.needsSignIn {
+                    Label(String(format: NSLocalizedString("Signed in at %@", comment: "MCP: sign-in host"), URL(string: state.metadata.issuer)?.host ?? state.metadata.issuer),
+                          systemImage: "person.badge.key")
+                    if let scope = state.scope, !scope.isEmpty { Text(scope).font(.caption).foregroundStyle(.secondary).lineLimit(1) }
+                    Spacer()
+                    Button("Sign Out") { Task { await signIn.signOut(server.id) } }
+                } else {
+                    Label(server.oauth == nil ? "No sign-in" : "Needs sign-in", systemImage: "person.badge.key")
+                        .foregroundStyle(server.oauth == nil ? .secondary : .primary)
+                    Spacer()
+                    if signIn.signingIn.contains(server.id) {
+                        ProgressView().controlSize(.small)
+                        Text("Finish in your browser…").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        Button("Sign In") { Task { installer.message = await installer.startOrSignIn(server.id) } }
+                    }
+                }
+            }
+            .font(.callout)
+            DisclosureGroup("Your own app (only for servers that need one, like Slack)") {
+                VStack(alignment: .leading, spacing: 6) {
+                    TextField("Client ID", text: $clientID)
+                    SecureField(MCPSecrets.get(server: server.id, name: MCPSignIn.clientSecretName) == nil ? "Client secret" : "Client secret (saved)",
+                                text: $clientSecret)
+                    if let redirect {
+                        HStack {
+                            Text("Redirect URL to add to your app:").foregroundStyle(.secondary)
+                            Text(redirect).font(.system(.caption, design: .monospaced)).textSelection(.enabled).lineLimit(1)
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(redirect, forType: .string)
+                            }
+                        }
+                    }
+                    HStack {
+                        Spacer()
+                        Button("Save") {
+                            guard var config = hub.server(server.id) else { return }
+                            let id = clientID.trimmingCharacters(in: .whitespaces)
+                            config.oauthClientID = id.isEmpty ? nil : id
+                            let secret = clientSecret.trimmingCharacters(in: .whitespaces)
+                            if !secret.isEmpty {
+                                MCPSecrets.set(secret, server: server.id, name: MCPSignIn.clientSecretName)
+                                if !config.secretNames.contains(MCPSignIn.clientSecretName) { config.secretNames.append(MCPSignIn.clientSecretName) }
+                                clientSecret = ""
+                            }
+                            hub.update(config)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
+            .font(.caption)
+            .task {
+                // The redirect to register names the server's sign-in host.
+                guard redirect == nil, let url = URL(string: server.url),
+                      let d = try? await MCPOAuth.discover(server: url, challenge: nil, fetch: MCPOAuthHTTP()) else { return }
+                redirect = MCPOAuth.manualRedirectURI(issuer: d.server.issuer)
+            }
+        }
+        .onAppear { clientID = server.oauthClientID ?? "" }
     }
 }

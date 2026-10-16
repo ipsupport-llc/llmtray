@@ -18,6 +18,11 @@ public enum MCPError: Error, Equatable, LocalizedError {
     case unsupportedVersion(String)
     case sessionExpired
     case badReply
+    /// HTTP 401: sign in (or refresh); the request wasn't run. The
+    /// `WWW-Authenticate` header, if any.
+    case unauthorized(String?)
+    /// HTTP 403 insufficient_scope: more scopes needed (adr/0028).
+    case insufficientScope(String?)
 
     public var errorDescription: String? {
         switch self {
@@ -27,6 +32,8 @@ public enum MCPError: Error, Equatable, LocalizedError {
         case .unsupportedVersion(let v): return "The server speaks MCP \(v), which LLMTray doesn't."
         case .sessionExpired: return "The server's session ended."
         case .badReply: return "The server's reply couldn't be read."
+        case .unauthorized: return "The server needs you to sign in."
+        case .insufficientScope: return "The server needs more permission than was granted."
         }
     }
 }
@@ -49,6 +56,9 @@ public actor MCPClient {
         case unknown
         /// Not sent (the server isn't there): nothing happened.
         case notSent(String)
+        /// Refused before it ran (HTTP 401 / 403 insufficient_scope): sign in
+        /// or refresh, then it may be sent again.
+        case unauthorized(MCPError)
     }
 
     private let transport: MCPTransport
@@ -130,6 +140,11 @@ public actor MCPClient {
             let text = MCP.resultText(result)
             return .result(text: text.text, isError: text.isError)
         } catch {
+            // Refused before running: safe to send again once signed in.
+            if let e = error as? MCPError {
+                if case .unauthorized = e { return .unauthorized(e) }
+                if case .insufficientScope = e { return .unauthorized(e) }
+            }
             if error is CancellationError || (error as? MCPError) == .timedOut {
                 // Not waited for: a server that stopped reading would hold it.
                 let transport = transport
@@ -298,6 +313,8 @@ public final class MCPStdioTransport: MCPTransport, @unchecked Sendable {
 public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
     public let url: URL
     private let headers: [String: String]
+    /// The bearer token for each request (adr/0028); nil: none.
+    private let bearer: (@Sendable () async -> String?)?
     private let session: URLSession
     private let lock = NSLock()
     private var sessionID: String?
@@ -309,10 +326,11 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
     private var readers: [UUID: Task<Void, Never>] = [:]
     static let maxBody = 8 << 20
 
-    public init(url: URL, headers: [String: String], session: URLSession = .shared) {
+    public init(url: URL, headers: [String: String], session: URLSession = .shared, bearer: (@Sendable () async -> String?)? = nil) {
         self.url = url
         self.headers = headers
         self.session = session
+        self.bearer = bearer
     }
 
     public func open(onMessage: @escaping @Sendable (Data) -> Void, onClose: @escaping @Sendable (String) -> Void) async throws {
@@ -332,6 +350,7 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json, text/event-stream", forHTTPHeaderField: "Accept")
         for (k, v) in headers { request.setValue(v, forHTTPHeaderField: k) }
+        if let token = await bearer?() { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
         let (sid, version, isClosed) = lock.withLock { (sessionID, self.version, closed) }
         if isClosed { throw MCPError.closed("closed") }
         // Delivered only while open: nothing comes in after close.
@@ -350,8 +369,11 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
             throw MCPError.sessionExpired
         }
         guard (200..<300).contains(http.statusCode) else {
+            let challenge = http.value(forHTTPHeaderField: "WWW-Authenticate")
             switch http.statusCode {
-            case 401, 403: throw MCPError.closed("it needs a sign-in or an API key (HTTP \(http.statusCode))")
+            case 401: throw MCPError.unauthorized(challenge)
+            case 403 where challenge?.contains("insufficient_scope") == true: throw MCPError.insufficientScope(challenge)
+            case 403: throw MCPError.closed("it needs a sign-in or an API key (HTTP 403)")
             case 402: throw MCPError.closed("it needs a paid account (HTTP 402)")
             case 404: throw MCPError.closed("nothing answers at its address (HTTP 404)")
             default: throw MCPError.closed("HTTP \(http.statusCode)")

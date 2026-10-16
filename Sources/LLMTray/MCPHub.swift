@@ -265,6 +265,18 @@ final class MCPHub: ObservableObject {
     /// Starts the server (once; callers share a start in progress) and lists
     /// its tools, which may change what's visible.
     func connect(_ id: UUID, forReview: Bool = false) async throws -> MCPClient {
+        do {
+            return try await connectOnce(id, forReview: forReview)
+        } catch MCPError.unauthorized(let header) {
+            // Signed in before: refresh once and try again (adr/0028).
+            if server(id)?.oauth?.needsSignIn == false, await MCPSignIn.shared.refresh(id) != nil {
+                return try await connectOnce(id, forReview: forReview)
+            }
+            throw MCPError.unauthorized(header)
+        }
+    }
+
+    private func connectOnce(_ id: UUID, forReview: Bool) async throws -> MCPClient {
         if let client = clients[id], await client.isOpen {
             states[id, default: ServerState()].lastUsed = Date()
             return client
@@ -305,8 +317,11 @@ final class MCPHub: ObservableObject {
         do {
             return try await start.value
         } catch {
-            // A stop while starting isn't a crash.
-            if !(error is CancellationError) && !Task.isCancelled { noteFailure(id, redact(error.localizedDescription, config)) }
+            // A stop while starting isn't a crash, nor is a server asking to sign in.
+            var signInNeeded = false
+            if case MCPError.unauthorized? = error as? MCPError { signInNeeded = true }
+            if !(error is CancellationError) && !Task.isCancelled && !signInNeeded { noteFailure(id, redact(error.localizedDescription, config)) }
+            if signInNeeded { states[id, default: ServerState()].status = .stopped }
             throw error
         }
     }
@@ -349,8 +364,14 @@ final class MCPHub: ObservableObject {
                 throw MCPError.closed("its URL isn't valid")
             }
             var headers = config.headers
-            for name in config.secretNames { if let v = MCPSecrets.get(server: config.id, name: name) { headers[name] = v } }
-            return MCPHTTPTransport(url: url, headers: headers)
+            for name in config.secretNames where name != MCPSignIn.tokensName {
+                if let v = MCPSecrets.get(server: config.id, name: name) { headers[name] = v }
+            }
+            // A signed-in server: its access token on every request (adr/0028).
+            let id = config.id
+            guard config.oauth != nil else { return MCPHTTPTransport(url: url, headers: headers) }
+            let bearer: @Sendable () async -> String? = { await MCPSignIn.shared.token(id) }
+            return MCPHTTPTransport(url: url, headers: headers, bearer: bearer)
         }
     }
 
@@ -404,9 +425,26 @@ final class MCPHub: ObservableObject {
             return .notSent("the server changed this tool since it was allowed; the user has to review it in Settings")
         }
         states[config.id, default: ServerState()].lastUsed = Date()
-        switch await client.call(tool.name, arguments: arguments, timeout: Self.callTimeout) {
+        var outcome = await client.call(tool.name, arguments: arguments, timeout: Self.callTimeout)
+        // Refused before it ran: refresh (401) or sign in for more (403
+        // insufficient_scope), then once more (adr/0028).
+        if case .unauthorized(let e) = outcome {
+            var again = false
+            switch e {
+            case .unauthorized: again = await MCPSignIn.shared.refresh(config.id) != nil
+            case .insufficientScope(let header):
+                if let scope = MCPOAuth.parseChallenge(header)?.scope {
+                    again = (try? await MCPSignIn.shared.signIn(config.id, challenge: MCPOAuth.parseChallenge(header), stepUp: scope)) != nil
+                }
+            default: break
+            }
+            if again { outcome = await client.call(tool.name, arguments: arguments, timeout: Self.callTimeout) }
+        }
+        switch outcome {
         case .result(let text, let isError): return .done(text, isError: isError)
         case .notSent(let why): return .notSent(why)
+        case .unauthorized:
+            return .done("The server needs the user to sign in again (Settings › Tools). Tell the user.", isError: true)
         case .unknown:
             // Restarted before its next call: the child goes now.
             await stop(config.id)
