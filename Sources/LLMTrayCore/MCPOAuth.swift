@@ -524,14 +524,14 @@ extension MCPOAuth {
     /// Who we are to this server: a kept registration, our metadata document,
     /// a dynamic registration, else the user's pasted client id.
     public static func client(for m: ServerMetadata, kept: (id: String, registration: Registration)?, pasted: String?,
-                              fetch: MCPOAuthFetching) async throws -> (id: String, registration: Registration) {
+                              server: URL, fetch: MCPOAuthFetching) async throws -> (id: String, registration: Registration) {
         if let kept { return kept }
         // The user's own app first, when they gave one.
         if let pasted, !pasted.isEmpty { return (pasted, .manual) }
         if m.acceptsClientMetadataDocument, mixUpSafe(m, registration: .metadataDocument) {
             return (clientMetadataURL, .metadataDocument)
         }
-        if let endpoint = m.registrationEndpoint {
+        if let endpoint = m.registrationEndpoint, fetchable(endpoint, for: server) {
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -545,6 +545,7 @@ extension MCPOAuth {
 
     public static func exchange(_ flow: Flow, callback target: String, fetch: MCPOAuthFetching) async throws -> Tokens {
         let code = try flow.code(fromCallback: target)
+        guard let resource = URL(string: flow.resource), fetchable(flow.metadata.tokenEndpoint, for: resource) else { throw Failure.insecureURL }
         let (data, status) = try await fetch.fetch(flow.tokenRequest(code: code))
         return try tokens(data, status: status)
     }
@@ -552,6 +553,7 @@ extension MCPOAuth {
     public static func refresh(_ tokens: Tokens, tokenEndpoint: URL, clientID: String, resource: String, clientSecret: String? = nil,
                                fetch: MCPOAuthFetching) async throws -> Tokens {
         guard let refreshToken = tokens.refreshToken else { throw Failure.invalidGrant }
+        guard let r = URL(string: resource), fetchable(tokenEndpoint, for: r) else { throw Failure.insecureURL }
         let (data, status) = try await fetch.fetch(refreshRequest(tokenEndpoint: tokenEndpoint, refreshToken: refreshToken,
                                                                   clientID: clientID, resource: resource, clientSecret: clientSecret))
         return try MCPOAuth.tokens(data, status: status, previous: tokens)

@@ -228,7 +228,7 @@ final class MCPOAuthTests: XCTestCase {
         let d = try await MCPOAuth.discover(server: server, challenge: challenge, fetch: f)
         XCTAssertEqual(d.scope, "mcp")
         XCTAssertEqual(d.resourceURL, "https://mcp.example.com/mcp")
-        let client = try await MCPOAuth.client(for: d.server, kept: nil, pasted: nil, fetch: f)
+        let client = try await MCPOAuth.client(for: d.server, kept: nil, pasted: nil, server: server, fetch: f)
         XCTAssertEqual(client.id, "dyn-1")
         XCTAssertEqual(client.registration, .dynamic)
         // No credentials in discovery requests.
@@ -258,13 +258,13 @@ final class MCPOAuthTests: XCTestCase {
     func testClientChoice() async throws {
         let f = Fixtures()
         let cimd = try MCPOAuth.serverMetadata(JSONSerialization.data(withJSONObject: asMetadata(cimd: true)), issuer: URL(string: "https://auth.example.com")!)
-        let a = try await MCPOAuth.client(for: cimd, kept: nil, pasted: nil, fetch: f)
+        let a = try await MCPOAuth.client(for: cimd, kept: nil, pasted: nil, server: server, fetch: f)
         XCTAssertEqual(a.id, MCPOAuth.clientMetadataURL)
         let none = try MCPOAuth.serverMetadata(JSONSerialization.data(withJSONObject: asMetadata(registration: false)), issuer: URL(string: "https://auth.example.com")!)
-        let pasted = try await MCPOAuth.client(for: none, kept: nil, pasted: "my-client", fetch: f)
+        let pasted = try await MCPOAuth.client(for: none, kept: nil, pasted: "my-client", server: server, fetch: f)
         XCTAssertEqual(pasted.registration, .manual)
         do {
-            _ = try await MCPOAuth.client(for: none, kept: nil, pasted: nil, fetch: f)
+            _ = try await MCPOAuth.client(for: none, kept: nil, pasted: nil, server: server, fetch: f)
             XCTFail("registered")
         } catch {
             XCTAssertEqual(error as? MCPOAuth.Failure, .noRegistration)

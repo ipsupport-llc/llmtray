@@ -135,9 +135,13 @@ final class MCPHub: ObservableObject {
         let wasEnabled = servers[i].enabled
         var config = config
         // Another address: the sign-in for the old one goes (adr/0028).
-        if config.oauth != nil, MCPOAuth.canonical(config.url) != MCPOAuth.canonical(servers[i].url) {
+        // So do the user's own app's id and secret: they were for that one.
+        if MCPOAuth.canonical(config.url) != MCPOAuth.canonical(servers[i].url), config.oauth != nil || config.oauthClientID != nil {
             config.oauth = nil
+            config.oauthClientID = nil
             MCPSecrets.set(nil, server: config.id, name: MCPSignIn.tokensName)
+            MCPSecrets.set(nil, server: config.id, name: MCPSignIn.clientSecretName)
+            config.secretNames.removeAll { $0.hasPrefix("oauth.") }
         }
         servers[i] = config
         save()

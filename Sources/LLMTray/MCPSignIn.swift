@@ -94,7 +94,7 @@ final class MCPSignIn: ObservableObject {
             MCPOAuth.canonical($0.metadata.issuer) == MCPOAuth.canonical(discovery.server.issuer)
                 && (config.oauthClientID == nil || $0.clientID == config.oauthClientID) ? ($0.clientID, $0.registration) : nil
         }
-        let client = try await MCPOAuth.client(for: discovery.server, kept: kept, pasted: config.oauthClientID, fetch: fetch)
+        let client = try await MCPOAuth.client(for: discovery.server, kept: kept, pasted: config.oauthClientID, server: server, fetch: fetch)
         guard MCPOAuth.mixUpSafe(discovery.server, registration: client.registration) else { throw MCPOAuth.Failure.mixUpRisk }
         var scope = discovery.scope
         if let stepUp { scope = MCPOAuth.scope(challenge: MCPOAuth.Challenge(scope: stepUp), metadata: discovery.resource, granted: tokens(id)?.scope ?? config.oauth?.scope) }
@@ -120,7 +120,8 @@ final class MCPSignIn: ObservableObject {
 
     /// Tokens gone (revoked where the server can), "Sign in" again.
     func signOut(_ id: UUID) async {
-        if let state = hub.server(id)?.oauth, let endpoint = state.metadata.revocationEndpoint, let t = tokens(id) {
+        if let state = hub.server(id)?.oauth, let endpoint = state.metadata.revocationEndpoint, let t = tokens(id),
+           let resource = URL(string: state.resource), MCPOAuth.fetchable(endpoint, for: resource) {
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
