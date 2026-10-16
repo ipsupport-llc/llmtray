@@ -126,10 +126,13 @@ struct ToolsPane: View {
                             Divider().padding(.horizontal, 12)
                         }
                     }
-                    // The rest of the pane: where a bundle is dropped.
-                    dropZone
-                        .frame(maxWidth: .infinity, minHeight: 160, maxHeight: .infinity)
-                        .padding(20)
+                    // The rest of the pane: where a bundle is dropped (the
+                    // App Store build installs none: only its empty state).
+                    if MCPHub.commandsAllowed || hub.servers.isEmpty {
+                        dropZone
+                            .frame(maxWidth: .infinity, minHeight: 160, maxHeight: .infinity)
+                            .padding(20)
+                    }
                 }
                 .frame(minHeight: geo.size.height)
             }
