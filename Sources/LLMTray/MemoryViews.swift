@@ -31,16 +31,13 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryHalfLifeCorrection.name) private var halfLifeCorrection = Pref.memoryHalfLifeCorrection.defaultValue
     @AppStorage(Pref.memoryHalfLifeObservation.name) private var halfLifeObservation = Pref.memoryHalfLifeObservation.defaultValue
     @State private var draft: MemoryNoteDraft?
-    @State private var confirmForgetAll = false
     /// Memory on again with something put aside: read what was said meanwhile?
     @State private var askResume = false
-    @State private var confirmLearnPast = false
-    @State private var confirmForgetLearned = false
+    @State private var confirmRead = false
+    @State private var confirmForget = false
+    @State private var showAdvanced = false
     @State private var showPreview = false
-    @State private var confirmReadAgain = false
-    /// The last "Learn from Past Chats Now" found nothing left to read.
-    @State private var nothingLeft = false
-    /// What "Learn from Past Chats Now" did, shown under it.
+    /// What the last "Read Past Chats" did, shown by its button.
     @State private var learnPastResult: String?
     @State private var about: [MemoryAboutField: String] = [:]
     @State private var aboutError: String?
@@ -87,48 +84,6 @@ struct MemoryPane: View {
                 }
             }
             if enabled {
-                aboutSection
-                notesSection
-                if !expiredNotes.isEmpty { expiredSection }
-                Section("What chats get") {
-                    Toggle(isOn: kindBinding(.preference)) {
-                        SettingLabel(title: "Preferences", help: "How you like things: language, length, tone, formatting.")
-                    }
-                    Toggle(isOn: kindBinding(.correction)) {
-                        SettingLabel(title: "Corrections", help: "What you corrected before, so it isn't repeated.")
-                    }
-                    Toggle(isOn: kindBinding(.fact)) {
-                        SettingLabel(title: "Facts", help: "About you and your work: what you do, what you use.")
-                    }
-                    Toggle(isOn: kindBinding(.observation)) {
-                        SettingLabel(title: "Observations", help: "What you did, kept apart from what it may mean. Sent as a guess.")
-                    }
-                    Stepper(value: $moodHours, in: 0...24) {
-                        SettingLabel(title: moodHours == 0 ? "Your mood: not read" : "Your mood: for \(moodHours) hours",
-                                     help: "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.")
-                    }
-                    if let mood = memory.file.mood, mood.isFresh(now: Date(), hours: moodHours) {
-                        HStack {
-                            Text(String(format: NSLocalizedString("Now: %@ → %@ (until %@)", comment: "memory mood"), mood.observed, mood.text,
-                                        mood.until(hours: moodHours).formatted(date: .omitted, time: .shortened)))
-                                .font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Button("Forget") { memory.change { $0.mood = nil } }
-                        }
-                    }
-                    Toggle(isOn: $projects) {
-                        SettingLabel(title: "Remember in projects", help: "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.")
-                    }
-                    Picker(selection: $shareLearned) {
-                        Text("Stays in its project").tag(false)
-                        Text("Shared by all chats").tag(true)
-                    } label: {
-                        SettingLabel(title: "Learned from chats", help: "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way.")
-                    }
-                    Stepper(value: $budget, in: 50...4000, step: 50) {
-                        SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")
-                    }
-                }
                 Section("Learning") {
                     if memory.file.hasPaused {
                         // Unanswered: nothing is read or met until it is.
@@ -140,30 +95,6 @@ struct MemoryPane: View {
                         }
                     }
                     learningStatus
-                    Picker(selection: $learningModel) {
-                        Text("The chat's own model").tag("")
-                        // Not offered as the reader (adr/0025: it misses too
-                        // much); kept for a setting made in a test build.
-                        if learningModel == AppleSystemModel.id {
-                            Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
-                        }
-                        ForEach(learningModels, id: \.path) { model in
-                            Text(model.displayName).tag(model.path)
-                        }
-                    } label: {
-                        SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.")
-                    }
-                    if AppleSystemModel.isAvailable || sorter == AppleSystemModel.id {
-                        Picker(selection: $sorter) {
-                            Text("The model that reads them").tag("")
-                            Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
-                        } label: {
-                            SettingLabel(title: "Sorts messages with", help: "Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in.")
-                        }
-                        if sorter == AppleSystemModel.id, case .unavailable(let why) = AppleSystemModel.availability {
-                            Text(why).font(.caption).foregroundStyle(.orange)
-                        }
-                    }
                     ForEach(unfitReaders, id: \.self) { path in
                         HStack {
                             Text(String(format: NSLocalizedString("%@ couldn't read chats for memory: another model reads its chats.", comment: "memory: a model unfit to read"),
@@ -177,77 +108,128 @@ struct MemoryPane: View {
                             }
                         }
                     }
-                    if let warning = languageWarning {
-                        Text(warning).font(.caption).foregroundStyle(.orange)
-                    }
-                    Picker(selection: $switchIdleMinutes) {
-                        Text("Never").tag(0)
-                        ForEach([30, 60, 120, 240], id: \.self) { Text("After \($0) idle minutes").tag($0) }
-                    } label: {
-                        SettingLabel(title: "Load it itself", help: "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment.")
-                    }
-                    Picker(selection: $language) {
-                        Text("Same as LLMTray").tag("auto")
-                        ForEach(Self.languages, id: \.self) { code in
-                            Text(Locale.current.localizedString(forLanguageCode: code) ?? code).tag(code)
+                    if let mood = memory.file.mood, mood.isFresh(now: Date(), hours: moodHours) {
+                        HStack {
+                            Text(String(format: NSLocalizedString("Now: %@ → %@ (until %@)", comment: "memory mood"), mood.observed, mood.text,
+                                        mood.until(hours: moodHours).formatted(date: .omitted, time: .shortened)))
+                                .font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Forget") { memory.change { $0.mood = nil } }
                         }
-                    } label: {
-                        SettingLabel(title: "Notes in", help: "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.")
-                    }
-                    Stepper(value: $idleMinutes, in: 1...240) {
-                        SettingLabel(title: "Read a chat after \(idleMinutes) quiet minutes", help: "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
-                    }
-                    Toggle(isOn: $forgetDeletedChats) {
-                        SettingLabel(title: "Deleting a chat forgets what it taught", help: "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.")
                     }
                     HStack {
-                        SettingLabel(title: "Past chats", help: "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped.")
+                        Text(learningSummary).font(.caption).foregroundStyle(.secondary)
                         Spacer()
-                        Button("Learn from Past Chats Now") { confirmLearnPast = true }
+                        Button("Read Past Chats…") { confirmRead = true }
                             .disabled(memory.unreadable || memory.file.hasPaused)
                     }
-                    HStack {
-                        SettingLabel(title: "Start over", help: "Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile.")
-                        Spacer()
-                        Button("Forget What Was Learned…") { confirmForgetLearned = true }
-                            .disabled(memory.unreadable || memory.file.unreviewedCount == 0 && memory.file.queue.isEmpty)
-                    }
-                    Stepper(value: $factChats, in: 1...5) {
-                        SettingLabel(title: factChats == 1 ? "Use a learned fact at once" : "Use a learned fact once \(factChats) chats show it",
-                                     help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
-                    }
-                    if let learnPastResult {
-                        HStack {
-                            Text(learnPastResult).font(.caption).foregroundStyle(.secondary)
-                            if nothingLeft {
-                                Spacer()
-                                Button("Read All Chats Again…") { confirmReadAgain = true }
-                                    .disabled(memory.unreadable || memory.file.hasPaused)
+                }
+                aboutSection
+                notesSection
+                if !expiredNotes.isEmpty { expiredSection }
+                Section {
+                    DisclosureGroup(isExpanded: $showAdvanced) {
+                        advancedHeader("What chats get")
+                        Toggle(isOn: kindBinding(.preference)) {
+                            SettingLabel(title: "Preferences", help: "How you like things: language, length, tone, formatting.")
+                        }
+                        Toggle(isOn: kindBinding(.correction)) {
+                            SettingLabel(title: "Corrections", help: "What you corrected before, so it isn't repeated.")
+                        }
+                        Toggle(isOn: kindBinding(.fact)) {
+                            SettingLabel(title: "Facts", help: "About you and your work: what you do, what you use.")
+                        }
+                        Toggle(isOn: kindBinding(.observation)) {
+                            SettingLabel(title: "Observations", help: "What you did, kept apart from what it may mean. Sent as a guess.")
+                        }
+                        Stepper(value: $moodHours, in: 0...24) {
+                            SettingLabel(title: moodHours == 0 ? "Your mood: not read" : "Your mood: for \(moodHours) hours",
+                                         help: "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.")
+                        }
+                        Toggle(isOn: $projects) {
+                            SettingLabel(title: "Remember in projects", help: "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.")
+                        }
+                        Picker(selection: $shareLearned) {
+                            Text("Stays in its project").tag(false)
+                            Text("Shared by all chats").tag(true)
+                        } label: {
+                            SettingLabel(title: "Learned from chats", help: "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way.")
+                        }
+                        Stepper(value: $budget, in: 50...4000, step: 50) {
+                            SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")
+                        }
+                        advancedHeader("Reading chats")
+                        Picker(selection: $learningModel) {
+                            Text("The chat's own model").tag("")
+                            // Not offered as the reader (adr/0025: it misses too
+                            // much); kept for a setting made in a test build.
+                            if learningModel == AppleSystemModel.id {
+                                Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
+                            }
+                            ForEach(learningModels, id: \.path) { model in
+                                Text(model.displayName).tag(model.path)
+                            }
+                        } label: {
+                            SettingLabel(title: "Reads chats with", help: "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.")
+                        }
+                        if AppleSystemModel.isAvailable || sorter == AppleSystemModel.id {
+                            Picker(selection: $sorter) {
+                                Text("The model that reads them").tag("")
+                                Text(AppleSystemModel.displayName).tag(AppleSystemModel.id)
+                            } label: {
+                                SettingLabel(title: "Sorts messages with", help: "Before a chat is read, each message is sorted: how you want answers, something about you, your mood, or nothing. Apple (on this Mac): the system's own model sorts on the Neural Engine, before your model is needed -- a part of a chat with nothing to learn is done there, without loading your model or using the GPU; your model reads only what was sorted in.")
+                            }
+                            if sorter == AppleSystemModel.id, case .unavailable(let why) = AppleSystemModel.availability {
+                                Text(why).font(.caption).foregroundStyle(.orange)
                             }
                         }
-                    }
-                    if !memory.file.queue.isEmpty {
-                        Text("\(memory.file.queue.count) parts of chats wait to be read.")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                Section("How long notes last") {
-                    halfLifeStepper("Preferences: half after \(halfLifePreference) days", $halfLifePreference)
-                    halfLifeStepper("Corrections: half after \(halfLifeCorrection) days", $halfLifeCorrection)
-                    halfLifeStepper("Facts: half after \(halfLifeFact) days", $halfLifeFact)
-                    halfLifeStepper("Observations: half after \(halfLifeObservation) days", $halfLifeObservation)
-                    Stepper(value: $maxActive, in: 20...2000, step: 20) {
-                        SettingLabel(title: "Keep at most \(maxActive) notes", help: "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.")
-                    }
-                    Stepper(value: $deleteAfter, in: 0...365, step: 5) {
-                        SettingLabel(title: "Delete expired notes after \(deleteAfter) days", help: "An expired note isn't sent any more; you can bring it back until it's deleted.")
+                        if let warning = languageWarning {
+                            Text(warning).font(.caption).foregroundStyle(.orange)
+                        }
+                        Picker(selection: $switchIdleMinutes) {
+                            Text("Never").tag(0)
+                            ForEach([30, 60, 120, 240], id: \.self) { Text("After \($0) idle minutes").tag($0) }
+                        } label: {
+                            SettingLabel(title: "Load it itself", help: "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment.")
+                        }
+                        Picker(selection: $language) {
+                            Text("Same as LLMTray").tag("auto")
+                            ForEach(Self.languages, id: \.self) { code in
+                                Text(Locale.current.localizedString(forLanguageCode: code) ?? code).tag(code)
+                            }
+                        } label: {
+                            SettingLabel(title: "Notes in", help: "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.")
+                        }
+                        Stepper(value: $idleMinutes, in: 1...240) {
+                            SettingLabel(title: "Read a chat after \(idleMinutes) quiet minutes", help: "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
+                        }
+                        Toggle(isOn: $forgetDeletedChats) {
+                            SettingLabel(title: "Deleting a chat forgets what it taught", help: "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.")
+                        }
+                        Stepper(value: $factChats, in: 1...5) {
+                            SettingLabel(title: factChats == 1 ? "Use a learned fact at once" : "Use a learned fact once \(factChats) chats show it",
+                                         help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
+                        }
+                        advancedHeader("How long notes last")
+                        halfLifeStepper("Preferences: half after \(halfLifePreference) days", $halfLifePreference)
+                        halfLifeStepper("Corrections: half after \(halfLifeCorrection) days", $halfLifeCorrection)
+                        halfLifeStepper("Facts: half after \(halfLifeFact) days", $halfLifeFact)
+                        halfLifeStepper("Observations: half after \(halfLifeObservation) days", $halfLifeObservation)
+                        Stepper(value: $maxActive, in: 20...2000, step: 20) {
+                            SettingLabel(title: "Keep at most \(maxActive) notes", help: "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.")
+                        }
+                        Stepper(value: $deleteAfter, in: 0...365, step: 5) {
+                            SettingLabel(title: "Delete expired notes after \(deleteAfter) days", help: "An expired note isn't sent any more; you can bring it back until it's deleted.")
+                        }
+                    } label: {
+                        SettingLabel(title: "Advanced", help: "What chats get, how chats are read, how long notes last. The defaults suit most people.")
                     }
                 }
                 Section {
                     HStack {
                         Spacer()
-                        Button("Forget Everything…", role: .destructive) { confirmForgetAll = true }
-                            .disabled(memory.file.notes.isEmpty)
+                        Button("Forget…", role: .destructive) { confirmForget = true }
+                            .disabled(memory.unreadable || memory.file.notes.isEmpty && memory.file.queue.isEmpty)
                     }
                 }
             }
@@ -271,26 +253,6 @@ struct MemoryPane: View {
         } message: {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
         }
-        .confirmationDialog("Forget what was learned?", isPresented: $confirmForgetLearned) {
-            if !memory.file.hasPaused {
-                Button("Forget and Read All Chats Again") {
-                    if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
-                }
-            }
-            Button("Only Forget", role: .destructive) {
-                if memory.forgetLearned(readAgain: false) {
-                    learnPastResult = nil
-                    nothingLeft = false
-                }
-            }
-        } message: {
-            Text("\(memory.file.unreviewedCount) learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay.")
-        }
-        .confirmationDialog("Learn from all your past chats?", isPresented: $confirmLearnPast) {
-            Button("Read Them") { learnFromPastChats() }
-        } message: {
-            Text("Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while.")
-        }
         .onAppear(perform: loadAbout)
         .onChange(of: learningModel) { _, _ in reflector.poke(after: 2) }
         .onChange(of: sorter) { _, _ in reflector.poke(after: 2) }
@@ -308,30 +270,43 @@ struct MemoryPane: View {
                 draft = nil
             } onCancel: { draft = nil }
         }
-        .confirmationDialog("Forget every note?", isPresented: $confirmForgetAll) {
+        .confirmationDialog("Read your past chats?", isPresented: $confirmRead) {
+            Button("Read What Wasn't Read") { learnFromPastChats() }
+            Button("Read Everything Again") { show(memory.readAllAgain()) }
+        } message: {
+            Text("Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped.")
+        }
+        .confirmationDialog("Forget what memory knows?", isPresented: $confirmForget) {
+            Button("Forget What Was Learned", role: .destructive) {
+                if memory.forgetLearned(readAgain: false) { learnPastResult = nil }
+            }
             if !memory.file.hasPaused {
-                Button("Forget and Read All Chats Again", role: .destructive) {
-                    if memory.forgetEverything(readAgain: true) {
-                        loadAbout()
-                        learnFromPastChats()
-                    }
+                Button("Forget What Was Learned and Read Chats Again", role: .destructive) {
+                    if memory.forgetLearned(readAgain: true) { learnFromPastChats() }
                 }
             }
-            Button("Only Forget", role: .destructive) {
+            Button("Forget Everything", role: .destructive) {
                 if memory.forgetEverything(readAgain: false) {
                     loadAbout()
                     learnPastResult = nil
-                    nothingLeft = false
                 }
             }
         } message: {
-            Text("Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again.")
+            Text("What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone.")
         }
-        .confirmationDialog("Read all your chats again?", isPresented: $confirmReadAgain) {
-            Button("Read All Chats Again") { show(memory.readAllAgain()) }
-        } message: {
-            Text("Every saved chat is read from its start once more. Notes already there are confirmed, not doubled.")
+    }
+
+    /// The line by "Read Past Chats…": what's waiting, or what the last
+    /// read did, or that memory is up to date.
+    private var learningSummary: String {
+        if !memory.file.queue.isEmpty {
+            return String(format: NSLocalizedString("%d parts of chats wait to be read.", comment: "memory"), memory.file.queue.count)
         }
+        return learnPastResult ?? NSLocalizedString("Up to date.", comment: "memory: nothing waits to be read")
+    }
+
+    private func advancedHeader(_ title: LocalizedStringKey) -> some View {
+        Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary).padding(.top, 6)
     }
 
     /// Every saved chat queued from its start; what it did, under the button.
@@ -341,7 +316,6 @@ struct MemoryPane: View {
 
     private func show(_ result: (queued: Int, waiting: Int)) {
         let (queued, waiting) = result
-        nothingLeft = queued == 0 && waiting == 0
         var lines: [String] = []
         if queued > 0 {
             lines.append(String(format: NSLocalizedString("%d chats queued; reading starts now if the model is free.", comment: ""), queued))
