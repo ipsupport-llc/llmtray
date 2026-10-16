@@ -114,6 +114,12 @@ final class MemoryLiveEval: XCTestCase {
                 ("def median(xs): ...", "добавь тесты"),
                 ("Вот тесты...", "ок, работает"),
             ]),
+            // A task's own details and asks aren't lasting (a real queue's batch).
+            Chat(project: nil, messages: [
+                (nil, "hi, please take a look on a contract is there is anything wrong with it?"),
+                ("Since I don't know if you are the Buyer or the Seller...", "okay, we are buyer in this contract please propose changes I need to ask about"),
+                ("Here are the changes to ask for...", "make it shorter, just a list"),
+            ]),
         ],
     ]
 
@@ -246,7 +252,7 @@ final class MemoryLiveEval: XCTestCase {
             file.setMood(MemoryMood(observed: mood.observed, text: mood.text, date: mood.message.date, chat: batch.chat, quote: mood.quote))
         }
         print("reflect: \(ops.count) op(s)")
-        struct Pending { var op: MemoryReflection.Operation; var message: MemoryBatchMessage; var subject: MemorySubject; var claim: MemoryReflection.Claim }
+        struct Pending { var op: MemoryReflection.Operation; var message: MemoryBatchMessage; var subject: MemorySubject; var claim: MemoryReflection.Claim; var spanned: Bool }
         var pending: [Pending] = []
         for op in ops {
             let label = "\(op.action.rawValue) \(op.id ?? "") \(op.text ?? "") ← \"\(op.quote)\""
@@ -274,7 +280,8 @@ final class MemoryLiveEval: XCTestCase {
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: .init(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                 message: message.text, quote: op.quote, before: message.before,
-                                                isObservation: MemoryReflection.isShown(op, note: note))))
+                                                isObservation: MemoryReflection.isShown(op, note: note)),
+                                   spanned: MemoryReflection.needsSpan(op, note: note)))
         }
         if !pending.isEmpty {
             let reply = try await ask(MemoryReflection.verifyMessages(pending.map(\.claim)), 40 + 12 * pending.count,
@@ -287,6 +294,18 @@ final class MemoryLiveEval: XCTestCase {
             for (p, v) in zip(pending, verdicts) where v != .yes { print("  ✗ verify \(v.rawValue): \(p.claim.statement)") }
             pending = zip(pending, verdicts).filter { $0.1 == .yes }.map(\.0)
         }
+        var tasks = Set<Int>()
+        for i in pending.indices where pending[i].spanned {
+            let reply = try await ask(MemoryReflection.spanMessages([pending[i].claim]), 40, MemoryReflection.spanShape(1))
+            if ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1" { print("  [span] → \(reply.prefix(200))") }
+            guard let span = MemoryReflection.parseSpans(reply, count: 1)?.first else {
+                print("!! unreadable span reply: \(reply.prefix(300))")
+                file.dropBatch(batch.id)
+                return
+            }
+            if span == .task { tasks.insert(i); print("  ✗ task only: \(pending[i].claim.statement)") }
+        }
+        pending = pending.indices.filter { !tasks.contains($0) }.map { pending[$0] }
         let adds = pending.indices.filter { pending[$0].op.action == .add }
         let kept = Set(MemoryReflection.keptAdds(adds.map { pending[$0].op.kind }).map { adds[$0] })
         for i in adds where !kept.contains(i) { print("  ✗ over the cap: \(pending[i].op.text ?? "")") }

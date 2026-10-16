@@ -66,6 +66,27 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertNil(MemoryReflection.parseRelations("{}", count: 1))
     }
 
+    func testSpansAreLastingOnlyWhenSaidSo() {
+        XCTAssertEqual(MemoryReflection.parseSpans(#"{"spans":["lasting"]}"#, count: 1), [.lasting])
+        XCTAssertEqual(MemoryReflection.parseSpans(#"{"spans":["Task","maybe"," LASTING "]}"#, count: 3), [.task, .task, .lasting])
+        XCTAssertNil(MemoryReflection.parseSpans(#"{"spans":["lasting"]}"#, count: 2))
+        XCTAssertNil(MemoryReflection.parseSpans("lasting", count: 1))
+    }
+
+    func testSpanIsAskedForNewWishesAndFactsOnly() throws {
+        let ops = try XCTUnwrap(MemoryReflection.parseOperations("""
+        {"op":"add","kind":"preference","topic":"t","text":"Short answers","quote":"q"}
+        {"op":"add","kind":"observation","topic":"tone","text":"Stay calm","quote":"q"}
+        {"op":"confirm","id":"m1","quote":"q"}
+        """))
+        XCTAssertEqual(ops.map { MemoryReflection.needsSpan($0, note: nil) }, [true, false, false])
+        let claim = MemoryReflection.Claim(statement: "Short answers", aboutProject: false, message: "make it shorter",
+                                           quote: "make it shorter", before: "Here is the plan")
+        let user = MemoryReflection.spanMessages([claim])[1]["content"] as? String ?? ""
+        XCTAssertTrue(user.contains("Assistant's answer before it: Here is the plan"))
+        XCTAssertTrue(user.contains("User's message: make it shorter"))
+    }
+
     // MARK: Provenance
 
     func testTypedTextLeavesOutFencesQuotesAndPastes() {

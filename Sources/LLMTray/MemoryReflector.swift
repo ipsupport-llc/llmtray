@@ -547,6 +547,8 @@ final class MemoryReflector: ObservableObject {
             var message: MemoryBatchMessage
             var subject: MemorySubject
             var claim: MemoryReflection.Claim
+            /// Asked whether it outlasts the chat (`MemoryReflection.needsSpan`).
+            var spanned: Bool
         }
         var pending: [Pending] = []
         for op in operations {
@@ -575,7 +577,8 @@ final class MemoryReflector: ObservableObject {
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                                  message: message.text, quote: op.quote, before: message.before,
-                                                                 isObservation: MemoryReflection.isShown(op, note: note))))
+                                                                 isObservation: MemoryReflection.isShown(op, note: note)),
+                                   spanned: MemoryReflection.needsSpan(op, note: note)))
         }
         guard !pending.isEmpty else {
             return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:], mood: mood)
@@ -590,6 +593,20 @@ final class MemoryReflector: ObservableObject {
         case .failure(let error):
             return error.outcome
         }
+        // Lasting: only what helps in later, unrelated chats. One call per
+        // note: asked about two, a small model answered once.
+        var tasks = Set<Int>()
+        for i in pending.indices where pending[i].spanned {
+            switch await ask(MemoryReflection.spanMessages([pending[i].claim]), maxTokens: 40, modelPath: modelPath,
+                             shape: MemoryReflection.spanShape(1)) {
+            case .success(let reply):
+                guard let span = MemoryReflection.parseSpans(reply, count: 1)?.first else { return .failed("unreadable span reply") }
+                if span == .task { tasks.insert(i) }
+            case .failure(let error):
+                return error.outcome
+            }
+        }
+        pending = pending.indices.filter { !tasks.contains($0) }.map { pending[$0] }
         // At most a few new notes from one part of a chat: what the user
         // asked for first, then facts, then observations.
         let adds = pending.indices.filter { pending[$0].op.action == .add }

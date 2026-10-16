@@ -152,6 +152,22 @@ pastes). Live eval (`MemoryLiveEval`, sets 1-4): Gemma 4 26B gives the expected
 notes run after run; E4B keeps every trap out, its misses are safe (a confirm
 not made, so a note waits).
 
+**Lasting check (2026-10-16, after the user's past chats were read).** The
+steps were told "a task is no note", and E4B still turned "add tests" and
+"make it shorter, just a list" (about the answer just given) into wishes and
+"we are the buyer in this contract" into a fact; a line saying so in the
+instructions step made Gemma 4 26B drop "for this project use PlatformIO".
+So after verify, each new or changed preference, correction or fact gets one
+more narrow question, one call per note (asked about two, E4B answered once):
+the user's message, the assistant's answer before it and the note -- `task`
+(steers the work at hand, redoes one answer, a detail of this task, asked once)
+or `lasting` (how answers should be from now on, a fact that stays true, a
+wish for a whole project, a complaint that answers keep being some way).
+Anything but `lasting` drops the note. Live eval, sets 1-5 (set 5 now holds
+the contract chat from the user's queue), twice each: 26B identical and
+complete, every task dropped; E4B drops every task, its one miss is safe ("vague
+again, be concrete" kept as the mood, not a wish).
+
 ### Mood (2026-10-14, the user: "mood is a short-lived metric")
 
 How the user seems right now -- angry at a failing build, tired, in a hurry --
@@ -161,7 +177,8 @@ how to answer now ("Angry: the linker keeps failing" / "Brief, straight to the
 fix"). The newest one is kept (`MemoryFile.mood`), from the message's time;
 new chats get a line "Right now (from the user's last messages, a guess): ...",
 at most half the budget; a chat whose block holds a mood that ran out chooses
-its block again. Sensitive topics never become a mood. Reading past chats gives
+its block again. Sensitive topics never become a mood: a message about one isn't read for
+it at all ("I've been depressed for weeks" gave E4B a mood). Reading past chats gives
 none (their hours are gone). Settings shows the mood now, with Forget; forgetting
 a chat's lessons, everything, or what was learned drops it.
 
