@@ -785,8 +785,10 @@ final class ChatClient: ObservableObject {
             }
         }
         memoryIdleWork = work
-        let minutes = max(1, UserDefaults.standard[Pref.memoryIdleMinutes])
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(minutes * 60), execute: work)
+        // Right after the answer (the setting): a few seconds, so a quick
+        // follow-up comes first; any request stops a reading anyway.
+        let seconds = UserDefaults.standard[Pref.memoryReadRightAway] ? 8 : max(1, UserDefaults.standard[Pref.memoryIdleMinutes]) * 60
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(seconds), execute: work)
     }
 
     /// Notes were forgotten: a block holding one goes now, before this

@@ -14,7 +14,9 @@ enum BackgroundModelWork {
     static func complete(port: Int, modelAlias: String?, messages: [[String: Any]], maxTokens: Int,
                          fields: [String: Any] = [:]) async -> BackgroundRequest.Outcome {
         guard let url = URL(string: "http://127.0.0.1:\(port)/v1/chat/completions") else { return .failed("bad port") }
-        var body: [String: Any] = ["messages": messages, "stream": true, "max_tokens": maxTokens]
+        // Read the server's prompt cache, add nothing to it (fork #42): a
+        // reading must not push a chat's cached prompt out.
+        var body: [String: Any] = ["messages": messages, "stream": true, "max_tokens": maxTokens, "cache_store": false]
         if let modelAlias { body["model"] = modelAlias }
         body.merge(fields) { $1 }
         guard let data = try? JSONSerialization.data(withJSONObject: body) else { return .failed("unencodable request") }

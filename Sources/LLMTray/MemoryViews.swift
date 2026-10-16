@@ -25,6 +25,7 @@ struct MemoryPane: View {
     @AppStorage(Pref.memorySwitchIdleMinutes.name) private var switchIdleMinutes = Pref.memorySwitchIdleMinutes.defaultValue
     @ObservedObject private var catalog = ModelCatalog.shared
     @AppStorage(Pref.memoryIdleMinutes.name) private var idleMinutes = Pref.memoryIdleMinutes.defaultValue
+    @AppStorage(Pref.memoryReadRightAway.name) private var readRightAway = Pref.memoryReadRightAway.defaultValue
     @AppStorage(Pref.memoryForgetDeletedChats.name) private var forgetDeletedChats = Pref.memoryForgetDeletedChats.defaultValue
     @AppStorage(Pref.memoryHalfLifeFact.name) private var halfLifeFact = Pref.memoryHalfLifeFact.defaultValue
     @AppStorage(Pref.memoryHalfLifePreference.name) private var halfLifePreference = Pref.memoryHalfLifePreference.defaultValue
@@ -213,8 +214,16 @@ struct MemoryPane: View {
                         } label: {
                             SettingLabel(title: "Notes in", help: "Notes are written in this language whatever language the chat is in, so one thing doesn't become two notes in two languages.")
                         }
-                        Stepper(value: $idleMinutes, in: 1...240) {
-                            SettingLabel(title: "Read a chat after \(idleMinutes) quiet minutes", help: "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
+                        Picker(selection: $readRightAway) {
+                            Text("Right after each answer").tag(true)
+                            Text("When the chat is quiet").tag(false)
+                        } label: {
+                            SettingLabel(title: "Read chats", help: "When what you wrote is read for notes: a few seconds after each answer, or once the chat has been quiet for a while -- and always when you leave it or quit. Either way it runs in the background only while the model has nothing else to do, and any chat, app or coding agent stops it at once. It never pushes your chat out of the model's prompt cache. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.")
+                        }
+                        if !readRightAway {
+                            Stepper(value: $idleMinutes, in: 1...240) {
+                                SettingLabel(title: "Quiet for \(idleMinutes) minutes", help: "How long a chat stays quiet before it's read.")
+                            }
                         }
                         Toggle(isOn: $forgetDeletedChats) {
                             SettingLabel(title: "Deleting a chat forgets what it taught", help: "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.")

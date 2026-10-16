@@ -172,6 +172,9 @@ public enum Pref {
     public static let memoryLanguage = PrefKey("llmtray.memory.language", default: "auto")
     /// A chat is read for memory after this many quiet minutes.
     public static let memoryIdleMinutes = PrefKey("llmtray.memory.idleMinutes", default: 10)
+    /// Read a chat a few seconds after each answer instead of after the
+    /// quiet minutes (any request still stops a reading at once).
+    public static let memoryReadRightAway = PrefKey("llmtray.memory.readRightAway", default: false)
     /// Deleting a chat forgets notes learned only from it.
     public static let memoryForgetDeletedChats = PrefKey("llmtray.memory.forgetDeletedChats", default: true)
 

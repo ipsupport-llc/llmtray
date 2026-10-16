@@ -290,7 +290,12 @@ or in one project's chats (`project:P`).
 - **Message ids.** Messages get a persistent sequence number in the chat file
   (`PersistedMessage.seq`, assigned once, kept across reloads). The watermark is a seq.
 - **Trigger.** A chat goes quiet (no message for N minutes, default 10), the user
-  switches away, or the app quits (queued, run on next launch). Before a chat is
+  switches away, or the app quits (queued, run on next launch). Or, with "Read
+  chats: Right after each answer" (the user's idea, 2026-10-16), 8 seconds after
+  each answer; any request still stops a reading at once. Readings never store
+  in the server's prompt cache (`cache_store: false`, fork #42): an LRU entry of
+  theirs pushed the chat's cached prompt out, and the next message prefilled the
+  whole chat again. Before a chat is
   compacted, its unreflected user messages are copied into the queue entry. A
   summary is never evidence.
 - **Never.** A temporary chat; a chat marked "Don't remember this chat"
