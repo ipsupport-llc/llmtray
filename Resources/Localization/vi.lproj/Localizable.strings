@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · đang chạy";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" đã thay đổi kể từ khi câu trả lời này trích dẫn nó: trang %lld có thể hiển thị khác bây giờ.";
 "\"%@\" is no longer in the project." = "\"%@\" không còn trong dự án nữa.";
 "%.0f%% from drafts" = "%.0f%% từ bản nháp";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@ và %2$lld mục khác";
 "%1$@ asks for %2$@" = "%1$@ yêu cầu %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ yêu cầu %2$@. Chuyển sẽ tháo mô hình đang tải.";
+"%1$@ couldn't be updated: %2$@" = "Không thể cập nhật %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ mục, %2$@";
+"%1$@ was installed but didn't start: %2$@" = "Đã cài đặt %1$@ nhưng không khởi động được: %2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@: không tìm thấy lệnh %2$@.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld bản sao không thể so sánh với bản gốc, nên đã bỏ chọn: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld bản sao khác với bản gốc, nên không phải trùng lặp: %2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "%lld yêu cầu";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld yêu cầu đang xử lý (được trả lời cùng nhau tối đa theo giá trị «Yêu cầu đồng thời»)";
 "%lld s" = "%lld giây";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld công cụ mới hoặc đã thay đổi: bị ẩn khỏi cuộc trò chuyện cho đến khi được đánh giá.";
-"%lld tools%@" = "%lld công cụ%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld công cụ là mới hoặc đã thay đổi trên máy chủ: bị ẩn khỏi Trò chuyện cho đến khi bạn chấp nhận.";
+"%lld tools changed on the server: Configure to accept them." = "%lld công cụ đã thay đổi trên máy chủ: hãy cấu hình để chấp nhận chúng.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
@@ -112,13 +113,12 @@
 "About LLMTray" = "Giới thiệu về LLMTray";
 "About you" = "Về bạn";
 "About you and your work: what you do, what you use." = "Về bạn và công việc của bạn: bạn làm gì, dùng gì.";
+"Accept" = "Chấp nhận";
 "Add" = "Thêm";
-"Add %@" = "Thêm %@";
 "Add Files to “%@”…" = "Thêm Tệp vào “%@”…";
 "Add Files…" = "Thêm tệp…";
 "Add Note…" = "Thêm ghi chú…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Thêm PDF, Word và tệp văn bản vào dự án. Các cuộc trò chuyện có thể tìm kiếm trong đó và trích dẫn trang; ghim tệp để giữ toàn bộ nội dung trong cuộc hội thoại.";
-"Add Server" = "Thêm Máy chủ";
 "Add a Command Server" = "Thêm Máy chủ Lệnh";
 "Add a Command…" = "Thêm lệnh…";
 "Add a URL Server" = "Thêm Máy chủ URL";
@@ -191,7 +191,6 @@
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps và agents";
 "Arguments, one per line" = "Đối số, mỗi dòng một mục";
-"Arguments…" = "Đối số…";
 "Ask Later" = "Hỏi sau";
 "Ask about LLMTray" = "Hỏi về LLMTray";
 "Ask again in two weeks" = "Hỏi lại sau hai tuần";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Lớn hơn khuyến nghị: câu trả lời tốt hơn nhưng chậm hơn và để lại ít bộ nhớ cho ứng dụng khác.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Sao chép cuộc trò chuyện, dự án, hồ sơ, các mô hình ảnh, nhạc, giọng nói và embedding cùng cài đặt từ phiên bản trên ipsupport.us (đóng nó trước). Cuộc trò chuyện và mô hình tại đây được giữ; cài đặt của nó sẽ thay thế. Các mô hình không chiếm thêm dung lượng đĩa. Mô hình chat vẫn nằm trong thư mục models của bạn: chọn nó trong Settings › Models.";
 "Browse Hugging Face…" = "Duyệt Hugging Face…";
-"Browse the Catalog…" = "Duyệt danh mục…";
 "Built into macOS · LLMTray's chat only" = "Tích hợp sẵn trong macOS · Chỉ trong Trò chuyện của LLMTray";
 "Cached" = "Đã lưu trong bộ nhớ đệm";
 "Calculator" = "Máy tính";
@@ -301,7 +299,6 @@
 "Coffee" = "Cà phê";
 "Comes with %@" = "Đi kèm với %@";
 "Command" = "Lệnh";
-"Command servers don't run in this version of LLMTray." = "Máy chủ lệnh không chạy trong phiên bản LLMTray này.";
 "Command-line tool" = "Công cụ dòng lệnh";
 "Compact" = "Thu gọn";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Thu gọn sẽ thay phần giữa của cuộc trò chuyện dài bằng một bản tóm tắt do mô hình viết. Số tin nhắn này ở đầu sẽ được giữ nguyên từng chữ.";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Tự động thu gọn cuộc trò chuyện khi vượt quá số tin nhắn này. Nút Thu gọn trong cuộc trò chuyện vẫn hoạt động trong mọi trường hợp.";
 "Composing…" = "Đang soạn…";
 "Concurrent requests" = "Yêu cầu đồng thời";
-"Connects to" = "Kết nối tới";
+"Configure" = "Cấu hình";
+"Connect Again" = "Kết nối lại";
+"Connecting…" = "Đang kết nối…";
 "Context" = "Ngữ cảnh";
 "Continue" = "Tiếp tục";
 "Copied" = "Đã sao chép";
@@ -362,6 +361,8 @@
 "Deny" = "Từ chối";
 "Describe a picture, drawn on this Mac" = "Mô tả hình ảnh vẽ trên Mac này";
 "Diagnostics" = "Chẩn đoán";
+"Discover" = "Khám phá";
+"Discover Servers" = "Khám phá máy chủ";
 "Disk usage" = "Sử dụng ổ đĩa";
 "Dismiss" = "Bỏ qua";
 "Document: %@" = "Tài liệu: %@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này; ảnh sẽ vào tin nhắn của bạn.";
 "Documents tools" = "Công cụ Tài liệu";
 "Doesn't open at login" = "Không mở khi đăng nhập";
+"Doesn't run in this version of LLMTray." = "Không chạy được trong phiên bản LLMTray này.";
 "Don't Add" = "Không thêm";
 "Don't Ask Again" = "Không hỏi nữa";
 "Don't Remember This Chat…" = "Không nhớ Trò chuyện này…";
@@ -399,6 +401,7 @@
 "Downloading…" = "Đang tải…";
 "Downloads" = "Tải về";
 "Downloads waiting: %lld" = "Các tải chờ: %lld";
+"Drag .mcpb files here to install" = "Kéo tệp .mcpb vào đây để cài đặt";
 "Drag chats here, or use a chat's menu" = "Kéo cuộc trò chuyện vào đây, hoặc dùng menu của cuộc trò chuyện";
 "Drag chats or files here, or use a chat's menu" = "Kéo cuộc trò chuyện hoặc tệp vào đây, hoặc dùng menu cuộc trò chuyện";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Kéo tài liệu vào cuộc trò chuyện này: chúng sẽ vào dự án và mô hình trả lời dựa trên chúng.";
@@ -494,7 +497,7 @@
 "Free disk space" = "Dung lượng đĩa trống";
 "Free on disk: %@ · your models: %@" = "Còn trống trên ổ: %@ · các mô hình của bạn: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Giải phóng bộ nhớ mà mô hình đã tải đang giữ sau khoảng thời gian không có yêu cầu này. Mô hình sẽ tự động tải lại ở yêu cầu tiếp theo, với độ trễ tải như thường lệ.";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "Từ MCP Registry chính thức. Registry kiểm tra ai đã phát hành một tên, không kiểm tra mã làm gì: hãy đánh giá máy chủ trước khi bật.";
+"From the MCP Registry" = "Từ Sổ đăng ký MCP";
 "Full" = "Đầy đủ";
 "Full duplex" = "Full duplex";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Full duplex: nói bất kỳ lúc nào, mô hình nghe khi nó nói — cần Mac có thể chạy theo thời gian thực. Walkie-talkie: nói, nhấn Hoàn tất, rồi nghe. Tự động chọn theo tốc độ đo được của Mac khi Voice Lab khởi chạy.";
@@ -529,7 +532,6 @@
 "Help" = "Trợ giúp";
 "Help improve LLMTray?" = "Giúp cải thiện LLMTray?";
 "Hide" = "Ẩn";
-"Hide Log" = "Ẩn nhật ký";
 "Hide chats" = "Ẩn trò chuyện";
 "Hide the reasoning" = "Ẩn phần lý giải";
 "Hide these steps for good" = "Ẩn các bước này vĩnh viễn";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Cài đặt của nó cũng được chuyển sang; bạn cần nhập lại token Hugging Face trong Cài đặt › Mô hình.";
 "Its settings were the same as these already." = "Cài đặt của nó đã giống với cài đặt ở đây.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Không nhập được cài đặt của nó: %@ không phải là một mục trong ~/Library/Preferences.";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "Cài đặt, bí mật và (đối với gói) các tệp của nó sẽ bị xóa. Trò chuyện vẫn giữ bản ghi các lần gọi trước đó.";
 "KV cache" = "Bộ nhớ đệm KV";
 "KV group size" = "Kích cỡ nhóm KV";
 "Keep" = "Giữ";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "Giữ các tin nhắn đầu: %lld";
 "Keep last messages: %lld" = "Giữ các tin nhắn cuối: %lld";
 "Keep the loaded model" = "Giữ mô hình đang tải";
-"Keeps crashing: off until started again (see its log)." = "Liên tục bị sập: tắt cho đến khi được khởi động lại (xem nhật ký).";
+"Keeps crashing -- see its log." = "Liên tục bị sự cố — hãy xem nhật ký của nó.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Giữ N token đầu tiên của ngữ cảnh ở độ chính xác đầy đủ trước khi lượng tử hóa. Giá trị cao hơn đánh đổi mức tiết kiệm bộ nhớ để lấy độ chính xác với prompt dài.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Giữ cổng này. Nếu ứng dụng khác đang dùng, server sẽ không khởi động cho đến khi bạn thay đổi cổng trong Cài đặt.";
 "Kept free: %lld MB" = "Giữ trống: %lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "Học cần Mô hình embedding (Cài đặt › Bộ nhớ).";
 "Leave a Review" = "Gửi đánh giá";
 "Length" = "Độ dài";
-"Less" = "Ít hơn";
 "Let chats make documents" = "Cho phép cuộc trò chuyện tạo tài liệu";
 "Let chats work in folders" = "Cho phép trò chuyện thao tác trong thư mục";
 "Let coding agents and scripts use your models." = "Cho agents và script sử dụng mô hình của bạn.";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Nhỏ hơn khuyến nghị: nhanh hơn và dành bộ nhớ cho ứng dụng khác, nhưng câu trả lời đơn giản hơn.";
 "Like LLMTray?" = "Thích LLMTray?";
 "Likes" = "Thích";
-"List Again" = "Liệt kê lại";
 "List my name" = "Liệt kê tên tôi";
 "List my name in Supporters" = "Liệt kê tên tôi trong Supporters";
 "Listening…" = "Đang nghe…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Cuộc trò chuyện dài và tệp đã ghim lấy từ bộ đệm (cache) thay vì đọc lại mỗi lượt.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Các cuộc trò chuyện dài thuận tiện hơn trong cửa sổ: dự án, tệp và mọi cuộc trò chuyện trong thanh bên.";
-"MCP Servers" = "Máy chủ MCP";
 "MTP drafter: speeds up %@, same answers" = "Bộ nháp MTP: tăng tốc %@, cùng câu trả lời";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dành cho lập trình và agent: công cụ lập trình và OpenAI API.";
 "Maintenance" = "Bảo trì";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Chưa có ghi chú. Thêm điều mọi Trò chuyện nên biết: “Trả lời bằng tiếng Nga, ngắn gọn”, “Tôi chế tạo loa ESP32”.";
 "No requests yet." = "Chưa có yêu cầu nào.";
 "No runs yet." = "Chưa có lần chạy nào.";
-"No servers yet." = "Chưa có máy chủ.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Không đăng ký. Không khoá tính năng. Ủng hộ phát triển nếu LLMTray hữu ích với bạn.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Không có gợi ý cho bộ nhớ Mac này. Duyệt Hugging Face để tìm mô hình.";
 "No thanks" = "Không, cảm ơn";
@@ -792,13 +789,13 @@
 "No update check at launch" = "Không kiểm tra cập nhật khi khởi động";
 "No usage statistics" = "Không gửi thống kê sử dụng";
 "Non-commercial license: read it on the model card before using the model." = "Giấy phép phi thương mại: đọc trên model card trước khi sử dụng.";
+"None" = "Không có";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Chưa có. Các quyền cấp cho một cuộc trò chuyện hoặc một yêu cầu không được liệt kê ở đây: chúng kết thúc cùng với nó.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Không đủ dung lượng đĩa: mô hình giọng nói cần %1$@, chỉ còn %2$@.";
 "Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Không đủ dung lượng đĩa trống: %@ cần khoảng %@, hiện có %@.";
 "Not identical to %@: not a duplicate." = "Không giống %@: không phải bản trùng lặp.";
 "Not indexed" = "Chưa lập chỉ mục";
-"Not reviewed yet: review it to see its tools." = "Chưa được đánh giá: hãy đánh giá để xem các công cụ của nó.";
 "Not sent any more. Bring one back, or it's deleted later." = "Không được gửi nữa. Khôi phục ghi chú, nếu không ghi chú sẽ bị xóa sau.";
 "Not sent yet: waits for another chat to show it, or your approval." = "Chưa gửi: chờ một Trò chuyện khác cho thấy điều đó, hoặc chờ bạn phê duyệt.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods), và giữ ảnh (png, jpg, heic, webp, tiff, gif).";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "Không còn gì để đọc: mọi Trò chuyện đã được đọc từ đầu.";
 "Nothing logged yet." = "Chưa có gì được ghi lại.";
 "Nothing new to import" = "Không có gì mới để import";
-"Nothing runs yet: next you start it once and review its tools." = "Chưa có gì chạy: tiếp theo, hãy khởi động một lần và đánh giá các công cụ của nó.";
 "Nothing sent yet." = "Chưa gửi gì.";
 "Nothing to change." = "Không có gì để thay đổi.";
 "Nothing to pin until the file has been read" = "Không có gì để ghim cho đến khi tệp được đọc";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Tắt: chỉ Mac này. Bật: bất kỳ ai trên mạng của bạn, chỉ bật trên mạng bạn tin tưởng.";
 "Older" = "Cũ hơn";
+"On" = "Bật";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Một lần: Cà phê $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Chỉ từ bây giờ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
@@ -954,7 +951,6 @@
 "Ready." = "Sẵn sàng.";
 "Ready. This is the Full build: the runtime is included." = "Sẵn sàng. Đây là bản Full: đã bao gồm runtime.";
 "Reasoning" = "Lý luận";
-"Recent" = "Gần đây";
 "Recent changes" = "Thay đổi gần đây";
 "Recently updated" = "Mới cập nhật";
 "Recommended" = "Được khuyến nghị";
@@ -981,7 +977,6 @@
 "Remove recording" = "Xóa bản ghi";
 "Remove this file from the project?" = "Gỡ tệp này khỏi dự án?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
-"Remove…" = "Xóa…";
 "Rename" = "Đổi tên";
 "Rename %1$@ to %2$@" = "Đổi tên %1$@ thành %2$@";
 "Rename Profile" = "Đổi tên Hồ sơ";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "Khởi động lại tiến trình mô hình với cài đặt mới (mất vài giây để tải lại).";
 "Restore" = "Khôi phục";
 "Restore Purchases" = "Khôi phục mua hàng";
-"Results" = "Kết quả";
 "Resume" = "Tiếp tục";
 "Resume Download" = "Tiếp tục tải";
 "Resume Indexing" = "Tiếp tục lập chỉ mục";
 "Resume download" = "Tiếp tục tải về.";
 "Retry" = "Thử lại";
 "Review" = "Đánh giá";
-"Review…" = "Đánh giá…";
 "Revoke" = "Thu hồi";
 "Revoke %@" = "Thu hồi %@";
 "Right after each answer" = "Ngay sau mỗi câu trả lời";
 "Room in each chat: %lld tokens" = "Dung lượng trong mỗi Trò chuyện: %lld token";
 "Run benchmark" = "Chạy đo hiệu năng";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Chạy trong Terminal để tăng giới hạn bộ nhớ GPU; sẽ về lại khi Mac khởi động lại.";
-"Run without asking" = "Chạy mà không cần hỏi";
-"Run without asking:" = "Chạy mà không cần hỏi:";
 "Running" = "Đang chạy";
 "Running — %@ on :%lld" = "Đang chạy — %@ trên :%lld";
 "Running…" = "Đang chạy…";
-"Runs this command" = "Chạy lệnh này";
+"Runs" = "Lần chạy";
 "Runtime data" = "Dữ liệu thời gian chạy";
 "Same as LLMTray" = "Giống LLMTray";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Chỉ lấy mẫu từ các token có khả năng cao nhất sao cho tổng xác suất bằng giá trị này. 1.0 sẽ tắt tính năng này.";
@@ -1060,7 +1051,7 @@
 "Server Log" = "Nhật ký máy chủ";
 "Server log" = "Nhật ký máy chủ";
 "Server settings changed -- restart to apply them." = "Cài đặt máy chủ đã thay đổi — hãy khởi động lại để áp dụng.";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "Các máy chủ cung cấp thêm công cụ cho cuộc trò chuyện: thư, ghi chú, lịch, tệp, dịch vụ. Mỗi máy chủ chỉ chạy sau khi bạn đánh giá, được nạp vào một cuộc trò chuyện từ menu + (hoặc khi mô hình yêu cầu), và sẽ hỏi bạn trước mỗi lần gọi trừ khi bạn cho phép một công cụ chạy mà không cần hỏi.";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Máy chủ cung cấp thêm công cụ cho Trò chuyện: thư, ghi chú, lịch, tệp, dịch vụ. Trò chuyện sẽ hỏi bạn trước mỗi lần gọi.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Đang thiết lập tạo ảnh (chỉ lần đầu)…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "Hiển thị cửa sổ trò chuyện";
 "Show Files" = "Hiện tệp";
 "Show Less" = "Hiển thị ít hơn";
+"Show Log…" = "Hiện Nhật ký…";
 "Show Next Tab" = "Hiện tab tiếp";
 "Show Previous Tab" = "Hiện tab trước";
 "Show Reports…" = "Hiện Báo cáo…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Thời gian chờ khi ngưng phản hồi: %lld giây";
 "Start" = "Bắt đầu";
-"Start Again" = "Bắt đầu lại";
 "Start LLMTray automatically when you log in to this Mac." = "Tự động mở LLMTray khi bạn đăng nhập vào máy Mac này.";
 "Start Server" = "Khởi động máy chủ";
 "Start a new saved chat (⌘N) to add files to a project." = "Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm tệp vào dự án.";
-"Start and Review" = "Bắt đầu và đánh giá";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "Hãy khởi động một lần để xem những gì nó cung cấp. Việc khởi động không tự cho phép gì cả; cuộc trò chuyện không thể dùng nó cho đến khi bạn bật.";
 "Start server" = "Khởi động máy chủ.";
 "Start talking" = "Bắt đầu nói";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "Bắt đầu sau %.0f giây…";
 "Starting…" = "Đang khởi động…";
 "Startup" = "Khởi động";
+"Status" = "Trạng thái";
 "Staying up to date" = "Giữ cập nhật";
 "Stays in its project" = "Chỉ ở trong Dự án của nó";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Chỉ ở trong Dự án của nó: Trò chuyện của một Dự án thấy những gì đã học trong Dự án đó; Trò chuyện ngoài Dự án thấy những gì đã học bên ngoài Dự án. Được chia sẻ với Tất cả Trò chuyện: mọi Trò chuyện đều thấy tất cả những gì đã học ở bất cứ đâu (ghi chú của một Dự án chỉ khi Ghi nhớ trong Dự án đang bật). Những gì bạn tự viết (Về bạn, ghi chú cho Tất cả Trò chuyện) vẫn được thấy ở mọi nơi trong cả hai trường hợp.";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "Ngôn ngữ của ứng dụng (chỉ ngôn ngữ, không bao gồm vùng).";
 "The app's name." = "Tên ứng dụng.";
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
-"The bundle couldn't be downloaded." = "Không thể tải xuống gói.";
-"The bundle's address isn't https." = "Địa chỉ của gói không phải https.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó đều có thể tìm kiếm nội dung này.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó có thể sử dụng nó trong tài liệu.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Mô hình trò chuyện có thể tạo bố cục nội dung thành PDF — báo cáo, thư, ghi chú, hoá đơn — kèm bảng và biểu đồ. PDF được giữ trong cuộc trò chuyện cho đến khi bạn mở, lưu hoặc thêm vào dự án. Không cần tải xuống gì để dùng tính năng này; tính năng không khả dụng trong cuộc trò chuyện tạm.";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Bản sao các tệp thêm vào dự án và các chỉ mục của chúng, cùng nhau. Bản sao của từng dự án được hiển thị trong cửa sổ Files; xóa dự án sẽ xóa chúng.";
 "The day the counts are for." = "Ngày mà các số liệu tương ứng.";
 "The download didn't start." = "Việc tải xuống đã không bắt đầu.";
-"The download doesn't match what the registry lists for it." = "Bản tải xuống không khớp với thông tin registry liệt kê cho nó.";
 "The download failed: %@" = "Tải xuống thất bại: %@";
 "The download stopped." = "Việc tải xuống đã dừng lại.";
 "The downloaded embedder files don't match their checksums: %@" = "Các tệp embedder tải xuống không khớp với checksum của chúng: %@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "Kế hoạch đã thay đổi kể từ khi bạn xem: xem lại lần nữa.";
 "The port and network access can change only while the server is stopped." = "Cổng và quyền truy cập mạng chỉ thay đổi được khi server đang dừng.";
 "The project's files, and Add Files…" = "Tệp của dự án, và Thêm Tệp…";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Sổ đăng ký kiểm tra ai đã phát hành một tên, không kiểm tra mã thực hiện việc gì. Trò chuyện sẽ hỏi bạn trước mỗi lần gọi.";
 "The reply was cut at its length limit." = "Phản hồi bị cắt do vượt giới hạn độ dài.";
 "The report" = "Báo cáo";
 "The reports" = "Các báo cáo";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Máy chủ đang dùng mô hình này hoặc đang xử lý yêu cầu: dừng nó (hoặc chọn mô hình khác), hoặc chờ đến khi máy chủ rảnh.";
 "The server log" = "Nhật ký máy chủ";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "Máy chủ có thể làm nhiều hơn những gì các đối số này cho thấy (người nhận và văn bản được trích dẫn của thư trả lời đến từ Mail).";
+"The server says this only reads." = "Máy chủ cho biết mục này chỉ đọc.";
 "The server starts once %@ is downloaded" = "Server sẽ khởi động khi %@ được tải xong";
 "The server starts with %@" = "Máy chủ khởi động bằng %@";
 "The settings here were kept." = "Các cài đặt ở đây đã được giữ.";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "Mức suy nghĩ: mô hình có thể suy nghĩ trong bao lâu trước khi trả lời.";
 "Thinking…" = "Đang suy nghĩ…";
 "Thinking… %@ s of reply ready" = "Đang suy nghĩ… %@ giây phản hồi sẵn sàng";
+"This Mac" = "Máy Mac này";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Mac này chạy mô hình ở ~%@× thời gian thực: nói, rồi nghe.";
+"This can change things." = "Mục này có thể thay đổi mọi thứ.";
 "This chat knows" = "Trò chuyện này biết";
 "This chat may use" = "Cuộc trò chuyện này có thể dùng";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Không thể liệt kê: không tìm thấy thanh toán hoặc tên bị từ chối.";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "Thẻ của mô hình này không liệt kê %@: mô hình có thể đọc trò chuyện bằng ngôn ngữ đó kém và viết ghi chú còn kém hơn.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";
+"This tool" = "Công cụ này";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Phiên bản này lập chỉ mục các tệp Văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods) và giữ ảnh cho tài liệu; không thể thêm thư mục và tệp ẩn.";
 "This version of LLMTray can't send reviews. Please update the app." = "Phiên bản LLMTray này không gửi được đánh giá. Vui lòng cập nhật ứng dụng.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Phiên bản LLMTray này thiết lập môi trường bằng Python. Cài Python từ python.org hoặc Homebrew rồi kiểm tra lại. Hoặc dùng LLMTray-Full, đã bao gồm mọi thứ cần thiết.";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "Quy tắc sử dụng công cụ";
 "Tools" = "Công cụ";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Các công cụ mà mô hình có thể gọi trong trò chuyện của ứng dụng (cần mô hình hỗ trợ gọi công cụ). Công cụ web gửi truy vấn của mô hình tới dịch vụ công cộng đó (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); công cụ cục bộ không bao giờ rời khỏi Mac.";
-"Tools…" = "Công cụ…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "Chủ đề";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
 "Try Again" = "Thử lại";
 "Try It Again" = "Thử lại";
+"Turn Off" = "Tắt";
 "Turn On" = "Bật";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "Kênh cập nhật: Beta";
 "Update channel: Stable" = "Kênh cập nhật: Stable";
 "Update failed: %@" = "Cập nhật thất bại: %@";
+"Update to %@" = "Cập nhật lên %@";
 "Updates" = "Bản cập nhật";
 "Usage statistics" = "Thống kê sử dụng";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Thống kê sử dụng đang tắt: không có gì được gửi. Đây là ví dụ một báo cáo nếu bạn bật chúng (ID được tạo khi đó).";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "Chờ mô hình được tải.";
 "Walkie-talkie" = "Walkie-talkie";
 "Weather" = "Thời tiết";
+"Web" = "Web";
 "Web search" = "Tìm web";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "Tìm web, tin tức, Wikipedia, thời tiết và hơn thế. Các truy vấn của mô hình sẽ gửi tới các dịch vụ đó.";
 "Web tools" = "Công cụ web";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
+"a new setting (%@): uninstall and install it again to give it" = "một cài đặt mới (%@): hãy gỡ cài đặt rồi cài đặt lại để cấp cho nó";
 "always" = "luôn";
 "and %lld more" = "và %lld mục nữa";
 "at least %1$@ items, %2$@" = "ít nhất %1$@ mục, %2$@";
 "at least %@" = "ít nhất %@";
 "building %@" = "đang xây dựng %@";
+"by %lld" = "bởi %lld";
 "calls tools" = "gọi công cụ";
 "can look" = "có thể xem";
 "can look and propose changes" = "có thể xem và đề xuất thay đổi";
@@ -1573,11 +1569,11 @@
 "removing" = "đang xóa";
 "rename %lld" = "đổi tên %lld";
 "search by words only" = "tìm theo từ";
+"something LLMTray can't run" = "thứ mà LLMTray không thể chạy";
 "the download finished incomplete" = "việc tải xuống kết thúc không hoàn chỉnh";
 "the installed version didn't change" = "phiên bản đã cài đặt không thay đổi";
 "the model" = "mô hình";
 "the model runtime isn't installed yet" = "chưa cài đặt runtime mô hình";
-"the server says it only reads" = "máy chủ cho biết chỉ đọc";
 "then" = "sau đó";
 "this call only" = "chỉ cuộc gọi này";
 "tight fit" = "khít";
