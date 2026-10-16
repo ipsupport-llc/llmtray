@@ -116,8 +116,10 @@ struct ToolsPane: View {
                             Text("Server").frame(maxWidth: .infinity, alignment: .leading)
                             Text("Runs").frame(width: 90, alignment: .leading)
                             Text("Status").frame(width: 60, alignment: .leading)
-                            Color.clear.frame(width: 190)
+                            // Only a width: Color.clear alone takes all the height it's offered.
+                            Color.clear.frame(width: 190, height: 0)
                         }
+                        .fixedSize(horizontal: false, vertical: true)
                         .font(.callout).foregroundStyle(.secondary)
                         .padding(.horizontal, 20).padding(.vertical, 8)
                         Divider().padding(.horizontal, 12)
