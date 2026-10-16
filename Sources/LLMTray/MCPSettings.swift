@@ -341,14 +341,17 @@ private struct AsksSheet: View {
             if let description = found.description, !description.isEmpty {
                 Text(description).font(.callout).foregroundStyle(.secondary)
             }
-            GroupBox {
+            Label(found.kind == .command ? "Runs on this Mac." : "Connects to a server on the internet.",
+                  systemImage: found.kind == .command ? "desktopcomputer" : "network")
+                .font(.callout)
+            DisclosureGroup("Details") {
                 Text(found.kind == .command ? ([found.command] + found.arguments).map(Self.quoted).joined(separator: " ") : found.url)
                     .font(.system(.caption, design: .monospaced))
                     .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-            } label: {
-                Text(found.kind == .command ? "Runs this command" : "Connects to")
             }
+            .font(.callout)
             if !found.asks.isEmpty {
                 Form {
                     ForEach(found.asks, id: \.key) { ask in
@@ -361,7 +364,7 @@ private struct AsksSheet: View {
                     }
                 }
             }
-            Text("Nothing runs yet: next you start it once and review its tools.").font(.caption).foregroundStyle(.secondary)
+            Text("Next you see what it offers, then turn it on.").font(.caption).foregroundStyle(.secondary)
             HStack {
                 Spacer()
                 Button("Cancel") { dismiss() }
@@ -429,51 +432,75 @@ private struct AsksSheet: View {
 
 // MARK: - Review
 
-/// Start once, see every tool, turn it on; then each tool's (or action's)
-/// "Run without asking".
+/// What a server offers, in plain words, and Turn On. It connects by
+/// itself when opened (adding it was the user's choice); the command, the
+/// versions and the tools' arguments wait under Details.
 private struct ReviewSheet: View {
     let serverID: UUID
     @ObservedObject private var hub = MCPHub.shared
     @Environment(\.dismiss) private var dismiss
     @State private var starting = false
     @State private var error: String?
+    @State private var details = false
 
     private var server: MCPServerConfig? { hub.server(serverID) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             if let server {
-                Text(server.name).font(.headline)
-                GroupBox {
-                    Text(server.kind == .command ? ([server.command] + server.arguments).joined(separator: " ") : server.url)
-                        .font(.system(.caption, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } label: { Text(server.kind == .command ? "Command" : "URL") }
-                if let info = hub.states[serverID]?.info {
-                    Text("\(info.name) \(info.version) · MCP \(info.protocolVersion)").font(.caption).foregroundStyle(.secondary)
-                }
-                if server.tools.isEmpty {
-                    Text("Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on.")
-                        .font(.callout).foregroundStyle(.secondary)
-                } else {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 10) {
-                            ForEach(server.tools, id: \.name) { tool in
-                                ToolReviewRow(server: server, tool: tool)
-                                Divider()
-                            }
+                HStack(spacing: 8) {
+                    Image(systemName: "puzzlepiece.extension").font(.title2).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(server.name).font(.headline)
+                        if let description = server.description, !description.isEmpty {
+                            Text(description).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                         }
                     }
-                    .frame(minHeight: 220, maxHeight: 380)
                 }
-                if let error { Text(error).foregroundStyle(.red).font(.callout) }
+                if starting {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text("Connecting to see what it offers…").foregroundStyle(.secondary)
+                    }
+                } else if let error {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
+                        Button("Try Again") { start() }
+                    }
+                } else if !server.tools.isEmpty {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            ForEach(server.tools, id: \.name) { tool in
+                                ToolReviewRow(server: server, tool: tool, details: details)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(minHeight: 160, maxHeight: 360)
+                    Text(server.enabled
+                         ? "The chat asks you before each call, unless you let an action run without asking."
+                         : "Nothing runs from a chat until you turn it on -- and then the chat asks you before each call.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                DisclosureGroup("Details", isExpanded: $details) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(server.kind == .command ? ([server.command] + server.arguments).joined(separator: " ") : server.url)
+                            .font(.system(.caption, design: .monospaced))
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let info = hub.states[serverID]?.info {
+                            Text("\(info.name) \(info.version) · MCP \(info.protocolVersion)").font(.caption).foregroundStyle(.secondary)
+                        }
+                        Button("List Its Tools Again") { start() }.disabled(starting).font(.caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 4)
+                }
+                .font(.callout)
                 HStack {
-                    Button(server.tools.isEmpty ? "Start and Review" : "List Again") { start() }.disabled(starting)
-                    if starting { ProgressView().controlSize(.small) }
                     Spacer()
                     Button("Close") { dismiss() }
-                    if !server.tools.isEmpty, !server.unreviewedTools.isEmpty || !server.enabled {
+                    if !server.tools.isEmpty, !starting, !server.unreviewedTools.isEmpty || !server.enabled {
                         Button("Turn On") {
                             hub.markReviewed(serverID)
                             hub.setEnabled(serverID, true)
@@ -484,8 +511,11 @@ private struct ReviewSheet: View {
                 }
             }
         }
-        .padding()
-        .frame(width: 600)
+        .padding(20)
+        .frame(width: 560)
+        .task {
+            if server?.tools.isEmpty == true { start() }
+        }
     }
 
     private func start() {
@@ -498,41 +528,54 @@ private struct ReviewSheet: View {
     }
 }
 
+/// One tool: its title, the first line of what it says, what it can do
+/// (its actions), whether it changes things; its arguments under Details.
 private struct ToolReviewRow: View {
     let server: MCPServerConfig
     let tool: MCP.Tool
+    let details: Bool
     @ObservedObject private var hub = MCPHub.shared
-    @State private var open = false
+    @State private var allowOpen = false
 
     private var reviewed: Bool { server.reviewed[tool.name] == tool.definitionHash }
+    private var summary: String {
+        tool.description.split(separator: "\n").first.map(String.init)?.trimmingCharacters(in: .whitespaces) ?? ""
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
-                Text(tool.title ?? tool.name).font(.callout.weight(.medium))
-                Text(tool.name).font(.caption.monospaced()).foregroundStyle(.secondary)
-                if !reviewed { Text("new or changed").font(.caption2).foregroundStyle(.orange) }
-                if tool.readOnlyHint == true {
-                    Text("the server says it only reads").font(.caption2).foregroundStyle(.secondary)
-                }
+                Image(systemName: tool.readOnlyHint == true ? "eye" : "pencil")
+                    .foregroundStyle(tool.readOnlyHint == true ? Color.secondary : Color.orange)
+                    .help(tool.readOnlyHint == true ? Text("The server says this only reads.") : Text("This can change things."))
+                Text(tool.title ?? tool.name).font(.callout.weight(.semibold))
+                if !reviewed && !server.reviewed.isEmpty { Text("new or changed").font(.caption2).foregroundStyle(.orange) }
             }
-            Text(tool.description).font(.caption).foregroundStyle(.secondary).lineLimit(open ? nil : 3)
-            Button(open ? "Less" : "Arguments…") { open.toggle() }.buttonStyle(.link).font(.caption)
-            if open {
+            if !summary.isEmpty {
+                Text(summary).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            if let field = tool.actionField {
+                Text(field.values.map { $0.replacingOccurrences(of: "_", with: " ") }.joined(separator: " · "))
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            if details {
                 Text(tool.inputSchemaJSON).font(.system(.caption2, design: .monospaced)).textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             if reviewed && server.enabled {
-                if let field = tool.actionField {
-                    Text("Run without asking:").font(.caption)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 170), alignment: .leading)], alignment: .leading, spacing: 2) {
-                        ForEach(field.values, id: \.self) { action in
-                            Toggle(action, isOn: binding(action))
-                                .toggleStyle(.checkbox).font(.caption)
+                DisclosureGroup("Run without asking", isExpanded: $allowOpen) {
+                    if let field = tool.actionField {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), alignment: .leading)], alignment: .leading, spacing: 2) {
+                            ForEach(field.values, id: \.self) { action in
+                                Toggle(action.replacingOccurrences(of: "_", with: " "), isOn: binding(action))
+                                    .toggleStyle(.checkbox).font(.caption)
+                            }
                         }
+                    } else {
+                        Toggle("This tool", isOn: binding(nil)).toggleStyle(.checkbox).font(.caption)
                     }
-                } else {
-                    Toggle("Run without asking", isOn: binding(nil)).toggleStyle(.checkbox).font(.caption)
                 }
+                .font(.caption)
             }
         }
     }
