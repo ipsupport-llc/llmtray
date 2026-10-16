@@ -463,7 +463,7 @@ final class ChatClient: ObservableObject {
         let citations = ChatMessage.citationsByAnswer(messages)
         var persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
-            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, !msg.hasMedia { return nil }
+            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, !msg.hasMedia, msg.mcpCalls.isEmpty { return nil }
             // Keyed by this message's own (stable for its lifetime) id, so
             // re-persisting the same session after a later turn doesn't
             // re-derive different filenames for images already on disk.
@@ -838,7 +838,8 @@ final class ChatClient: ObservableObject {
     func askMCP(_ request: MCPCallRequest, chatID: String, token: Int) async -> MCPCallChoice? {
         guard folderChatID == chatID, token == turnToken else { return nil }
         let key = MCPApproval.key(tool: request.tool.name, action: request.action)
-        if !request.afterOutsideText, mcpChatAllowances[request.server.id]?[key] == request.tool.definitionHash { return .allowOnce }
+        if !request.afterOutsideText, request.chatAllowanceUsable,
+           mcpChatAllowances[request.server.id]?[key] == request.tool.definitionHash { return .allowOnce }
         let prompt = MCPCallPrompt(request: request)
         mcpPrompt?.resolve(nil)
         mcpPrompt = prompt
@@ -1527,6 +1528,7 @@ final class ChatClient: ObservableObject {
         now.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? start.documentsSession : nil
         // As loaded now: a group load_tools just loaded applies.
         now.loadedToolGroups = loadedToolGroups
+        now.mcpChat = start.mcpChat
         return now
     }
 
@@ -1883,7 +1885,16 @@ final class ChatClient: ObservableObject {
                     maxTokens: settings.maxTokens).map(ProjectTextBudget.bytes(forTokens:)) ?? 0
             }
             let result = await toolbox.run(call, context: toolContext)
-            guard stillCurrent() else { break }
+            // Stopped while an MCP call ran: its line stays, outcome and all
+            // (a send may have happened: adr/0027) -- in this chat only.
+            if !stillCurrent() {
+                if case .mcp(let record, _, _) = result, epoch == conversationEpoch, sourceIndex < messages.count {
+                    messages[sourceIndex].mcpCalls.append(record)
+                    hasUnsavedChanges = true
+                    persistCurrentSession()
+                }
+                break
+            }
             // A proposal went to the chat's plan: its card shows it.
             if call.name == FolderTools.changeName { refreshFolderPlan() }
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)

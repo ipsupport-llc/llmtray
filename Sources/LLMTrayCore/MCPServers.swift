@@ -36,6 +36,8 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     /// The tools as last listed: declared from here without starting the
     /// server; refreshed whenever it starts.
     public var tools: [MCP.Tool] = []
+    /// Tool name → the name the model sees: given once, kept.
+    public var modelNames: [String: String] = [:]
     public var added = Date()
 
     /// The tools the model may see: those whose definition is the one the
@@ -53,7 +55,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
-             origin, description, reviewed, runWithoutAsking, tools, added
+             origin, description, reviewed, runWithoutAsking, tools, modelNames, added
     }
 
     /// Fields added later read as their defaults: an older file still loads.
@@ -76,6 +78,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
         reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
         runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
         tools = try c.decodeIfPresent([MCP.Tool].self, forKey: .tools) ?? []
+        modelNames = try c.decodeIfPresent([String: String].self, forKey: .modelNames) ?? [:]
         added = try c.decodeIfPresent(Date.self, forKey: .added) ?? Date()
     }
 

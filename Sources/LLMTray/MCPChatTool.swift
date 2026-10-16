@@ -12,6 +12,9 @@ struct MCPCallRequest {
     /// Proposed right after outside text in the turn: flagged, and "Allow
     /// for This Chat" isn't offered.
     let afterOutsideText: Bool
+    /// The tools were listed again just now: an earlier "Allow for This
+    /// Chat" may answer (else the card asks).
+    var chatAllowanceUsable = true
 }
 
 enum MCPCallChoice: Equatable {
@@ -45,20 +48,19 @@ final class MCPChatTool: ChatTool {
             return .text("\(name) isn't available any more (its server was switched off or changed). Answer without it.")
         }
         let action = MCPApproval.action(of: tool, arguments: arguments)
-        // An HTTP server has no change stream (v1): its tools are listed
-        // again before an allowance stands for a call.
-        if !context.outsideTextThisTurn, config.kind == .url,
-           MCPApproval.runsWithoutAsking(tool, arguments: arguments, config: config) {
-            await MCPHub.shared.confirmListed(config)
-            guard let again = MCPHub.shared.tool(named: name) else {
-                return .text("\(name) changed on its server; the user has to review it in Settings first. Tell the user.")
-            }
-            (config, tool) = again
+        // The tools listed again first (a server may change them without
+        // saying so): an allowance holds only for the definition listed now,
+        // and a listing that fails means asking.
+        let listed = await MCPHub.shared.confirmListed(config)
+        guard let again = MCPHub.shared.tool(named: name), again.config.id == config.id else {
+            return .text("\(name) changed on its server; the user has to review it in Settings first. Tell the user.")
         }
-        let standing = !context.outsideTextThisTurn && MCPApproval.runsWithoutAsking(tool, arguments: arguments, config: config)
+        (config, tool) = again
+        let standing = listed && !context.outsideTextThisTurn && MCPApproval.runsWithoutAsking(tool, arguments: arguments, config: config)
         if !standing {
             let request = MCPCallRequest(server: config, tool: tool, modelName: name, action: action,
-                                         arguments: Self.pretty(arguments), afterOutsideText: context.outsideTextThisTurn)
+                                         arguments: Self.pretty(arguments), afterOutsideText: context.outsideTextThisTurn,
+                                         chatAllowanceUsable: listed)
             guard let ask = context.askMCP else {
                 return .mcp(MCPCallRecord(server: config.name, tool: tool.name, action: action, arguments: arguments, outcome: .denied),
                             text: "Not run: the user couldn't be asked about it here.", refused: true)
@@ -70,7 +72,7 @@ final class MCPChatTool: ChatTool {
                             : "Not run: the user didn't allow this call. Don't ask again unless the user does.", refused: true)
             }
             // Asked and allowed: the definition must still be the one shown.
-            guard MCPHub.shared.tool(named: name)?.tool == tool else {
+            guard let now = MCPHub.shared.tool(named: name), now.tool == tool, now.config.id == config.id else {
                 return .text("\(name) changed on its server while the user was asked; nothing ran. Tell the user.")
             }
         }

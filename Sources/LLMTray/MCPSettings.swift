@@ -408,7 +408,10 @@ private struct AsksSheet: View {
                 else { f.headers[ask.key] = value }
             }
         }
-        for (k, v) in f.environment.merging(f.headers, uniquingKeysWith: { a, _ in a }) where MCPServerConfig.looksSecret(k) { secrets[k] = v }
+        // The server's own values that look secret, unless already resolved
+        // above (a bundle's) or still a placeholder.
+        for (k, v) in f.environment.merging(f.headers, uniquingKeysWith: { a, _ in a })
+            where MCPServerConfig.looksSecret(k) && secrets[k] == nil && !v.contains("${") && !v.isEmpty { secrets[k] = v }
         add(f, secrets)
     }
 }

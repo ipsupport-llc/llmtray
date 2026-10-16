@@ -187,13 +187,25 @@ final class MCPHub: ObservableObject {
         didSet { if reservedNames != oldValue { publishGroups() } }
     }
 
+    /// A tool's model name is given once and kept with its server
+    /// (`modelNames`): switching another server off or on never moves a
+    /// name to a different tool (adr/0027).
     private func rebuildNames() {
-        var taken = reservedNames
+        var taken = reservedNames.union(servers.flatMap { $0.modelNames.values })
+        var changed = false
+        for i in servers.indices {
+            for tool in servers[i].tools where servers[i].modelNames[tool.name] == nil {
+                let name = MCPNames.toolName(server: servers[i].key, tool: tool.name, taken: taken)
+                taken.insert(name)
+                servers[i].modelNames[tool.name] = name
+                changed = true
+            }
+        }
+        if changed { save() }
         var out: [String: (UUID, String)] = [:]
         for config in servers where config.enabled && Self.runsHere(config) {
             for tool in config.visibleTools {
-                let name = MCPNames.toolName(server: config.key, tool: tool.name, taken: taken)
-                taken.insert(name)
+                guard let name = config.modelNames[tool.name], !reservedNames.contains(name) else { continue }
                 out[name] = (config.id, tool.name)
             }
         }
@@ -219,7 +231,7 @@ final class MCPHub: ObservableObject {
 
     /// Starts the server (once; callers share a start in progress) and lists
     /// its tools, which may change what's visible.
-    func connect(_ id: UUID) async throws -> MCPClient {
+    func connect(_ id: UUID, forReview: Bool = false) async throws -> MCPClient {
         if let client = clients[id], await client.isOpen {
             states[id, default: ServerState()].lastUsed = Date()
             return client
@@ -227,6 +239,8 @@ final class MCPHub: ObservableObject {
         clients.removeValue(forKey: id)
         if let start = starts[id] { return try await start.value }
         guard let config = server(id) else { throw MCPError.closed("removed") }
+        // Nothing starts while it's off, but the user's own review.
+        guard config.enabled || forReview else { throw MCPError.closed("it's switched off") }
         if states[id]?.status == .crashing { throw MCPError.closed("it keeps crashing -- see its log in Settings") }
         let start = Task { @MainActor () throws -> MCPClient in
             states[id, default: ServerState()].status = .starting
@@ -234,8 +248,18 @@ final class MCPHub: ObservableObject {
             if let stdio = transport as? MCPStdioTransport { transports[id] = stdio }
             let client = MCPClient(transport: transport)
             await client.setToolsChanged { Task { @MainActor in await MCPHub.shared.refreshTools(id) } }
-            let info = try await client.start()
-            let tools = try await client.listTools()
+            let info: MCPClient.ServerInfo
+            let tools: [MCP.Tool]
+            do {
+                info = try await client.start()
+                tools = try await client.listTools()
+            } catch {
+                // Started or not, it goes: no child outlives a failed start.
+                await client.close()
+                await transport.close()
+                transports.removeValue(forKey: id)
+                throw error
+            }
             clients[id] = client
             states[id, default: ServerState()].info = info
             states[id, default: ServerState()].status = .running
@@ -248,7 +272,7 @@ final class MCPHub: ObservableObject {
         do {
             return try await start.value
         } catch {
-            noteFailure(id, error.localizedDescription)
+            noteFailure(id, redact(error.localizedDescription, config))
             throw error
         }
     }
@@ -309,10 +333,10 @@ final class MCPHub: ObservableObject {
         states[id]?.crashes = []
         if states[id]?.status == .crashing { states[id]?.status = .stopped }
         do {
-            _ = try await connect(id)
+            _ = try await connect(id, forReview: true)
             return nil
         } catch {
-            return error.localizedDescription
+            return redact(error.localizedDescription, server(id))
         }
     }
 
@@ -347,17 +371,19 @@ final class MCPHub: ObservableObject {
         }
     }
 
-    /// For an HTTP server (no change stream in v1): its tools listed again
-    /// before a standing approval is used (adr/0027).
-    func confirmListed(_ config: MCPServerConfig) async {
-        guard config.kind == .url, (try? await connect(config.id)) != nil else { return }
-        await refreshTools(config.id)
+    /// The tools listed again before any approval that doesn't ask is used
+    /// (adr/0027): false when that failed -- then the user is asked.
+    func confirmListed(_ config: MCPServerConfig) async -> Bool {
+        guard let client = try? await connect(config.id), let tools = try? await client.listTools() else { return false }
+        storeTools(config.id, tools)
+        return true
     }
 
     func stop(_ id: UUID) async {
         starts[id]?.cancel()
         if let client = clients.removeValue(forKey: id) { await client.close() }
-        transports.removeValue(forKey: id)
+        // No client (a start under way or failed): the child still goes.
+        if let transport = transports.removeValue(forKey: id) { await transport.close() }
         if states[id]?.status != .crashing { states[id]?.status = .stopped }
     }
 
@@ -376,6 +402,16 @@ final class MCPHub: ObservableObject {
         for (id, state) in states where clients[id] != nil && now.timeIntervalSince(state.lastUsed) > Self.idleStop {
             Task { await stop(id) }
         }
+    }
+
+    /// A server's secret values blanked out of text shown in Settings.
+    func redact(_ text: String, _ config: MCPServerConfig?) -> String {
+        guard let config else { return text }
+        var out = text
+        for name in config.secretNames {
+            if let v = MCPSecrets.get(server: config.id, name: name), v.count >= 4 { out = out.replacingOccurrences(of: v, with: "•••") }
+        }
+        return out
     }
 
     private func noteFailure(_ id: UUID, _ why: String) {
