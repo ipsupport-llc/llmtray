@@ -188,24 +188,27 @@ final class MCPInstaller: ObservableObject {
     }
 
     private func notifyUpdates() {
-        var notified = UserDefaults.standard.dictionary(forKey: Self.notifiedKey) as? [String: String] ?? [:]
+        guard Bundle.main.bundleIdentifier != nil, Bundle.main.bundleURL.pathExtension == "app" else { return }
+        let notified = UserDefaults.standard.dictionary(forKey: Self.notifiedKey) as? [String: String] ?? [:]
         for (id, latest) in updates where notified[id.uuidString] != latest {
             guard let server = hub.server(id) else { continue }
-            notified[id.uuidString] = latest
             let content = UNMutableNotificationContent()
             content.title = NSLocalizedString("Tool server update", comment: "MCP update notification title")
             content.body = String(format: NSLocalizedString("%1$@ %2$@ is available. Update it in Settings › Tools.", comment: "MCP update notification: server, version"),
                                   server.name, latest)
             let request = UNNotificationRequest(identifier: Self.notificationPrefix + id.uuidString, content: content, trigger: nil)
-            ModelSwitchPrompter.shared.setUpNotifications()
-            guard Bundle.main.bundleURL.pathExtension == "app" else { continue }
             Task {
                 let center = UNUserNotificationCenter.current()
                 guard (try? await center.requestAuthorization(options: [.alert])) == true else { return }
-                try? await center.add(request)
+                do {
+                    try await center.add(request)
+                    // Once per version, counted only when it was shown.
+                    var done = UserDefaults.standard.dictionary(forKey: Self.notifiedKey) as? [String: String] ?? [:]
+                    done[id.uuidString] = latest
+                    UserDefaults.standard.set(done, forKey: Self.notifiedKey)
+                } catch {}
             }
         }
-        UserDefaults.standard.set(notified, forKey: Self.notifiedKey)
     }
 
     /// At most once an hour, when the Tools pane shows.
