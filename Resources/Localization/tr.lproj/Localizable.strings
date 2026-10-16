@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "%lld dakika boşta kaldıktan sonra";
 "After %lld min" = "%lld dk sonra";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Yeni sohbetin ilk yanıtından sonra model, sohbetler listesi için kısa bir başlık belirler (kısa ek bir istek). Kapalı: ilk mesajın başı kullanılır. Sohbetin adını yeniden verme her zaman çalışır.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Sohbet dış metinleri (bir e-posta, bir dosya, web) okuduktan sonra da her çağrı için yine sorulur.";
 "Air quality" = "Hava kalitesi";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Takma ad: Diğer araçların bu modeli almak için LLMTray API’sine gönderdiği “model” adı. Profil: Bu modelin kullandığı ayarlar profili.";
+"All" = "Tümü";
 "All chats" = "Tüm sohbetler";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Açmadığınız sürece hepsi kapalıdır. Modeller Finish sonrası, teker teker indirilir.";
 "Allow" = "İzin ver";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Sunucunun yanıtladığı her istek — sohbetten ve API üzerinden diğer uygulama ve ajanlardan — bu Mac'te tutulur. Model ve ayar başına medyanlar.";
+"Everything" = "Her Şey";
 "Everything in that folder is here already." = "O klasördeki her şey zaten burada.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray'nin ipsupport.us'a alan alan gönderdiği tam bilgiler. Başka hiçbir şey Mac'inizden ayrılmaz.";
 "Experimental — English only" = "Deneysel — yalnızca İngilizce";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Notlar bağlantı içeremez.";
 "Notes in" = "Notların dili";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Yalnızca silinen bir sohbetten öğrenilen Notlar, düzenlemediyseniz, sabitlemediyseniz veya onaylamadıysanız onunla birlikte gider.";
+"Nothing" = "Hiçbiri";
 "Nothing left to read: every chat was read from its start." = "Okunacak bir şey kalmadı: her sohbet başından itibaren okundu.";
 "Nothing logged yet." = "Henüz günlük yok.";
 "Nothing new to import" = "İçe aktarılacak yeni bir şey yok";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "İsteme okuma: en fazla %lld%";
 "Reading chats" = "Sohbetleri okuma";
 "Reading what's installed…" = "Yüklüler okunuyor…";
+"Reads Only" = "Yalnızca Okuma";
 "Reads chats with" = "Sohbetleri şununla okur";
 "Ready." = "Hazır.";
 "Ready. This is the Full build: the runtime is included." = "Hazır. Bu Full derlemesidir: runtime dahil.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Her sohbetteki yer: %lld token";
 "Run benchmark" = "Benchmark Çalıştır";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU bellek sınırını artırmak için Terminal'de çalıştırın; Mac yeniden başladığında sıfırlanır.";
+"Run without asking:" = "Sormadan çalıştır:";
 "Running" = "Çalışıyor";
 "Running — %@ on :%lld" = "Çalışıyor — %@, :%lld üzerinde";
 "Running…" = "Çalışıyor…";

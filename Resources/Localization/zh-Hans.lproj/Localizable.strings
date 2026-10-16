@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "空闲 %lld 分钟后";
 "After %lld min" = "%lld 分钟后";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "在新对话的第一次回答后，模型会为对话列表生成一个简短标题（会额外发出一次简短请求）。关闭：使用第一条消息的开头。重命名对话始终有效。";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "聊天读取外部文本（邮件、文件、网页）后，仍会在每次调用时询问。";
 "Air quality" = "空气质量";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "别名：其他工具发送到 LLMTray API 以使用此模型的“model”名称。配置：此模型使用的设置配置。";
+"All" = "全部";
 "All chats" = "所有聊天";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "除非你打开，否则均为关闭。模型在“完成”后逐个下载。";
 "Allow" = "允许";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "此项目中的每个对话在模型配置文件的系统提示之后都会应用这些指令。更改自下一条消息起生效。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "当文件被置顶时，项目的每个对话都会获取该文件的全部文本；这些对话中的网页搜索和图像或音乐生成功能被禁用。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "服务器回答的每个请求（聊天，以及通过 API 的其他应用和智能体）都保存在这台 Mac 上。按模型和设置取中位数。";
+"Everything" = "所有内容";
 "Everything in that folder is here already." = "该文件夹中的内容已全部存在于此。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray 向 ipsupport.us 发送的完整内容，逐字段列出。你的 Mac 不会发送其他任何内容。";
 "Experimental — English only" = "试验性功能 — 仅限英语";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "笔记不能包含链接。";
 "Notes in" = "笔记语言";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "仅从已删除聊天中学到的笔记会随之移除，除非你编辑、置顶或批准过这些笔记。";
+"Nothing" = "不允许";
 "Nothing left to read: every chat was read from its start." = "没有剩余内容可读取：每个聊天都已从开头读取。";
 "Nothing logged yet." = "还没有日志。";
 "Nothing new to import" = "无可导入的新内容";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "读取提示：最多 %lld%";
 "Reading chats" = "读取聊天";
 "Reading what's installed…" = "正在读取已安装内容…";
+"Reads Only" = "仅读取";
 "Reads chats with" = "使用以下模型读取聊天";
 "Ready." = "已就绪。";
 "Ready. This is the Full build: the runtime is included." = "已就绪。此为 Full 版本：包含运行时。";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "每个聊天中的空间：%lld 个 token";
 "Run benchmark" = "运行基准测试";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在终端中运行以提高 GPU 内存限制；Mac 重启后会重置。";
+"Run without asking:" = "无需询问即可运行：";
 "Running" = "正在运行";
 "Running — %@ on :%lld" = "正在运行 — %@，端口 :%lld";
 "Running…" = "正在运行…";

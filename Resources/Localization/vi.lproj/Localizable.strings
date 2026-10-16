@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Sau %lld phút không hoạt động";
 "After %lld min" = "Sau %lld phút";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Sau khi cuộc trò chuyện mới nhận được câu trả lời đầu tiên, mô hình sẽ gán một tiêu đề ngắn cho danh sách trò chuyện (một truy vấn phụ ngắn). Tắt: bắt đầu của tin nhắn đầu tiên. Đổi tên trò chuyện luôn hoạt động.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Sau khi Trò chuyện đọc văn bản bên ngoài (thư, tệp, web), mọi lệnh gọi vẫn đều phải hỏi.";
 "Air quality" = "Chất lượng không khí";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Bí danh: tên “model” mà các công cụ khác gửi đến API của LLMTray để lấy mô hình này. Hồ sơ: hồ sơ cài đặt mà mô hình này sử dụng.";
+"All" = "Tất cả";
 "All chats" = "Tất cả Trò chuyện";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tất cả tắt cho đến khi bạn bật. Các mô hình được tải về sau khi nhấn Finish, từng cái một.";
 "Allow" = "Cho phép";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ văn bản; tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi một tệp được ghim.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Mọi yêu cầu máy chủ trả lời, từ cuộc trò chuyện và từ ứng dụng, agent khác qua API, được lưu trên máy Mac này. Trung vị theo mô hình và cài đặt.";
+"Everything" = "Mọi thứ";
 "Everything in that folder is here already." = "Mọi thứ trong thư mục đó đã có ở đây rồi.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Đây là chính xác những gì LLMTray gửi tới ipsupport.us, trường từng trường. Không gì khác rời khỏi máy Mac của bạn.";
 "Experimental — English only" = "Thử nghiệm — chỉ tiếng Anh";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Ghi chú không được chứa liên kết.";
 "Notes in" = "Ghi chú bằng";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Các Ghi chú chỉ học từ Trò chuyện đã xóa sẽ bị xóa theo, trừ khi bạn đã sửa, ghim hoặc phê duyệt chúng.";
+"Nothing" = "Không có gì";
 "Nothing left to read: every chat was read from its start." = "Không còn gì để đọc: mọi Trò chuyện đã được đọc từ đầu.";
 "Nothing logged yet." = "Chưa có gì được ghi lại.";
 "Nothing new to import" = "Không có gì mới để import";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Đọc prompt: tối đa %lld%";
 "Reading chats" = "Đọc Trò chuyện";
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
+"Reads Only" = "Chỉ đọc";
 "Reads chats with" = "Đọc trò chuyện bằng";
 "Ready." = "Sẵn sàng.";
 "Ready. This is the Full build: the runtime is included." = "Sẵn sàng. Đây là bản Full: đã bao gồm runtime.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Dung lượng trong mỗi Trò chuyện: %lld token";
 "Run benchmark" = "Chạy đo hiệu năng";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Chạy trong Terminal để tăng giới hạn bộ nhớ GPU; sẽ về lại khi Mac khởi động lại.";
+"Run without asking:" = "Chạy mà không cần hỏi:";
 "Running" = "Đang chạy";
 "Running — %@ on :%lld" = "Đang chạy — %@ trên :%lld";
 "Running…" = "Đang chạy…";

@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "بعد %lld دقيقة من الخمول";
 "After %lld min" = "بعد %lld دقيقة";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "بعد إجابة الدردشة الأولى، يقدّم النموذج عنوانًا قصيرًا لقائمة الدردشات (طلب قصير إضافي). إيقاف: بداية الرسالة الأولى. إعادة تسمية الدردشة تعمل دائمًا.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "بعد أن تقرأ الدردشة نصًا من خارجها (رسالة بريد، ملف، الويب)، سيُطلب الإذن لكل استدعاء على أي حال.";
 "Air quality" = "جودة الهواء";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "الاسم المستعار: اسم «model» الذي ترسله أدوات أخرى إلى API الخاص بـ LLMTray للحصول على هذا النموذج. ملف التعريف: ملف إعدادات هذا النموذج.";
+"All" = "الكل";
 "All chats" = "كل الدردشات";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "كلها مغلقة ما لم تقم بتشغيلها. يتم تنزيل النماذج بعد Finish، واحدًا تلو الآخر.";
 "Allow" = "السماح";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "تحصل كل محادثة في المشروع على كامل نص الملف؛ البحث على الويب وتوليد الصور أو الموسيقى متوقفان في تلك المحادثات طالما الملف مثبت.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "كل طلب يجيب عنه الخادم، من الدردشة ومن التطبيقات والوكلاء الأخرى عبر الواجهة البرمجية، محفوظ على هذا الـ Mac. الوسيط لكل نموذج وإعدادات.";
+"Everything" = "كل شيء";
 "Everything in that folder is here already." = "كل شيء في ذلك المجلد موجود هنا بالفعل.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "بالضبط ما يرسله LLMTray إلى ipsupport.us، حقلًا بحقل. لا شيء آخر يغادر جهاز Mac الخاص بك.";
 "Experimental — English only" = "تجريبي — الإنجليزية فقط";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "لا يمكن أن تحتوي الملاحظات على روابط.";
 "Notes in" = "الملاحظات باللغة";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "تُحذف معها الملاحظات التي تم تعلّمها فقط من دردشة محذوفة، ما لم تكن قد عدّلتها أو ثبّتها أو وافقت عليها.";
+"Nothing" = "لا شيء";
 "Nothing left to read: every chat was read from its start." = "لم يبقَ شيء لقراءته: قُرئت كل دردشة من بدايتها.";
 "Nothing logged yet." = "لا يوجد شيء في السجل بعد.";
 "Nothing new to import" = "لا يوجد شيء جديد للاستيراد";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "قراءة المطالبة: حتى %lld%";
 "Reading chats" = "قراءة الدردشات";
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
+"Reads Only" = "القراءة فقط";
 "Reads chats with" = "يقرأ الدردشات باستخدام";
 "Ready." = "جاهز.";
 "Ready. This is the Full build: the runtime is included." = "جاهز. هذا هو البناء Full: الـ runtime مضمن.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "المساحة في كل دردشة: %lld رمزًا مميزًا";
 "Run benchmark" = "تشغيل الاختبار المعياري";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "شغّله في Terminal لزيادة حد ذاكرة GPU؛ سيُعاد تعيينه عند إعادة تشغيل الـMac.";
+"Run without asking:" = "تشغيل من دون طلب إذن:";
 "Running" = "قيد التشغيل";
 "Running — %@ on :%lld" = "قيد التشغيل — %@ على :%lld";
 "Running…" = "جارٍ التشغيل…";

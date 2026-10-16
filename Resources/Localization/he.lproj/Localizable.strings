@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "אחרי %lld דקות ללא פעילות";
 "After %lld min" = "לאחר %lld דק׳";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "לאחר התשובה הראשונה בצ'אט חדש, המודל נותן לו כותרת קצרה לרשימת הצ'אטים (בקשה קצרה נוספת). כבוי: תחילת ההודעה הראשונה. שינוי שם צ'אט תמיד פועל.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "אחרי שהצ׳אט קורא טקסט חיצוני (מייל, קובץ, האינטרנט), כל קריאה עדיין דורשת אישור.";
 "Air quality" = "איכות אוויר";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "כינוי: שם ה־“model” שכלים אחרים שולחים ל־API של LLMTray כדי לקבל את המודל הזה. פרופיל: פרופיל ההגדרות שבו המודל הזה משתמש.";
+"All" = "הכול";
 "All chats" = "כל הצ׳אטים";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "הכול כבוי עד שתדליקו. המודלים יורדו אחרי Finish, אחד‑אחד.";
 "Allow" = "אפשר";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
+"Everything" = "הכול";
 "Everything in that folder is here already." = "הכל בתיקיה הזו כבר כאן.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "בדיוק מה ש‑LLMTray שולח אל ipsupport.us, שדה אחר שדה. שום דבר אחר לא יוצא מהמחשב.";
 "Experimental — English only" = "ניסיוני — אנגלית בלבד";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "הערות לא יכולות להכיל קישורים.";
 "Notes in" = "הערות ב־";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "הערות שנלמדו רק מצ׳אט שנמחק נמחקות איתו, אלא אם ערכת, נעצת או אישרת אותן.";
+"Nothing" = "ללא";
 "Nothing left to read: every chat was read from its start." = "לא נשאר מה לקרוא: כל צ׳אט נקרא מההתחלה.";
 "Nothing logged yet." = "עדיין לא נרשם דבר.";
 "Nothing new to import" = "אין משהו חדש לייבא";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "קריאת פקודה: עד %lld%";
 "Reading chats" = "קריאת צ'אטים";
 "Reading what's installed…" = "קורא מה מותקן…";
+"Reads Only" = "קריאה בלבד";
 "Reads chats with" = "קורא צ׳אטים באמצעות";
 "Ready." = "מוכן.";
 "Ready. This is the Full build: the runtime is included." = "מוכן. זו הבנייה Full: ה‑runtime כלול.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "מקום בכל צ׳אט: %lld טוקנים";
 "Run benchmark" = "הרץ מבחן ביצועים";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "הרץ זאת ב‑Terminal כדי להגדיל את מגבלת זיכרון ה‑GPU; היא תתאפס בריסטארט של ה‑Mac.";
+"Run without asking:" = "להריץ בלי לשאול:";
 "Running" = "פועל";
 "Running — %@ on :%lld" = "פועל — %@ ב־:%lld";
 "Running…" = "פועל…";

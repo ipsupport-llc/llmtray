@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Setelah %lld menit tidak aktif";
 "After %lld min" = "Setelah %lld menit";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Setelah jawaban pertama dari chat baru, model memberi judul singkat untuk daftar chat (satu permintaan tambahan singkat). Mati: awal pesan pertama. Mengganti nama chat selalu berhasil.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Setelah Obrolan membaca teks dari luar (mail, file, web), setiap panggilan tetap akan diminta.";
 "Air quality" = "Kualitas udara";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: nama “model” yang dikirim alat lain ke API LLMTray untuk mendapatkan model ini. Profil: profil pengaturan yang digunakan model ini.";
+"All" = "Semua";
 "All chats" = "Semua obrolan";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Semua mati kecuali Anda mengaktifkannya. Model diunduh setelah Selesai, satu per satu.";
 "Allow" = "Izinkan";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Setiap permintaan yang dijawab server, dari chat dan dari aplikasi serta agen lain lewat API, disimpan di Mac ini. Median per model dan pengaturan.";
+"Everything" = "Semua";
 "Everything in that folder is here already." = "Semua di folder itu sudah ada di sini.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Persis apa yang dikirim LLMTray ke ipsupport.us, per bidang. Tidak ada yang lain keluar dari Mac Anda.";
 "Experimental — English only" = "Eksperimental — hanya Bahasa Inggris";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Catatan tidak dapat memuat tautan.";
 "Notes in" = "Catatan dalam";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Catatan yang dipelajari hanya dari obrolan yang dihapus akan ikut dihapus, kecuali yang Anda edit, sematkan, atau setujui.";
+"Nothing" = "Tidak Ada";
 "Nothing left to read: every chat was read from its start." = "Tidak ada lagi yang perlu dibaca: setiap obrolan sudah dibaca dari awalnya.";
 "Nothing logged yet." = "Belum ada yang dicatat.";
 "Nothing new to import" = "Tidak ada yang baru untuk diimport";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Membaca prompt: hingga %lld%";
 "Reading chats" = "Membaca chat";
 "Reading what's installed…" = "Membaca yang terpasang…";
+"Reads Only" = "Hanya Baca";
 "Reads chats with" = "Membaca obrolan dengan";
 "Ready." = "Siap.";
 "Ready. This is the Full build: the runtime is included." = "Siap. Ini adalah build Full: runtime sudah disertakan.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Ruang di setiap obrolan: %lld token";
 "Run benchmark" = "Jalankan benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Jalankan di Terminal untuk menaikkan batas memori GPU; akan kembali saat Mac di-restart.";
+"Run without asking:" = "Jalankan tanpa bertanya:";
 "Running" = "Berjalan";
 "Running — %@ on :%lld" = "Berjalan — %@ di :%lld";
 "Running…" = "Berjalan…";

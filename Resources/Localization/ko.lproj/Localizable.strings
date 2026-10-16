@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "유휴 상태가 %lld분 지난 후";
 "After %lld min" = "%lld분 후";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "새 채팅의 첫 응답 후 모델이 채팅 목록에 표시할 짧은 제목을 생성합니다(짧은 추가 요청 하나). 끄기: 첫 메시지의 시작 부분을 사용합니다. 채팅 이름 변경은 언제나 가능합니다.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "채팅이 외부 텍스트(메일, 파일, 웹)를 읽은 후에도 모든 호출은 계속 확인을 요청합니다.";
 "Air quality" = "대기 질";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "별칭: 다른 도구가 이 모델을 사용하려고 LLMTray의 API로 보내는 “model” 이름입니다. 프로필: 이 모델이 사용하는 설정 프로필입니다.";
+"All" = "모두";
 "All chats" = "모든 채팅";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "켜지지 않은 항목은 사용자가 켤 때까지 꺼짐. 모델은 Finish 후 한 번에 하나씩 다운로드됩니다.";
 "Allow" = "허용";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "이 프로젝트의 모든 채팅은 모델 프로필의 시스템 프롬프트 뒤에 이 지침을 받습니다. 변경 내용은 다음 메시지부터 적용됩니다.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "프로젝트의 모든 채팅이 전체 텍스트를 받습니다. 파일이 고정되어 있는 동안 해당 채팅에서는 웹 검색과 이미지·음악 생성이 비활성화됩니다.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "서버가 응답한 모든 요청(채팅, API를 통한 다른 앱과 에이전트)을 이 Mac에 기록합니다. 모델과 설정별 중앙값.";
+"Everything" = "모두";
 "Everything in that folder is here already." = "해당 폴더의 모든 항목이 이미 여기에 있습니다.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray가 ipsupport.us로 보내는 항목을 필드별로 그대로 표시합니다. 다른 데이터는 Mac을 떠나지 않습니다.";
 "Experimental — English only" = "실험적 — 영어 전용";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "메모에는 링크를 담을 수 없습니다.";
 "Notes in" = "메모 언어";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "삭제된 채팅에서만 배운 메모는 함께 사라집니다. 단, 사용자가 편집, 고정 또는 승인한 메모는 제외됩니다.";
+"Nothing" = "안 함";
 "Nothing left to read: every chat was read from its start." = "읽을 항목이 남아 있지 않습니다. 모든 채팅을 처음부터 읽었습니다.";
 "Nothing logged yet." = "아직 기록된 로그가 없습니다.";
 "Nothing new to import" = "가져올 새 항목이 없습니다";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "프롬프트 읽기: 최대 %lld%";
 "Reading chats" = "대화 읽기";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
+"Reads Only" = "읽기만";
 "Reads chats with" = "채팅을 읽을 모델";
 "Ready." = "준비됨.";
 "Ready. This is the Full build: the runtime is included." = "준비됨. Full 빌드입니다: 런타임 포함.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "각 채팅의 공간: %lld개 토큰";
 "Run benchmark" = "벤치마크 실행";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "터미널에서 실행하여 GPU 메모리 한도를 높이세요; Mac 재시작 시 초기화됩니다.";
+"Run without asking:" = "묻지 않고 실행:";
 "Running" = "실행 중";
 "Running — %@ on :%lld" = "%@, :%lld에서 실행 중";
 "Running…" = "실행 중…";

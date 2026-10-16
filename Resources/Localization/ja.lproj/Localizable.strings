@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "%lld分アイドル状態の後";
 "After %lld min" = "%lld分後";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "新しいチャットの最初の応答後、モデルがチャット一覧用の短いタイトルを自動で付けます（短い追加リクエストが発生します）。オフ：最初のメッセージの先頭をタイトルに使用します。チャットの名前変更は常に可能です。";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "チャットが外部のテキスト（メール、ファイル、Web）を読んだあとでも、呼び出しのたびに確認します。";
 "Air quality" = "空気質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "エイリアス: ほかのツールがこのモデルを使うために LLMTray の API へ送る「model」名です。プロファイル: このモデルで使う設定プロファイルです。";
+"All" = "すべて";
 "All chats" = "すべてのチャット";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "有効にしない限りすべてオフです。モデルは Finish 後に一度にひとつずつダウンロードされます。";
 "Allow" = "許可";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "プロジェクト内のすべてのチャットがファイル全体のテキストを取得します。ファイルがピン留めされている間、そのチャットでは Web 検索や画像・音楽生成は無効になります。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
+"Everything" = "すべて";
 "Everything in that folder is here already." = "そのフォルダ内のものはすでにここにあります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
 "Experimental — English only" = "実験的 — 英語のみ";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "ノートにリンクは含められません。";
 "Notes in" = "ノートの言語";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "削除したチャットだけから学習したノートは、そのチャットと一緒に削除されます。ただし、編集、ピン留め、または承認したものは除きます。";
+"Nothing" = "なし";
 "Nothing left to read: every chat was read from its start." = "読み取るものは残っていません。すべてのチャットを先頭から読み取り済みです。";
 "Nothing logged yet." = "ログはまだありません。";
 "Nothing new to import" = "新しい項目はありません";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "プロンプト読み取り: 最大 %lld%";
 "Reading chats" = "チャットの読み取り";
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
+"Reads Only" = "読み取りのみ";
 "Reads chats with" = "チャットの読み取りに使用";
 "Ready." = "準備完了。";
 "Ready. This is the Full build: the runtime is included." = "準備完了。これは Full ビルドで、ランタイムが同梱されています。";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "各チャットの余裕：%lldトークン";
 "Run benchmark" = "ベンチマークを実行";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU メモリ制限を上げるには Terminal で実行してください；Mac を再起動するとリセットされます。";
+"Run without asking:" = "確認なしで実行:";
 "Running" = "実行中";
 "Running — %@ on :%lld" = "実行中 — %@（:%lld）";
 "Running…" = "実行中…";
