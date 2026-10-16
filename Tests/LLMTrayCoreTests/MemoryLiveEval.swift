@@ -298,12 +298,7 @@ final class MemoryLiveEval: XCTestCase {
         for i in pending.indices where pending[i].spanned {
             let reply = try await ask(MemoryReflection.spanMessages([pending[i].claim]), 40, MemoryReflection.spanShape(1))
             if ProcessInfo.processInfo.environment["MEMORY_EVAL_DEBUG"] == "1" { print("  [span] → \(reply.prefix(200))") }
-            guard let span = MemoryReflection.parseSpans(reply, count: 1)?.first else {
-                print("!! unreadable span reply: \(reply.prefix(300))")
-                file.dropBatch(batch.id)
-                return
-            }
-            if span == .task { tasks.insert(i); print("  ✗ task only: \(pending[i].claim.statement)") }
+            if MemoryReflection.parseSpans(reply, count: 1)?.first != .lasting { tasks.insert(i); print("  ✗ task only: \(pending[i].claim.statement)") }
         }
         pending = pending.indices.filter { !tasks.contains($0) }.map { pending[$0] }
         let adds = pending.indices.filter { pending[$0].op.action == .add }

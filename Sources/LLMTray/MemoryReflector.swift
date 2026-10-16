@@ -600,8 +600,9 @@ final class MemoryReflector: ObservableObject {
             switch await ask(MemoryReflection.spanMessages([pending[i].claim]), maxTokens: 40, modelPath: modelPath,
                              shape: MemoryReflection.spanShape(1)) {
             case .success(let reply):
-                guard let span = MemoryReflection.parseSpans(reply, count: 1)?.first else { return .failed("unreadable span reply") }
-                if span == .task { tasks.insert(i) }
+                // Unreadable: that note only is dropped (kept by doubt it's the log
+                // this avoids); the rest of the batch stands.
+                if MemoryReflection.parseSpans(reply, count: 1)?.first != .lasting { tasks.insert(i) }
             case .failure(let error):
                 return error.outcome
             }
