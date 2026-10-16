@@ -271,7 +271,7 @@ private struct ServerRow: View {
                     .disabled(installer.busy.contains(server.id.uuidString))
                 }
                 if server.oauth?.needsSignIn == true {
-                    Button("Sign In") { Task { installer.message = await installer.startOrSignIn(server.id) } }
+                    Button("Sign In") { Task { installer.message = await installer.signInNow(server.id) } }
                         .buttonStyle(.borderedProminent)
                         .disabled(signIn.signingIn.contains(server.id))
                 } else {
@@ -1017,7 +1017,7 @@ private struct SignInSection: View {
                         ProgressView().controlSize(.small)
                         Text("Finish in your browser…").font(.caption).foregroundStyle(.secondary)
                     } else {
-                        Button("Sign In") { Task { installer.message = await installer.startOrSignIn(server.id) } }
+                        Button("Sign In") { Task { installer.message = await installer.signInNow(server.id) } }
                     }
                 }
             }

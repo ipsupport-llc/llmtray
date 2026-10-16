@@ -62,6 +62,17 @@ public enum MCPOAuth {
         URL(string: text).map(canonical)
     }
 
+    /// Whether a token for `resource` may go to `server`: the same canonical
+    /// URL, or `resource` is the root of the server's own origin.
+    public static func covers(resource: String, server: URL) -> Bool {
+        guard let r = canonical(resource) else { return false }
+        if r == canonical(server) { return true }
+        var root = URLComponents(url: server, resolvingAgainstBaseURL: false)
+        root?.path = ""
+        root?.query = nil
+        return root?.url.map(canonical) == r
+    }
+
     // MARK: Challenge
 
     public struct Challenge: Equatable {
@@ -216,7 +227,10 @@ public enum MCPOAuth {
     public static func mixUpSafe(_ m: ServerMetadata, registration: Registration) -> Bool {
         if m.sendsIssInResponse || registration != .metadataDocument { return true }
         guard let issuer = URL(string: m.issuer) else { return false }
-        func origin(_ u: URL) -> String { "\(u.scheme?.lowercased() ?? "")://\(u.host?.lowercased() ?? ""):\(u.port ?? 443)" }
+        func origin(_ u: URL) -> String {
+            let scheme = u.scheme?.lowercased() ?? ""
+            return "\(scheme)://\(u.host?.lowercased() ?? ""):\(u.port ?? (scheme == "http" ? 80 : 443))"
+        }
         return origin(m.authorizationEndpoint) == origin(issuer) && origin(m.tokenEndpoint) == origin(issuer)
     }
 
@@ -256,7 +270,8 @@ public enum MCPOAuth {
 
     public static func randomURLSafe(_ bytes: Int) -> String {
         var data = Data(count: bytes)
-        _ = data.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, bytes, $0.baseAddress!) }
+        let status = data.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, bytes, $0.baseAddress!) }
+        precondition(status == errSecSuccess, "no secure random bytes")
         return base64url(data)
     }
 

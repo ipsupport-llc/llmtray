@@ -35,6 +35,14 @@ final class MCPOAuthTests: XCTestCase {
         XCTAssertNotEqual(MCPOAuth.canonical(URL(string: "https://a.example/mcp")!), MCPOAuth.canonical(URL(string: "https://a.example/mcp2")!))
     }
 
+    func testTokensStayWithTheirServer() {
+        let mcp = URL(string: "https://mcp.example.com/mcp")!
+        XCTAssertTrue(MCPOAuth.covers(resource: "https://mcp.example.com/mcp", server: mcp))
+        XCTAssertTrue(MCPOAuth.covers(resource: "https://mcp.example.com", server: mcp))     // the origin root
+        XCTAssertFalse(MCPOAuth.covers(resource: "https://mcp.example.com/other", server: mcp))
+        XCTAssertFalse(MCPOAuth.covers(resource: "https://mcp.example.com/mcp", server: URL(string: "https://evil.example/mcp")!))
+    }
+
     func testChallengeParsing() {
         let c = MCPOAuth.parseChallenge(#"Bearer resource_metadata="https://mcp.example.com/.well-known/oauth-protected-resource/mcp", scope="read write", error="invalid_token""#)
         XCTAssertEqual(c?.resourceMetadata?.absoluteString, "https://mcp.example.com/.well-known/oauth-protected-resource/mcp")

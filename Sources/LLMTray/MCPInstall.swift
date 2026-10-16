@@ -188,6 +188,25 @@ final class MCPInstaller: ObservableObject {
         }
     }
 
+    /// Sign In, asked for: the browser opens whatever the server answers
+    /// unsigned (some list their tools to anyone), then it starts again.
+    func signInNow(_ id: UUID) async -> String? {
+        await hub.stop(id)
+        var challenge: MCPOAuth.Challenge?
+        do {
+            _ = try await hub.connect(id, forReview: true)
+        } catch MCPError.unauthorized(let header) {
+            challenge = MCPOAuth.parseChallenge(header)
+        } catch {}
+        await hub.stop(id)
+        do {
+            try await MCPSignIn.shared.signIn(id, challenge: challenge)
+        } catch {
+            return error is CancellationError ? NSLocalizedString("the sign-in was cancelled", comment: "MCP") : error.localizedDescription
+        }
+        return await hub.startForReview(id)
+    }
+
     // MARK: Updates
 
     static let notificationPrefix = "mcp-update-"

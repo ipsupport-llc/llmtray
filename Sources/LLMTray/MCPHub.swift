@@ -133,6 +133,12 @@ final class MCPHub: ObservableObject {
     func update(_ config: MCPServerConfig) {
         guard let i = servers.firstIndex(where: { $0.id == config.id }) else { return }
         let wasEnabled = servers[i].enabled
+        var config = config
+        // Another address: the sign-in for the old one goes (adr/0028).
+        if config.oauth != nil, MCPOAuth.canonical(config.url) != MCPOAuth.canonical(servers[i].url) {
+            config.oauth = nil
+            MCPSecrets.set(nil, server: config.id, name: MCPSignIn.tokensName)
+        }
         servers[i] = config
         save()
         publishGroups()
@@ -364,12 +370,16 @@ final class MCPHub: ObservableObject {
                 throw MCPError.closed("its URL isn't valid")
             }
             var headers = config.headers
-            for name in config.secretNames where name != MCPSignIn.tokensName {
+            // Never the sign-in's own secrets (tokens, a client secret).
+            for name in config.secretNames where !name.hasPrefix("oauth.") {
                 if let v = MCPSecrets.get(server: config.id, name: name) { headers[name] = v }
             }
             // A signed-in server: its access token on every request (adr/0028).
             let id = config.id
-            guard config.oauth != nil else { return MCPHTTPTransport(url: url, headers: headers) }
+            // A token only for the server it was issued for.
+            guard let state = config.oauth, MCPOAuth.covers(resource: state.resource, server: url) else {
+                return MCPHTTPTransport(url: url, headers: headers)
+            }
             let bearer: @Sendable () async -> String? = { await MCPSignIn.shared.token(id) }
             return MCPHTTPTransport(url: url, headers: headers, bearer: bearer)
         }

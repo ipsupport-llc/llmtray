@@ -13,6 +13,9 @@ final class MCPSignIn: ObservableObject {
     /// Servers being signed in to now.
     @Published private(set) var signingIn: Set<UUID> = []
     private var refreshes: [UUID: Task<String?, Never>] = [:]
+    /// Bumped by every sign-in and sign-out: a refresh that started before
+    /// one commits nothing.
+    private var generation: [UUID: Int] = [:]
     private let fetch = MCPOAuthHTTP()
     private var hub: MCPHub { MCPHub.shared }
     static let tokensName = "oauth.tokens"
@@ -44,6 +47,7 @@ final class MCPSignIn: ObservableObject {
     /// is forgotten too; a network failure keeps what there is.
     func refresh(_ id: UUID) async -> String? {
         if let running = refreshes[id] { return await running.value }
+        let started = generation[id, default: 0]
         let task = Task { @MainActor () -> String? in
             defer { refreshes.removeValue(forKey: id) }
             guard let config = hub.server(id), let state = config.oauth, let t = tokens(id) else { return nil }
@@ -52,12 +56,13 @@ final class MCPSignIn: ObservableObject {
                                                        resource: state.resource,
                                                        clientSecret: state.registration == .manual ? MCPSecrets.get(server: id, name: Self.clientSecretName) : nil,
                                                        fetch: fetch)
+                guard generation[id, default: 0] == started else { return tokens(id)?.accessToken }
                 store(fresh, for: id)
                 return fresh.accessToken
             } catch MCPOAuth.Failure.invalidGrant {
-                markNeedsSignIn(id, dropRegistration: false)
+                if generation[id, default: 0] == started { markNeedsSignIn(id, dropRegistration: false) }
             } catch MCPOAuth.Failure.invalidClient {
-                markNeedsSignIn(id, dropRegistration: state.registration == .dynamic)
+                if generation[id, default: 0] == started { markNeedsSignIn(id, dropRegistration: state.registration == .dynamic) }
             } catch {}
             return nil
         }
@@ -99,9 +104,12 @@ final class MCPSignIn: ObservableObject {
         let flow = MCPOAuth.Flow(metadata: discovery.server, clientID: client.id, registration: client.registration,
                                  resource: discovery.resourceURL, scope: scope, port: listener.port,
                                  clientSecret: client.registration == .manual ? MCPSecrets.get(server: id, name: Self.clientSecretName) : nil)
+        // Only a callback that passes the flow's checks ends the wait.
+        listener.accepts = { (try? flow.code(fromCallback: $0)) != nil || $0.contains("error=") && $0.contains("state=\(flow.state)") }
         NSWorkspace.shared.open(flow.authorizationURL)
         let target = try await listener.wait(timeout: 300)
         let fresh = try await MCPOAuth.exchange(flow, callback: target, fetch: fetch)
+        generation[id, default: 0] += 1
         store(fresh, for: id)
         config = hub.server(id) ?? config
         config.oauth = MCPOAuthState(metadata: discovery.server, clientID: client.id, registration: client.registration,
@@ -120,6 +128,7 @@ final class MCPSignIn: ObservableObject {
             request.httpBody = Data("token=\(token)&client_id=\(state.clientID.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")".utf8)
             _ = try? await fetch.fetch(request)
         }
+        generation[id, default: 0] += 1
         await hub.stop(id)
         markNeedsSignIn(id, dropRegistration: false)
     }
@@ -129,6 +138,9 @@ final class MCPSignIn: ObservableObject {
 /// takes the first request, answers it with a short page, and closes.
 final class LoopbackCallback: @unchecked Sendable {
     private let listener: NWListener
+    /// Whether a request target is the callback awaited; others get a 400
+    /// and the wait goes on (a stray request can't end the sign-in).
+    var accepts: (@Sendable (String) -> Bool)?
     private let queue = DispatchQueue(label: "LLMTray sign-in callback")
     private let lock = NSLock()
     private var continuation: CheckedContinuation<String, Error>?
@@ -164,11 +176,11 @@ final class LoopbackCallback: @unchecked Sendable {
             let line = text.split(separator: "\r\n").first.map(String.init) ?? ""
             let parts = line.split(separator: " ")
             let target = parts.count >= 2 && parts[0] == "GET" ? String(parts[1]) : ""
-            let ok = target.hasPrefix("/callback")
+            let ok = target.hasPrefix("/callback") && (self?.accepts?(target) ?? false)
             let page = ok
                 ? "<html><body style=\"font-family:-apple-system;padding:40px\"><h2>Signed in</h2><p>You can close this tab and go back to LLMTray.</p></body></html>"
-                : "<html><body>Not found</body></html>"
-            let response = "HTTP/1.1 \(ok ? "200 OK" : "404 Not Found")\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(page.utf8.count)\r\nConnection: close\r\n\r\n\(page)"
+                : "<html><body>Not this sign-in.</body></html>"
+            let response = "HTTP/1.1 \(ok ? "200 OK" : "400 Bad Request")\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(page.utf8.count)\r\nConnection: close\r\n\r\n\(page)"
             connection.send(content: Data(response.utf8), completion: .contentProcessed { _ in connection.cancel() })
             if ok { self?.deliver(target) }
         }

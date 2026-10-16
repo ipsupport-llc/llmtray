@@ -326,10 +326,17 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
     private var readers: [UUID: Task<Void, Never>] = [:]
     static let maxBody = 8 << 20
 
-    public init(url: URL, headers: [String: String], session: URLSession = .shared, bearer: (@Sendable () async -> String?)? = nil) {
+    public init(url: URL, headers: [String: String], session: URLSession? = nil, bearer: (@Sendable () async -> String?)? = nil) {
         self.url = url
         self.headers = headers
-        self.session = session
+        // Its own session: no cookies or stored credentials, and no request
+        // with a token or a header follows a redirect (adr/0028).
+        self.session = session ?? URLSession(configuration: {
+            let c = URLSessionConfiguration.ephemeral
+            c.httpCookieStorage = nil
+            c.urlCredentialStorage = nil
+            return c
+        }(), delegate: NoRedirects.shared, delegateQueue: nil)
         self.bearer = bearer
     }
 
@@ -431,4 +438,12 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
         }
         closer?("closed")
     }
+}
+
+/// Redirects are never followed for MCP requests: they carry a token or
+/// the server's headers, and the server's address is the one the user gave.
+final class NoRedirects: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    static let shared = NoRedirects()
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest) async -> URLRequest? { nil }
 }
