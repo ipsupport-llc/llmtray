@@ -77,11 +77,18 @@ public actor MCPClient {
             guard let self else { return }
             Task { await self.closed(why) }
         })
-        let reply = try await request("initialize", MCP.initializeParams(), timeout: timeout)
-        guard let result = reply.result else { throw MCPError.badReply }
+        let result: [String: Any]
+        do {
+            guard let r = try await request("initialize", MCP.initializeParams(), timeout: timeout).result else { throw MCPError.badReply }
+            result = r
+        } catch {
+            // Whatever went wrong, the child (or the session) goes with it.
+            await close()
+            throw error
+        }
         let version = result["protocolVersion"] as? String ?? ""
         guard MCP.protocolVersions.contains(version) else {
-            await transport.close()
+            await close()
             throw MCPError.unsupportedVersion(version.isEmpty ? "?" : version)
         }
         transport.agreed(version: version)
@@ -102,6 +109,7 @@ public actor MCPClient {
             guard let result = reply.result else { throw MCPError.badReply }
             let page = MCP.parseTools(result)
             tools += page.tools
+            guard tools.count < 1000 else { break }
             guard let next = page.next, !next.isEmpty, next != cursor else { break }
             cursor = next
         }
@@ -122,12 +130,11 @@ public actor MCPClient {
             let text = MCP.resultText(result)
             return .result(text: text.text, isError: text.isError)
         } catch {
-            // A lost session: the next call starts a new one (the owner
-            // restarts the client); this one's outcome stays unknown.
-            if (error as? MCPError) == .sessionExpired { closed("the session ended") }
             if error is CancellationError || (error as? MCPError) == .timedOut {
-                try? await transport.send(MCP.notification("notifications/cancelled",
-                                                           params: ["requestId": id, "reason": "The user stopped it, or it took too long."]))
+                // Not waited for: a server that stopped reading would hold it.
+                let transport = transport
+                Task { try? await transport.send(MCP.notification("notifications/cancelled",
+                                                                  params: ["requestId": id, "reason": "The user stopped it, or it took too long."])) }
             }
             return .unknown
         }
@@ -159,6 +166,12 @@ public actor MCPClient {
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<MCP.Message, Error>) in
                 pending[id] = continuation
+                // Stopped before the continuation was stored: the cancel
+                // handler found nothing to fail.
+                if Task.isCancelled {
+                    fail(id, CancellationError())
+                    return
+                }
                 // A write or a POST that fails may still have reached the
                 // server: from here on a call's outcome is unknown, not "not sent".
                 Task {
@@ -176,6 +189,9 @@ public actor MCPClient {
 
     private func fail(_ id: Int, _ error: Error) {
         pending.removeValue(forKey: id)?.resume(throwing: error)
+        // A lost session needs a new initialize: the client is done (its
+        // owner starts another); the call's outcome stays unknown.
+        if (error as? MCPError) == .sessionExpired { closed("the session ended") }
     }
 
     private func receive(_ data: Data) async {
@@ -190,7 +206,7 @@ public actor MCPClient {
                 }
                 continue
             }
-            if let id = message.id { pending.removeValue(forKey: id)?.resume(returning: message) }
+            if let id = message.rawID as? Int { pending.removeValue(forKey: id)?.resume(returning: message) }
         }
     }
 
@@ -280,6 +296,10 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
     private var version: String?
     private var onMessage: (@Sendable (Data) -> Void)?
     private var onClose: (@Sendable (String) -> Void)?
+    private var closed = false
+    /// SSE replies being read: cancelled by `close`.
+    private var readers: [UUID: Task<Void, Never>] = [:]
+    static let maxBody = 8 << 20
 
     public init(url: URL, headers: [String: String], session: URLSession = .shared) {
         self.url = url
@@ -304,7 +324,13 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json, text/event-stream", forHTTPHeaderField: "Accept")
         for (k, v) in headers { request.setValue(v, forHTTPHeaderField: k) }
-        let (sid, version, deliver) = lock.withLock { (sessionID, self.version, onMessage) }
+        let (sid, version, isClosed) = lock.withLock { (sessionID, self.version, closed) }
+        if isClosed { throw MCPError.closed("closed") }
+        // Delivered only while open: nothing comes in after close.
+        let deliver: @Sendable (Data) -> Void = { [weak self] data in
+            guard let self, let handler = self.lock.withLock({ self.closed ? nil : self.onMessage }) else { return }
+            handler(data)
+        }
         if let sid { request.setValue(sid, forHTTPHeaderField: "Mcp-Session-Id") }
         if let version { request.setValue(version, forHTTPHeaderField: "MCP-Protocol-Version") }
 
@@ -321,36 +347,46 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
         if http.statusCode == 202 { return }
         let type = http.value(forHTTPHeaderField: "Content-Type")?.lowercased() ?? ""
         if type.contains("text/event-stream") {
-            // Read on: the reply comes as an event, maybe after others.
-            Task.detached {
+            // Read on: the reply comes as an event, maybe after others. At
+            // most 8 MB per event and 32 MB per stream; cancelled by close.
+            let key = UUID()
+            let reader = Task.detached { [weak self] in
                 var event = ""
+                var total = 0
                 do {
                     for try await line in bytes.lines {
+                        if Task.isCancelled { break }
+                        total += line.utf8.count + 1
+                        if total > Self.maxBody * 4 { break }
                         if line.hasPrefix("data:") {
                             event += (event.isEmpty ? "" : "\n") + line.dropFirst(5).trimmingCharacters(in: .whitespaces)
+                            if event.utf8.count > Self.maxBody { break }
                         } else if line.isEmpty, !event.isEmpty {
-                            deliver?(Data(event.utf8))
+                            deliver(Data(event.utf8))
                             event = ""
                         }
                     }
-                    if !event.isEmpty { deliver?(Data(event.utf8)) }
+                    if !event.isEmpty, !Task.isCancelled { deliver(Data(event.utf8)) }
                 } catch {}
+                self?.lock.withLock { _ = self?.readers.removeValue(forKey: key) }
             }
+            lock.withLock { readers[key] = reader }
         } else {
             var body = Data()
             for try await byte in bytes {
                 body.append(byte)
-                if body.count > 8 << 20 { throw MCPError.badReply }
+                if body.count > Self.maxBody { throw MCPError.badReply }
             }
-            if !body.isEmpty { deliver?(body) }
+            if !body.isEmpty { deliver(body) }
         }
     }
 
     public func close() async {
-        let (sid, closer) = lock.withLock { () -> (String?, (@Sendable (String) -> Void)?) in
-            defer { sessionID = nil; onClose = nil }
-            return (sessionID, onClose)
+        let (sid, closer, running) = lock.withLock { () -> (String?, (@Sendable (String) -> Void)?, [Task<Void, Never>]) in
+            defer { sessionID = nil; onClose = nil; closed = true; readers = [:] }
+            return (sessionID, onClose, Array(readers.values))
         }
+        running.forEach { $0.cancel() }
         if let sid {
             var request = URLRequest(url: url)
             request.httpMethod = "DELETE"

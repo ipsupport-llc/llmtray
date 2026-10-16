@@ -296,6 +296,14 @@ final class MCPTests: XCTestCase {
         // Past the time limit: unknown, never retried.
         let slow = await client.call("slow", arguments: [:], timeout: 0.5)
         XCTAssertEqual(slow, .unknown)
+        // Stop: unknown at once, not after the time limit.
+        let started = Date()
+        let stopped = Task { await client.call("slow", arguments: [:], timeout: 60) }
+        try await Task.sleep(nanoseconds: 200_000_000)
+        stopped.cancel()
+        let stoppedOutcome = await stopped.value
+        XCTAssertEqual(stoppedOutcome, .unknown)
+        XCTAssertLessThan(Date().timeIntervalSince(started), 3)
         try await Task.sleep(nanoseconds: 300_000_000)
         XCTAssertTrue(log.text.contains("called echo"))
         XCTAssertTrue(changed.text.contains("changed"))

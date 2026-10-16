@@ -184,7 +184,7 @@ public enum MCPImport {
                 f.workingDirectory = s["cwd"] as? String
                 return f
             }
-            if let url = (s["url"] as? String) ?? (s["serverUrl"] as? String), URL(string: url)?.scheme?.hasPrefix("http") == true {
+            if let url = (s["url"] as? String) ?? (s["serverUrl"] as? String), ["http", "https"].contains(URL(string: url)?.scheme?.lowercased() ?? "") {
                 var f = Found(name: name, kind: .url)
                 f.url = url
                 f.headers = (s["headers"] as? [String: Any] ?? [:]).mapValues { "\($0)" }
