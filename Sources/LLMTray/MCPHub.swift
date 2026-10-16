@@ -31,6 +31,8 @@ final class MCPHub: ObservableObject {
     }
 
     private var clients: [UUID: MCPClient] = [:]
+    /// The stdio transports, for the kill at quit.
+    private var transports: [UUID: MCPStdioTransport] = [:]
     private var starts: [UUID: Task<MCPClient, Error>] = [:]
     private var idleTimer: Timer?
 
@@ -229,6 +231,7 @@ final class MCPHub: ObservableObject {
         let start = Task { @MainActor () throws -> MCPClient in
             states[id, default: ServerState()].status = .starting
             let transport = try self.transport(for: config)
+            if let stdio = transport as? MCPStdioTransport { transports[id] = stdio }
             let client = MCPClient(transport: transport)
             await client.setToolsChanged { Task { @MainActor in await MCPHub.shared.refreshTools(id) } }
             let info = try await client.start()
@@ -354,11 +357,18 @@ final class MCPHub: ObservableObject {
     func stop(_ id: UUID) async {
         starts[id]?.cancel()
         if let client = clients.removeValue(forKey: id) { await client.close() }
+        transports.removeValue(forKey: id)
         if states[id]?.status != .crashing { states[id]?.status = .stopped }
     }
 
     func stopAll() async {
         for id in Array(clients.keys) { await stop(id) }
+    }
+
+    /// At quit: every server child goes now.
+    func killAllNow() {
+        transports.values.forEach { $0.killNow() }
+        transports = [:]
     }
 
     private func stopIdle() {

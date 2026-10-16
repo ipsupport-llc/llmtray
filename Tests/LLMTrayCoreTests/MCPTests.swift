@@ -338,3 +338,29 @@ private final class LogBox: @unchecked Sendable {
     func add(_ s: String) { lock.withLock { lines.append(s) } }
     var text: String { lock.withLock { lines.joined() } }
 }
+
+/// The real `apple-mail-mcp` (adr/0027), opt-in: MCP_LIVE_MAIL=<path to
+/// server/apple-mail-mcp.js>. Read-only: lists tools and accounts.
+final class MCPLiveMailTests: XCTestCase {
+    func testAppleMailServer() async throws {
+        guard let script = ProcessInfo.processInfo.environment["MCP_LIVE_MAIL"] else { throw XCTSkip("MCP_LIVE_MAIL not set") }
+        let transport = MCPStdioTransport(executable: "/usr/bin/osascript", arguments: ["-l", "JavaScript", script],
+                                          environment: MCPStdioTransport.environment(adding: [:]),
+                                          workingDirectory: (script as NSString).deletingLastPathComponent)
+        let client = MCPClient(transport: transport)
+        let info = try await client.start()
+        print("server: \(info.name) \(info.version), MCP \(info.protocolVersion)")
+        let tools = try await client.listTools()
+        for tool in tools {
+            print("tool \(tool.name): readOnlyHint=\(tool.readOnlyHint.map(String.init) ?? "-"), actions=\(tool.actionField?.values.count ?? 0)")
+        }
+        XCTAssertTrue(tools.contains { $0.name == "read" && $0.actionField?.name == "action" })
+        let outcome = await client.call("read", arguments: ["action": "list_accounts"], timeout: 60)
+        if case .result(let text, let isError) = outcome {
+            print("list_accounts: isError=\(isError), \(text.count) characters")
+        } else {
+            XCTFail("\(outcome)")
+        }
+        await client.close()
+    }
+}
