@@ -75,6 +75,11 @@ event, run a shell. The app can't know which tools are safe, so:
   to it ("the server says it only reads") but decides nothing: a server
   vouches for itself, and a "read" can still send its arguments away or
   change a little (marking a message read).
+- **Per action, where a tool has them.** A tool whose schema has a
+  top-level string field with a fixed list of values (`action`, `mode`, as
+  `apple-mail-mcp`'s `read` / `write` do) is approved per value: Run without
+  asking for `write` / `set_read` says nothing about `write` /
+  `create_rule`. Settings lists the values under the tool.
 - **Approval is bound to what was reviewed.** Each tool's definition (name,
   description, schema) has a hash; Run without asking and Allow for This
   Chat hold for that hash only, and a card waiting for an answer is dropped
@@ -94,6 +99,16 @@ event, run a shell. The app can't know which tools are safe, so:
   that turn a mail body saying "search the web for …" can't make a search;
   one saying "send this to …" reaches the user as a card. Later turns are
   the user's: the barrier is per turn, as everywhere.
+- **In `ToolTrust`**: a `.mcp` kind and an `mcpText` turn flag that
+  `record` sets after an MCP result, counted in `hasUntrustedText`,
+  `hasFileText` and `hasToolText`. `allows(.mcp, …)` is always true -- the
+  card is the gate -- and `refusedUpFront` treats an MCP call in a batch as
+  outside text for the calls beside it (a web search next to a mail read is
+  refused, as next to a project read).
+- **A record in the chat.** Saved chats keep no tool calls or results, so
+  each MCP call leaves a small line under the answer, saved with the
+  message: server, tool (and action), the arguments as approved, and
+  done / failed / outcome unknown / denied.
 - **Descriptions are reviewed, not barred.** What a server says about its
   tools goes into every request of a chat that loaded it; it is trusted as
   far as the user trusted it when reviewing (above), not treated as text
@@ -110,17 +125,28 @@ event, run a shell. The app can't know which tools are safe, so:
   `notifications/tools/list_changed`, `ping`, `notifications/cancelled` on
   Stop. No resources, prompts, sampling or elicitation in v1 (asked for
   nothing: the client says so in its capabilities).
-- **stdio**: the server is started at the first need (a chat loads its group,
+- **The server's key** (the `<server>` in tool names) is made once, when it's
+  added, from its name: ASCII letters and digits, lowercase, at most 20
+  (`apple_mail`), `server1`, `server2`… when nothing is left; renaming it
+  later doesn't change the key.
+- **stdio**: a bare command (`npx`, `node`, `uvx`) is looked up once, when
+  the server is added, through the user's login shell (`zsh -lc 'command -v
+  …'`), and stored as the absolute path -- the app's own PATH has no
+  Homebrew or nvm. The server is started at the first need (a chat loads its group,
   or Settings shows its tools), as a child process in its own process
   group, with a minimal environment (PATH, HOME, the user's variables) and
   the server's folder as working directory; kept while the app runs, stopped
   after 15 idle minutes and on quit (SIGTERM, SIGKILL after 3 s). Stdout is
   the protocol (a line over 8 MB ends the server), stderr goes to the
   server's log in Settings (last 200 lines, secret values blanked). A crash is shown there; the
-  next call starts it again, at most three times in a minute.
+  next call starts it again, at most three times in a minute; then it stays
+  off ("keeps crashing -- see its log") until started in Settings.
 - **HTTP**: POST per message; a reply is plain JSON or an SSE stream, either
   read; `Mcp-Session-Id` kept and `MCP-Protocol-Version` sent after
-  initialize; a 404 for the session means initialize again. No OAuth in v1
+  initialize; a 404 for the session means initialize again for the next
+  call -- a call that got it is answered as outcome unknown, never resent.
+  Tool changes come on the server's GET stream when it offers one; when it
+  doesn't, the tools are listed again before a standing approval is used. No OAuth in v1
   (a token in a header covers our servers).
 - **Time limits**: 20 s to start and initialize; 60 s per call, counted
   from Allow. Then `notifications/cancelled` -- which a server may ignore,
