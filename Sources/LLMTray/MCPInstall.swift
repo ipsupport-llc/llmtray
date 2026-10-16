@@ -231,7 +231,13 @@ final class MCPInstaller: ObservableObject {
                     found.version = entry.version
                 }
             }
-            let values = Self.defaults(found).merging(config.answers) { _, kept in kept }
+            var values = Self.defaults(found).merging(config.answers) { _, kept in kept }
+            // A secret already in the Keychain stays: its default doesn't
+            // replace what the user gave.
+            for ask in found.asks where Self.isSecret(ask, in: found)
+                && (MCPSecrets.get(server: id, name: "user_config.\(ask.key)") ?? MCPSecrets.get(server: id, name: ask.key)) != nil {
+                values[ask.key] = ""
+            }
             // A new required setting nobody gave: not now.
             let missing = found.asks.filter { ask in
                 ask.required && (values[ask.key] ?? "").isEmpty

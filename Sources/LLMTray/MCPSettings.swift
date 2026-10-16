@@ -591,6 +591,8 @@ private struct PasteConfigSheet: View {
 /// description under it.
 private struct AskField: View {
     let ask: MCPImport.Ask
+    /// Shown as a secret: the bundle says so, or it looks like one.
+    var secret = false
     @Binding var value: String
 
     var body: some View {
@@ -609,7 +611,7 @@ private struct AskField: View {
             case .number:
                 TextField(ask.title + (ask.required ? " *" : ""), text: $value)
             case .string:
-                if ask.sensitive {
+                if ask.sensitive || secret {
                     SecureField(ask.title + (ask.required ? " *" : ""), text: $value)
                 } else {
                     TextField(ask.title + (ask.required ? " *" : ""), text: $value)
@@ -654,7 +656,8 @@ private struct AsksSheet: View {
             }
             Form {
                 ForEach(found.asks, id: \.key) { ask in
-                    AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }))
+                    AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }),
+                             secret: MCPInstaller.isSecret(ask, in: found))
                 }
             }
             .formStyle(.grouped)
@@ -721,7 +724,8 @@ private struct ConfigureSheet: View {
                             GroupBox("Settings") {
                                 VStack(alignment: .leading, spacing: 10) {
                                     ForEach(found.asks, id: \.key) { ask in
-                                        AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }))
+                                        AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }),
+                                                 secret: MCPInstaller.isSecret(ask, in: found))
                                     }
                                     HStack {
                                         Spacer()
