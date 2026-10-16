@@ -331,6 +331,18 @@ public enum MemoryText {
 
     /// Why `text` can't be a note; nil when it can. A note is about the
     /// person and their work, never a place to keep links, paths or keys.
+    /// Whether an observation's "how to answer" reads as the assistant
+    /// talking to the user -- in the first person or as a question -- rather
+    /// than an instruction ("Stay calm and go straight to the fix").
+    public static func readsAsReply(_ text: String) -> Bool {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.hasSuffix("?") { return true }
+        let lower = t.lowercased()
+        let starts = ["i ", "i'd ", "i'll ", "i'm ", "i’d ", "i’ll ", "i’m ", "sure", "of course", "happy to", "glad to",
+                      "я ", "конечно", "с удовольствием", "рад ", "буду рад", "охотно", "звичайно", "із задоволенням"]
+        return starts.contains { lower.hasPrefix($0) }
+    }
+
     public static func problem(_ text: String) -> Problem? {
         let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if t.isEmpty { return .empty }
