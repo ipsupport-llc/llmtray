@@ -128,6 +128,10 @@ public enum MemoryReflection {
         // Only an observation keeps what was observed.
         guard op.kind == .observation else { return true }
         if let observed = op.observed, MemoryText.unlearnable(observed) { return false }
+        // Its text tells the assistant how to answer; a small model wrote a
+        // reply to the user instead ("I'd be happy to help with your
+        // creative requests.").
+        if MemoryText.readsAsReply(text) { return false }
         return MemoryText.observationTopics.contains(MemoryTopics.learned(op.topic))
     }
 

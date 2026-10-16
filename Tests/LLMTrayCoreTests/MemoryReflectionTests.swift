@@ -66,6 +66,18 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertNil(MemoryReflection.parseRelations("{}", count: 1))
     }
 
+    func testAnObservationWrittenAsAReplyIsDropped() {
+        for text in ["I'd be happy to help with your creative requests.", "Конечно, я посмотрю. Что именно вас интересует?",
+                     "Я буду рад помочь с вашими запросами.", "What would you like to change?"] {
+            XCTAssertTrue(MemoryText.readsAsReply(text), text)
+        }
+        for text in ["Stay calm and go straight to the fix", "Сохранять спокойствие и сразу переходить к решению", "Be brief when they swear"] {
+            XCTAssertFalse(MemoryText.readsAsReply(text), text)
+        }
+        let op = MemoryReflection.parseOperations(#"{"op":"add","kind":"observation","topic":"tone","observed":"Polite","text":"I'd be happy to help.","quote":"q"}"#)!.first!
+        XCTAssertFalse(MemoryReflection.mayLearn(op))
+    }
+
     func testSpansAreLastingOnlyWhenSaidSo() {
         XCTAssertEqual(MemoryReflection.parseSpans(#"{"spans":["lasting"]}"#, count: 1), [.lasting])
         XCTAssertEqual(MemoryReflection.parseSpans(#"{"spans":["Task","maybe"," LASTING "]}"#, count: 3), [.task, .task, .lasting])
