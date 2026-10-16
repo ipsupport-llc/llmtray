@@ -31,6 +31,6 @@ here; this is where the history lives.
 | [0023](0023-spoken-messages.md) | Spoken messages for models that hear: click for a clip, hold to talk; WAV to the runtime's `input_audio` |
 | [0024](0024-memory.md) | Memory between chats: notes learned only from the user's own words, reconciled into one note per claim across languages and models, injected within a budget, aging by kind; opt-in, all local |
 | [0025](0025-apple-system-model.md) | Apple's on-device model (FoundationModels): memory's reader in-process, then a chat model served by the proxy itself; app only, no cloud, nothing to download |
-| [0027](0027-mcp-client.md) | MCP servers the user adds (command, URL, .mcpb, pasted config, the official registry) as on-demand tool groups; every call asked unless allowed per tool, all asked after outside text; own small client (proposed) |
+| [0027](0027-mcp-client.md) | MCP servers the user adds (command, URL, .mcpb, pasted config, the official registry) as on-demand tool groups; every call asked unless allowed per tool, all asked after outside text; own small client |
 
 New ADR: next number, one topic, the decision first, then why.

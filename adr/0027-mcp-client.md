@@ -1,6 +1,6 @@
 # 0027 — MCP servers: the chat uses tools from servers the user adds
 
-**Status: proposed** (2026-10-16). The user's call: "пора делать" -- connect
+**Status: accepted** (2026-10-16, by the user). The user's call: "пора делать" -- connect
 ready MCP servers instead of writing each integration ourselves. The first
 one is our own `ipsupport-llc/apple-mail-mcp` (Mail, Calendar, Notes), instead of
 the Mail tools drafted in PR #339 (closed; its findings on Mail scripting
