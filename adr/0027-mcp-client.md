@@ -10,7 +10,10 @@ and trust are folded in below).
 
 LLMTray's chat becomes an MCP client. A server the user adds gives the chat
 its tools, the way the built-in ones work: declared, called, answered as
-`role: tool` ([0007](0007-chat-tools.md)).
+`role: tool` ([0007](0007-chat-tools.md)). Our own tools stay native (0007's
+reasons hold for them: images, songs, the generator queue); 0007's "no MCP
+client" now means "not for our own tools", and its limits apply to MCP calls
+too (rounds and calls per turn, dangling calls closed on Stop).
 
 - **Opt-in, per server.** Settings › Tools › MCP Servers lists the servers;
   none is there until the user adds one. A server can be switched off
@@ -18,19 +21,32 @@ its tools, the way the built-in ones work: declared, called, answered as
 - **Adding a server**, three ways:
   - **A command** (stdio): command, arguments, environment.
   - **A URL** (Streamable HTTP), with optional headers (a token).
-  - **Import**: an `.mcpb` bundle (unpacked into the app's data, its
-    `manifest.json` read for the command; what Claude Desktop installs with a
-    double click), or the servers in Claude Desktop's
-    `claude_desktop_config.json`, picked from a list.
-  Secrets (environment values and headers the user marks secret) go to the
-  Keychain, not to the settings file.
+  - **Import**: an `.mcpb` bundle (what Claude Desktop installs with a
+    double click), or servers from Claude Desktop's
+    `claude_desktop_config.json`, picked from a list. A bundle is a zip:
+    unpacked into a fresh folder in the app's data, entries whose path
+    leaves it or that are links refused, at most 200 MB unpacked. Its
+    `manifest.json` `server.mcp_config` gives the command, with
+    `${__dirname}`, `${HOME}` and `${user_config.<key>}` filled in (the
+    user is asked for `user_config` values at import; `sensitive` ones go to
+    the Keychain); a bundle needing anything else is refused with what.
+  Nothing runs before the user confirms: adding shows the command or URL in
+  full; **Start and Review** then starts the server once and shows its name,
+  description and every tool with its description and arguments, and the
+  user turns the server on. Environment values and headers marked secret
+  (default for names with KEY, TOKEN, SECRET, PASSWORD, AUTH) go to the
+  Keychain and are blanked in the server's log.
 - **Each server is a tool group** ([0020](0020-documents.md), "Tools loaded
   when needed"): on demand by default (`load_tools` names it with the
   server's description; the + menu has **Use <server>**), Always in a profile
   if the user sets it. A server with 40 tools costs nothing until a chat
-  loads it. Tool names go to the model as `<server>_<tool>` (letters, digits,
-  `_`, at most 64 characters), so two servers can't clash with each other or
-  with ours.
+  loads it. 0020's rules hold: after outside text in a turn a load waits for
+  the user's next message (`pendingToolGroups`); a call to a server's tool
+  before its group is loaded is answered "call load_tools first"; a server
+  switched off answers that it is off. Tool names go to the model as
+  `<server>_<tool>` within MCP's `[A-Za-z0-9_-]{1,64}`; the app hands them
+  out and keeps the exact map back to (server, tool), adding a number to a
+  name already taken (ours included), so a call never reaches another tool.
 - **Schemas as the server gives them.** A tool's `inputSchema` is sent to the
   model unchanged (JSON Schema is what the chat template takes); the
   arguments the model writes are read as JSON, with the usual repair of a
@@ -49,29 +65,47 @@ event, run a shell. The app can't know which tools are safe, so:
 - **Every call is asked**, unless the user let that tool run without asking.
   The card shows the server, the tool and its arguments in full, with
   **Allow**, **Allow for This Chat** and **Deny** (no Return shortcut, as the
-  folder plan's Approve). A deny is answered to the model ("the user didn't
-  allow this call") and the turn goes on.
-- **Run without asking** is a per-tool switch in Settings, default on only
-  for tools the server marks `readOnlyHint: true`; the user can change it
-  either way. A tool the server changes (a new description or schema, by
-  `tools/list_changed` or at a restart) loses the switch until the user
-  looks at it again.
+  folder plan's Approve), and says the server may do more than the
+  arguments show (a mail reply's recipients and quoted text are Mail's).
+  A deny is answered to the model ("the user didn't allow this call; don't
+  ask again unless the user does") and that tool is refused for the rest of
+  the turn: no consent loop ([0014](0014-folder-tools.md), Hardening 9).
+- **Run without asking** is a per-tool switch in Settings, off for every
+  tool until the user turns it on. A server's `readOnlyHint` is shown next
+  to it ("the server says it only reads") but decides nothing: a server
+  vouches for itself, and a "read" can still send its arguments away or
+  change a little (marking a message read).
+- **Approval is bound to what was reviewed.** Each tool's definition (name,
+  description, schema) has a hash; Run without asking and Allow for This
+  Chat hold for that hash only, and a card waiting for an answer is dropped
+  if the server changes the tool. A tool or server changed or added since the
+  review (`tools/list_changed`, a restart, an update) is hidden from the
+  model until the user reviews it in Settings. Just before sending a call
+  the app checks again that the server is on and the hash is the same.
 - **After outside text, everything is asked.** Once the turn has file,
-  folder, web or MCP text in it (`ToolTrust`'s `hasUntrustedText`), every MCP
-  call is asked, run-without-asking or not, and the card says above Allow
-  "Proposed right after reading outside text -- check it". "Allow for This
-  Chat" isn't offered then.
+  folder, web or MCP text in it (`hasUntrustedText || networkText`), every
+  MCP call is asked, run-without-asking or Allow for This Chat or not, and
+  the card says above Allow "Proposed right after reading outside text --
+  check it". "Allow for This Chat" isn't offered then.
 - **MCP results are outside text.** A new trust kind, `mcp`, counts in
   `hasUntrustedText`, `hasFileText` and `hasToolText`: after an MCP result,
   network tools and generators are refused for the turn, a pin is refused,
-  folder changes go to their plan flagged ([0014](0014-folder-tools.md),
-  Hardening 2 revised). A mail body saying "search the web for …" leaks
-  nothing; one saying "send this to …" reaches the user as a card.
+  folder changes go to their plan flagged (0014, Hardening 2 revised). In
+  that turn a mail body saying "search the web for …" can't make a search;
+  one saying "send this to …" reaches the user as a card. Later turns are
+  the user's: the barrier is per turn, as everywhere.
+- **Descriptions are reviewed, not barred.** What a server says about its
+  tools goes into every request of a chat that loaded it; it is trusted as
+  far as the user trusted it when reviewing (above), not treated as text
+  read this turn -- else loading a mail server would switch off web search
+  for the whole chat.
 
 ## The client
 
-- **Our own, small**, no package: JSON-RPC 2.0, the `2025-06-18` protocol
-  (and what the server answers with, if older); `initialize` /
+- **Our own, small**, no package: JSON-RPC 2.0. Protocol versions
+  `2025-06-18`, `2025-03-26` and `2024-11-05` (what `apple-mail-mcp`
+  answers): we ask for the newest, accept one of these back, and refuse any
+  other; `initialize` /
   `notifications/initialized`, `tools/list` (paged), `tools/call`,
   `notifications/tools/list_changed`, `ping`, `notifications/cancelled` on
   Stop. No resources, prompts, sampling or elicitation in v1 (asked for
@@ -82,29 +116,38 @@ event, run a shell. The app can't know which tools are safe, so:
   the server's folder as working directory; kept while the app runs, stopped
   after 15 idle minutes and on quit (SIGTERM, SIGKILL after 3 s). Stdout is
   the protocol (a line over 8 MB ends the server), stderr goes to the
-  server's log in Settings (last 200 lines). A crash is shown there; the
+  server's log in Settings (last 200 lines, secret values blanked). A crash is shown there; the
   next call starts it again, at most three times in a minute.
-- **HTTP**: POST per message, `Mcp-Session-Id` kept, SSE replies read; no
-  OAuth in v1 (a token in a header covers our servers).
-- **Time limits**: 60 s per call (then `notifications/cancelled` and an
-  error answer), 20 s to start and initialize. A call's time counts while
-  the card waits only from Allow.
+- **HTTP**: POST per message; a reply is plain JSON or an SSE stream, either
+  read; `Mcp-Session-Id` kept and `MCP-Protocol-Version` sent after
+  initialize; a 404 for the session means initialize again. No OAuth in v1
+  (a token in a header covers our servers).
+- **Time limits**: 20 s to start and initialize; 60 s per call, counted
+  from Allow. Then `notifications/cancelled` -- which a server may ignore,
+  and a busy one can't read -- and the answer says the outcome is unknown:
+  "it may have happened; check before trying again, and don't repeat it
+  without asking the user". The same after Stop. Nothing is retried by the
+  app, ever. A server whose call timed out is restarted before the next
+  call.
 - **macOS permissions** go to whoever sends the Apple events: an `osascript`
   server started by LLMTray is attributed to LLMTray ("LLMTray wants to
   control Mail"). The Developer ID build gets
   `com.apple.security.automation.apple-events` and an
-  `NSAppleEventsUsageDescription` for that. To check on the user's Mac in
-  the first run.
+  `NSAppleEventsUsageDescription` for that. That the prompt names LLMTray,
+  not `osascript`, is to be checked on the user's Mac in the first run; if
+  it names `osascript`, the permission is still per app pair and works, only
+  the wording differs.
 
 ## Where it doesn't go
 
-- **Temporary chats**: servers can be loaded, every call is asked (nothing
-  runs without the card, since the chat leaves no trace of what it did).
+- **Temporary chats**: no MCP. They leave no trace, so a send or delete
+  from one couldn't be looked up later; the folder tools there only read.
 - **External clients through the proxy**: no. They have their own MCP; the
   app's servers serve its chat only.
 - **Memory** never reads tool results ([0024](0024-memory.md)).
-- **App Store flavor**: the sandbox can't start other programs, so only URL
-  servers there; command servers and imports are hidden.
+- **App Store flavor**: only URL servers. A command server there would run
+  inside our sandbox (children inherit it) and couldn't reach what it's
+  for; command servers and imports are hidden (a scope choice, for now).
 
 ## Plan
 
