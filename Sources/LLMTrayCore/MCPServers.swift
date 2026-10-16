@@ -483,25 +483,36 @@ public enum MCPSource: Codable, Equatable, Sendable {
 }
 
 /// Who stands behind a server: IPSupport's own (ipsupport-llc on GitHub or
-/// in the registry) or a third party, with no warranty from us.
+/// in the registry) or a third party, with no warranty from us. Decided by
+/// what is verified -- a registry namespace, an exact GitHub owner -- never
+/// by text a publisher writes (a repository field, a description).
 public enum MCPVendor {
     public static let owner = "ipsupport-llc"
 
-    /// A GitHub URL or a registry name of ours.
-    public static func isIPSupport(_ text: String?) -> Bool {
-        guard let t = text?.lowercased() else { return false }
-        return t.hasPrefix("io.github.\(owner)/") || t.contains("github.com/\(owner)/")
+    /// A registry name in our namespace (the registry checks namespaces).
+    public static func isIPSupport(registryName name: String) -> Bool {
+        name.lowercased().hasPrefix("io.github.\(owner)/")
+    }
+
+    /// https://github.com/ipsupport-llc/… exactly.
+    public static func isIPSupport(gitHubURL text: String?) -> Bool {
+        guard let text, let url = URL(string: text), url.scheme?.lowercased() == "https",
+              url.host?.lowercased() == "github.com" else { return false }
+        return url.path.split(separator: "/").first.map { $0.lowercased() == owner } ?? false
+    }
+
+    /// An install's source, as recorded.
+    public static func isIPSupport(_ source: MCPSource?) -> Bool {
+        switch source {
+        case .githubRelease(let o, _, _)?: return o.lowercased() == owner
+        case .registry(let name)?: return isIPSupport(registryName: name)
+        case nil: return false
+        }
     }
 }
 
 extension MCPServerConfig {
-    /// Published by IPSupport (adr/0027): everything else is third-party.
-    public var isFromIPSupport: Bool {
-        switch source {
-        case .githubRelease(let owner, _, _)?: if owner.lowercased() == MCPVendor.owner { return true }
-        case .registry(let name)?: if MCPVendor.isIPSupport(name) { return true }
-        case nil: break
-        }
-        return MCPVendor.isIPSupport(origin)
-    }
+    /// Published by IPSupport (adr/0027): by its recorded source only;
+    /// everything else is third-party.
+    public var isFromIPSupport: Bool { MCPVendor.isIPSupport(source) }
 }

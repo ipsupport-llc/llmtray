@@ -98,11 +98,7 @@ struct ToolsPane: View {
                 found.forEach { install($0, origin: NSLocalizedString("Pasted config", comment: "MCP server origin"), source: nil) }
             }
             case .asks(let found, let origin, let source):
-                AsksSheet(found: found, approved: MCPVendor.isIPSupport(origin) || {
-                    if case .githubRelease(let owner, _, _)? = source { return owner.lowercased() == MCPVendor.owner }
-                    if case .registry(let name)? = source { return MCPVendor.isIPSupport(name) }
-                    return false
-                }()) { values in
+                AsksSheet(found: found, approved: MCPVendor.isIPSupport(source)) { values in
                     Task { await installer.finish(found, values: values, origin: origin, source: source) }
                 }
             case .configure(let id): ConfigureSheet(serverID: id)
@@ -342,7 +338,7 @@ private struct DiscoverView: View {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(featured, id: \.bundleURL) { item in
                             Card(icon: item.iconURL, title: item.title, description: item.description, publisher: item.publisher,
-                                 approved: MCPVendor.isIPSupport(item.repository),
+                                 approved: MCPVendor.isIPSupport(MCPSource.githubRelease(url: item.bundleURL)),
                                  state: state(source: MCPSource.githubRelease(url: item.bundleURL), name: item.title),
                                  install: { installFeatured(item) })
                         }
@@ -363,7 +359,7 @@ private struct DiscoverView: View {
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(entries) { entry in
                         Card(icon: entry.iconURL, title: entry.title, description: entry.description, publisher: entry.publisher,
-                             approved: MCPVendor.isIPSupport(entry.name) || MCPVendor.isIPSupport(entry.repository),
+                             approved: MCPVendor.isIPSupport(registryName: entry.name),
                              state: entryState(entry), install: { install(entry) })
                     }
                 }
