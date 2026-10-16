@@ -2,6 +2,7 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+" · running" = " · 執行中";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "自本回答引用後，「%@」已變更：第 %lld 頁的內容可能已不同。";
 "\"%@\" is no longer in the project." = "「%@」已不再包含於專案中。";
 "%.0f%% from drafts" = "%.0f%% 來自草稿";
@@ -11,6 +12,7 @@
 "%1$@ asks for %2$@" = "%1$@ 請求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 請求 %2$@。切換會卸載目前載入的模型。";
 "%1$@ items, %2$@" = "%1$@ 項目，%2$@";
+"%1$@: the command %2$@ wasn't found." = "%1$@：找不到指令 %2$@。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 個副本無法與原始檔比較，已取消勾選：%2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 個副本與原始檔不同，因此不是重複項：%2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld 已完成，%2$lld 已復原，%3$lld 失敗";
@@ -18,13 +20,16 @@
 "%1$lld items, %2$@." = "%1$lld 項目，%2$@。";
 "%1$lld items, at least %2$@." = "%1$lld 項目，至少 %2$@。";
 "%1$lld of %2$lld changes selected" = "已選取 %1$lld / %2$lld 項變更";
+"%@ %lld · MCP %lld" = "%@ %lld · MCP %lld";
 "%@ (LM Studio's, shared with it)" = "%@（LM Studio 的，與之共用）";
+"%@ On in This Chat" = "%@ 已在此聊天中開啟";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ 已存在且不是 LLMTray 的。請先移除它以安裝 LLMTray 的版本。";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ 已存在且指向 %@。請先移除它以安裝 LLMTray 的版本。";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ 無法讀取聊天以用於記憶：另一個模型正在讀取它的聊天。";
 "%@ didn't download: %@" = "%@ 未下載：%@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ 是一個指向目前無法使用之資料夾的連結：請連接其磁碟，或移除該連結。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 已受限制：請在 huggingface.co/%@ 接受其授權，然後在「設定 → Models」新增 Hugging Face 代幣。";
+"%@ is on in this chat: you'll be asked before each call." = "%@ 已在此聊天中開啟：每次呼叫前都會先詢問你。";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ 不是 LLMTray 的連結，已保留原樣。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ 尚未下載 — 請在「設定」中重新啟用影像生成功能。";
 "%@ isn't installed yet" = "%@ 尚未安裝";
@@ -66,6 +71,8 @@
 "%lld requests" = "%lld 個請求";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld 個進行中的請求（依「並行要求數」設定的上限同時回應）";
 "%lld s" = "%lld 秒";
+"%lld tools new or changed: hidden from the chat until reviewed." = "%lld 個工具是新增或已變更：在評論前會對聊天隱藏。";
+"%lld tools%@" = "%lld 個工具%@";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位元";
 "(Please attach the report file shown in Finder.)" = "（請在 Finder 中附上報告檔案。）";
@@ -106,10 +113,16 @@
 "About you" = "關於你";
 "About you and your work: what you do, what you use." = "關於你和你的工作：你做什麼、使用什麼。";
 "Add" = "新增";
+"Add %@" = "新增 %@";
 "Add Files to “%@”…" = "將檔案加入「%@」…";
 "Add Files…" = "加入檔案…";
 "Add Note…" = "新增附註…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "將 PDF、Word 與文字檔加入專案。對話會搜尋並引用頁面；將檔案釘選可將整個檔案保留在對話中。";
+"Add Server" = "新增伺服器";
+"Add a Command Server" = "新增指令伺服器";
+"Add a Command…" = "新增指令⋯";
+"Add a URL Server" = "新增 URL 伺服器";
+"Add a URL…" = "新增 URL⋯";
 "Add files" = "加入檔案";
 "Add files or folders" = "加入檔案或檔案夾";
 "Add files or images" = "加入檔案或影像";
@@ -139,6 +152,7 @@
 "Allow Once" = "允許一次";
 "Allow connections from the local network" = "允許來自區域網路的連線";
 "Allow folders" = "允許檔案夾";
+"Allow for This Chat" = "允許用於此聊天室";
 "Allowed folders" = "已允許的資料夾";
 "Allowed in a chat" = "允許在聊天室使用";
 "Almost done" = "即將完成";
@@ -176,6 +190,8 @@
 "Approve Selected" = "核可所選";
 "Apps & agents" = "應用程式與代理";
 "Apps and agents" = "應用程式與代理";
+"Arguments, one per line" = "引數，每行一個";
+"Arguments…" = "引數⋯";
 "Ask Later" = "稍後提醒";
 "Ask about LLMTray" = "詢問 LLMTray";
 "Ask again in two weeks" = "兩週後再問一次";
@@ -214,6 +230,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "比建議的更大：回答更佳但較慢，且留給其他應用的記憶體較少。";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "會從 ipsupport.us 的版本帶入對話、專案、個人檔案、圖片、音樂、語音與 embedding 模型，以及設定（請先將該版本退出）。此處的對話與模型會保留；其設定會取代這裡的設定。這些模型不會佔用額外磁碟空間。聊天模型仍會放在您的 models 資料夾：可於「設定 › Models」中選擇。";
 "Browse Hugging Face…" = "瀏覽 Hugging Face…";
+"Browse the Catalog…" = "瀏覽目錄⋯";
 "Built into macOS · LLMTray's chat only" = "macOS 內建 · 僅限 LLMTray 的聊天";
 "Cached" = "快取";
 "Calculator" = "計算機";
@@ -267,6 +284,7 @@
 "Choose a folder chats may use." = "選擇聊天室可使用的資料夾。";
 "Choose a folder the chat may look in." = "選擇聊天室可檢視的資料夾。";
 "Choose a folder the chat may propose changes in. You approve every change." = "選擇聊天室可提出變更的資料夾。您會核可每項變更。";
+"Choose an MCP bundle (.mcpb)." = "選擇 MCP 套件組合（.mcpb）。";
 "Choose the LLMTray folder of the version from ipsupport.us (it's already selected), then Import." = "選取來自 ipsupport.us 版本的 LLMTray 資料夾（已為您選好），然後點「Import」。";
 "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "選擇 ~/Library/Application Support/LLMTray：該資料夾包含來自 ipsupport.us 版本的工作階段、專案與模型。";
 "Choose…" = "選擇…";
@@ -282,6 +300,8 @@
 "Coding agents" = "程式代理";
 "Coffee" = "咖啡";
 "Comes with %@" = "隨 %@ 提供";
+"Command" = "指令";
+"Command servers don't run in this version of LLMTray." = "此版本的 LLMTray 不支援執行指令伺服器。";
 "Command-line tool" = "命令列工具";
 "Compact" = "精簡";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "壓縮會將長對話的中段替換為一段由模型撰寫的摘要。開頭會逐字保留這麼多則訊息。";
@@ -291,6 +311,7 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "當對話超過這麼多則訊息後自動壓縮。對話中的「壓縮」按鈕不受此設定影響，隨時可用。";
 "Composing…" = "正在構思…";
 "Concurrent requests" = "並行要求數";
+"Connects to" = "連接至";
 "Context" = "上下文";
 "Continue" = "繼續";
 "Copied" = "已複製";
@@ -414,6 +435,7 @@
 "End" = "結束";
 "End the conversation (the chat model reloads)" = "結束對話（聊天模型將重新載入）";
 "Enjoying LLMTray?" = "滿意 LLMTray 嗎？";
+"Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "環境，每行一個 NAME=value（key、token 和密碼會存到鑰匙圈）";
 "Errors" = "錯誤";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "每個專案中的對話會在模型設定檔的系統提示之後收到這些指示。變更自下一則訊息起生效。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "專案中的每個對話會取得該檔案的全部文字；檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
@@ -431,6 +453,7 @@
 "Failed: %@" = "失敗：%@";
 "Fast (smaller canvas)" = "快速（畫布較小）";
 "Faster long chats" = "加速長對話";
+"Featured" = "精選";
 "Fetching file list…" = "正在擷取檔案清單…";
 "Files" = "檔案";
 "Files Settings…" = "檔案設定…";
@@ -471,6 +494,7 @@
 "Free disk space" = "剩餘磁碟空間";
 "Free on disk: %@ · your models: %@" = "磁碟可用空間：%@ · 您的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "載入的模型在這段時間內沒有要求後，會釋放其占用的記憶體。下次收到要求時會自動重新載入，並有一般的載入延遲。";
+"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "來自官方 MCP Registry。Registry 會檢查名稱是由誰發布，不會檢查程式碼的行為：請先評論伺服器，再開啟它。";
 "Full" = "完整";
 "Full duplex" = "全雙工";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "全雙工：可隨時說話，模型在說話時也能聽到你 — 需能即時運作的 Mac。對講機：說話、按「完成」然後聽。自動會在 Voice Lab 啟動時根據此 Mac 的測試速度選擇。";
@@ -501,9 +525,11 @@
 "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings." = "依目前設定逐步檢視模型資料夾、聊天模型、可選功能、API，並再次檢查更新。";
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "有其他名稱（硬連結）：它們會保留該檔案。";
+"Headers, Name: value per line (an Authorization header goes to the Keychain)" = "標頭，每行一個 名稱: value（Authorization 標頭會存到鑰匙圈）";
 "Help" = "說明";
 "Help improve LLMTray?" = "要協助改進 LLMTray 嗎？";
 "Hide" = "隱藏";
+"Hide Log" = "隱藏記錄";
 "Hide chats" = "隱藏對話";
 "Hide the reasoning" = "隱藏推理過程";
 "Hide these steps for good" = "永久隱藏這些步驟";
@@ -515,6 +541,7 @@
 "How do I connect my coding agent to LLMTray?" = "如何將我的程式代理連接到 LLMTray？";
 "How do you like LLMTray?" = "您覺得 LLMTray 如何？";
 "How it was made" = "此作品的製作方式";
+"How long a chat stays quiet before it's read." = "聊天在安靜多久後會被讀取。";
 "How long notes last" = "附註保留多久";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "伺服器同時回應多少個請求 — 例如你的聊天與程式碼助理。單一請求可以全速執行（若有 drafter 或 MTP head）；多個請求則在每個 GPU 步驟共享運算：單個稍慢，但整體更快。每個執行中的請求會在記憶體保留其上下文，因此記憶體較少的 Mac 同時回應的數量會較少。1：依序執行。";
@@ -563,6 +590,7 @@
 "Indexing failed" = "建立索引失敗";
 "Install" = "安裝";
 "Install ID" = "安裝識別碼";
+"Install a Bundle (.mcpb)…" = "安裝套件組合（.mcpb）⋯";
 "Installed" = "已安裝";
 "Installed · %@" = "已安裝 · %@";
 "Installing mflux…" = "正在安裝 mflux…";
@@ -582,6 +610,7 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "它的設定也一併帶入；Hugging Face 代幣必須在「設定 › 模型」中重新輸入。";
 "Its settings were the same as these already." = "其設定已與此處相同。";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "未匯入其設定：~/Library/Preferences 中的 %@ 並非如此。";
+"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "其設定、機密資訊以及（若為套件組合）其檔案會一併移除。對話會保留過去呼叫的記錄。";
 "KV cache" = "KV 快取";
 "KV group size" = "KV 群組大小";
 "Keep" = "保留";
@@ -592,6 +621,7 @@
 "Keep first messages: %lld" = "保留最前面的訊息：%lld";
 "Keep last messages: %lld" = "保留最後的訊息：%lld";
 "Keep the loaded model" = "保留已載入的模型";
+"Keeps crashing: off until started again (see its log)." = "持續當掉：在再次啟動前會保持關閉（請查看其記錄）。";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "在量化前，將上下文的前 N 個 token 保持完整精度。數值越高，記憶體節省較少，但長提示詞的準確度較高。";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "保留此連接埠。如果其他應用程式已佔用，伺服器將無法啟動，請到「設定」變更連接埠。";
 "Kept free: %lld MB" = "保留空閒：%lld MB";
@@ -617,16 +647,20 @@
 "Learning needs the embedding model (Settings › Memory)." = "學習需要嵌入模型（設定 › 記憶體）。";
 "Leave a Review" = "撰寫評論";
 "Length" = "長度";
+"Less" = "較少";
 "Let chats make documents" = "允許對話建立文件";
 "Let chats work in folders" = "允許聊天室在資料夾中作業";
 "Let coding agents and scripts use your models." = "允許編碼代理與腳本使用你的模型。";
 "Let the chat look in %@?" = "是否允許聊天室檢視 %@？";
 "Let the chat propose changes in %@?" = "是否允許聊天室在 %@ 中提出變更？";
+"Let the chat run %1$@ (%2$@)?" = "要讓聊天執行 %1$@（%2$@）嗎？";
+"Let the chat run %@?" = "要讓聊天執行 %@ 嗎？";
 "Library" = "資料庫";
 "Licence: %@" = "授權：%@";
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "比建議的更小：較快並保留更多記憶體給其他應用，但回答較簡單。";
 "Like LLMTray?" = "喜歡 LLMTray 嗎？";
 "Likes" = "按讚數";
+"List Again" = "重新列出";
 "List my name" = "列出我的名字";
 "List my name in Supporters" = "在贊助者中列出我的名字";
 "Listening…" = "偵聽中…";
@@ -638,9 +672,11 @@
 "Loading %@…" = "正在載入 %@…";
 "Loading the voice model…" = "正在載入語音模型…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即載入上次使用的模型，不必按下 Play 即可就緒。";
+"Log" = "記錄";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "記錄每個產生的 token（DEBUG）。僅用於疑難排解模型程序 — 這會拖慢速度。下次啟動伺服器時生效。";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "長對話與釘選檔案會從快取讀取，而非每回合重新讀取。";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "較長的對話在視窗中較為方便：專案、檔案與每個對話都會顯示於側欄。";
+"MCP Servers" = "MCP 伺服器";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter：加速 %@，答案相同";
 "Made for programming and agents: coding tools and the OpenAI API." = "為程式開發與代理設計：含程式工具與 OpenAI API。";
 "Maintenance" = "維護";
@@ -701,6 +737,7 @@
 "Name or how to call you" = "名稱或對你的稱呼";
 "Name to show (up to 40 characters)" = "顯示名稱（最多 40 字）";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "顯示其查詢之檔案名稱、大小、日期與短節錄。內部私人位置（keys、Library）仍會隱藏。";
+"Needs %@" = "需要 %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "大約需要 %1$@ GB，超過 GPU 可用的 %2$@ GB：在其他應用程式開啟時可能會耗盡記憶體。";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "大約需要 %1$@ GB；此 Mac 有 %2$@ GB。";
 "Network" = "網路";
@@ -747,6 +784,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "尚無附註。新增每個聊天都應該知道的內容：「以俄文簡短回應」、「我在製作 ESP32 喇叭」。";
 "No requests yet." = "還沒有請求。";
 "No runs yet." = "尚未執行。";
+"No servers yet." = "尚無伺服器。";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "無訂閱。無功能鎖定。如果 LLMTray 對你有幫助，歡迎支持開發。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "針對此 Mac 的記憶體沒有建議。請至 Hugging Face 瀏覽模型。";
 "No thanks" = "不用了，謝謝";
@@ -760,6 +798,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁碟空間不足：%@ 大約需要 %@，目前可用 %@。";
 "Not identical to %@: not a duplicate." = "與 %@ 不相同：非重複項。";
 "Not indexed" = "未建立索引";
+"Not reviewed yet: review it to see its tools." = "尚未評論：請先評論，才能查看其工具。";
 "Not sent any more. Bring one back, or it's deleted later." = "不會再送出。請復原其中一則，否則稍後會被刪除。";
 "Not sent yet: waits for another chat to show it, or your approval." = "尚未傳送：等待另一個聊天顯示相同內容，或等你核准。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "尚不支援：%@。此版本會為文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods）建立索引，並保留圖片（png、jpg、heic、webp、tiff、gif）。";
@@ -770,7 +809,9 @@
 "Notes in" = "附註語言";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "只從已刪除聊天學到的附註會一併移除，除非你已編輯、釘選或核准它們。";
 "Nothing left to read: every chat was read from its start." = "沒有剩下要讀取的內容：每個聊天都已從頭讀取。";
+"Nothing logged yet." = "尚無記錄。";
 "Nothing new to import" = "沒有新項目可匯入";
+"Nothing runs yet: next you start it once and review its tools." = "尚未執行任何內容：接下來請先啟動一次並評論其工具。";
 "Nothing sent yet." = "尚未寄出任何資料。";
 "Nothing to change." = "無需變更。";
 "Nothing to pin until the file has been read" = "未讀取檔案前無法釘選";
@@ -816,6 +857,9 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "僅覆寫 LLMTray 的 macOS 語言。重新啟動 LLMTray 後生效。未翻譯的文字會以英文顯示。";
 "PDF · %lld pages" = "PDF · %lld 頁";
 "Past %lld messages" = "過去 %lld 則訊息";
+"Paste a Config" = "貼上設定";
+"Paste a Config…" = "貼上設定⋯";
+"Pasted config" = "已貼上的設定";
 "Pause" = "暫停";
 "Pause Indexing" = "暫停建立索引";
 "Pause download" = "暫停下載。";
@@ -877,12 +921,14 @@
 "Prompt processing" = "提示處理";
 "Prompt size" = "提示大小";
 "Prompt size (input sent to the model):" = "提示大小（傳送給模型的輸入）：";
+"Proposed right after reading outside text (mail, files, web) -- check it." = "在讀取外部文字（郵件、檔案、網頁）後立即提出——請檢查。";
 "Proposed right after reading your files: check each of these %lld changes before approving." = "在閱讀檔案後立即提出：在核准之前請檢查這 %lld 項變更。";
 "Public holidays" = "國定假日";
 "Puts this step back to how it was when setup opened, and goes on." = "將此步驟還原為開啟設定時的狀態，並繼續。";
 "Quantization group size for the KV cache. 64 is a good default." = "KV 快取的量化群組大小。64 是不錯的預設值。";
 "Quantize KV from token" = "從權杖開始量化 KV";
 "Quick benchmark" = "快速基準測試";
+"Quiet for %lld minutes" = "安靜 %lld 分鐘後";
 "Quit" = "退出";
 "Quit LLMTray" = "結束 LLMTray";
 "RAG on" = "RAG 已開啟";
@@ -899,7 +945,7 @@
 "Read It Too" = "也讀取它";
 "Read Past Chats…" = "讀取過往對話⋯";
 "Read What Wasn't Read" = "讀取尚未讀取的內容";
-"Read a chat after %lld quiet minutes" = "聊天靜置 %lld 分鐘後讀取";
+"Read chats" = "讀取聊天";
 "Reading a chat…" = "正在讀取聊天…";
 "Reading a prompt: up to %lld%" = "讀取提示：最多 %lld%";
 "Reading chats" = "讀取對話";
@@ -908,6 +954,7 @@
 "Ready." = "已就緒。";
 "Ready. This is the Full build: the runtime is included." = "已就緒。這是 Full 版本：已包含執行環境。";
 "Reasoning" = "推理";
+"Recent" = "最近使用";
 "Recent changes" = "最近的變更";
 "Recently updated" = "最近已更新";
 "Recommended" = "建議";
@@ -934,6 +981,7 @@
 "Remove recording" = "移除錄音";
 "Remove this file from the project?" = "要從專案中移除此檔案嗎？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "從 %@ 移除已下載的 mlx-lm 執行環境與圖像生成功能（其執行環境與圖像模型）。下次伺服器啟動或啟用圖像生成功能時會重新設定。已儲存的對話和設定檔會保留。";
+"Remove…" = "移除⋯";
 "Rename" = "重新命名";
 "Rename %1$@ to %2$@" = "將 %1$@ 重新命名為 %2$@";
 "Rename Profile" = "重新命名設定檔";
@@ -956,20 +1004,26 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "使用新設定重新啟動模型程序（重新載入需要幾秒鐘）。";
 "Restore" = "復原";
 "Restore Purchases" = "還原購買";
+"Results" = "結果";
 "Resume" = "繼續";
 "Resume Download" = "恢復下載";
 "Resume Indexing" = "恢復建立索引";
 "Resume download" = "繼續下載。";
 "Retry" = "重試";
 "Review" = "評論";
+"Review…" = "評論⋯";
 "Revoke" = "撤銷";
 "Revoke %@" = "撤銷 %@";
+"Right after each answer" = "每次回答後立即";
 "Room in each chat: %lld tokens" = "每個聊天中的空間：%lld 個 token";
 "Run benchmark" = "執行基準測試";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在終端執行以提高 GPU 記憶體限制；Mac 重新啟動後會重設。";
+"Run without asking" = "不需詢問即執行";
+"Run without asking:" = "不需詢問即執行：";
 "Running" = "執行中";
 "Running — %@ on :%lld" = "執行中 — %@ 於 :%lld";
 "Running…" = "執行中…";
+"Runs this command" = "執行此指令";
 "Runtime data" = "執行階段資料";
 "Same as LLMTray" = "與 LLMTray 相同";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "只從機率加總達到此值的最高機率詞元中取樣。1.0 會將其關閉。";
@@ -1006,6 +1060,7 @@
 "Server Log" = "伺服器記錄";
 "Server log" = "伺服器記錄";
 "Server settings changed -- restart to apply them." = "伺服器設定已更改，重新啟動後才會套用。";
+"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "為聊天提供更多工具的伺服器：郵件、備忘錄、行事曆、檔案、服務。每個伺服器都必須先經過你評論後才會執行，可從「+」選單載入到聊天中（或在該模型要求時載入），且除非你允許工具不需詢問即執行，否則每次呼叫前都會先詢問你。";
 "Set Up LLMTray" = "設定 LLMTray";
 "Set Up LLMTray…" = "設定 LLMTray…";
 "Setting up image generation (first time only)…" = "正在設定影像生成功能（僅首次）…";
@@ -1021,9 +1076,11 @@
 "Share anonymous usage statistics" = "分享匿名使用統計";
 "Shared by all chats" = "由所有聊天共享";
 "Share…" = "分享…";
+"Show All %lld Lines" = "顯示全部 %lld 行";
 "Show All Files…" = "顯示所有檔案…";
 "Show Chat Window" = "顯示對話視窗";
 "Show Files" = "顯示檔案";
+"Show Less" = "顯示較少";
 "Show Next Tab" = "顯示下一個分頁";
 "Show Previous Tab" = "顯示上一個分頁";
 "Show Reports…" = "顯示報告…";
@@ -1062,9 +1119,12 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "停滯逾時：%lld 秒";
 "Start" = "開始";
+"Start Again" = "再次開始";
 "Start LLMTray automatically when you log in to this Mac." = "登入此 Mac 時自動啟動 LLMTray。";
 "Start Server" = "啟動伺服器";
 "Start a new saved chat (⌘N) to add files to a project." = "建立新的已儲存對話（⌘N）以將檔案加入專案。";
+"Start and Review" = "開始並評論";
+"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "先啟動一次以查看它提供的內容。啟動它不會自動授予任何權限；在你開啟之前，聊天無法使用它。";
 "Start server" = "啟動伺服器。";
 "Start talking" = "開始說話";
 "Start the server first." = "請先啟動伺服器。";
@@ -1123,11 +1183,14 @@
 "Thank you! List your name in Supporters?" = "謝謝你！要在贊助者中列出你的名字嗎？";
 "Thanks! Your name will appear once it's been checked." = "感謝！你的名字將在審核通過後顯示。";
 "Thanks! Your review will appear after moderation." = "謝謝！您的評論經審核後會顯示。";
+"That command wasn't found (looked up the way Terminal would)." = "找不到該指令（已依照 Terminal 的方式查找）。";
 "That folder can't be shared with the chat: %@" = "該資料夾無法與聊天室分享：%@";
 "That isn't LLMTray's folder" = "那不是 LLMTray 的資料夾";
+"That isn't an http(s) URL." = "那不是 http(s) URL。";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "已取消勾選 %lld 項移至資源回收桶：請勾選您想要的項目。";
 "The App Store couldn't confirm the purchase." = "App Store 無法確認購買。";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store 版本的 LLMTray 正在執行。請先將它退出（從選單列圖示 › 退出），再重新開啟這個版本：兩者會使用相同埠號並重複載入模型。";
+"The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "伺服器 README 提供的 JSON，包含「mcpServers」。每個伺服器在新增時都會先保持關閉，需先評論後才會執行。";
 "The Keychain refused to remove the token." = "Keychain 無法移除該代幣。";
 "The Keychain refused to save the token." = "Keychain 無法儲存該代幣。";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "LLMTray 指南位於此專案：例如可詢問如何連接程式代理。";
@@ -1138,6 +1201,8 @@
 "The app's language (the language only, not the region)." = "應用程式語言（僅語言，不包含地區）。";
 "The app's name." = "應用程式名稱。";
 "The base profile: every other profile inherits from it." = "基礎設定檔：所有其他設定檔都會繼承其設定。";
+"The bundle couldn't be downloaded." = "無法下載該套件組合。";
+"The bundle's address isn't https." = "該套件組合的位址不是 https。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天要求將 %1$@（%2$@）複製到專案中。專案中的所有聊天之後都能搜尋它。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "對話要求將 %1$@（%2$@）複製到專案中。專案中的每個對話之後都可以在文件中使用它。";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以把產出的內容排版成 PDF — 例如報告、信件、筆記或發票，並包含表格與圖表。PDF 會保留在聊天中，直到您開啟、儲存或加入專案。無需為此下載任何內容；此功能無法在臨時對話中使用。";
@@ -1149,9 +1214,11 @@
 "The chat's own model" = "聊天自己的模型";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "聊天自己的模型：每個聊天都由曾在其中回答的模型讀取——使用 Gemma 進行的俄文聊天，不會由你稍後載入且只懂英文的編碼模型讀取。單一模型：每個聊天都由該模型讀取，因此所有筆記的寫法一致。不論哪種方式，聊天都會等到其模型已載入且可用；除非你在下方允許，否則不會為它載入任何模型。";
 "The chats and models in that folder were here already." = "該資料夾內的對話與模型已存在於此處。";
+"The command %@ wasn't found." = "找不到指令 %@。";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "加入專案的檔案複本與其索引存放在一起。專案自有的檔案會在其「檔案」視窗顯示；刪除專案會一併刪除這些檔案與索引。";
 "The day the counts are for." = "計數所屬的日期。";
 "The download didn't start." = "下載未開始。";
+"The download doesn't match what the registry lists for it." = "下載內容與 registry 所列的不符。";
 "The download failed: %@" = "下載失敗：%@";
 "The download stopped." = "下載已停止。";
 "The downloaded embedder files don't match their checksums: %@" = "已下載的 embedder 檔案與其校驗碼不符：%@";
@@ -1227,6 +1294,7 @@
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "伺服器會記錄連線來源的近似國家；LLMTray 並不會寄送此資料，也無法設定它。";
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "伺服器正在使用此模型或忙於處理請求：請停止伺服器（或選擇其他模型），或等待它閒置。";
 "The server log" = "伺服器日誌";
+"The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "伺服器執行的內容可能比這些引數顯示的更多（郵件回覆的收件人和引用文字來自 Mail）。";
 "The server starts once %@ is downloaded" = "在 %@ 下載完成後伺服器即會啟動";
 "The server starts with %@" = "伺服器以 %@ 啟動";
 "The settings here were kept." = "此處的設定已保留。";
@@ -1285,7 +1353,9 @@
 "Tool call statistics" = "工具呼叫統計";
 "Tool calls" = "工具呼叫";
 "Tool-use rule" = "工具使用規則";
+"Tools" = "工具";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型在內建聊天中可能呼叫的工具（需支援工具呼叫的模型）。網路工具會將模型的查詢傳送至該公開服務（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本機工具的資料絕不離開 Mac。";
+"Tools…" = "工具⋯";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "主題";
@@ -1297,6 +1367,7 @@
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "將檔案文字轉為用於語意搜尋的向量，並儲存在此台 Mac。移除模型不會刪除索引：在重新下載前，檔案會改以文字方式搜尋。";
 "Tweak…" = "微調…";
 "Type a message below and press Return. Try: “What can you do?”" = "在下方輸入訊息並按 Return。試試：「你能做什麼？」";
+"URL" = "URL";
 "Unavailable" = "無法使用";
 "Uncompressed (WAV)" = "未壓縮（WAV）";
 "Undo" = "復原";
@@ -1328,6 +1399,7 @@
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "使用統計已關閉：不會寄送任何資料。若啟用時，報告會長得像這樣（ID 會在啟用時產生）。";
 "Usage statistics: the reports" = "使用統計：報告";
 "Use" = "使用";
+"Use %@" = "使用 %@";
 "Use %lld" = "使用 %lld";
 "Use Anyway" = "仍然使用";
 "Use Default Folder" = "使用預設資料夾";
@@ -1392,7 +1464,6 @@
 "What you do" = "你的工作";
 "What you know about the user from earlier chats. It may be outdated: what the user says now wins.\n- Answer briefly, in Russian\n- Builds an ESP32-S3 speaker with OTA updates\nRight now (from the user's last messages, a guess): Angry: the linker keeps failing. So: Brief, straight to the fix" = "你從先前的聊天中得知的使用者資訊。這些資訊可能已過時：以使用者現在所說的為準。\n- 簡短地以俄文回應\n- 正在製作具 OTA 更新功能的 ESP32-S3 喇叭\n目前（根據使用者最近幾則訊息的推測）：很生氣：linker 一直失敗。所以：簡短，直接給修正方式";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "請說明您當時的操作、預期結果及實際看到的情形。您的對話絕不會包含在內。";
-"What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "你在聊天中寫下的內容，會在靜置這段時間後、你離開時，或 LLMTray 結束時讀取為附註——在背景中進行，而且只會在該模型沒有其他工作時進行。只會計入你自己的文字，不會計入回答、檔案或網頁。臨時對話和標示為「不記住」的聊天一律不會讀取。";
 "What's New" = "更新內容";
 "What's New in LLMTray %@" = "LLMTray %@ 的更新內容";
 "What's New…" = "查看更新…";
@@ -1403,6 +1474,8 @@
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "當聊天在等待尚未載入的模型時，若 LLMTray 已閒置這麼久（沒有聊天、app 或圖片正在處理），記憶體可能會載入該模型。下次請求你常用的模型時，會再載回該模型，這需要一點時間。";
 "When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "文件已啟用（設定 > 檔案）且 make_document 已宣告時適用。在需要時：模型會以 load_tools 載入，或由您從 + 選單載入，每個聊天只需一次 — 每次請求使用較少詞元。永遠：在每個已儲存的聊天中宣告該工具。";
 "When needed" = "在需要時";
+"When the chat is quiet" = "當聊天安靜時";
+"When what you wrote is read for notes: a few seconds after each answer, or once the chat has been quiet for a while -- and always when you leave it or quit. Either way it runs in the background only while the model has nothing else to do, and any chat, app or coding agent stops it at once. It never pushes your chat out of the model's prompt cache. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "你所寫的內容會在何時被讀取以製作筆記：每次回答後幾秒，或在聊天安靜一段時間後——而且在你離開它或結束時一律會讀取。無論哪種方式，都只會在該模型沒有其他工作要做時於背景執行，且任何聊天、App 或程式設計代理都會立即使其停止。它絕不會把你的聊天從該模型的提示快取中擠掉。只有你自己寫的內容會計入，答案、檔案或網頁都不會。臨時對話和標記為「Don't Remember」的聊天絕不會被讀取。";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray 儲存模型的所在位置，每個模型一個資料夾。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray 在何處尋找 MLX 模型（每個模型為一個資料夾，例如 <org>/<name>）。可選任一資料夾，也可以與其他應用程式共用同一資料夾。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 尋找 MLX 模型的位置（每個模型一個檔案夾，例如 <org>/<name>）。將其指向 ~/.lmstudio/models 即可與 LM Studio 共用模型。";
@@ -1476,14 +1549,19 @@
 "move %1$lld files into %2$lld folders" = "將 %1$lld 個檔案移入 %2$lld 個資料夾";
 "move %1$lld items into %2$lld folders" = "將 %1$lld 項移入 %2$lld 個資料夾";
 "never used" = "從未使用";
+"new or changed" = "新增或已變更";
 "no changes" = "無變更";
 "no text" = "無文字";
 "not a picture" = "不是圖片";
+"not allowed" = "不允許";
 "not downloaded" = "尚未下載";
 "not indexed" = "未建立索引";
+"not sent" = "未傳送";
 "not supported" = "不支援";
 "not used by any model" = "未被任何模型使用";
+"npx, uvx, or a full path" = "npx、uvx 或完整路徑";
 "off" = "關閉";
+"outcome unknown -- check before trying again" = "結果不明——請先檢查，再試一次";
 "over 50 MB" = "超過 50 MB";
 "prompt %.0f tok/s" = "提示 %.0f tok/s";
 "queued" = "已排隊";
@@ -1499,6 +1577,7 @@
 "the installed version didn't change" = "已安裝的版本未變更";
 "the model" = "該模型";
 "the model runtime isn't installed yet" = "尚未安裝模型執行環境";
+"the server says it only reads" = "伺服器表示它只會讀取";
 "then" = "然後";
 "this call only" = "僅限此呼叫";
 "tight fit" = "空間不足";
