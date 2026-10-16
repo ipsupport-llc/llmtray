@@ -372,7 +372,11 @@ struct ChatComposer: View {
             // for a model that wouldn't think of load_tools.
             if id != nil, documentsEnabled {
                 Divider()
-                if chat.loadedToolGroups.contains(ToolGroups.documents) {
+                // On in every saved chat already (the profile's "Always"):
+                // shown as on, not offered again.
+                let always = ProfileManager.shared.resolved(for: UserDefaults.standard[Pref.selectedModelID])
+                    .toolLoading[ToolGroups.documents] == .always
+                if always || chat.loadedToolGroups.contains(ToolGroups.documents) {
                     Button { } label: { Label("Documents On in This Chat", systemImage: "checkmark") }
                         .disabled(true)
                 } else {
