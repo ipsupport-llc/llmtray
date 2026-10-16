@@ -189,7 +189,6 @@
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
 "Arguments, one per line" = "Arguments, one per line";
-"Arguments…" = "Arguments…";
 "Ask Later" = "Ask Later";
 "Ask about LLMTray" = "Ask about LLMTray";
 "Ask again in two weeks" = "Ask again in two weeks";
@@ -309,7 +308,8 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.";
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
-"Connects to" = "Connects to";
+"Connecting to see what it offers…" = "Connecting to see what it offers…";
+"Connects to a server on the internet." = "Connects to a server on the internet.";
 "Context" = "Context";
 "Continue" = "Continue";
 "Copied" = "Copied";
@@ -645,7 +645,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "Learning needs the embedding model (Settings › Memory).";
 "Leave a Review" = "Leave a Review";
 "Length" = "Length";
-"Less" = "Less";
 "Let chats make documents" = "Let chats make documents";
 "Let chats work in folders" = "Let chats work in folders";
 "Let coding agents and scripts use your models." = "Let coding agents and scripts use your models.";
@@ -658,7 +657,7 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler.";
 "Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
-"List Again" = "List Again";
+"List Its Tools Again" = "List Its Tools Again";
 "List my name" = "List my name";
 "List my name in Supporters" = "List my name in Supporters";
 "Listening…" = "Listening…";
@@ -760,6 +759,7 @@
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "New temporary chat (⌘⇧N) -- nothing about it is ever saved";
 "News" = "News";
 "Next" = "Next";
+"Next you see what it offers, then turn it on." = "Next you see what it offers, then turn it on.";
 "No API key is needed; if an app asks for one, any text works." = "No API key is needed; if an app asks for one, any text works.";
 "No Models" = "No Models";
 "No Python 3.10 or newer was found." = "No Python 3.10 or newer was found.";
@@ -809,7 +809,7 @@
 "Nothing left to read: every chat was read from its start." = "Nothing left to read: every chat was read from its start.";
 "Nothing logged yet." = "Nothing logged yet.";
 "Nothing new to import" = "Nothing new to import";
-"Nothing runs yet: next you start it once and review its tools." = "Nothing runs yet: next you start it once and review its tools.";
+"Nothing runs from a chat until you turn it on -- and then the chat asks you before each call." = "Nothing runs from a chat until you turn it on -- and then the chat asks you before each call.";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
 "Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
@@ -1016,12 +1016,10 @@
 "Room in each chat: %lld tokens" = "Room in each chat: %lld tokens";
 "Run benchmark" = "Run benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts.";
-"Run without asking" = "Run without asking";
-"Run without asking:" = "Run without asking:";
 "Running" = "Running";
 "Running — %@ on :%lld" = "Running — %@ on :%lld";
 "Running…" = "Running…";
-"Runs this command" = "Runs this command";
+"Runs on this Mac." = "Runs on this Mac.";
 "Runtime data" = "Runtime data";
 "Same as LLMTray" = "Same as LLMTray";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off.";
@@ -1121,8 +1119,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Start LLMTray automatically when you log in to this Mac.";
 "Start Server" = "Start Server";
 "Start a new saved chat (⌘N) to add files to a project." = "Start a new saved chat (⌘N) to add files to a project.";
-"Start and Review" = "Start and Review";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on.";
 "Start server" = "Start server";
 "Start talking" = "Start talking";
 "Start the server first." = "Start the server first.";
@@ -1203,6 +1199,7 @@
 "The bundle's address isn't https." = "The bundle's address isn't https.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents.";
+"The chat asks you before each call, unless you let an action run without asking." = "The chat asks you before each call, unless you let an action run without asking.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
 "The chat model couldn't be unloaded for Voice Lab." = "The chat model couldn't be unloaded for Voice Lab.";
@@ -1293,6 +1290,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle.";
 "The server log" = "The server log";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail).";
+"The server says this only reads." = "The server says this only reads.";
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
 "The settings here were kept." = "The settings here were kept.";
@@ -1314,6 +1312,7 @@
 "Thinking…" = "Thinking…";
 "Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";
+"This can change things." = "This can change things.";
 "This chat knows" = "This chat knows";
 "This chat may use" = "This chat may use";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "This couldn't be listed: the payment wasn't found, or the name was refused.";
@@ -1327,6 +1326,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "This model's card doesn't list %@: it may read chats in it poorly and write worse notes.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
+"This tool" = "This tool";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added.";
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs.";
@@ -1575,7 +1575,6 @@
 "the installed version didn't change" = "the installed version didn't change";
 "the model" = "the model";
 "the model runtime isn't installed yet" = "the model runtime isn't installed yet";
-"the server says it only reads" = "the server says it only reads";
 "then" = "then";
 "this call only" = "this call only";
 "tight fit" = "tight fit";
