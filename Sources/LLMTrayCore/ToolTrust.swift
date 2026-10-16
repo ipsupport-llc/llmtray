@@ -16,6 +16,10 @@ public enum ToolTrust {
         /// Reaches the network (ToolCatalog's usesNetwork) or starts a
         /// generator (image, edit, music).
         case guarded
+        /// A tool of an MCP server the user added (adr/0027): never refused
+        /// here -- the user's card is its gate -- and its result is outside
+        /// text.
+        case mcp
     }
 
     /// What the turn has returned so far that isn't the user's.
@@ -31,6 +35,8 @@ public enum ToolTrust {
         public var changeResult = false
         /// A network tool (or a generator) returned something: web text.
         public var networkText = false
+        /// An MCP server's tool returned something (adr/0027): outside text.
+        public var mcpText = false
         /// The request carries the project's pinned files (adr/0012, "Pinned
         /// files"): file text from the turn's start, every turn while pinned.
         public var pinnedText = false
@@ -45,15 +51,18 @@ public enum ToolTrust {
         }
 
         /// Anything that names files: guarded tools are off.
-        public var hasUntrustedText: Bool { projectText || folderText || changeResult || pinnedText }
+        public var hasUntrustedText: Bool { projectText || folderText || changeResult || pinnedText || mcpText }
         /// Outside text a change could be prompted by -- file, folder or web
         /// text: folder changes are off (a change's own result isn't: its
         /// names are the model's).
-        public var hasFileText: Bool { projectText || folderText || networkText || pinnedText }
+        public var hasFileText: Bool { projectText || folderText || networkText || pinnedText || mcpText }
         /// What this turn's tool results brought in (the pinned prefix aside).
         /// The listing doesn't count: a model learns a file's id from it
         /// before pinning the file the user asked for.
-        public var hasToolText: Bool { projectContent || folderText || changeResult || networkText }
+        public var hasToolText: Bool { projectContent || folderText || changeResult || networkText || mcpText }
+        /// Any outside text this turn, web included: every MCP call is asked
+        /// then, whatever the user allowed (adr/0027).
+        public var hasOutsideText: Bool { hasUntrustedText || networkText }
 
         /// After a call of `kind` returned.
         /// After a project call that returned names only (the listing, a
@@ -71,6 +80,7 @@ public enum ToolTrust {
             case .folderRead: folderText = true
             case .folderChange: changeResult = true
             case .guarded: networkText = true
+            case .mcp: mcpText = true
             case .ordinary: break
             }
         }
@@ -110,7 +120,7 @@ public enum ToolTrust {
         switch kind {
         case .guarded: return allowsGuarded(state)
         case .folderChange: return allowsChange(state)
-        case .ordinary, .project, .folderRead: return true
+        case .ordinary, .project, .folderRead, .mcp: return true
         }
     }
 
@@ -150,6 +160,10 @@ public enum ToolTrust {
     public static let pinnedRefusal = "Not run: this project has pinned files in context, so web search, generators and "
         + "folder changes are off in its chats. Tell the user; they can unpin files in the project's Files window."
 
+    /// The refusal of a guarded call after (or beside) an MCP server's text.
+    public static let mcpRefusal = "Not run: text from a connected server (mail, notes, …) is part of this turn, so web and "
+        + "generator tools are off until the user's next message. Answer in text."
+
     /// The refusal of a pin after a tool's text this turn.
     public static let pinRefusal = "Not pinned: text a tool returned this turn can't pin files. Ask the user to pin it "
         + "in the project's Files window, or to ask again in a new message."
@@ -158,6 +172,7 @@ public enum ToolTrust {
     public static func refusalText(for kind: Kind, _ state: TurnState) -> String {
         if state.pinnedText { return pinnedRefusal }
         if kind == .folderChange { return changeRefusal }
-        return state.projectText ? refusal : folderRefusal
+        if state.projectText { return refusal }
+        return state.mcpText && !state.folderText && !state.changeResult ? mcpRefusal : folderRefusal
     }
 }
