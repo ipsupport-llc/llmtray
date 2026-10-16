@@ -591,9 +591,9 @@ private struct PasteConfigSheet: View {
 /// description under it.
 private struct AskField: View {
     let ask: MCPImport.Ask
+    @Binding var value: String
     /// Shown as a secret: the bundle says so, or it looks like one.
     var secret = false
-    @Binding var value: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
