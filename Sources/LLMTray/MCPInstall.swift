@@ -18,47 +18,54 @@ final class MCPInstaller: ObservableObject {
 
     // MARK: Values
 
-    /// A server's settings applied: a bundle's placeholders filled (secret
-    /// ones kept out of what's stored), registry variables or headers set,
-    /// secret-looking values to the Keychain. `values`: every ask's value
-    /// ("" for a secret left as it is).
+    /// Whether a setting is secret: the bundle says so, its name looks like
+    /// a key, or it goes into a variable or header whose name does.
+    static func isSecret(_ ask: MCPImport.Ask, in found: MCPImport.Found) -> Bool {
+        if ask.sensitive || MCPServerConfig.looksSecret(ask.key) { return true }
+        let marker = "${user_config.\(ask.key)}"
+        return found.environment.merging(found.headers) { a, _ in a }.contains { MCPServerConfig.looksSecret($0.key) && $0.value.contains(marker) }
+    }
+
+    /// A server's settings applied (adr/0027). A bundle's plain settings are
+    /// filled in; a secret one stays a placeholder in what's stored, its value
+    /// in the Keychain as `user_config.<key>`, filled in when the server
+    /// starts -- so saving or updating never loses or writes it. Registry
+    /// variables and headers go in by name, secret ones to the Keychain;
+    /// secret-looking values given outright too. A secret left empty keeps
+    /// what the Keychain has. `values`: every setting's value.
     static func prepare(_ found: MCPImport.Found, values: [String: String]) -> (found: MCPImport.Found, secrets: [String: String], answers: [String: String]) {
         var f = found
         var secrets: [String: String] = [:]
         let home = FileManager.default.homeDirectoryForCurrentUser.path
-        let plain = values.filter { key, _ in !(found.asks.first { $0.key == key }?.sensitive ?? false) }
+        let secretKeys = Set(found.asks.filter { isSecret($0, in: found) }.map(\.key))
+        let plain = values.filter { !secretKeys.contains($0.key) }
         if let folder = f.workingDirectory, isBundle(found) {
             f.command = MCPImport.fill(f.command, folder: folder, home: home, answers: plain)
             f.arguments = f.arguments.map { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
-            // Variables holding secret settings: every placeholder filled in
-            // one value, then kept in the Keychain.
-            var environment = f.environment.mapValues { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
-            for (k, v) in environment {
-                var filled = v
-                for ask in found.asks where ask.sensitive {
-                    filled = filled.replacingOccurrences(of: "${user_config.\(ask.key)}", with: values[ask.key] ?? "")
-                }
-                if filled != v { secrets[k] = filled; environment.removeValue(forKey: k) }
-            }
-            f.environment = environment
-            for ask in found.asks where ask.sensitive {
-                let value = values[ask.key] ?? ""
-                guard !value.isEmpty else { continue }
-                let marker = "${user_config.\(ask.key)}"
-                if (f.arguments + [f.command]).contains(where: { $0.contains(marker) }) { secrets["user_config.\(ask.key)"] = value }
+            f.environment = f.environment.mapValues { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
+            for key in secretKeys {
+                if let value = values[key], !value.isEmpty { secrets["user_config.\(key)"] = value }
             }
             if !f.command.hasPrefix("/"), !f.command.contains("${"), let path = MCPImport.resolveCommand(f.command) { f.command = path }
         } else {
             for ask in found.asks {
                 let value = values[ask.key] ?? ""
                 guard !value.isEmpty else { continue }
-                if ask.sensitive { secrets[ask.key] = value }
+                if secretKeys.contains(ask.key) { secrets[ask.key] = value }
                 else if f.kind == .command { f.environment[ask.key] = value }
                 else { f.headers[ask.key] = value }
             }
         }
-        for (k, v) in f.environment.merging(f.headers, uniquingKeysWith: { a, _ in a })
-            where MCPServerConfig.looksSecret(k) && secrets[k] == nil && !v.contains("${") && !v.isEmpty { secrets[k] = v }
+        // Secret-looking values given outright (a pasted config): out of
+        // what's stored, into the Keychain.
+        for (k, v) in f.environment where MCPServerConfig.looksSecret(k) && !v.contains("${") && !v.isEmpty {
+            secrets[k] = v
+            f.environment.removeValue(forKey: k)
+        }
+        for (k, v) in f.headers where MCPServerConfig.looksSecret(k) && !v.contains("${") && !v.isEmpty {
+            secrets[k] = v
+            f.headers.removeValue(forKey: k)
+        }
         return (f, secrets, plain)
     }
 
@@ -95,6 +102,7 @@ final class MCPInstaller: ObservableObject {
         if prepared.found.kind == .command, !prepared.found.command.hasPrefix("/") {
             guard let path = MCPImport.resolveCommand(prepared.found.command) else {
                 message = String(format: NSLocalizedString("%1$@: the command %2$@ wasn't found.", comment: "MCP install"), found.name, prepared.found.command)
+                if Self.isBundle(found), let folder = found.workingDirectory { try? FileManager.default.removeItem(atPath: folder) }
                 return
             }
             prepared.found.command = path
@@ -143,11 +151,7 @@ final class MCPInstaller: ObservableObject {
     /// the manifest; a secret left empty keeps its value. Restarted.
     func apply(_ id: UUID, values: [String: String]) async {
         guard var config = hub.server(id), let found = asks(of: config) else { return }
-        var values = values
-        for ask in found.asks where ask.sensitive && (values[ask.key] ?? "").isEmpty {
-            // Unchanged: the stored secret goes back in.
-            if let v = MCPSecrets.get(server: id, name: "user_config.\(ask.key)") { values[ask.key] = v }
-        }
+        // A secret left empty keeps its Keychain value (prepare skips it).
         let prepared = Self.prepare(found, values: values)
         config.command = prepared.found.command
         config.arguments = prepared.found.arguments
@@ -194,8 +198,10 @@ final class MCPInstaller: ObservableObject {
         return MCPRegistry.parse(data, available: runners).entries.first { $0.name == name }
     }
 
-    /// One click: the new version in, the settings kept, its tools taken as
-    /// they are now (the user asked for the update).
+    /// One click: the new version in, installed the same way (a remote stays
+    /// remote), the settings kept, its tools taken as they are now (the user
+    /// asked for the update). A new required setting with no default stops
+    /// it: Configure first.
     func update(_ id: UUID) async {
         guard var config = hub.server(id), let source = config.source else { return }
         busy.insert(id.uuidString)
@@ -206,9 +212,15 @@ final class MCPInstaller: ObservableObject {
             case .githubRelease(let owner, let repo, let asset):
                 found = try await downloadBundle("https://github.com/\(owner)/\(repo)/releases/latest/download/\(asset)", sha256: nil)
             case .registry(let name):
-                guard let entry = await registryEntry(name), let install = entry.installs.first else {
-                    throw MCPImport.Failure.notABundle("the registry doesn't list it any more")
+                guard let entry = await registryEntry(name) else { throw MCPImport.Failure.notABundle("the registry doesn't list it any more") }
+                let same = entry.installs.first { install in
+                    switch install {
+                    case .remote: return config.kind == .url
+                    case .bundle: return config.kind == .command && config.workingDirectory?.hasPrefix(MCPHub.bundlesFolder.path + "/") == true
+                    case .package: return config.kind == .command && config.workingDirectory?.hasPrefix(MCPHub.bundlesFolder.path + "/") != true
+                    }
                 }
+                guard let install = same else { throw MCPImport.Failure.notABundle("it isn't offered the way it was installed any more") }
                 if case .bundle(let url, let sha) = install {
                     found = try await downloadBundle(url, sha256: sha)
                 } else {
@@ -219,17 +231,26 @@ final class MCPInstaller: ObservableObject {
                     found.version = entry.version
                 }
             }
-            var values = Self.defaults(found).merging(config.answers) { _, kept in kept }
-            for ask in found.asks where ask.sensitive {
-                values[ask.key] = MCPSecrets.get(server: id, name: "user_config.\(ask.key)") ?? MCPSecrets.get(server: id, name: ask.key) ?? ""
+            let values = Self.defaults(found).merging(config.answers) { _, kept in kept }
+            // A new required setting nobody gave: not now.
+            let missing = found.asks.filter { ask in
+                ask.required && (values[ask.key] ?? "").isEmpty
+                    && MCPSecrets.get(server: id, name: "user_config.\(ask.key)") == nil && MCPSecrets.get(server: id, name: ask.key) == nil
+            }
+            guard missing.isEmpty else {
+                if Self.isBundle(found), let folder = found.workingDirectory { try? FileManager.default.removeItem(atPath: folder) }
+                throw MCPImport.Failure.unsupported(String(format: NSLocalizedString("a new setting (%@): uninstall and install it again to give it", comment: "MCP update"),
+                                                           missing.map(\.title).joined(separator: ", ")))
             }
             let prepared = Self.prepare(found, values: values)
             let oldFolder = config.workingDirectory
             await hub.stop(id)
+            config.kind = found.kind
             config.command = prepared.found.command
             config.arguments = prepared.found.arguments
-            config.environment = prepared.found.environment.merging(config.environment.filter { key, _ in prepared.found.environment[key] == nil && found.kind == .command && !Self.isBundle(found) }) { new, _ in new }
-            config.url = prepared.found.url.isEmpty ? config.url : prepared.found.url
+            config.environment = prepared.found.environment
+            config.headers = prepared.found.headers
+            config.url = prepared.found.url
             config.workingDirectory = prepared.found.workingDirectory ?? config.workingDirectory
             config.version = found.version
             config.icon = found.icon ?? config.icon

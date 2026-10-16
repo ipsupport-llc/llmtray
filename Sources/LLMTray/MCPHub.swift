@@ -291,10 +291,16 @@ final class MCPHub: ObservableObject {
                 if name.hasPrefix("user_config.") {
                     arguments = arguments.map { $0.replacingOccurrences(of: "${\(name)}", with: v) }
                     command = command.replacingOccurrences(of: "${\(name)}", with: v)
+                    env = env.mapValues { $0.replacingOccurrences(of: "${\(name)}", with: v) }
                 } else {
                     env[name] = v
                 }
             }
+            // A secret setting never given (optional): empty, not the placeholder.
+            let unset = #"\$\{user_config\.[^}]*\}"#
+            command = command.replacingOccurrences(of: unset, with: "", options: .regularExpression)
+            arguments = arguments.map { $0.replacingOccurrences(of: unset, with: "", options: .regularExpression) }
+            env = env.mapValues { $0.replacingOccurrences(of: unset, with: "", options: .regularExpression) }
             let secrets = config.secretNames.compactMap { MCPSecrets.get(server: config.id, name: $0) }.filter { $0.count >= 3 }
             let id = config.id
             return MCPStdioTransport(executable: command, arguments: arguments,

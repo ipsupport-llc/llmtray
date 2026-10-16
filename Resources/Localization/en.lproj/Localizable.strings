@@ -1495,6 +1495,7 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
+"a new setting (%@): uninstall and install it again to give it" = "a new setting (%@): uninstall and install it again to give it";
 "always" = "always";
 "and %lld more" = "and %lld more";
 "at least %1$@ items, %2$@" = "at least %1$@ items, %2$@";

@@ -459,16 +459,20 @@ public enum MCPSource: Codable, Equatable, Sendable {
     /// Whether `latest` is newer than `installed` (dotted numbers; a
     /// leading "v" ignored; anything unreadable is "not newer").
     public static func isNewer(_ latest: String, than installed: String?) -> Bool {
-        func parts(_ v: String) -> [Int]? {
-            let t = v.hasPrefix("v") ? String(v.dropFirst()) : v
-            let p = t.split(separator: ".").map { Int($0.prefix { $0.isNumber }) }
-            return p.contains(nil) || p.isEmpty ? nil : p.compactMap { $0 }
+        /// The numbers, and whether it's a prerelease (`-beta.1`).
+        func parts(_ v: String) -> (numbers: [Int], pre: Bool)? {
+            var t = v.hasPrefix("v") ? String(v.dropFirst()) : v
+            let pre = t.contains("-")
+            if let dash = t.firstIndex(of: "-") { t = String(t[..<dash]) }
+            let p = t.split(separator: ".").map { Int($0) }
+            return p.contains(nil) || p.isEmpty ? nil : (p.compactMap { $0 }, pre)
         }
         guard let installed, let a = parts(latest), let b = parts(installed) else { return false }
-        for i in 0..<max(a.count, b.count) {
-            let x = i < a.count ? a[i] : 0, y = i < b.count ? b[i] : 0
+        for i in 0..<max(a.numbers.count, b.numbers.count) {
+            let x = i < a.numbers.count ? a.numbers[i] : 0, y = i < b.numbers.count ? b.numbers[i] : 0
             if x != y { return x > y }
         }
-        return false
+        // The same numbers: a release is newer than its prerelease.
+        return b.pre && !a.pre
     }
 }

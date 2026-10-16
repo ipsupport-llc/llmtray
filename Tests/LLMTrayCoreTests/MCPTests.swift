@@ -115,6 +115,8 @@ final class MCPTests: XCTestCase {
         XCTAssertFalse(MCPSource.isNewer("1.4.0", than: "1.4"))
         XCTAssertFalse(MCPSource.isNewer("1.4.0", than: nil))
         XCTAssertFalse(MCPSource.isNewer("nightly", than: "1.0"))
+        XCTAssertTrue(MCPSource.isNewer("1.2.0", than: "1.2.0-beta.1"))
+        XCTAssertFalse(MCPSource.isNewer("1.2.0-beta.2", than: "1.2.0"))
     }
 
     func testSecretLookingNames() {

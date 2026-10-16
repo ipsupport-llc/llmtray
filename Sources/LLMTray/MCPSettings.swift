@@ -350,7 +350,7 @@ private struct DiscoverView: View {
 
     private func state(source: MCPSource?, name: String) -> CardState {
         if installer.busy.contains(name) { return .installing }
-        if hub.servers.contains(where: { ($0.source != nil && $0.source == source) || $0.name == name }) { return .installed }
+        if let source, hub.servers.contains(where: { $0.source == source }) { return .installed }
         return .available
     }
 
@@ -381,7 +381,9 @@ private struct DiscoverView: View {
     private func installFeatured(_ item: MCPFeatured.Item) {
         Task {
             do {
-                let found = try await installer.downloadBundle(item.bundleURL, sha256: nil)
+                var found = try await installer.downloadBundle(item.bundleURL, sha256: nil)
+                found.name = item.title
+                found.icon = found.icon ?? item.iconURL
                 await go(found, origin: item.repository, source: MCPSource.githubRelease(url: item.bundleURL))
             } catch {
                 installer.message = error.localizedDescription
@@ -639,6 +641,7 @@ private struct AsksSheet: View {
     let install: ([String: String]) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var values: [String: String] = [:]
+    @State private var installing = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -657,12 +660,9 @@ private struct AsksSheet: View {
             .formStyle(.grouped)
             HStack {
                 Spacer()
-                Button("Cancel") {
-                    // An unpacked bundle nobody installed goes.
-                    if MCPInstaller.isBundle(found), let folder = found.workingDirectory { try? FileManager.default.removeItem(atPath: folder) }
-                    dismiss()
-                }
+                Button("Cancel") { dismiss() }
                 Button("Install") {
+                    installing = true
                     install(values)
                     dismiss()
                 }
@@ -673,6 +673,10 @@ private struct AsksSheet: View {
         .padding(20)
         .frame(width: 520)
         .onAppear { values = MCPInstaller.defaults(found) }
+        // Closed without Install (Cancel, Esc): an unpacked bundle goes.
+        .onDisappear {
+            if !installing, MCPInstaller.isBundle(found), let folder = found.workingDirectory { try? FileManager.default.removeItem(atPath: folder) }
+        }
     }
 }
 
@@ -787,7 +791,7 @@ private struct ConfigureSheet: View {
             settingsFound = installer.asks(of: server)
             if let found = settingsFound {
                 values = MCPInstaller.defaults(found).merging(server.answers) { _, kept in kept }
-                for ask in found.asks where ask.sensitive { values[ask.key] = "" }
+                for ask in found.asks where MCPInstaller.isSecret(ask, in: found) { values[ask.key] = "" }
             }
             if server.tools.isEmpty { reconnect() }
         }
@@ -796,7 +800,12 @@ private struct ConfigureSheet: View {
     private func reconnect() {
         starting = true
         Task {
-            if let error = await hub.startForReview(serverID) { installer.message = error }
+            if let error = await hub.startForReview(serverID) {
+                installer.message = error
+            } else if hub.server(serverID)?.reviewed.isEmpty == true {
+                // It never started at install: this is its first look.
+                hub.markReviewed(serverID)
+            }
             starting = false
         }
     }
