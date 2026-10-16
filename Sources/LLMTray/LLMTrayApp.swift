@@ -206,8 +206,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pulseTimer: Timer?
     /// When the work behind the pulse ended (nil: still going).
     private var pulseStopAsked: Date?
-    /// How long the pulse lingers after the work ends, for the next request.
-    private static let pulseLinger: TimeInterval = 2
+    /// How long the pulse lingers once the icon is no longer busy (iconBusy
+    /// lingers already); it still ends at the top of a cycle.
+    private static let pulseLinger: TimeInterval = 0
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if APP_STORE
@@ -980,12 +981,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .sink { [weak self] combined, isGeneratingMedia in
                 let (_, isStreaming, _, isBusy) = combined
                 guard let self else { return }
-                self.statusItem.button?.image = self.coloredStatusImage
                 // isStreaming is immediate but only fires for this app's own
                 // chat UI; isBusy is a ~1s-latency CPU-poll fallback that
                 // also catches an external tool hitting the OpenAI-compatible
                 // endpoint directly, which never touches ChatClient at all.
-                self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingMedia)
+                self.setIconBusy(isStreaming || isBusy || isGeneratingMedia)
+                self.statusItem.button?.image = self.coloredStatusImage
             }
             .store(in: &cancellables)
         // A project indexing (adr/0012): a small dot on the icon.
@@ -1003,6 +1004,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Any project indexing: the icon carries a dot.
     private var isIndexingProjects = false
+
+    /// What the icon shows as busy (green, pulsing): on at once, off only
+    /// once nothing has been at work for `iconBusyLinger` -- short requests
+    /// one after another (memory's, an agent's) flickered it green and back.
+    private var iconBusy = false
+    private var iconIdleWork: DispatchWorkItem?
+    private static let iconBusyLinger: TimeInterval = 2
+
+    private func setIconBusy(_ busy: Bool) {
+        if busy {
+            iconIdleWork?.cancel()
+            iconIdleWork = nil
+            guard !iconBusy else { return }
+            iconBusy = true
+            updatePulse(isStreaming: true)
+            return
+        }
+        guard iconBusy, iconIdleWork == nil else { return }
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.iconIdleWork = nil
+                self.iconBusy = false
+                self.statusItem.button?.image = self.coloredStatusImage
+                self.updatePulse(isStreaming: false)
+            }
+        }
+        iconIdleWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.iconBusyLinger, execute: work)
+    }
 
     /// Color alone can't carry both signals once thermal state (orange/red)
     /// outranks "is generating" (green) -- so activity is layered on as a
@@ -1081,7 +1112,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusColor: Color {
         if systemMonitor.isThrottling { return .red }
         if systemMonitor.isWarm { return .orange }
-        if tabs.isAnyStreaming || server.isBusy || tabs.isAnyGeneratingMedia { return .green }
+        if iconBusy { return .green }
         return .primary
     }
 
