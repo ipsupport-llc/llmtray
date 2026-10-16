@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" não faz mais parte do projeto.";
 "%.0f%% from drafts" = "%.0f%% dos rascunhos";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ está disponível. Atualize em Ajustes › Ferramentas.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ e mais %2$lld";
 "%1$@ asks for %2$@" = "%1$@ solicita %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "Ajustes de ferramentas…";
 "Tool call statistics" = "Estatísticas de chamadas de ferramentas";
 "Tool calls" = "Chamadas de ferramentas";
+"Tool server update" = "Atualização do servidor de Ferramenta";
 "Tool-use rule" = "Regra de uso de ferramentas";
 "Tools" = "Ferramentas";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Ferramentas que o modelo pode chamar no chat do app (requer modelo com chamada de ferramenta). Ferramentas web enviam a consulta do modelo ao serviço público correspondente (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); ferramentas locais nunca saem do Mac.";

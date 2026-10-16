@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "״%@״ כבר לא חלק מהפרויקט.";
 "%.0f%% from drafts" = "%.0f%% מטיוטות";
 "%.1f s" = "%.1f שנ'";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ זמין. עדכן אותו ב״הגדרות › כלים״.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ ועוד %2$lld";
 "%1$@ asks for %2$@" = "%1$@ מבקש את %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "הגדרות כלי…";
 "Tool call statistics" = "סטטיסטיקת קריאות לכלים";
 "Tool calls" = "קריאות לכלים";
+"Tool server update" = "עדכון לשרת הכלים";
 "Tool-use rule" = "כלל לשימוש בכלים";
 "Tools" = "כלים";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "כלים שהמודל יכול לקרוא בשיחה בתוך האפליקציה (דורש מודל התומך בקריאה לכלים). כלים ברשת שולחים את שאילתת המודל לשירות הציבורי המתאים (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); כלים מקומיים אינם עוזבים את המאק.";

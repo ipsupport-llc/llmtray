@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" 不再在项目中。";
 "%.0f%% from drafts" = "%.0f%% 来自草稿";
 "%.1f s" = "%.1f 秒";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "有可用的 %1$@ %2$@。请在“设置”›“工具”中更新。";
 "%1$@ (%2$lld)" = "%1$@（%2$lld）";
 "%1$@ and %2$lld more" = "%1$@，另有 %2$lld 项";
 "%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "工具设置…";
 "Tool call statistics" = "工具调用统计";
 "Tool calls" = "工具调用";
+"Tool server update" = "工具服务器更新";
 "Tool-use rule" = "工具使用规则";
 "Tools" = "工具";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型可在应用内聊天中调用的工具（需支持调用工具的模型）。网页版工具会将模型的查询发送到相应的公共服务（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本地工具的数据不会离开这台 Mac。";

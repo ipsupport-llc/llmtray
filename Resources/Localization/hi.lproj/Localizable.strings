@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "“%@” अब प्रोजेक्ट में नहीं है।";
 "%.0f%% from drafts" = "%.0f%% ड्राफ़्ट से";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ उपलब्ध है। इसे सेटिंग्स › टूल में अपडेट करें।";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ और %2$lld और";
 "%1$@ asks for %2$@" = "%1$@ ने %2$@ मांगा है";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "टूल सेटिंग्स…";
 "Tool call statistics" = "टूल कॉल आँकड़े";
 "Tool calls" = "टूल कॉल";
+"Tool server update" = "टूल सर्वर अपडेट";
 "Tool-use rule" = "टूल उपयोग नियम";
 "Tools" = "टूल";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "मॉडल इन-ऐप चैट में इन टूल्स को कॉल कर सकता है (इसके लिए tool-calling मॉडल चाहिए)। वेब टूल मॉडल के प्रश्न को सार्वजनिक सेवा पर भेजते हैं (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); स्थानीय टूल कभी भी Mac से बाहर नहीं जाते।";

@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" sudah tidak ada lagi dalam proyek.";
 "%.0f%% from drafts" = "%.0f%% dari draf";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ tersedia. Perbarui di Pengaturan › Alat.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ dan %2$lld lagi";
 "%1$@ asks for %2$@" = "%1$@ meminta %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "Pengaturan Alat…";
 "Tool call statistics" = "Statistik panggilan alat";
 "Tool calls" = "Panggilan alat";
+"Tool server update" = "Pembaruan server alat";
 "Tool-use rule" = "Aturan penggunaan alat";
 "Tools" = "Alat";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Alat yang dapat dipanggil model dalam obrolan aplikasi (membutuhkan model pemanggil alat). Alat web mengirim kueri model ke layanan publik tersebut (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); alat lokal tidak pernah meninggalkan Mac.";

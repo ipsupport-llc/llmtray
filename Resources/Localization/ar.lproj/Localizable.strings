@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "لم يعد «%@» موجودًا في المشروع.";
 "%.0f%% from drafts" = "%.0f%% من المسودات";
 "%.1f s" = "%.1f ث";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "يتوفر %1$@ %2$@. حدّثه في الإعدادات › الأدوات.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ و%2$lld أخرى";
 "%1$@ asks for %2$@" = "%1$@ يطلب %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "إعدادات الأدوات…";
 "Tool call statistics" = "إحصاءات استدعاءات الأدوات";
 "Tool calls" = "استدعاءات الأدوات";
+"Tool server update" = "تحديث خادم الأداة";
 "Tool-use rule" = "قاعدة استخدام الأدوات";
 "Tools" = "الأدوات";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "الأدوات التي قد يستدعيها الموديل داخل دردشة التطبيق (تتطلب موديل يدعم استدعاء الأدوات). الأدوات التي تعمل عبر الويب ترسل استعلام الموديل إلى تلك الخدمة العامة (DuckDuckGo، Google News، Wikipedia/Wikidata، Hacker News، date.nager.at، open.er-api.com، Open-Meteo)؛ أما الأدوات المحلية فلا تغادر بياناتها جهاز الـMac.";

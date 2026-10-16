@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "«%@» больше не в проекте.";
 "%.0f%% from drafts" = "%.0f%% из черновиков";
 "%.1f s" = "%.1f с";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "Доступен %1$@ %2$@. Обновите его в разделе «Настройки › Инструменты».";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ и ещё %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запрашивает %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "Настройки инструментов…";
 "Tool call statistics" = "Статистика вызовов инструментов";
 "Tool calls" = "Вызовы инструментов";
+"Tool server update" = "Обновление сервера инструментов";
 "Tool-use rule" = "Правило инструментов";
 "Tools" = "Инструменты";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Инструменты, которые модель может вызывать в чате приложения (требуется модель с поддержкой вызова инструментов). Веб‑инструменты отправляют запрос модели в соответствующий публичный сервис (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open‑Meteo); локальные инструменты никогда не покидают Mac.";

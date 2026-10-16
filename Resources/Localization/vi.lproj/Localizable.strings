@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" không còn trong dự án nữa.";
 "%.0f%% from drafts" = "%.0f%% từ bản nháp";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "Đã có %1$@ %2$@. Hãy cập nhật trong Cài đặt › Công cụ.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ và %2$lld mục khác";
 "%1$@ asks for %2$@" = "%1$@ yêu cầu %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "Cài đặt Công cụ…";
 "Tool call statistics" = "Thống kê lượt gọi công cụ";
 "Tool calls" = "Lượt gọi công cụ";
+"Tool server update" = "Cập nhật máy chủ công cụ";
 "Tool-use rule" = "Quy tắc sử dụng công cụ";
 "Tools" = "Công cụ";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Các công cụ mà mô hình có thể gọi trong trò chuyện của ứng dụng (cần mô hình hỗ trợ gọi công cụ). Công cụ web gửi truy vấn của mô hình tới dịch vụ công cộng đó (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); công cụ cục bộ không bao giờ rời khỏi Mac.";
