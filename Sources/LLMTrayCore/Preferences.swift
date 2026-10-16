@@ -165,6 +165,9 @@ public enum Pref {
     /// Hours the user's mood, read from their last messages, reaches new
     /// chats; 0: not read at all.
     public static let memoryMoodHours = PrefKey("llmtray.memory.moodHours", default: 3)
+    /// Models memory found can't read chats (their replies unreadable again
+    /// and again), one path a line: their chats are read by another model.
+    public static let memoryUnfitReaders = PrefKey("llmtray.memory.unfitReaders", default: "")
     /// The notes' language: a language code, or "auto" (the app's).
     public static let memoryLanguage = PrefKey("llmtray.memory.language", default: "auto")
     /// A chat is read for memory after this many quiet minutes.

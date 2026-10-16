@@ -19,6 +19,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio's, shared with it)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ couldn't read chats for memory: another model reads its chats.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
@@ -1295,6 +1296,7 @@
 "Total time" = "Total time";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.";
 "Try Again" = "Try Again";
+"Try It Again" = "Try It Again";
 "Turn On" = "Turn On";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
