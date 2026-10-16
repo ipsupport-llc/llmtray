@@ -128,8 +128,20 @@ struct MemoryPane: View {
                 notesSection
                 if !expiredNotes.isEmpty { expiredSection }
                 Section {
-                    DisclosureGroup(isExpanded: $showAdvanced) {
-                        advancedHeader("What chats get")
+                    Button {
+                        withAnimation { showAdvanced.toggle() }
+                    } label: {
+                        HStack {
+                            SettingLabel(title: "Advanced", help: "What chats get, how chats are read, how long notes last. The defaults suit most people.")
+                            Spacer()
+                            Image(systemName: showAdvanced ? "chevron.down" : "chevron.right").foregroundStyle(.secondary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                if showAdvanced {
+                    Section("What chats get") {
                         Toggle(isOn: kindBinding(.preference)) {
                             SettingLabel(title: "Preferences", help: "How you like things: language, length, tone, formatting.")
                         }
@@ -144,7 +156,7 @@ struct MemoryPane: View {
                         }
                         Stepper(value: $moodHours, in: 0...24) {
                             SettingLabel(title: moodHours == 0 ? "Your mood: not read" : "Your mood: for \(moodHours) hours",
-                                         help: "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.")
+                            help: "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.")
                         }
                         Toggle(isOn: $projects) {
                             SettingLabel(title: "Remember in projects", help: "A project's chats learn and get notes about their project. Off: nothing is learned in a project's chats and no project note is sent.")
@@ -158,7 +170,8 @@ struct MemoryPane: View {
                         Stepper(value: $budget, in: 50...4000, step: 50) {
                             SettingLabel(title: "Room in each chat: \(budget) tokens", help: "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.")
                         }
-                        advancedHeader("Reading chats")
+                    }
+                    Section("Reading chats") {
                         Picker(selection: $learningModel) {
                             Text("The chat's own model").tag("")
                             // Not offered as the reader (adr/0025: it misses too
@@ -208,9 +221,10 @@ struct MemoryPane: View {
                         }
                         Stepper(value: $factChats, in: 1...5) {
                             SettingLabel(title: factChats == 1 ? "Use a learned fact at once" : "Use a learned fact once \(factChats) chats show it",
-                                         help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
+                            help: "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.")
                         }
-                        advancedHeader("How long notes last")
+                    }
+                    Section("How long notes last") {
                         halfLifeStepper("Preferences: half after \(halfLifePreference) days", $halfLifePreference)
                         halfLifeStepper("Corrections: half after \(halfLifeCorrection) days", $halfLifeCorrection)
                         halfLifeStepper("Facts: half after \(halfLifeFact) days", $halfLifeFact)
@@ -221,8 +235,6 @@ struct MemoryPane: View {
                         Stepper(value: $deleteAfter, in: 0...365, step: 5) {
                             SettingLabel(title: "Delete expired notes after \(deleteAfter) days", help: "An expired note isn't sent any more; you can bring it back until it's deleted.")
                         }
-                    } label: {
-                        SettingLabel(title: "Advanced", help: "What chats get, how chats are read, how long notes last. The defaults suit most people.")
                     }
                 }
                 Section {
@@ -291,6 +303,14 @@ struct MemoryPane: View {
                     learnPastResult = nil
                 }
             }
+            if !memory.file.hasPaused {
+                Button("Forget Everything and Read Chats Again", role: .destructive) {
+                    if memory.forgetEverything(readAgain: true) {
+                        loadAbout()
+                        learnFromPastChats()
+                    }
+                }
+            }
         } message: {
             Text("What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone.")
         }
@@ -303,10 +323,6 @@ struct MemoryPane: View {
             return String(format: NSLocalizedString("%d parts of chats wait to be read.", comment: "memory"), memory.file.queue.count)
         }
         return learnPastResult ?? NSLocalizedString("Up to date.", comment: "memory: nothing waits to be read")
-    }
-
-    private func advancedHeader(_ title: LocalizedStringKey) -> some View {
-        Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary).padding(.top, 6)
     }
 
     /// Every saved chat queued from its start; what it did, under the button.

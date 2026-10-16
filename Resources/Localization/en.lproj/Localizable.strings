@@ -460,6 +460,7 @@
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
 "Forget" = "Forget";
 "Forget Everything" = "Forget Everything";
+"Forget Everything and Read Chats Again" = "Forget Everything and Read Chats Again";
 "Forget What Was Learned" = "Forget What Was Learned";
 "Forget What Was Learned and Read Chats Again" = "Forget What Was Learned and Read Chats Again";
 "Forget…" = "Forget…";
@@ -512,6 +513,7 @@
 "How do I connect my coding agent to LLMTray?" = "How do I connect my coding agent to LLMTray?";
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How it was made" = "How it was made";
+"How long notes last" = "How long notes last";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
@@ -898,6 +900,7 @@
 "Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
+"Reading chats" = "Reading chats";
 "Reading what's installed…" = "Reading what's installed…";
 "Reads chats with" = "Reads chats with";
 "Ready." = "Ready.";
