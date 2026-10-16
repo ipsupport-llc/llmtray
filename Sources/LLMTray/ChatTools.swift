@@ -239,7 +239,9 @@ final class ChatToolbox {
             prepared[call.id] = Prepared(tool: nil, arguments: ParsedToolArguments(values: [:], repairs: [], problems: []))
             return call
         }
-        var parsed = ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema)
+        // An MCP tool's arguments go to its server as written (JSON read
+        // leniently, nothing unwrapped or renamed): adr/0027.
+        var parsed = tool is MCPChatTool ? Self.rawArguments(call.argumentsJSON) : ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema)
         for (key, value) in implied where parsed.values[key] == nil { parsed.values[key] = value }
         if let nameRepair { parsed.repairs.insert(nameRepair, at: 0) }
         // Its own output read again (ChatClient prepared it, then run):
@@ -263,6 +265,7 @@ final class ChatToolbox {
     /// Read from the call itself, not the cache by id: a model may repeat ids.
     func understood(_ call: ToolCall) -> Bool {
         guard let tool = resolve(call.name)?.tool else { return true }   // unknown: runs nothing
+        if tool is MCPChatTool { return Self.rawArguments(call.argumentsJSON).isValid }
         return ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).isValid
     }
 
@@ -496,6 +499,10 @@ final class ChatToolbox {
             guard !mcpDenied.contains(tool.name) else {
                 return finish(.refused("Not run: the user didn't allow \(tool.name) in this turn. Don't call it again unless the user asks."))
             }
+            // Arguments that aren't one JSON object never run (not as `{}`).
+            if !arguments.isValid {
+                return finish(.text("\(tool.name): the arguments must be one JSON object, as its schema describes. Nothing ran."), .error("bad_json"))
+            }
             var context = context
             context.outsideTextThisTurn = turnTrust.hasOutsideText
             let result = await mcp.run(arguments.values, context: context)
@@ -571,6 +578,21 @@ final class ChatToolbox {
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success
         case .generatedImage, .generatedAudio, .generatedDocument, .loadedTools, .imageForModel, .projectText, .mcp: return .success
+        }
+    }
+
+    /// An MCP call's arguments: one JSON object (a fence or single quotes
+    /// forgiven), its fields untouched; empty arguments are `{}`.
+    static func rawArguments(_ json: String) -> ParsedToolArguments {
+        if json.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return ParsedToolArguments(values: [:], repairs: [], problems: []) }
+        switch LenientJSON.parse(json) {
+        case .success(let parsed):
+            guard let object = parsed.value as? [String: Any] else {
+                return ParsedToolArguments(values: [:], repairs: [], problems: [.badJSON("not a JSON object")])
+            }
+            return ParsedToolArguments(values: object, repairs: parsed.repairs, problems: [])
+        case .failure(let failure):
+            return ParsedToolArguments(values: [:], repairs: [], problems: [.badJSON("\(failure)")])
         }
     }
 

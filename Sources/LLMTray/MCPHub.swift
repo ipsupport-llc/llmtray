@@ -272,7 +272,8 @@ final class MCPHub: ObservableObject {
         do {
             return try await start.value
         } catch {
-            noteFailure(id, redact(error.localizedDescription, config))
+            // A stop while starting isn't a crash.
+            if !(error is CancellationError) && !Task.isCancelled { noteFailure(id, redact(error.localizedDescription, config)) }
             throw error
         }
     }
@@ -283,18 +284,20 @@ final class MCPHub: ObservableObject {
             guard Self.commandsAllowed else { throw MCPError.closed("command servers don't run in this build") }
             var env = config.environment
             var arguments = config.arguments
+            var command = config.command
             for name in config.secretNames {
                 guard let v = MCPSecrets.get(server: config.id, name: name) else { continue }
                 // A bundle's secret setting used in an argument (adr/0027).
                 if name.hasPrefix("user_config.") {
                     arguments = arguments.map { $0.replacingOccurrences(of: "${\(name)}", with: v) }
+                    command = command.replacingOccurrences(of: "${\(name)}", with: v)
                 } else {
                     env[name] = v
                 }
             }
-            let secrets = config.secretNames.compactMap { MCPSecrets.get(server: config.id, name: $0) }.filter { $0.count >= 4 }
+            let secrets = config.secretNames.compactMap { MCPSecrets.get(server: config.id, name: $0) }.filter { $0.count >= 3 }
             let id = config.id
-            return MCPStdioTransport(executable: config.command, arguments: arguments,
+            return MCPStdioTransport(executable: command, arguments: arguments,
                                      environment: MCPStdioTransport.environment(adding: env),
                                      workingDirectory: config.workingDirectory ?? FileManager.default.homeDirectoryForCurrentUser.path,
                                      onLog: { text in
@@ -353,7 +356,9 @@ final class MCPHub: ObservableObject {
         do {
             client = try await connect(config.id)
         } catch {
-            return .notSent(error.localizedDescription)
+            // The server's own words (an error, its stderr) stay in Settings:
+            // they may hold a secret, or instructions for the model.
+            return .notSent("the server couldn't be started or reached (its log in Settings says why)")
         }
         // The definition the user allowed must still be the one listed.
         guard let now = server(config.id), now.enabled, now.visibleTools.contains(tool) else {
@@ -364,9 +369,8 @@ final class MCPHub: ObservableObject {
         case .result(let text, let isError): return .done(text, isError: isError)
         case .notSent(let why): return .notSent(why)
         case .unknown:
-            await client.close()
-            clients.removeValue(forKey: config.id)
-            states[config.id, default: ServerState()].status = .stopped
+            // Restarted before its next call: the child goes now.
+            await stop(config.id)
             return .unknown
         }
     }
@@ -388,7 +392,7 @@ final class MCPHub: ObservableObject {
     }
 
     func stopAll() async {
-        for id in Array(clients.keys) { await stop(id) }
+        for id in Set(clients.keys).union(transports.keys) { await stop(id) }
     }
 
     /// At quit: every server child goes now.
@@ -409,7 +413,7 @@ final class MCPHub: ObservableObject {
         guard let config else { return text }
         var out = text
         for name in config.secretNames {
-            if let v = MCPSecrets.get(server: config.id, name: name), v.count >= 4 { out = out.replacingOccurrences(of: v, with: "•••") }
+            if let v = MCPSecrets.get(server: config.id, name: name), v.count >= 3 { out = out.replacingOccurrences(of: v, with: "•••") }
         }
         return out
     }

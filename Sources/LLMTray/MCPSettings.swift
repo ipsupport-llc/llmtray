@@ -389,15 +389,26 @@ private struct AsksSheet: View {
             f.environment = f.environment.mapValues { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
             // A secret placeholder goes in by the environment, never written
             // into the arguments on disk: in an argument it's filled at start.
+            // Variables holding secret settings: every placeholder filled in
+            // one value (a connection string can hold two), then kept in the
+            // Keychain.
+            for (k, v) in f.environment {
+                var filled = v
+                for ask in found.asks where ask.sensitive {
+                    filled = filled.replacingOccurrences(of: "${user_config.\(ask.key)}", with: values[ask.key] ?? "")
+                }
+                if filled != v { secrets[k] = filled }
+            }
             for ask in found.asks where ask.sensitive {
                 let value = values[ask.key] ?? ""
                 guard !value.isEmpty else { continue }
                 let marker = "${user_config.\(ask.key)}"
-                for (k, v) in f.environment where v.contains(marker) { secrets[k] = v.replacingOccurrences(of: marker, with: value) }
-                // In an argument: kept as the placeholder, the value in the
-                // Keychain under its name, filled when the server starts.
-                if f.arguments.contains(where: { $0.contains(marker) }) { secrets["user_config.\(ask.key)"] = value }
+                // In an argument or the command: kept as the placeholder, the
+                // value in the Keychain under its name, filled at start.
+                if (f.arguments + [f.command]).contains(where: { $0.contains(marker) }) { secrets["user_config.\(ask.key)"] = value }
             }
+            // A bare command name, as Terminal would find it.
+            if !f.command.hasPrefix("/"), !f.command.contains("${"), let path = MCPImport.resolveCommand(f.command) { f.command = path }
         } else {
             // Registry variables or headers: secret ones to the Keychain.
             for ask in found.asks {
