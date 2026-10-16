@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Haga clic para activar Archivos del proyecto: agregue archivos al proyecto y permita que sus chats los busquen.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Haz clic para grabar un clip; mantén pulsado para hablar y suelta para enviarlo (el modelo lo oye).";
 "Click ■ to stop · Esc cancels" = "Haz clic en ■ para detener · Esc cancela";
+"Client ID" = "ID de cliente";
 "Close" = "Cerrar";
 "Close Tab" = "Cerrar pestaña";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Cierra esta ventana. Ajustes › General › Configurar LLMTray… vuelve a abrirla.";
@@ -479,6 +480,7 @@
 "Files…" = "Archivos…";
 "Finish" = "Finalizar";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finalizar aplica lo que elegiste. Podrás cambiarlo más tarde en Ajustes.";
+"Finish in your browser…" = "Finaliza en tu navegador…";
 "First token" = "Primer token";
 "First-run setup" = "Configuración inicial";
 "Fits comfortably" = "Cabe holgadamente";
@@ -750,6 +752,8 @@
 "Needs %@" = "Necesita %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Necesita unos %1$@ GB, más que los %2$@ GB que puede usar la GPU: podría quedarse sin memoria si hay otras apps abiertas.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Necesita unos %1$@ GB; este Mac tiene %2$@ GB.";
+"Needs sign-in" = "Requiere iniciar sesión";
+"Needs sign-in." = "Requiere iniciar sesión.";
 "Network" = "Red";
 "Never" = "Nunca";
 "New Chat" = "Nuevo chat";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Aún no hay notas. Añade lo que todo Chat debería saber: «Responde en ruso, brevemente», «Estoy creando un altavoz ESP32».";
 "No requests yet." = "Aún no hay solicitudes.";
 "No runs yet." = "Aún no hay ejecuciones.";
+"No sign-in" = "Sin inicio de sesión";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Sin suscripciones. Sin funciones bloqueadas. Apoya el desarrollo si LLMTray te resulta útil.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No hay sugerencias para la memoria de este Mac. Busca un modelo en Hugging Face.";
 "No thanks" = "No, gracias";
@@ -973,6 +978,7 @@
 "Record" = "Grabar";
 "Recording" = "Grabando";
 "Recovery" = "Recuperación";
+"Redirect URL to add to your app:" = "URL de redirección para añadir a tu app:";
 "Refused" = "Rechazadas";
 "Regenerate" = "Regenerar";
 "Reinstall" = "Reinstalar";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "Muestra Pausar, Detener y los archivos del proyecto";
 "Shows the chat window" = "Muestra la ventana de chat";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Muestra el razonamiento del modelo (el bloque plegable «Thought process») encima de su respuesta.";
+"Sign In" = "Iniciar sesión";
+"Sign Out" = "Cerrar sesión";
+"Signed in at %@" = "Sesión iniciada a las %@";
+"Signing in: finish in your browser." = "Iniciando sesión: finaliza en tu navegador.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Canta las letras claramente, voz en primer plano. Unos 40 s para 30 s de música.";
 "Size" = "Tamaño";
 "Skip" = "Omitir";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "El plan cambió desde que lo viste: revísalo de nuevo.";
 "The port and network access can change only while the server is stopped." = "El puerto y el acceso de red solo se pueden cambiar mientras el servidor esté detenido.";
 "The project's files, and Add Files…" = "Los archivos del proyecto y Agregar archivos…";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "El registro comprueba quién publicó un nombre, no lo que hace el código. El Chat te pregunta antes de cada llamada.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "El registro no respondió en 30 segundos. Inténtalo de nuevo dentro de un momento.";
 "The reply was cut at its length limit." = "La respuesta se truncó por el límite de longitud.";
 "The report" = "El informe";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "Esfuerzo de razonamiento: cuánto tiempo puede pensar el modelo antes de responder";
 "Thinking…" = "Pensando…";
 "Thinking… %@ s of reply ready" = "Pensando… %@ s de respuesta lista";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "Servidor de terceros, no de IPSupport. Sin garantía de ningún tipo: lo instalas y lo usas bajo tu propia responsabilidad.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "Servidor de terceros, no de IPSupport. Sin garantía de ningún tipo: lo usas bajo tu propia responsabilidad.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "Servidores de terceros, no de IPSupport. El registro comprueba quién publicó un nombre, no lo que hace el código. Sin garantía de ningún tipo: los instalas y los usas bajo tu propia responsabilidad. Chat te pregunta antes de cada llamada.";
 "This Mac" = "Este Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Este Mac ejecuta el modelo a ~%@× tiempo real: habla y luego escucha.";
 "This can change things." = "Esto puede cambiar cosas.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "al menos %1$@ elementos, %2$@";
 "at least %@" = "al menos %@";
 "building %@" = "construyendo %@";
-"by %lld" = "por %lld";
+"by %lld · third-party" = "por %lld · de terceros";
+"by IPSupport" = "por IPSupport";
 "calls tools" = "invoca herramientas";
 "can look" = "puede ver";
 "can look and propose changes" = "puede ver y proponer cambios";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "la versión instalada no ha cambiado";
 "the model" = "el modelo";
 "the model runtime isn't installed yet" = "el runtime del modelo aún no está instalado";
+"the sign-in was cancelled" = "se canceló el inicio de sesión";
 "then" = "entonces";
 "this call only" = "solo esta llamada";
 "tight fit" = "ajuste ajustado";

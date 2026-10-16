@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Нажмите, чтобы включить файлы проекта: добавляйте файлы в проект и разрешите чатам проекта их искать.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Нажмите, чтобы записать фрагмент; удерживайте, чтобы говорить, и отпустите, чтобы отправить (модель это услышит).";
 "Click ■ to stop · Esc cancels" = "Нажмите ■, чтобы остановить · Esc — отменить";
+"Client ID" = "Идентификатор клиента";
 "Close" = "Закрыть";
 "Close Tab" = "Закрыть вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закрывает это окно. Снова открыть: Настройки › Основные › Настроить LLMTray…";
@@ -479,6 +480,7 @@
 "Files…" = "Файлы…";
 "Finish" = "Готово";
 "Finish applies what you chose. You can change all of it later in Settings." = "«Готово» применяет выбранное. Всё это можно изменить позже в Настройках.";
+"Finish in your browser…" = "Завершите вход в браузере…";
 "First token" = "Первый токен";
 "First-run setup" = "Первоначальная настройка";
 "Fits comfortably" = "Помещается с запасом";
@@ -750,6 +752,8 @@
 "Needs %@" = "Требуется %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Требуется около %1$@ ГБ, больше, чем %2$@ ГБ, доступных для GPU: при открытых других приложениях может закончиться память.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Требуется около %1$@ ГБ; в этом Mac — %2$@ ГБ.";
+"Needs sign-in" = "Требуется вход";
+"Needs sign-in." = "Требуется вход.";
 "Network" = "Сеть";
 "Never" = "Никогда";
 "New Chat" = "Новый чат";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Заметок пока нет. Добавьте то, что должен знать каждый чат: «Ответ на русском, кратко», «Я собираю колонку на ESP32».";
 "No requests yet." = "Запросов пока нет.";
 "No runs yet." = "Прогонов ещё не было.";
+"No sign-in" = "Без входа";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Никаких подписок. Никаких блокировок функций. Поддержите развитие, если LLMTray оказался полезен.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Нет рекомендаций по памяти для этого Mac. Просмотрите модели на Hugging Face.";
 "No thanks" = "Нет, спасибо";
@@ -973,6 +978,7 @@
 "Record" = "Записать";
 "Recording" = "Запись";
 "Recovery" = "Восстановление";
+"Redirect URL to add to your app:" = "URL перенаправления для добавления в приложение:";
 "Refused" = "Отклонено";
 "Regenerate" = "Сгенерировать заново";
 "Reinstall" = "Переустановить";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "Показывает Пауза, Остановить и файлы проекта";
 "Shows the chat window" = "Показывает окно чата";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показывает ход размышлений модели (сворачиваемый блок «Ход размышлений») перед её ответом.";
+"Sign In" = "Войти";
+"Sign Out" = "Выйти";
+"Signed in at %@" = "Выполнен вход в %@";
+"Signing in: finish in your browser." = "Вход: завершите его в браузере.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Вокал отчётливый, голос спереди. Примерно 40 с на 30 с музыки.";
 "Size" = "Размер";
 "Skip" = "Пропустить";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "План изменился с момента просмотра: просмотрите его снова.";
 "The port and network access can change only while the server is stopped." = "Порт и сетевой доступ можно изменить только при остановленном сервере.";
 "The project's files, and Add Files…" = "Файлы проекта и «Добавить файлы…»";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Реестр проверяет, кто опубликовал имя, а не то, что делает код. Чат спрашивает вас перед каждым вызовом.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Реестр не ответил за 30 секунд. Повторите попытку чуть позже.";
 "The reply was cut at its length limit." = "Ответ был обрезан по ограничению длины.";
 "The report" = "Отчёт";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "Усилие размышления: как долго модель может размышлять перед ответом.";
 "Thinking…" = "Думаю…";
 "Thinking… %@ s of reply ready" = "Думаю… готов ответ на %@ с";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "Сторонний сервер, не от IPSupport. Никаких гарантий: вы устанавливаете и используете его на свой риск.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "Сторонний сервер, не от IPSupport. Никаких гарантий: вы используете его на свой риск.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "Сторонние серверы, не от IPSupport. Реестр проверяет, кто опубликовал имя, а не что делает код. Никаких гарантий: вы устанавливаете и используете их на свой риск. Чат спрашивает вас перед каждым вызовом.";
 "This Mac" = "Этот Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Этот Mac запускает модель примерно в %@× реального времени: говорите, затем слушайте.";
 "This can change things." = "Это может вносить изменения.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "как минимум %1$@ элементов, %2$@";
 "at least %@" = "как минимум %@";
 "building %@" = "сборка %@";
-"by %lld" = "от %lld";
+"by %lld · third-party" = "от %lld · сторонний";
+"by IPSupport" = "от IPSupport";
 "calls tools" = "вызовы инструментов";
 "can look" = "может просматривать";
 "can look and propose changes" = "может просматривать и предлагать изменения";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "установленная версия не изменилась";
 "the model" = "модель";
 "the model runtime isn't installed yet" = "исполняющая среда модели ещё не установлена";
+"the sign-in was cancelled" = "вход был отменён";
 "then" = "тогда";
 "this call only" = "только этот вызов";
 "tight fit" = "плотная укладка";

@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Klik untuk mengaktifkan Berkas Proyek: tambahkan berkas ke proyek dan biarkan obrolannya mencarinya.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Klik untuk merekam klip; tahan untuk berbicara dan lepas untuk mengirim (model akan mendengarnya).";
 "Click ■ to stop · Esc cancels" = "Klik ■ untuk berhenti · Esc membatalkan";
+"Client ID" = "ID Klien";
 "Close" = "Tutup";
 "Close Tab" = "Tutup Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Menutup jendela ini. Pengaturan › Umum › Set Up LLMTray… akan membukanya lagi.";
@@ -479,6 +480,7 @@
 "Files…" = "Berkas…";
 "Finish" = "Selesai";
 "Finish applies what you chose. You can change all of it later in Settings." = "Selesai menerapkan pilihan Anda. Anda bisa mengubah semuanya nanti di Pengaturan.";
+"Finish in your browser…" = "Selesaikan di browser Anda…";
 "First token" = "Token pertama";
 "First-run setup" = "Pengaturan pertama kali";
 "Fits comfortably" = "Muatan pas";
@@ -750,6 +752,8 @@
 "Needs %@" = "Memerlukan %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Membutuhkan sekitar %1$@ GB, lebih besar dari %2$@ GB yang mungkin digunakan GPU: memori bisa habis jika aplikasi lain dibuka.";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Membutuhkan sekitar %1$@ GB; Mac ini memiliki %2$@ GB.";
+"Needs sign-in" = "Perlu masuk";
+"Needs sign-in." = "Perlu masuk.";
 "Network" = "Jaringan";
 "Never" = "Tidak Pernah";
 "New Chat" = "Obrolan Baru";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Belum ada catatan. Tambah hal yang perlu diketahui setiap obrolan: “Jawab dalam bahasa Rusia, singkat”, “Saya membuat speaker ESP32”.";
 "No requests yet." = "Belum ada permintaan.";
 "No runs yet." = "Belum ada yang dijalankan.";
+"No sign-in" = "Tidak perlu masuk";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Tanpa langganan. Tanpa fitur terkunci. Dukung pengembangan jika LLMTray berguna bagi Anda.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Tidak ada saran untuk memori Mac ini. Jelajahi Hugging Face untuk model.";
 "No thanks" = "Tidak, terima kasih";
@@ -973,6 +978,7 @@
 "Record" = "Rekam";
 "Recording" = "Merekam";
 "Recovery" = "Pemulihan";
+"Redirect URL to add to your app:" = "URL pengalihan untuk ditambahkan ke app Anda:";
 "Refused" = "Ditolak";
 "Regenerate" = "Buat Ulang";
 "Reinstall" = "Pasang ulang";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "Menampilkan Jeda, Hentikan, dan berkas proyek";
 "Shows the chat window" = "Menampilkan jendela obrolan";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
+"Sign In" = "Masuk";
+"Sign Out" = "Keluar";
+"Signed in at %@" = "Masuk pada %@";
+"Signing in: finish in your browser." = "Sedang masuk: selesaikan di browser Anda.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Menyanyikan lirik dengan jelas, vokal di depan. Sekitar 40 s untuk 30 s musik.";
 "Size" = "Ukuran";
 "Skip" = "Lewati";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "Rencana berubah sejak Anda melihatnya: tinjau lagi.";
 "The port and network access can change only while the server is stopped." = "Port dan akses jaringan hanya dapat diubah saat server dihentikan.";
 "The project's files, and Add Files…" = "Berkas proyek, dan Tambahkan Berkas…";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registri memeriksa siapa yang memublikasikan nama, bukan apa yang dilakukan kode. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Registri tidak menjawab dalam 30 detik. Coba lagi sebentar lagi.";
 "The reply was cut at its length limit." = "Balasan terpotong karena batas panjang.";
 "The report" = "Laporannya";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "Upaya berpikir: berapa lama model boleh berpikir sebelum menjawab.";
 "Thinking…" = "Berpikir…";
 "Thinking… %@ s of reply ready" = "Memikirkan… %@ s balasan siap";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "Server pihak ketiga, bukan oleh IPSupport. Tidak ada jaminan dalam bentuk apa pun: Anda memasang dan menggunakannya dengan risiko Anda sendiri.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "Server pihak ketiga, bukan oleh IPSupport. Tidak ada jaminan dalam bentuk apa pun: Anda menggunakannya dengan risiko Anda sendiri.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "Server pihak ketiga, bukan oleh IPSupport. Registri memeriksa siapa yang menerbitkan suatu nama, bukan apa yang dilakukan kodenya. Tidak ada jaminan dalam bentuk apa pun: Anda memasang dan menggunakannya dengan risiko Anda sendiri. Obrolan meminta konfirmasi Anda sebelum setiap panggilan.";
 "This Mac" = "Mac Ini";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Mac ini menjalankan model sekitar ~%@× waktu nyata: bicara, lalu dengarkan.";
 "This can change things." = "Ini dapat mengubah sesuatu.";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "setidaknya %1$@ item, %2$@";
 "at least %@" = "setidaknya %@";
 "building %@" = "membangun %@";
-"by %lld" = "oleh %lld";
+"by %lld · third-party" = "oleh %lld · pihak ketiga";
+"by IPSupport" = "oleh IPSupport";
 "calls tools" = "memanggil alat";
 "can look" = "bisa melihat";
 "can look and propose changes" = "bisa melihat dan mengusulkan perubahan";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "versi yang terinstal tidak berubah";
 "the model" = "model";
 "the model runtime isn't installed yet" = "runtime model belum terpasang";
+"the sign-in was cancelled" = "proses masuk dibatalkan";
 "then" = "lalu";
 "this call only" = "hanya panggilan ini";
 "tight fit" = "muat pas";

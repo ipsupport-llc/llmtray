@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "クリックして「プロジェクトファイル」を有効にします：ファイルをプロジェクトに追加し、そのチャットで検索できるようにします。";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "クリックしてクリップを録音します。押したまま話し、離すと送信します（モデルが音声を聞きます）。";
 "Click ■ to stop · Esc cancels" = "■をクリックして停止 · Escでキャンセル";
+"Client ID" = "クライアントID";
 "Close" = "閉じる";
 "Close Tab" = "タブを閉じる";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "このウインドウを閉じます。設定 › 一般 › Set Up LLMTray… で再度開けます。";
@@ -479,6 +480,7 @@
 "Files…" = "ファイル…";
 "Finish" = "完了";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish で選択内容が適用されます。後で設定でいつでも変更できます。";
+"Finish in your browser…" = "ブラウザで完了…";
 "First token" = "最初のトークン";
 "First-run setup" = "初回設定";
 "Fits comfortably" = "余裕あり";
@@ -750,6 +752,8 @@
 "Needs %@" = "%@が必要";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "約 %1$@ GB が必要です。これは GPU が使用する可能性のある %2$@ GB を上回ります。他のアプリを開いているとメモリ不足になる可能性があります。";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "約 %1$@ GB が必要です。この Mac には %2$@ GB しかありません。";
+"Needs sign-in" = "サインインが必要";
+"Needs sign-in." = "サインインが必要です。";
 "Network" = "ネットワーク";
 "Never" = "しない";
 "New Chat" = "新しいチャット";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "ノートはまだありません。すべてのチャットに知らせたいことを追加します：「ロシア語で簡潔に回答」「ESP32スピーカーを作っています」。";
 "No requests yet." = "まだリクエストはありません。";
 "No runs yet." = "実行履歴はまだありません。";
+"No sign-in" = "サインインなし";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "購読なし。機能ロックなし。LLMTrayが役立つと思ったら開発を支援してください。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "この Mac のメモリに対する提案はありません。Hugging Face でモデルを探してください。";
 "No thanks" = "結構です";
@@ -973,6 +978,7 @@
 "Record" = "録音";
 "Recording" = "録音中";
 "Recovery" = "復旧";
+"Redirect URL to add to your app:" = "アプリに追加するリダイレクトURL:";
 "Refused" = "拒否";
 "Regenerate" = "再生成";
 "Reinstall" = "再インストール";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "一時停止、停止、プロジェクトのファイルを表示します";
 "Shows the chat window" = "チャットウインドウを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
+"Sign In" = "サインイン";
+"Sign Out" = "サインアウト";
+"Signed in at %@" = "%@でサインイン済み";
+"Signing in: finish in your browser." = "サインイン中: ブラウザで完了してください。";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌詞がはっきり歌われ、ボーカルが前面に出ます。30秒の音楽に約40秒かかります。";
 "Size" = "サイズ";
 "Skip" = "スキップ";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "表示してから計画が変更されました：再度確認してください。";
 "The port and network access can change only while the server is stopped." = "ポートとネットワークアクセスはサーバー停止中にのみ変更できます。";
 "The project's files, and Add Files…" = "プロジェクトのファイル、及び「ファイルを追加…」";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "レジストリが確認するのは、名前の公開元であり、コードの動作ではありません。チャットは呼び出しのたびに確認します。";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "レジストリは30秒以内に応答しませんでした。しばらくしてから再試行してください。";
 "The reply was cut at its length limit." = "返信が長さの上限で切られました。";
 "The report" = "レポート";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "思考量：モデルが回答する前に思考できる時間の長さ";
 "Thinking…" = "考え中…";
 "Thinking… %@ s of reply ready" = "考え中… %@ 秒分の返信が準備できました";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "IPSupport製ではないサードパーティ製サーバです。いかなる保証もありません。インストールと使用は自己責任で行ってください。";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "IPSupport製ではないサードパーティ製サーバです。いかなる保証もありません。使用は自己責任で行ってください。";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "IPSupport製ではないサードパーティ製サーバです。レジストリは、その名前を誰が公開したかは確認しますが、コードが何をするかは確認しません。いかなる保証もありません。インストールと使用は自己責任で行ってください。チャットは呼び出しのたびに確認します。";
 "This Mac" = "このMac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "この Mac はモデルを約 %@× 実時間で動作させます：話してから聞きます。";
 "This can change things." = "これは変更を加えることができます。";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "少なくとも %1$@ 個、%2$@";
 "at least %@" = "少なくとも %@";
 "building %@" = "ビルド中: %@";
-"by %lld" = "作成者 %lld";
+"by %lld · third-party" = "%lld製 · サードパーティ";
+"by IPSupport" = "IPSupport製";
 "calls tools" = "ツールを呼び出す";
 "can look" = "参照できます";
 "can look and propose changes" = "参照および変更を提案できます";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "インストールされているバージョンは変更されませんでした";
 "the model" = "モデル";
 "the model runtime isn't installed yet" = "モデル実行環境がまだインストールされていません";
+"the sign-in was cancelled" = "サインインはキャンセルされました";
 "then" = "その後";
 "this call only" = "この呼び出しのみ";
 "tight fit" = "ぴったり";

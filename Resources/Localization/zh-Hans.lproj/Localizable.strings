@@ -299,6 +299,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "点击以启用项目文件：将文件添加到项目并允许该项目的聊天搜索它们。";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "点按可录制片段；按住可说话，松开后发送（模型会听到）。";
 "Click ■ to stop · Esc cancels" = "点按 ■ 停止 · Esc 取消";
+"Client ID" = "客户端 ID";
 "Close" = "关闭";
 "Close Tab" = "关闭标签页";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "关闭此窗口。前往“设置 › 通用 › 设置 LLMTray…” 可重新打开。";
@@ -479,6 +480,7 @@
 "Files…" = "文件…";
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "“完成”将应用你的选择。你可在设置中随时更改。";
+"Finish in your browser…" = "在浏览器中完成…";
 "First token" = "首个标记";
 "First-run setup" = "首次运行设置";
 "Fits comfortably" = "可舒适放下";
@@ -750,6 +752,8 @@
 "Needs %@" = "需要 %@";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "大约需要 %1$@ GB，超过 GPU 可能使用的 %2$@ GB：在其他应用打开时可能会耗尽内存。";
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "大约需要 %1$@ GB；此 Mac 可用 %2$@ GB。";
+"Needs sign-in" = "需要登录";
+"Needs sign-in." = "需要登录。";
 "Network" = "网络";
 "Never" = "永不";
 "New Chat" = "新建对话";
@@ -794,6 +798,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "还没有笔记。添加每个聊天都应知道的内容：“用俄语简短回答”、“我在制作 ESP32 扬声器”。";
 "No requests yet." = "还没有请求。";
 "No runs yet." = "尚无运行记录。";
+"No sign-in" = "无需登录";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "无订阅。无功能锁定。如果 LLMTray 对你有用，可支持开发。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "无法为此 Mac 的内存提供建议。请在 Hugging Face 浏览模型。";
 "No thanks" = "不用了";
@@ -973,6 +978,7 @@
 "Record" = "录音";
 "Recording" = "正在录音";
 "Recovery" = "恢复";
+"Redirect URL to add to your app:" = "要添加到你的 App 的重定向 URL：";
 "Refused" = "已拒绝";
 "Regenerate" = "重新生成";
 "Reinstall" = "重新安装";
@@ -1107,6 +1113,10 @@
 "Shows Pause, Stop and the project's files" = "显示“暂停”、“停止”与项目文件";
 "Shows the chat window" = "显示对话窗口";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
+"Sign In" = "登录";
+"Sign Out" = "退出登录";
+"Signed in at %@" = "已于 %@ 登录";
+"Signing in: finish in your browser." = "正在登录：在浏览器中完成。";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌词清晰可闻，人声靠前。制作约需 30 秒音乐的 40 秒。";
 "Size" = "大小";
 "Skip" = "跳过";
@@ -1282,7 +1292,6 @@
 "The plan changed since you looked at it: review it again." = "计划自你查看后已更改：请再次审查。";
 "The port and network access can change only while the server is stopped." = "端口和网络访问仅可在服务器停止时更改。";
 "The project's files, and Add Files…" = "项目的文件，以及“添加文件…”";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "注册表会检查名称由谁发布，而不会检查代码的作用。聊天会在每次调用前征求你的同意。";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "注册表在 30 秒内未响应。请稍后重试。";
 "The reply was cut at its length limit." = "回复因长度限制被截断。";
 "The report" = "报告";
@@ -1322,6 +1331,9 @@
 "Thinking effort: how long the model may think before it answers" = "思考强度：模型在回答前可以思考多久。";
 "Thinking…" = "正在思考…";
 "Thinking… %@ s of reply ready" = "思考中… 已准备 %@ 秒回复";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "第三方服务器，并非由 IPSupport 提供。不提供任何形式的担保：安装和使用风险均由你自行承担。";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "第三方服务器，并非由 IPSupport 提供。不提供任何形式的担保：使用风险由你自行承担。";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "第三方服务器，并非由 IPSupport 提供。注册表会检查名称由谁发布，而不会检查代码的实际行为。不提供任何形式的担保：安装和使用风险均由你自行承担。每次调用前，“聊天”都会先征求你的确认。";
 "This Mac" = "这台 Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "此 Mac 以约 %@× 实时运行模型：先说话，然后聆听。";
 "This can change things." = "此项可以进行更改。";
@@ -1522,7 +1534,8 @@
 "at least %1$@ items, %2$@" = "至少 %1$@ 项，%2$@";
 "at least %@" = "至少 %@";
 "building %@" = "正在构建 %@";
-"by %lld" = "由 %lld 提供";
+"by %lld · third-party" = "由 %lld 发布 · 第三方";
+"by IPSupport" = "由 IPSupport 提供";
 "calls tools" = "调用工具";
 "can look" = "可查看";
 "can look and propose changes" = "可查看并建议更改";
@@ -1594,6 +1607,7 @@
 "the installed version didn't change" = "已安装的版本未更改";
 "the model" = "模型";
 "the model runtime isn't installed yet" = "模型运行时尚未安装";
+"the sign-in was cancelled" = "登录已取消";
 "then" = "然后";
 "this call only" = "仅此调用";
 "tight fit" = "空间紧张";
