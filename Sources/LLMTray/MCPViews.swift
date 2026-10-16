@@ -44,7 +44,14 @@ struct MCPCallCard: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.secondary)
             Text(title).font(.callout.weight(.medium))
-            if request.afterOutsideText {
+            if request.allowedButAsked {
+                Label(!request.chatAllowanceUsable
+                      ? "Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)."
+                      : "Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web.",
+                      systemImage: "info.circle")
+                    .font(.caption).foregroundColor(.secondary)
+            }
+            if request.afterOutsideText && !request.allowancesHold {
                 Label("Proposed right after reading outside text (mail, files, web) -- check it.", systemImage: "exclamationmark.triangle")
                     .font(.subheadline).foregroundColor(.orange)
             }
@@ -66,8 +73,18 @@ struct MCPCallCard: View {
                 .font(.caption).foregroundColor(.secondary)
             HStack(spacing: 6) {
                 Button("Allow") { prompt.resolve(.allowOnce) }
-                if !request.afterOutsideText {
-                    Button("Allow for This Chat") { prompt.resolve(.allowForChat) }
+                if request.allowancesHold {
+                    Button(request.action.map { String(format: NSLocalizedString("Always Allow %@", comment: "MCP card: an action"), $0.replacingOccurrences(of: "_", with: " ")) }
+                           ?? NSLocalizedString("Always Allow", comment: "MCP card")) { prompt.resolve(.allowAlways) }
+                    Menu {
+                        Button("Allow for This Chat") { prompt.resolve(.allowForChat) }
+                        Button(String(format: NSLocalizedString("Always Allow Everything from %@", comment: "MCP card: a server"), request.server.name)) {
+                            prompt.resolve(.allowServerAlways)
+                        }
+                    } label: {
+                        Text("More")
+                    }
+                    .fixedSize()
                 }
                 Spacer()
                 Button("Deny") { prompt.resolve(.deny) }

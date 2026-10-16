@@ -15,11 +15,29 @@ struct MCPCallRequest {
     /// The tools were listed again just now: an earlier "Allow for This
     /// Chat" may answer (else the card asks).
     var chatAllowanceUsable = true
+    /// The user let it run without asking, yet it's asked: the card says why.
+    var allowedButAsked = false
+
+    /// Whether what the user allowed (always, for this chat) stands for this
+    /// call: yes before outside text; after it only for reading on this Mac
+    /// -- a tool the server says only reads, on a command server: what it
+    /// reads comes back into the chat, its arguments go nowhere. A change, or
+    /// any call to a server on the web, is asked then (adr/0027).
+    var allowancesHold: Bool {
+        // The hint as reviewed and as listed now: a write relisted as a read
+        // doesn't pass.
+        !afterOutsideText || (tool.readOnlyHint == true && server.reviewedReadOnly[tool.name] == true && server.kind == .command)
+    }
 }
 
 enum MCPCallChoice: Equatable {
     case allowOnce
     case allowForChat
+    /// Allowed from now on: this tool's action runs without asking (as
+    /// Configure's checkbox).
+    case allowAlways
+    /// Every action of every tool of this server, from now on.
+    case allowServerAlways
     case deny
 }
 
@@ -56,11 +74,14 @@ final class MCPChatTool: ChatTool {
             return .text("\(name) changed on its server; the user has to review it in Settings first. Tell the user.")
         }
         (config, tool) = again
-        let standing = listed && !context.outsideTextThisTurn && MCPApproval.runsWithoutAsking(tool, arguments: arguments, config: config)
+        let request = MCPCallRequest(server: config, tool: tool, modelName: name, action: action,
+                                     arguments: Self.pretty(arguments), afterOutsideText: context.outsideTextThisTurn,
+                                     chatAllowanceUsable: listed)
+        let allowed = MCPApproval.runsWithoutAsking(tool, arguments: arguments, config: config)
+        let standing = listed && request.allowancesHold && allowed
         if !standing {
-            let request = MCPCallRequest(server: config, tool: tool, modelName: name, action: action,
-                                         arguments: Self.pretty(arguments), afterOutsideText: context.outsideTextThisTurn,
-                                         chatAllowanceUsable: listed)
+            var request = request
+            request.allowedButAsked = allowed
             guard let ask = context.askMCP else {
                 return .mcp(MCPCallRecord(server: config.name, tool: tool.name, action: action, arguments: arguments, outcome: .denied),
                             text: "Not run: the user couldn't be asked about it here.", refused: true)

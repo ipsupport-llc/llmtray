@@ -38,6 +38,10 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     /// Tool name → the definition hash the user reviewed. A tool missing
     /// here, or with another hash now, is hidden until reviewed again.
     public var reviewed: [String: String] = [:]
+    /// Tool name → whether the server said it only reads when the user
+    /// reviewed it: a hint changed since (a write relisted as a read) isn't
+    /// trusted after outside text (adr/0027).
+    public var reviewedReadOnly: [String: Bool] = [:]
     /// Approval keys (`MCPApproval.key`) that run without asking, each bound
     /// to the hash it was given for.
     public var runWithoutAsking: [String: String] = [:]
@@ -63,7 +67,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
-             origin, description, version, source, answers, icon, reviewed, runWithoutAsking, tools, modelNames, added
+             origin, description, version, source, answers, icon, reviewed, reviewedReadOnly, runWithoutAsking, tools, modelNames, added
     }
 
     /// Fields added later read as their defaults: an older file still loads.
@@ -88,6 +92,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
         answers = try c.decodeIfPresent([String: String].self, forKey: .answers) ?? [:]
         icon = try c.decodeIfPresent(String.self, forKey: .icon)
         reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
+        reviewedReadOnly = try c.decodeIfPresent([String: Bool].self, forKey: .reviewedReadOnly) ?? [:]
         runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
         tools = try c.decodeIfPresent([MCP.Tool].self, forKey: .tools) ?? []
         modelNames = try c.decodeIfPresent([String: String].self, forKey: .modelNames) ?? [:]
