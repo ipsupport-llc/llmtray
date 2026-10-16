@@ -25,6 +25,15 @@ public enum MCPRegistry {
         public var description: String
         public var version: String
         public var repository: String?
+        /// An https icon the entry lists, if any.
+        public var iconURL: String?
+        /// Who published it, from its name (`io.github.owner/x` → owner).
+        public var publisher: String {
+            let head = name.components(separatedBy: "/").first ?? name
+            let parts = head.split(separator: ".").map(String.init)
+            if parts.count >= 3, parts[0] == "io", parts[1] == "github" { return parts[2] }
+            return parts.count >= 2 ? parts.reversed().joined(separator: ".") : head
+        }
         /// Ways to run it here, best first (a remote, a bundle, a package).
         public var installs: [Install]
         /// Why it can't run here, when `installs` is empty (needs Docker…).
@@ -96,6 +105,7 @@ public enum MCPRegistry {
         return Entry(name: name, title: (server["title"] as? String) ?? name.components(separatedBy: "/").last ?? name,
                      description: server["description"] as? String ?? "", version: server["version"] as? String ?? "",
                      repository: (server["repository"] as? [String: Any])?["url"] as? String,
+                     iconURL: (server["icons"] as? [[String: Any]])?.compactMap { $0["src"] as? String }.first { $0.hasPrefix("https://") },
                      installs: installs, needs: installs.isEmpty ? Array(Set(needs)).sorted().joined(separator: ", ").nilIfEmpty : nil)
     }
 
@@ -116,6 +126,7 @@ public enum MCPRegistry {
             var f = MCPImport.Found(name: entry.title, kind: .url)
             f.url = url
             f.description = entry.description
+            f.icon = entry.iconURL
             f.asks = headers
             return f
         case .package(let runner, let identifier, let version, let arguments, let environment):
@@ -125,6 +136,7 @@ public enum MCPRegistry {
             let spec = version.map { runner == "npx" ? "\(identifier)@\($0)" : "\(identifier)==\($0)" } ?? identifier
             f.arguments = (runner == "npx" ? ["-y", spec] : [spec]) + arguments
             f.description = entry.description
+            f.icon = entry.iconURL
             f.asks = environment
             return f
         case .bundle:
@@ -147,13 +159,17 @@ public enum MCPFeatured {
         public var description: String
         public var bundleURL: String
         public var repository: String
+        public var iconURL: String?
+        public var publisher: String
     }
 
     public static let items: [Item] = [
         Item(title: "Apple Mail, Calendar & Notes",
              description: "Read, search and organize Apple Mail, Calendar and Notes on this Mac. Zero dependencies (runs on macOS's own JavaScript for Automation).",
              bundleURL: "https://github.com/ipsupport-llc/apple-mail-mcp/releases/latest/download/apple-mail-mcp.mcpb",
-             repository: "https://github.com/ipsupport-llc/apple-mail-mcp"),
+             repository: "https://github.com/ipsupport-llc/apple-mail-mcp",
+             iconURL: "https://raw.githubusercontent.com/ipsupport-llc/apple-mail-mcp/main/icon.png",
+             publisher: "IPSupport"),
     ]
 }
 

@@ -80,6 +80,31 @@ Face browser does for models:
 - The registry is read only when the user opens Browse; nothing about the
   user is sent beyond the search words.
 
+## Install, Update, Uninstall (2026-10-16, the user: "больше юзера спрашивать ничего нельзя")
+
+The first build's review step (a sheet with the command, Start and Review,
+Turn On) was too much. Now, as in an app store:
+
+- **Install is one click** (Settings › Tools › Discover, a dropped or chosen
+  `.mcpb`, a pasted config, + Add): the server is added, started, its tools
+  listed and taken as reviewed, and switched on. The user is asked only for
+  a setting the server needs that has no default (a key); every other
+  setting starts at its default and can be changed under Configure.
+- **Update** shows on the row when there is a newer version (a bundle's
+  GitHub release, a registry entry's), checked at most hourly while the pane
+  is open; one click installs it with the settings kept, its tools taken as
+  they are then. **Uninstall** removes it at once (settings, secrets, files).
+- What stays: every call is asked unless allowed per action; tools a server
+  changes by itself (`tools/list_changed`, a restart) are hidden until the
+  user accepts them under Configure; everything is asked after outside text.
+
+The pane: Installed | Discover, a search, + Add. Installed is a table (icon,
+name and version, This Mac / Web, status, Update, Configure, ⋯ with Turn
+On/Off, Show Log, Uninstall). Discover is a grid of cards (icon, name,
+description, by whom, +). Configure: on/off, the bundle's settings, each
+tool with what it reads or changes and its Run without asking, changed
+tools to accept, Details (command, versions, log), Uninstall.
+
 ## Asking before a call
 
 An MCP tool can do anything its server can: send mail, delete a calendar

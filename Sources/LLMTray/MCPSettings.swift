@@ -3,105 +3,170 @@ import LLMTrayCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Settings › Tools: the MCP servers the chat may use (adr/0027).
+/// Settings › Tools: the MCP servers the chat may use (adr/0027). Installed
+/// or Discover, a search, + Add; a server installs in one click (asked only
+/// for a setting with no default), updates in one, and is configured or
+/// uninstalled from its row.
 struct ToolsPane: View {
     @ObservedObject private var hub = MCPHub.shared
+    @ObservedObject private var installer = MCPInstaller.shared
+    @State private var tab: Tab = .installed
+    @State private var query = ""
     @State private var sheet: Sheet?
-    @State private var error: String?
+    @State private var dropTargeted = false
+
+    enum Tab: Hashable { case installed, discover }
 
     enum Sheet: Identifiable {
-        case command, url, paste, browse
-        case asks(MCPImport.Found, origin: String?)
-        case review(UUID)
+        case command, url, paste
+        case asks(MCPImport.Found, origin: String?, source: MCPSource?)
+        case configure(UUID)
         var id: String {
             switch self {
             case .command: return "command"
             case .url: return "url"
             case .paste: return "paste"
-            case .browse: return "browse"
-            case .asks(let f, _): return "asks-\(f.name)-\(f.command)-\(f.url)"
-            case .review(let id): return "review-\(id)"
+            case .asks(let f, _, _): return "asks-\(f.name)-\(f.command)-\(f.url)"
+            case .configure(let id): return "configure-\(id)"
             }
         }
     }
 
     var body: some View {
-        Form {
-            Section {
-                Text("Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking.")
-                    .font(.callout).foregroundStyle(.secondary)
-                if hub.servers.isEmpty {
-                    Text("No servers yet.").foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Text("Tools").font(.title2.weight(.semibold))
+                Picker("", selection: $tab) {
+                    Text("Installed").tag(Tab.installed)
+                    Text("Discover").tag(Tab.discover)
                 }
-                ForEach(hub.servers) { server in
-                    ServerRow(server: server, review: { sheet = .review(server.id) })
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+                Spacer()
+                HStack(spacing: 4) {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                    TextField("Search", text: $query).textFieldStyle(.plain)
                 }
-                HStack {
-                    Menu("Add Server") {
-                        Button("Browse the Catalog…") { sheet = .browse }
-                        Divider()
-                        if MCPHub.commandsAllowed {
-                            Button("Install a Bundle (.mcpb)…") { installBundle() }
-                            Button("Paste a Config…") { sheet = .paste }
-                            Button("Add a Command…") { sheet = .command }
-                        }
-                        Button("Add a URL…") { sheet = .url }
+                .padding(.horizontal, 8).padding(.vertical, 5)
+                .background(RoundedRectangle(cornerRadius: 7).stroke(Color.secondary.opacity(0.3)))
+                .frame(width: 180)
+                Menu {
+                    if MCPHub.commandsAllowed {
+                        Button("Install a Bundle (.mcpb)…") { pickBundle() }
+                        Button("Paste a Config…") { sheet = .paste }
+                        Button("Add a Command…") { sheet = .command }
                     }
-                    .fixedSize()
+                    Button("Add a URL…") { sheet = .url }
+                } label: {
+                    Label("Add", systemImage: "plus")
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+            }
+            .padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 10)
+            if let message = installer.message {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
+                    Text(message).font(.callout)
                     Spacer()
+                    Button { installer.message = nil } label: { Image(systemName: "xmark") }.buttonStyle(.borderless)
                 }
-                if let error {
-                    Text(error).font(.callout).foregroundStyle(.red)
-                }
-            } header: {
-                Text("MCP Servers")
+                .padding(.horizontal, 20).padding(.bottom, 8)
+            }
+            Divider()
+            switch tab {
+            case .installed: installed
+            case .discover: DiscoverView(query: query, askFor: { found, origin, source in sheet = .asks(found, origin: origin, source: source) })
             }
         }
-        .formStyle(.grouped)
+        .task { await installer.checkUpdates() }
+        .onDrop(of: [.fileURL], isTargeted: $dropTargeted) { providers in
+            guard let provider = providers.first else { return false }
+            _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                guard let url, url.pathExtension.lowercased() == "mcpb" else { return }
+                Task { @MainActor in installBundle(url) }
+            }
+            return true
+        }
+        .overlay {
+            if dropTargeted {
+                RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor, lineWidth: 2).padding(6)
+            }
+        }
         .sheet(item: $sheet) { sheet in
             switch sheet {
-            case .command: AddServerSheet(kind: .command) { found in self.sheet = .asks(found, origin: nil) }
-            case .url: AddServerSheet(kind: .url) { found in self.sheet = .asks(found, origin: nil) }
-            case .paste: PasteConfigSheet { found in self.sheet = found.count == 1 ? .asks(found[0], origin: nil) : nil; addAll(found) }
-            case .browse: BrowseSheet { found, origin in self.sheet = .asks(found, origin: origin) }
-            case .asks(let found, let origin):
-                AsksSheet(found: found) { filled, secrets in
-                    let config = hub.add(filled, secrets: secrets, origin: origin)
-                    self.sheet = .review(config.id)
+            case .command: AddServerSheet(kind: .command) { found in self.sheet = nil; install(found, origin: nil, source: nil) }
+            case .url: AddServerSheet(kind: .url) { found in self.sheet = nil; install(found, origin: nil, source: nil) }
+            case .paste: PasteConfigSheet { found in
+                self.sheet = nil
+                found.forEach { install($0, origin: NSLocalizedString("Pasted config", comment: "MCP server origin"), source: nil) }
+            }
+            case .asks(let found, let origin, let source):
+                AsksSheet(found: found) { values in
+                    Task { await installer.finish(found, values: values, origin: origin, source: source) }
                 }
-            case .review(let id): ReviewSheet(serverID: id)
+            case .configure(let id): ConfigureSheet(serverID: id)
             }
         }
     }
 
-    /// Several servers from one pasted config: each added (off), to review
-    /// from its row.
-    private func addAll(_ found: [MCPImport.Found]) {
-        guard found.count > 1 else { return }
-        for f in found {
-            var f = f
-            if f.kind == .command {
-                guard let path = MCPImport.resolveCommand(f.command) else {
-                    error = String(format: NSLocalizedString("%1$@: the command %2$@ wasn't found.", comment: ""), f.name, f.command)
-                    continue
+    private var installed: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                let shown = hub.servers.filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) }
+                if hub.servers.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call.")
+                            .foregroundStyle(.secondary)
+                        Button("Discover Servers") { tab = .discover }
+                    }
+                    .padding(20)
+                } else {
+                    HStack {
+                        Text("Server").frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Runs").frame(width: 90, alignment: .leading)
+                        Text("Status").frame(width: 60, alignment: .leading)
+                        Color.clear.frame(width: 190)
+                    }
+                    .font(.callout).foregroundStyle(.secondary)
+                    .padding(.horizontal, 20).padding(.vertical, 8)
+                    Divider().padding(.horizontal, 12)
+                    ForEach(shown) { server in
+                        ServerRow(server: server, configure: { sheet = .configure(server.id) })
+                        Divider().padding(.horizontal, 12)
+                    }
                 }
-                f.command = path
+                if MCPHub.commandsAllowed {
+                    Label("Drag .mcpb files here to install", systemImage: "lightbulb")
+                        .font(.callout).foregroundStyle(.secondary)
+                        .padding(20)
+                }
             }
-            let secrets = (f.environment.merging(f.headers) { a, _ in a }).filter { MCPServerConfig.looksSecret($0.key) }
-            hub.add(f, secrets: secrets, origin: NSLocalizedString("Pasted config", comment: "MCP server origin"))
         }
     }
 
-    private func installBundle() {
+    private func install(_ found: MCPImport.Found, origin: String?, source: MCPSource?) {
+        Task {
+            if await !installer.install(found, origin: origin, source: source) {
+                sheet = .asks(found, origin: origin, source: source)
+            }
+        }
+    }
+
+    private func pickBundle() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType(filenameExtension: "mcpb") ?? .zip, .zip]
         panel.message = NSLocalizedString("Choose an MCP bundle (.mcpb).", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }
+        installBundle(url)
+    }
+
+    private func installBundle(_ url: URL) {
         do {
-            let found = try MCPBundles.install(url)
-            sheet = .asks(found, origin: url.lastPathComponent)
+            install(try MCPBundles.install(url), origin: url.lastPathComponent, source: nil)
         } catch {
-            self.error = error.localizedDescription
+            installer.message = error.localizedDescription
         }
     }
 }
@@ -123,85 +188,275 @@ enum MCPBundles {
     }
 }
 
+/// A server's icon: its bundle's file, an https icon, or its first letter.
+struct ServerIcon: View {
+    let icon: String?
+    let name: String
+    var size: CGFloat = 32
+
+    var body: some View {
+        Group {
+            if let icon, icon.hasPrefix("/"), let image = NSImage(contentsOfFile: icon) {
+                Image(nsImage: image).resizable().scaledToFit()
+            } else if let icon, icon.hasPrefix("https://"), let url = URL(string: icon) {
+                AsyncImage(url: url) { image in image.resizable().scaledToFit() } placeholder: { monogram }
+            } else {
+                monogram
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+    }
+
+    private var monogram: some View {
+        RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+            .fill(Color.accentColor.opacity(0.18))
+            .overlay(Text(String(name.prefix(1)).uppercased()).font(.system(size: size * 0.45, weight: .semibold)).foregroundStyle(Color.accentColor))
+    }
+}
+
 // MARK: - A server's row
 
 private struct ServerRow: View {
     let server: MCPServerConfig
-    let review: () -> Void
+    let configure: () -> Void
     @ObservedObject private var hub = MCPHub.shared
-    @State private var showLog = false
-    @State private var confirmRemove = false
+    @ObservedObject private var installer = MCPInstaller.shared
 
     private var state: MCPHub.ServerState? { hub.states[server.id] }
-    private var needsReview: Bool { server.tools.isEmpty || !server.unreviewedTools.isEmpty }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(server.name).font(.body.weight(.medium))
-                        Text(server.kind == .command ? "command" : "URL").font(.caption2)
-                            .padding(.horizontal, 4).background(Color.secondary.opacity(0.15)).clipShape(Capsule())
+        HStack(spacing: 10) {
+            ServerIcon(icon: server.icon, name: server.name)
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 6) {
+                    Text(server.name).font(.body.weight(.medium))
+                    if let version = server.version { Text(version).font(.caption).foregroundStyle(.secondary) }
+                }
+                if let problem { Text(problem).font(.caption).foregroundStyle(.orange).lineLimit(2) }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(server.kind == .command ? "This Mac" : "Web").foregroundStyle(.secondary).frame(width: 90, alignment: .leading)
+            status.frame(width: 60, alignment: .leading)
+            HStack(spacing: 6) {
+                if let latest = installer.updates[server.id] {
+                    Button(String(format: NSLocalizedString("Update to %@", comment: "MCP server"), latest)) {
+                        Task { await installer.update(server.id) }
                     }
-                    Text(status).font(.caption).foregroundStyle(statusIsBad ? .orange : .secondary)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(installer.busy.contains(server.id.uuidString))
                 }
-                Spacer()
-                Button(needsReview ? "Review…" : "Tools…", action: review)
-                Toggle("", isOn: Binding(get: { server.enabled }, set: { hub.setEnabled(server.id, $0) }))
-                    .labelsHidden()
-                    .toggleStyle(.switch)
-                    .disabled(server.visibleTools.isEmpty || !MCPHub.runsHere(server))
-            }
-            HStack(spacing: 12) {
-                Button(showLog ? "Hide Log" : "Log") { showLog.toggle() }.buttonStyle(.link)
-                if case .crashing = state?.status {
-                    Button("Start Again") { Task { _ = await hub.startForReview(server.id) } }.buttonStyle(.link)
+                Button("Configure", action: configure)
+                Menu {
+                    Button(server.enabled ? "Turn Off" : "Turn On") { hub.setEnabled(server.id, !server.enabled) }
+                        .disabled(server.visibleTools.isEmpty || !MCPHub.runsHere(server))
+                    Button("Show Log…", action: configure)
+                    Divider()
+                    Button("Uninstall", role: .destructive) { hub.remove(server.id) }
+                } label: {
+                    Image(systemName: "ellipsis")
                 }
-                Spacer()
-                Button("Remove…") { confirmRemove = true }.buttonStyle(.link)
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
             }
-            .font(.caption)
-            if showLog {
-                ScrollView {
-                    Text((state?.log ?? []).joined().isEmpty ? NSLocalizedString("Nothing logged yet.", comment: "") : (state?.log ?? []).joined())
-                        .font(.system(.caption2, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(height: 120)
-            }
+            .frame(width: 190, alignment: .trailing)
         }
-        .confirmationDialog("Remove \(server.name)?", isPresented: $confirmRemove) {
-            Button("Remove", role: .destructive) { hub.remove(server.id) }
-        } message: {
-            Text("Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls.")
+        .padding(.horizontal, 20).padding(.vertical, 10)
+    }
+
+    @ViewBuilder private var status: some View {
+        if installer.busy.contains(server.id.uuidString) || state?.status == .starting {
+            ProgressView().controlSize(.small)
+        } else if problem != nil {
+            Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
+        } else if server.enabled {
+            Image(systemName: "checkmark").foregroundStyle(.green)
+        } else {
+            Text("Off").foregroundStyle(.secondary)
         }
     }
 
-    private var statusIsBad: Bool {
+    private var problem: String? {
+        if !MCPHub.runsHere(server) { return NSLocalizedString("Doesn't run in this version of LLMTray.", comment: "") }
         switch state?.status {
-        case .failed, .crashing: return true
-        default: return needsReview && !server.tools.isEmpty
-        }
-    }
-
-    private var status: String {
-        if !MCPHub.runsHere(server) { return NSLocalizedString("Command servers don't run in this version of LLMTray.", comment: "") }
-        switch state?.status {
-        case .starting: return NSLocalizedString("Starting…", comment: "MCP server")
         case .failed(let why): return why
-        case .crashing: return NSLocalizedString("Keeps crashing: off until started again (see its log).", comment: "MCP server")
+        case .crashing: return NSLocalizedString("Keeps crashing -- see its log.", comment: "MCP server")
         default: break
         }
-        if server.tools.isEmpty { return NSLocalizedString("Not reviewed yet: review it to see its tools.", comment: "MCP server") }
-        if !server.unreviewedTools.isEmpty {
-            return String(format: NSLocalizedString("%lld tools new or changed: hidden from the chat until reviewed.", comment: "MCP server"),
+        if !server.unreviewedTools.isEmpty, !server.reviewed.isEmpty {
+            return String(format: NSLocalizedString("%lld tools changed on the server: Configure to accept them.", comment: "MCP server"),
                           server.unreviewedTools.count)
         }
-        let n = server.visibleTools.count
-        let running = state?.status == .running ? NSLocalizedString(" · running", comment: "MCP server") : ""
-        return String(format: NSLocalizedString("%lld tools%@", comment: "MCP server: tool count, running"), n, running)
+        return nil
+    }
+}
+
+// MARK: - Discover
+
+private struct DiscoverView: View {
+    let query: String
+    let askFor: (MCPImport.Found, String?, MCPSource?) -> Void
+    @ObservedObject private var hub = MCPHub.shared
+    @ObservedObject private var installer = MCPInstaller.shared
+    @State private var entries: [MCPRegistry.Entry] = []
+    @State private var loading = false
+    @State private var error: String?
+    @State private var runners: [String: String] = [:]
+
+    private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                let featured = MCPFeatured.items.filter { query.isEmpty || $0.title.localizedCaseInsensitiveContains(query) }
+                if !featured.isEmpty, MCPHub.commandsAllowed {
+                    Text("Featured").font(.headline)
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(featured, id: \.bundleURL) { item in
+                            Card(icon: item.iconURL, title: item.title, description: item.description, publisher: item.publisher,
+                                 state: state(source: MCPSource.githubRelease(url: item.bundleURL), name: item.title),
+                                 install: { installFeatured(item) })
+                        }
+                    }
+                }
+                HStack {
+                    Text("From the MCP Registry").font(.headline)
+                    if loading { ProgressView().controlSize(.small) }
+                }
+                Text("The registry checks who published a name, not what the code does. The chat asks you before each call.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if let error { Text(error).foregroundStyle(.orange).font(.callout) }
+                LazyVGrid(columns: columns, spacing: 12) {
+                    ForEach(entries) { entry in
+                        Card(icon: entry.iconURL, title: entry.title, description: entry.description, publisher: entry.publisher,
+                             state: entryState(entry), install: { install(entry) })
+                    }
+                }
+            }
+            .padding(20)
+        }
+        .task(id: query) {
+            if runners.isEmpty {
+                runners = ["npx": MCPImport.resolveCommand("npx"), "uvx": MCPImport.resolveCommand("uvx")].compactMapValues { $0 }
+            }
+            try? await Task.sleep(nanoseconds: query.isEmpty ? 0 : 400_000_000)
+            guard !Task.isCancelled else { return }
+            await search()
+        }
+    }
+
+    enum CardState: Equatable { case available, installing, installed, needs(String) }
+
+    private func state(source: MCPSource?, name: String) -> CardState {
+        if installer.busy.contains(name) { return .installing }
+        if hub.servers.contains(where: { ($0.source != nil && $0.source == source) || $0.name == name }) { return .installed }
+        return .available
+    }
+
+    private func entryState(_ entry: MCPRegistry.Entry) -> CardState {
+        let s = state(source: .registry(name: entry.name), name: entry.title)
+        guard s == .available else { return s }
+        if !entry.installs.contains(where: allowed) { return .needs(entry.needs ?? NSLocalizedString("something LLMTray can't run", comment: "")) }
+        return .available
+    }
+
+    private func allowed(_ install: MCPRegistry.Install) -> Bool {
+        if case .remote = install { return true }
+        return MCPHub.commandsAllowed
+    }
+
+    private func search() async {
+        loading = true
+        defer { loading = false }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: MCPRegistry.searchURL(query, limit: 40))
+            entries = MCPRegistry.parse(data, available: Set(runners.keys)).entries
+            error = nil
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    private func installFeatured(_ item: MCPFeatured.Item) {
+        Task {
+            do {
+                let found = try await installer.downloadBundle(item.bundleURL, sha256: nil)
+                await go(found, origin: item.repository, source: MCPSource.githubRelease(url: item.bundleURL))
+            } catch {
+                installer.message = error.localizedDescription
+            }
+        }
+    }
+
+    private func install(_ entry: MCPRegistry.Entry) {
+        guard let install = entry.installs.first(where: allowed) else { return }
+        Task {
+            do {
+                var found: MCPImport.Found
+                if case .bundle(let url, let sha) = install {
+                    found = try await installer.downloadBundle(url, sha256: sha)
+                } else {
+                    guard let f = MCPRegistry.found(entry, install, runnerPath: { runners[$0] }) else { return }
+                    found = f
+                }
+                found.name = entry.title
+                found.version = found.version ?? entry.version
+                found.icon = found.icon ?? entry.iconURL
+                await go(found, origin: entry.name, source: .registry(name: entry.name))
+            } catch {
+                installer.message = error.localizedDescription
+            }
+        }
+    }
+
+    private func go(_ found: MCPImport.Found, origin: String?, source: MCPSource?) async {
+        if await !installer.install(found, origin: origin, source: source) { askFor(found, origin, source) }
+    }
+
+    private struct Card: View {
+        let icon: String?
+        let title: String
+        let description: String
+        let publisher: String
+        let state: CardState
+        let install: () -> Void
+
+        var body: some View {
+            HStack(alignment: .top, spacing: 10) {
+                ServerIcon(icon: icon, name: title, size: 40)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).font(.body.weight(.semibold)).lineLimit(1)
+                    Text(description).font(.callout).foregroundStyle(.secondary).lineLimit(2)
+                    HStack(spacing: 4) {
+                        if state == .installed {
+                            Label("Installed", systemImage: "checkmark").font(.caption).foregroundStyle(.green)
+                            Text("·").foregroundStyle(.secondary)
+                        }
+                        Text("by \(publisher)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    }
+                    if case .needs(let what) = state {
+                        Text(String(format: NSLocalizedString("Needs %@", comment: "MCP catalog"), what)).font(.caption).foregroundStyle(.orange)
+                    }
+                }
+                Spacer(minLength: 4)
+                switch state {
+                case .available:
+                    Button(action: install) { Image(systemName: "plus").frame(width: 18, height: 18) }
+                        .help(Text("Install"))
+                case .installing:
+                    ProgressView().controlSize(.small)
+                case .installed:
+                    Image(systemName: "checkmark").foregroundStyle(.green).frame(width: 26, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Color.green.opacity(0.15)))
+                case .needs:
+                    EmptyView()
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
+            .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.25)))
+        }
     }
 }
 
@@ -329,205 +584,223 @@ private struct PasteConfigSheet: View {
 /// The values a server needs from the user (a bundle's settings, a
 /// registry entry's variables or headers), and which of its own values
 /// are secret. Shows the command or URL in full before anything is added.
-private struct AsksSheet: View {
-    let found: MCPImport.Found
-    let add: (MCPImport.Found, [String: String]) -> Void
-    @Environment(\.dismiss) private var dismiss
-    @State private var answers: [String: String] = [:]
+/// One setting a server asks for, by its type: a checkbox, a number, a
+/// folder or file with Choose…, text (secure for a secret); its
+/// description under it.
+private struct AskField: View {
+    let ask: MCPImport.Ask
+    @Binding var value: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(String(format: NSLocalizedString("Add %@", comment: "MCP: add server"), found.name)).font(.headline)
-            if let description = found.description, !description.isEmpty {
-                Text(description).font(.callout).foregroundStyle(.secondary)
-            }
-            Label(found.kind == .command ? "Runs on this Mac." : "Connects to a server on the internet.",
-                  systemImage: found.kind == .command ? "desktopcomputer" : "network")
-                .font(.callout)
-            DisclosureGroup("Details") {
-                Text(found.kind == .command ? ([found.command] + found.arguments).map(Self.quoted).joined(separator: " ") : found.url)
-                    .font(.system(.caption, design: .monospaced))
-                    .textSelection(.enabled)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .font(.callout)
-            if !found.asks.isEmpty {
-                Form {
-                    ForEach(found.asks, id: \.key) { ask in
-                        let binding = Binding(get: { answers[ask.key] ?? ask.defaultValue ?? "" }, set: { answers[ask.key] = $0 })
-                        if ask.sensitive {
-                            SecureField(ask.title + (ask.required ? " *" : ""), text: binding)
-                        } else {
-                            TextField(ask.title + (ask.required ? " *" : ""), text: binding)
-                        }
+        VStack(alignment: .leading, spacing: 3) {
+            switch ask.kind {
+            case .boolean:
+                Toggle(ask.title, isOn: Binding(get: { value == "true" }, set: { value = $0 ? "true" : "false" }))
+            case .directory, .file:
+                LabeledContent(ask.title + (ask.required ? " *" : "")) {
+                    HStack {
+                        Text(value.isEmpty ? NSLocalizedString("None", comment: "MCP setting: no folder") : (value as NSString).abbreviatingWithTildeInPath)
+                            .lineLimit(1).truncationMode(.middle).foregroundStyle(value.isEmpty ? .secondary : .primary)
+                        Button("Choose…") { choose() }
                     }
                 }
+            case .number:
+                TextField(ask.title + (ask.required ? " *" : ""), text: $value)
+            case .string:
+                if ask.sensitive {
+                    SecureField(ask.title + (ask.required ? " *" : ""), text: $value)
+                } else {
+                    TextField(ask.title + (ask.required ? " *" : ""), text: $value)
+                }
             }
-            Text("Next you see what it offers, then turn it on.").font(.caption).foregroundStyle(.secondary)
-            HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }
-                Button("Add") { submit() }
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(found.asks.contains { $0.required && (answers[$0.key] ?? $0.defaultValue ?? "").isEmpty })
+            if let help = ask.help, !help.isEmpty {
+                Text(help).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding()
-        .frame(width: 560)
     }
 
-    static func quoted(_ s: String) -> String { s.contains(" ") ? "\"\(s)\"" : s }
-
-    private func submit() {
-        var f = found
-        var secrets: [String: String] = [:]
-        let values = Dictionary(uniqueKeysWithValues: found.asks.map { ($0.key, answers[$0.key] ?? $0.defaultValue ?? "") })
-        let home = FileManager.default.homeDirectoryForCurrentUser.path
-        if let folder = f.workingDirectory, !f.asks.isEmpty || f.arguments.contains(where: { $0.contains("${") }) || f.command.contains("${") {
-            // A bundle: its placeholders filled.
-            let plain = values.filter { key, _ in !(found.asks.first { $0.key == key }?.sensitive ?? false) }
-            f.command = MCPImport.fill(f.command, folder: folder, home: home, answers: plain)
-            f.arguments = f.arguments.map { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
-            f.environment = f.environment.mapValues { MCPImport.fill($0, folder: folder, home: home, answers: plain) }
-            // A secret placeholder goes in by the environment, never written
-            // into the arguments on disk: in an argument it's filled at start.
-            // Variables holding secret settings: every placeholder filled in
-            // one value (a connection string can hold two), then kept in the
-            // Keychain.
-            for (k, v) in f.environment {
-                var filled = v
-                for ask in found.asks where ask.sensitive {
-                    filled = filled.replacingOccurrences(of: "${user_config.\(ask.key)}", with: values[ask.key] ?? "")
-                }
-                if filled != v { secrets[k] = filled }
-            }
-            for ask in found.asks where ask.sensitive {
-                let value = values[ask.key] ?? ""
-                guard !value.isEmpty else { continue }
-                let marker = "${user_config.\(ask.key)}"
-                // In an argument or the command: kept as the placeholder, the
-                // value in the Keychain under its name, filled at start.
-                if (f.arguments + [f.command]).contains(where: { $0.contains(marker) }) { secrets["user_config.\(ask.key)"] = value }
-            }
-            // A bare command name, as Terminal would find it.
-            if !f.command.hasPrefix("/"), !f.command.contains("${"), let path = MCPImport.resolveCommand(f.command) { f.command = path }
-        } else {
-            // Registry variables or headers: secret ones to the Keychain.
-            for ask in found.asks {
-                let value = values[ask.key] ?? ""
-                guard !value.isEmpty else { continue }
-                if ask.sensitive { secrets[ask.key] = value }
-                else if f.kind == .command { f.environment[ask.key] = value }
-                else { f.headers[ask.key] = value }
-            }
-        }
-        // The server's own values that look secret, unless already resolved
-        // above (a bundle's) or still a placeholder.
-        for (k, v) in f.environment.merging(f.headers, uniquingKeysWith: { a, _ in a })
-            where MCPServerConfig.looksSecret(k) && secrets[k] == nil && !v.contains("${") && !v.isEmpty { secrets[k] = v }
-        add(f, secrets)
+    private func choose() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = ask.kind == .directory
+        panel.canChooseFiles = ask.kind == .file
+        panel.canCreateDirectories = ask.kind == .directory
+        if !value.isEmpty { panel.directoryURL = URL(fileURLWithPath: value) }
+        if panel.runModal() == .OK, let url = panel.url { value = url.path }
     }
 }
 
-// MARK: - Review
 
-/// What a server offers, in plain words, and Turn On. It connects by
-/// itself when opened (adding it was the user's choice); the command, the
-/// versions and the tools' arguments wait under Details.
-private struct ReviewSheet: View {
+// MARK: - Settings a server needs
+
+/// Only when a server needs a setting with no default (a key): its
+/// settings, then Install.
+private struct AsksSheet: View {
+    let found: MCPImport.Found
+    let install: ([String: String]) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var values: [String: String] = [:]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                ServerIcon(icon: found.icon, name: found.name, size: 40)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(found.name).font(.headline)
+                    if let description = found.description { Text(description).font(.callout).foregroundStyle(.secondary).lineLimit(3) }
+                }
+            }
+            Form {
+                ForEach(found.asks, id: \.key) { ask in
+                    AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }))
+                }
+            }
+            .formStyle(.grouped)
+            HStack {
+                Spacer()
+                Button("Cancel") {
+                    // An unpacked bundle nobody installed goes.
+                    if MCPInstaller.isBundle(found), let folder = found.workingDirectory { try? FileManager.default.removeItem(atPath: folder) }
+                    dismiss()
+                }
+                Button("Install") {
+                    install(values)
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(found.asks.contains { $0.required && (values[$0.key] ?? "").isEmpty })
+            }
+        }
+        .padding(20)
+        .frame(width: 520)
+        .onAppear { values = MCPInstaller.defaults(found) }
+    }
+}
+
+// MARK: - Configure
+
+/// On or off, the server's settings, what each tool does (and which run
+/// without asking), tools changed on the server, the command and the log
+/// under Details, Uninstall.
+private struct ConfigureSheet: View {
     let serverID: UUID
     @ObservedObject private var hub = MCPHub.shared
+    @ObservedObject private var installer = MCPInstaller.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var starting = false
-    @State private var error: String?
     @State private var details = false
+    @State private var values: [String: String] = [:]
+    @State private var settingsFound: MCPImport.Found?
+    @State private var saving = false
+    @State private var starting = false
 
     private var server: MCPServerConfig? { hub.server(serverID) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             if let server {
-                HStack(spacing: 8) {
-                    Image(systemName: "puzzlepiece.extension").font(.title2).foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    ServerIcon(icon: server.icon, name: server.name, size: 44)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(server.name).font(.headline)
-                        if let description = server.description, !description.isEmpty {
-                            Text(description).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        HStack(spacing: 6) {
+                            Text(server.name).font(.headline)
+                            if let v = server.version { Text(v).font(.caption).foregroundStyle(.secondary) }
                         }
+                        if let d = server.description { Text(d).font(.callout).foregroundStyle(.secondary).lineLimit(3) }
                     }
+                    Spacer()
+                    Toggle("On", isOn: Binding(get: { server.enabled }, set: { hub.setEnabled(serverID, $0) }))
+                        .toggleStyle(.switch)
+                        .disabled(server.visibleTools.isEmpty || !MCPHub.runsHere(server))
                 }
-                if starting {
-                    HStack(spacing: 8) {
-                        ProgressView().controlSize(.small)
-                        Text("Connecting to see what it offers…").foregroundStyle(.secondary)
-                    }
-                } else if let error {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
-                        Button("Try Again") { start() }
-                    }
-                } else if !server.tools.isEmpty {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 12) {
-                            ForEach(server.tools, id: \.name) { tool in
-                                ToolReviewRow(server: server, tool: tool, details: details)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        if let found = settingsFound, !found.asks.isEmpty {
+                            GroupBox("Settings") {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ForEach(found.asks, id: \.key) { ask in
+                                        AskField(ask: ask, value: Binding(get: { values[ask.key] ?? "" }, set: { values[ask.key] = $0 }))
+                                    }
+                                    HStack {
+                                        Spacer()
+                                        if saving { ProgressView().controlSize(.small) }
+                                        Button("Save") {
+                                            saving = true
+                                            Task {
+                                                await installer.apply(serverID, values: values)
+                                                saving = false
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(6)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .frame(minHeight: 160, maxHeight: 360)
-                    Text(server.enabled
-                         ? "The chat asks you before each call, unless you let an action run without asking."
-                         : "Nothing runs from a chat until you turn it on -- and then the chat asks you before each call.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                DisclosureGroup("Details", isExpanded: $details) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(server.kind == .command ? ([server.command] + server.arguments).joined(separator: " ") : server.url)
-                            .font(.system(.caption, design: .monospaced))
-                            .textSelection(.enabled)
-                            .fixedSize(horizontal: false, vertical: true)
-                        if let info = hub.states[serverID]?.info {
-                            Text("\(info.name) \(info.version) · MCP \(info.protocolVersion)").font(.caption).foregroundStyle(.secondary)
+                        if !server.unreviewedTools.isEmpty, !server.reviewed.isEmpty {
+                            HStack {
+                                Label(String(format: NSLocalizedString("%lld tools are new or changed on the server: hidden from the chat until you accept them.", comment: "MCP"),
+                                             server.unreviewedTools.count), systemImage: "exclamationmark.triangle")
+                                    .foregroundStyle(.orange)
+                                Spacer()
+                                Button("Accept") { hub.markReviewed(serverID) }
+                            }
                         }
-                        Button("List Its Tools Again") { start() }.disabled(starting).font(.caption)
+                        if starting {
+                            HStack { ProgressView().controlSize(.small); Text("Connecting…").foregroundStyle(.secondary) }
+                        }
+                        ForEach(server.tools, id: \.name) { tool in
+                            ToolReviewRow(server: server, tool: tool, details: details)
+                        }
+                        DisclosureGroup("Details", isExpanded: $details) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(server.kind == .command ? ([server.command] + server.arguments).joined(separator: " ") : server.url)
+                                    .font(.system(.caption, design: .monospaced)).textSelection(.enabled)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                if let info = hub.states[serverID]?.info {
+                                    Text("\(info.name) \(info.version) · MCP \(info.protocolVersion)").font(.caption).foregroundStyle(.secondary)
+                                }
+                                Text("Log").font(.caption.weight(.semibold))
+                                Text((hub.states[serverID]?.log ?? []).joined().isEmpty ? NSLocalizedString("Nothing logged yet.", comment: "") : (hub.states[serverID]?.log ?? []).joined())
+                                    .font(.system(.caption2, design: .monospaced)).textSelection(.enabled)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Button("Connect Again") { reconnect() }.disabled(starting)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 4)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 4)
                 }
-                .font(.callout)
+                .frame(minHeight: 240, maxHeight: 440)
                 HStack {
-                    Spacer()
-                    Button("Close") { dismiss() }
-                    if !server.tools.isEmpty, !starting, !server.unreviewedTools.isEmpty || !server.enabled {
-                        Button("Turn On") {
-                            hub.markReviewed(serverID)
-                            hub.setEnabled(serverID, true)
-                            dismiss()
-                        }
-                        .keyboardShortcut(.defaultAction)
+                    Button("Uninstall", role: .destructive) {
+                        hub.remove(serverID)
+                        dismiss()
                     }
+                    Spacer()
+                    Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
                 }
             }
         }
         .padding(20)
-        .frame(width: 560)
-        .task {
-            if server?.tools.isEmpty == true { start() }
+        .frame(width: 600)
+        .onAppear {
+            guard let server else { return }
+            settingsFound = installer.asks(of: server)
+            if let found = settingsFound {
+                values = MCPInstaller.defaults(found).merging(server.answers) { _, kept in kept }
+                for ask in found.asks where ask.sensitive { values[ask.key] = "" }
+            }
+            if server.tools.isEmpty { reconnect() }
         }
     }
 
-    private func start() {
+    private func reconnect() {
         starting = true
-        error = nil
         Task {
-            error = await hub.startForReview(serverID)
+            if let error = await hub.startForReview(serverID) { installer.message = error }
             starting = false
         }
     }
 }
-
 /// One tool: its title, the first line of what it says, what it can do
 /// (its actions), whether it changes things; its arguments under Details.
 private struct ToolReviewRow: View {
@@ -586,132 +859,3 @@ private struct ToolReviewRow: View {
     }
 }
 
-// MARK: - The catalog
-
-private struct BrowseSheet: View {
-    let next: (MCPImport.Found, String?) -> Void
-    @Environment(\.dismiss) private var dismiss
-    @State private var query = ""
-    @State private var entries: [MCPRegistry.Entry] = []
-    @State private var loading = false
-    @State private var error: String?
-    @State private var runners: [String: String] = [:]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("MCP Servers").font(.headline)
-            Text("From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on.")
-                .font(.caption).foregroundStyle(.secondary)
-            HStack {
-                TextField("Search", text: $query).onSubmit { search() }
-                Button("Search") { search() }
-                if loading { ProgressView().controlSize(.small) }
-            }
-            List {
-                if query.isEmpty {
-                    Section("Featured") {
-                        ForEach(MCPFeatured.items, id: \.bundleURL) { item in
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack {
-                                    Text(item.title).font(.callout.weight(.medium))
-                                    Spacer()
-                                    if MCPHub.commandsAllowed {
-                                        Button("Install") { installFeatured(item) }
-                                    }
-                                }
-                                Text(item.description).font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-                Section(query.isEmpty ? "Recent" : "Results") {
-                    ForEach(entries) { entry in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text(entry.title).font(.callout.weight(.medium))
-                                Text(entry.name).font(.caption2).foregroundStyle(.secondary)
-                                Spacer()
-                                if let install = entry.installs.first(where: allowed) {
-                                    Button("Install") { pick(entry, install) }
-                                } else {
-                                    Text(entry.needs.map { String(format: NSLocalizedString("Needs %@", comment: "MCP catalog"), $0) } ?? "")
-                                        .font(.caption).foregroundStyle(.secondary)
-                                }
-                            }
-                            Text(entry.description).font(.caption).foregroundStyle(.secondary).lineLimit(3)
-                        }
-                    }
-                }
-            }
-            .frame(minHeight: 320)
-            if let error { Text(error).foregroundStyle(.red).font(.callout) }
-            HStack {
-                Spacer()
-                Button("Close") { dismiss() }
-            }
-        }
-        .padding()
-        .frame(width: 640, height: 560)
-        .task {
-            runners = ["npx": MCPImport.resolveCommand("npx"), "uvx": MCPImport.resolveCommand("uvx")].compactMapValues { $0 }
-            search()
-        }
-    }
-
-    private func allowed(_ install: MCPRegistry.Install) -> Bool {
-        if case .remote = install { return true }
-        return MCPHub.commandsAllowed
-    }
-
-    private func search() {
-        loading = true
-        error = nil
-        Task {
-            defer { loading = false }
-            do {
-                let (data, _) = try await URLSession.shared.data(from: MCPRegistry.searchURL(query))
-                entries = MCPRegistry.parse(data, available: Set(runners.keys)).entries
-            } catch {
-                self.error = error.localizedDescription
-            }
-        }
-    }
-
-    private func pick(_ entry: MCPRegistry.Entry, _ install: MCPRegistry.Install) {
-        if case .bundle(let url, let sha) = install {
-            download(url, sha256: sha, origin: entry.name)
-            return
-        }
-        guard let found = MCPRegistry.found(entry, install, runnerPath: { runners[$0] }) else { return }
-        next(found, entry.name)
-    }
-
-    private func installFeatured(_ item: MCPFeatured.Item) {
-        download(item.bundleURL, sha256: nil, origin: item.repository)
-    }
-
-    private func download(_ url: String, sha256: String?, origin: String) {
-        guard let u = URL(string: url), u.scheme == "https" else { error = NSLocalizedString("The bundle's address isn't https.", comment: ""); return }
-        loading = true
-        Task {
-            defer { loading = false }
-            do {
-                let (data, response) = try await URLSession.shared.data(from: u)
-                guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                    error = NSLocalizedString("The bundle couldn't be downloaded.", comment: "")
-                    return
-                }
-                guard data.count < 200 << 20, MCPRegistry.verifyBundle(data, sha256: sha256) else {
-                    error = NSLocalizedString("The download doesn't match what the registry lists for it.", comment: "")
-                    return
-                }
-                let file = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).mcpb")
-                try data.write(to: file)
-                defer { try? FileManager.default.removeItem(at: file) }
-                next(try MCPBundles.install(file), origin)
-            } catch {
-                self.error = error.localizedDescription
-            }
-        }
-    }
-}

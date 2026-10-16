@@ -106,6 +106,17 @@ final class MCPTests: XCTestCase {
         XCTAssertTrue(MCPApproval.runsWithoutAsking(plain, arguments: [:], config: config))
     }
 
+    func testUpdateSources() {
+        XCTAssertEqual(MCPSource.githubRelease(url: "https://github.com/ipsupport-llc/apple-mail-mcp/releases/latest/download/apple-mail-mcp.mcpb"),
+                       .githubRelease(owner: "ipsupport-llc", repo: "apple-mail-mcp", asset: "apple-mail-mcp.mcpb"))
+        XCTAssertNil(MCPSource.githubRelease(url: "https://example.com/a.mcpb"))
+        XCTAssertTrue(MCPSource.isNewer("v1.5.0", than: "1.4.0"))
+        XCTAssertTrue(MCPSource.isNewer("1.10", than: "1.9.3"))
+        XCTAssertFalse(MCPSource.isNewer("1.4.0", than: "1.4"))
+        XCTAssertFalse(MCPSource.isNewer("1.4.0", than: nil))
+        XCTAssertFalse(MCPSource.isNewer("nightly", than: "1.0"))
+    }
+
     func testSecretLookingNames() {
         XCTAssertTrue(MCPServerConfig.looksSecret("GITHUB_TOKEN"))
         XCTAssertTrue(MCPServerConfig.looksSecret("Authorization"))
@@ -164,6 +175,12 @@ final class MCPTests: XCTestCase {
         XCTAssertEqual(found.command, "/usr/bin/osascript")
         XCTAssertEqual(found.asks.map(\.key), ["limit"])
         XCTAssertEqual(found.asks.first?.defaultValue, "20")
+        XCTAssertEqual(found.asks.first?.kind, .number)
+        XCTAssertEqual(MCPImport.fill("${user_config.dir}", folder: "/b", home: "/h", answers: ["dir": "${HOME}/Downloads"]), "/h/Downloads")
+        XCTAssertEqual(MCPImport.text(true), "true")
+        XCTAssertEqual(MCPImport.text(false), "false")
+        XCTAssertEqual(MCPImport.text(0), "0")
+        XCTAssertEqual(MCPImport.text(2.5), "2.5")
         XCTAssertEqual(found.workingDirectory, "/b")
         XCTAssertEqual(MCPImport.fill(found.arguments[2], folder: "/b", home: "/h", answers: [:]), "/b/server/a.js")
         XCTAssertEqual(MCPImport.fill(found.arguments[3], folder: "/b", home: "/h", answers: ["limit": "5"]), "5")
