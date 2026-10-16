@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "关闭此窗口。前往“设置 › 通用 › 设置 LLMTray…” 可重新打开。";
 "Coding agents" = "代码代理";
 "Coffee" = "咖啡";
+"Comes with %@" = "随 %@ 附带";
 "Command-line tool" = "命令行工具";
 "Compact" = "紧凑";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "压缩会将长聊天的中间部分替换为一段由模型编写的摘要。开头这么多条消息会逐字保留。";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "无法将「%@」移到废纸篓：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "无法连接到 ipsupport.us。已保存您的评论：请稍后重试。";
 "Couldn't reach the server -- please try again later." = "无法连接到服务器——请稍后再试。";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "无法读取聊天的某些部分；将于 %@ 再次尝试（原因：设置 › 服务器 › 日志）。";
 "Couldn't start the voice runner: %@" = "无法启动语音运行器：%@";
 "Countdown" = "倒计时";
 "Countdown: %lld s" = "倒计时：%lld 秒";
@@ -488,11 +490,13 @@
 "Generating image…" = "正在生成图像…";
 "Generating music…" = "正在生成音乐…";
 "Generation" = "生成";
+"Get" = "获取";
 "Get Started" = "开始";
 "Get a Model…" = "获取模型…";
 "Get one" = "获取一个";
 "Getting Started" = "入门指南";
 "Getting started" = "入门";
+"Getting…" = "正在获取…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "为模型提供 generate_image 工具（需要支持工具调用的模型）。首次使用时会下载图像模型。";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "为模型提供 generate_music 工具：根据描述生成带人声歌词的歌曲或纯音乐（ACE-Step 1.5，MIT 许可；生成 30 秒音乐约需 20 秒）。首次使用会下载模型。";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "为模型提供 edit_image 工具：更改聊天中的图像——你附加的或在此生成的。需要启用图像生成。该工具使用独立模型，选择时会下载。";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "位于 iCloud Drive 或其他云端：移到“废纸篓”也会从其他设备删除。";
 "In project %@" = "在项目 %@ 中";
 "In real use" = "实际使用";
+"In the Hugging Face cache; used once a %@ model is installed." = "位于 Hugging Face 缓存中；安装 %@ 模型后使用。";
 "In the queue: %lld ahead…" = "排队中：前面还有 %lld 个…";
 "Include LLMTray crash reports from the last two weeks" = "包含最近两周的 LLMTray 崩溃报告";
 "Include the server log" = "包含服务器日志";
@@ -595,6 +600,7 @@
 "Kind" = "类型";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray 指南";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray 会随其加速的模型一起获取它：下载该模型即可。";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允许使用麦克风。";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray 未被允许使用麦克风。请在“系统设置”›“隐私与安全性”›“麦克风”中允许。";
 "LLMTray restarts now to load them." = "LLMTray 现在将重启以加载这些内容。";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "模型进程的实时输出：加载、错误、请求。";
 "Load %@" = "加载 %@";
 "Load it itself" = "自行加载它";
+"Load it yourself, or let memory do it (Load it itself, below)." = "你可以自行加载，或让内存处理（下方“自行加载它”）。";
 "Loaded: %1$@ · selected: %2$@" = "已加载：%1$@ · 已选：%2$@";
 "Loading %@…" = "正在加载 %@…";
 "Loading the voice model…" = "正在加载语音模型…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "长对话和已固定文件从缓存读取，无需每次都重新读取。";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "较长的对话在窗口中更便捷：侧栏显示项目、文件和所有对话。";
+"MTP drafter: speeds up %@, same answers" = "MTP drafter：加速 %@，答案不变";
 "Made for programming and agents: coding tools and the OpenAI API." = "为编程与 agent 设计：包含编码工具并支持 OpenAI API。";
 "Maintenance" = "维护";
 "Make a 30-second calm lo-fi instrumental for studying" = "制作一段用于学习的 30 秒平静 lo-fi 背景乐";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "内存可以从关闭期间你在聊天中写的内容学习，也可以只从现在开始写的内容学习。";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "内存不会再从中学习任何内容。它已教过的笔记也可一并移除，但你编辑、置顶或批准过的除外。";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTray 空闲 %d 分钟后，内存会自行加载它。";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "内存只会从遇到某个聊天后的第一条消息开始读取该聊天。此操作也会在后台、模型空闲时，从开头读取每个已存储的聊天——也就是你在内存开启前写下的内容。标记为“不要记住”的聊天会被跳过。";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "内存会保留在这台 Mac 上：笔记保存在本地文件中，绝不会上传或共享。它们只会进入你的 LLMTray 聊天提示词——不会发送给使用 API 的 App，也不会进入临时对话。";
 "Memory was off. Read what was said meanwhile?" = "内存已关闭。要读取期间说过的内容吗？";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "正在说话…";
 "Speculative decoding (MTP)" = "推测解码（MTP）";
 "Speed" = "速度";
+"Speeds up %@: fetched where LLMTray loads it from." = "可加速 %@：从 LLMTray 加载它的位置获取。";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "停滞超时：%lld 秒";
 "Start" = "开始";
@@ -1063,6 +1073,7 @@
 "Start server" = "启动服务器。";
 "Start talking" = "开始说话";
 "Start the server first." = "请先启动服务器。";
+"Start the server to read your chats." = "启动服务器以读取你的聊天。";
 "Start the server when LLMTray opens" = "打开 LLMTray 时启动服务器";
 "Starting in %.0f s…" = "将在 %.0f 秒后开始…";
 "Starting…" = "正在启动…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "当 %lld 个聊天出现后使用已学习的事实";
 "Use headphones: the model hears its own voice from the speakers." = "使用耳机：模型会从扬声器听到自身声音。";
 "Used" = "已使用";
+"Used by %@." = "由 %@ 使用。";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "供图像生成、音乐和 Voice Lab 使用，它们会下载这些模型。模型也保存在 models 文件夹中，按其 Hugging Face 名称存放。";
 "Uses the internet" = "使用互联网";
 "Verbose server logging" = "详细服务器日志";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "等待聊天或生成器完成";
 "Waiting to be sent: %@" = "待发送：%@";
 "Waits for %@ to be loaded." = "等待 %@ 加载完成。";
-"Waits for a model to be loaded." = "等待模型加载完成。";
+"Waits for a model: start one to read your chats." = "正在等待模型：请启动一个模型以读取你的聊天。";
 "Waits for a picture or song to finish." = "等待图片或歌曲完成。";
 "Waits for the model to be free." = "等待模型空闲。";
 "Waits for the model to be loaded." = "等待模型加载完成。";

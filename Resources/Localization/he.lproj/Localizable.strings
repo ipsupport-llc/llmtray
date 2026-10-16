@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "סוגר את החלון הזה. הגדרות › כללי › הגדר את LLMTray… פותח אותו שוב.";
 "Coding agents" = "סוכני קוד";
 "Coffee" = "קפה";
+"Comes with %@" = "מגיע עם %@";
 "Command-line tool" = "כלי שורת פקודה";
 "Compact" = "קומפקטי";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "דחיסה מחליפה את אמצע השיחה הארוכה בסיכום אחד שנכתב על ידי המודל. זהו מספר ההודעות מתחילת השיחה שיישמרו מילה במילה.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "לא ניתן להעביר את “%@” לפח: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "לא ניתן היה להגיע ל-ipsupport.us. הביקורת נשמרה: נסה שוב מאוחר יותר.";
 "Couldn't reach the server -- please try again later." = "לא ניתן היה להגיע לשרת — נסה שוב מאוחר יותר.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "לא ניתן היה לקרוא חלקים מסוימים מהצ׳אטים; ננסה שוב ב-%@ (למה: הגדרות › שרת › יומן).";
 "Couldn't start the voice runner: %@" = "לא ניתן להפעיל את ה־voice runner: %@";
 "Countdown" = "ספירה לאחור";
 "Countdown: %lld s" = "ספירה לאחור: %lld שניות";
@@ -488,11 +490,13 @@
 "Generating image…" = "יוצר תמונה…";
 "Generating music…" = "מוליד מוזיקה…";
 "Generation" = "ייצור";
+"Get" = "הורד";
 "Get Started" = "התחל";
 "Get a Model…" = "השג מודל…";
 "Get one" = "קבל אחד";
 "Getting Started" = "התחלה";
 "Getting started" = "התחלה";
+"Getting…" = "מוריד…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "מספק למודל כלי generate_music: שיר עם מילים מושרות או יצירה אינסטרומנטלית מתוך תיאור (ACE-Step 1.5, רישיון MIT; כ‑20 שנ׳ ל‑30 שנ׳ של מוזיקה). בפעם הראשונה המודל יורד.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "נותן למודל כלי edit_image: משנה תמונה מהשיחה — אחת שצירפת או שנוצרה כאן. דורש שיהיה מופעל יצור תמונות. המודל נמצא משלו, יורד כשאתה בוחר בו.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "ב־iCloud Drive או בענן אחר: העברתו ל־Trash תסירו גם מהמכשירים האחרים שלך.";
 "In project %@" = "בפרויקט %@";
 "In real use" = "בשימוש אמיתי";
+"In the Hugging Face cache; used once a %@ model is installed." = "במטמון של Hugging Face; בשימוש לאחר שמותקן מודל %@.";
 "In the queue: %lld ahead…" = "בתור: %lld לפני…";
 "Include LLMTray crash reports from the last two weeks" = "כלול דוחות קריסה של LLMTray משבועיים אחרונים";
 "Include the server log" = "כלול את לוג השרת";
@@ -595,6 +600,7 @@
 "Kind" = "סוג";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "מדריך LLMTray";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray מוריד אותו עם המודל שהוא מאיץ: הורד את המודל הזה.";
 "LLMTray isn't allowed to use the microphone." = "אין ל‑LLMTray הרשאה להשתמש במיקרופון.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "ל־LLMTray אין הרשאה להשתמש במיקרופון. אפשר זאת בהגדרות המערכת › פרטיות ואבטחה › מיקרופון.";
 "LLMTray restarts now to load them." = "LLMTray יאתחל עכשיו כדי לטעון אותם.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "פלט חי של תהליך המודל: טעינה, שגיאות ובקשות.";
 "Load %@" = "טען %@";
 "Load it itself" = "לטעון אותו בעצמו";
+"Load it yourself, or let memory do it (Load it itself, below)." = "טען אותו בעצמך, או תן לזיכרון לעשות זאת (״לטעון אותו בעצמו״, למטה).";
 "Loaded: %1$@ · selected: %2$@" = "טעון: %1$@ · נבחר: %2$@";
 "Loading %@…" = "טוען %@…";
 "Loading the voice model…" = "טוען את מודל הקול…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "שיחות ארוכות וקבצים מצורפים נטענים מהמטמון במקום להיקרא שוב בכל פנייה.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "שיחות ארוכות נוחות יותר בחלון: פרויקטים, קבצים וכל שיחה בסרגל צד.";
+"MTP drafter: speeds up %@, same answers" = "מנסח MTP: מאיץ את %@, אותן תשובות";
 "Made for programming and agents: coding tools and the OpenAI API." = "מייועד לתכנות וסוכנים: כלי קידוד ו־OpenAI API.";
 "Maintenance" = "תחזוקה";
 "Make a 30-second calm lo-fi instrumental for studying" = "הכן קטע אינסטרומנטלי שקט ל‑lo‑fi למשך 30 שניות ללמידה";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "זיכרון יכול ללמוד ממה שכתבת בצ׳אטים שלך בזמן שהיה כבוי, או רק ממה שתכתוב מעכשיו.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "הזיכרון לא ילמד ממנו עוד. גם הערות שכבר לימד יכולות להימחק, חוץ מאלה שערכת, נעצת או אישרת.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "זיכרון טוען אותו בעצמו אחרי ש-LLMTray לא היה בשימוש במשך %d דקות.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "זיכרון קורא צ׳אט רק מההודעה הראשונה אחרי שהוא פגש אותו. פעולה זו קוראת גם כל צ׳אט שמור מההתחלה — מה שכתבת לפני שזיכרון הופעל — ברקע, כשהמודל פנוי. צ'אטים שמסומנים „לא לזכור” ידולגו.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "הזיכרון נשאר ב‑Mac הזה: ההערות נשמרות כאן בקובץ ולעולם לא מועלות או משותפות. הן נכנסות רק להנחיה של צ׳אטים ב‑LLMTray -- לא ליישומים שמשתמשים ב‑API, ולא לצ'אט זמני.";
 "Memory was off. Read what was said meanwhile?" = "זיכרון היה כבוי. לקרוא את מה שנאמר בינתיים?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "מדבר…";
 "Speculative decoding (MTP)" = "פענוח ספקולטיבי (MTP)";
 "Speed" = "מהירות";
+"Speeds up %@: fetched where LLMTray loads it from." = "מאיץ את %@: מורד מהמקום שממנו LLMTray טוען אותו.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "זמן קצוב לתקיעה: %lld שנ׳";
 "Start" = "התחל";
@@ -1063,6 +1073,7 @@
 "Start server" = "מפעיל את השרת.";
 "Start talking" = "התחל לדבר";
 "Start the server first." = "יש להפעיל את השרת תחילה.";
+"Start the server to read your chats." = "התחל את השרת כדי לקרוא את הצ׳אטים שלך.";
 "Start the server when LLMTray opens" = "הפעלת השרת בעת פתיחת LLMTray";
 "Starting in %.0f s…" = "מתחיל בעוד %.0f שנ׳…";
 "Starting…" = "מתחיל…";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "השתמש בעובדה שנלמדה לאחר ש־%lld צ׳אטים מראים אותה";
 "Use headphones: the model hears its own voice from the speakers." = "השתמש באוזניות: המודל שומע את קולו מהרמקולים.";
 "Used" = "בשימוש";
+"Used by %@." = "בשימוש על ידי %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "משמש/ת להפקת תמונה, למוזיקה ול‑Voice Lab, שהורדות אותן. גם נשמרות בתיקיית ה‑models תחת שמותיהן ב‑Hugging Face.";
 "Uses the internet" = "משתמש באינטרנט";
 "Verbose server logging" = "רישום שרת מפורט";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "ממתין לשיחה או לגנרטור שיסיים";
 "Waiting to be sent: %@" = "ממתין להשליחה: %@";
 "Waits for %@ to be loaded." = "ממתין לטעינת %@.";
-"Waits for a model to be loaded." = "ממתין לטעינת מודל.";
+"Waits for a model: start one to read your chats." = "ממתין למודל: התחל מודל כדי לקרוא את הצ׳אטים שלך.";
 "Waits for a picture or song to finish." = "ממתין לסיום תמונה או שיר.";
 "Waits for the model to be free." = "ממתין עד שהמודל יהיה פנוי.";
 "Waits for the model to be loaded." = "ממתין עד שהמודל ייטען.";

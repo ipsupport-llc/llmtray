@@ -282,6 +282,7 @@
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. „Einstellungen“ › „Allgemein“ › „LLMTray einrichten…“ öffnet es erneut.";
 "Coding agents" = "Code‑Agenten";
 "Coffee" = "Coffee";
+"Comes with %@" = "Enthält %@";
 "Command-line tool" = "Kommandozeilen‑Tool";
 "Compact" = "Kompakt";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Beim Kompaktieren wird die Mitte eines langen Chats durch eine vom Modell erstellte Zusammenfassung ersetzt. So viele Nachrichten am Anfang bleiben wortwörtlich erhalten.";
@@ -307,6 +308,7 @@
 "Couldn't move “%@” to the Trash: %@" = "Konnte „%@“ nicht in den Papierkorb verschieben: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us konnte nicht erreicht werden. Ihre Bewertung wird zwischengespeichert: Bitte später erneut versuchen.";
 "Couldn't reach the server -- please try again later." = "Server nicht erreichbar – bitte versuche es später noch einmal.";
+"Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Einige Teile von Chats konnten nicht gelesen werden; versucht es um %@ erneut (Grund: Einstellungen › Server › Log).";
 "Couldn't start the voice runner: %@" = "Konnte den Voice Runner nicht starten: %@";
 "Countdown" = "Countdown";
 "Countdown: %lld s" = "Countdown: %lld s";
@@ -488,11 +490,13 @@
 "Generating image…" = "Bild wird generiert …";
 "Generating music…" = "Musik wird erstellt…";
 "Generation" = "Generierung";
+"Get" = "Laden";
 "Get Started" = "Loslegen";
 "Get a Model…" = "Modell holen…";
 "Get one" = "Token holen";
 "Getting Started" = "Erste Schritte";
 "Getting started" = "Erste Schritte";
+"Getting…" = "Lädt…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gibt dem Modell ein generate_image-Tool (erfordert ein Modell mit Tool-Aufrufen). Beim ersten Mal wird das Bildmodell geladen.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Fügt dem Modell das generate_music-Tool hinzu: ein Lied mit gesungenen Texten oder ein Instrumentalstück aus einer Beschreibung (ACE‑Step 1.5, MIT‑Lizenz; etwa 20 Sekunden Verarbeitungszeit für 30 Sekunden Musik). Beim ersten Mal wird das Modell heruntergeladen.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Fügt dem Modell ein edit_image‑Werkzeug hinzu: Es verändert ein Bild aus dem Chat – eines, das Sie angehängt haben, oder hier erzeugt wurde. Benötigt aktivierte Bilderzeugung. Eigenes Modell, das beim Auswählen heruntergeladen wird.";
@@ -549,6 +553,7 @@
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "In iCloud Drive oder einer anderen Cloud: In den Papierkorb verschieben entfernt es auch von Ihren anderen Geräten.";
 "In project %@" = "Im Projekt %@";
 "In real use" = "Im echten Einsatz";
+"In the Hugging Face cache; used once a %@ model is installed." = "Im Hugging Face-Cache; wird verwendet, sobald ein %@-Modell installiert ist.";
 "In the queue: %lld ahead…" = "In der Warteschlange: %lld davor…";
 "Include LLMTray crash reports from the last two weeks" = "LLMTray‑Absturzberichte der letzten zwei Wochen einschließen";
 "Include the server log" = "Serverprotokoll einschließen";
@@ -595,6 +600,7 @@
 "Kind" = "Art";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray‑Anleitung";
+"LLMTray fetches it with the model it speeds up: download that model." = "LLMTray lädt es zusammen mit dem Modell, das es beschleunigt: Laden Sie dieses Modell.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray darf das Mikrofon nicht verwenden.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray darf das Mikrofon nicht verwenden. Erlauben Sie dies in Systemeinstellungen › Datenschutz & Sicherheit › Mikrofon.";
 "LLMTray restarts now to load them." = "LLMTray wird jetzt neu gestartet, um sie zu laden.";
@@ -630,6 +636,7 @@
 "Live output of the model process: loading, errors, requests." = "Live-Ausgabe des Modellprozesses: Laden, Fehler, Anfragen.";
 "Load %@" = "Lade %@";
 "Load it itself" = "Selbst laden";
+"Load it yourself, or let memory do it (Load it itself, below)." = "Lade es selbst oder lass den Speicher es erledigen („Selbst laden“, unten).";
 "Loaded: %1$@ · selected: %2$@" = "Geladen: %1$@ · ausgewählt: %2$@";
 "Loading %@…" = "Lade %@…";
 "Loading the voice model…" = "Sprachmodell wird geladen…";
@@ -637,6 +644,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Protokolliert jedes generierte Token (DEBUG). Nur zur Fehlerbehebung des Modellprozesses – verlangsamt die Ausführung. Wird beim nächsten Serverstart wirksam.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Lange Unterhaltungen und angeheftete Dateien werden aus dem Cache geladen, statt bei jedem Schritt neu gelesen zu werden.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Längere Gespräche sind im Fenster einfacher: Projekte, Dateien und jeder Chat in einer Seitenleiste.";
+"MTP drafter: speeds up %@, same answers" = "MTP-Drafter: beschleunigt %@, gleiche Antworten";
 "Made for programming and agents: coding tools and the OpenAI API." = "Für Programmierung und Agenten: Coding‑Tools und die OpenAI API.";
 "Maintenance" = "Wartung";
 "Make a 30-second calm lo-fi instrumental for studying" = "30 Sekunden ruhiges Lo‑Fi‑Instrumental zum Lernen erstellen";
@@ -658,6 +666,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Der Speicher kann aus dem lernen, was Sie in Ihren Chats geschrieben haben, während er ausgeschaltet war, oder nur aus dem, was Sie ab jetzt schreiben.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Speicher, der zum Wiederverwenden des Kontexts früherer Konversationen behalten wird, sodass ein fortgesetzter Chat nicht den gesamten Verlauf erneut einlesen muss. Begrenzt, damit er nicht anwächst, bis dem Server der Speicher ausgeht.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Der Speicher lernt nichts mehr daraus. Notizen, die er bereits daraus gelernt hat, können ebenfalls entfernt werden – außer denen, die du bearbeitet, angepinnt oder genehmigt hast.";
+"Memory loads it itself once LLMTray has been idle %d minutes." = "Der Speicher lädt es selbst, sobald LLMTray %d Minuten inaktiv war.";
 "Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Der Speicher liest einen Chat erst ab der ersten Nachricht, nachdem er ihn gesehen hat. Damit wird außerdem jeder gespeicherte Chat von Anfang an gelesen – auch das, was Sie geschrieben haben, bevor der Speicher aktiviert war – im Hintergrund, während das Modell frei ist. Chats, die mit „Nicht merken“ markiert sind, werden übersprungen.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Der Speicher bleibt auf diesem Mac: Notizen werden hier in einer Datei aufbewahrt und nie hochgeladen oder geteilt. Sie werden nur in den Prompt deiner LLMTray-Chats eingefügt – nicht an Apps, die die API verwenden, und nicht in temporäre Chats.";
 "Memory was off. Read what was said meanwhile?" = "Der Speicher war ausgeschaltet. Inzwischen Geschriebenes lesen?";
@@ -1053,6 +1062,7 @@
 "Speaking…" = "Spreche…";
 "Speculative decoding (MTP)" = "Spekulatives Decoding (MTP)";
 "Speed" = "Geschwindigkeit";
+"Speeds up %@: fetched where LLMTray loads it from." = "Beschleunigt %@: wird dort geladen, wo LLMTray es lädt.";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Timeout bei Stillstand: %lld s";
 "Start" = "Start";
@@ -1063,6 +1073,7 @@
 "Start server" = "Startet den Server.";
 "Start talking" = "Sprechen beginnen";
 "Start the server first." = "Zuerst den Server starten.";
+"Start the server to read your chats." = "Starte den Server, um deine Chats zu lesen.";
 "Start the server when LLMTray opens" = "Server beim Öffnen von LLMTray starten";
 "Starting in %.0f s…" = "Startet in %.0f s…";
 "Starting…" = "Wird gestartet …";
@@ -1331,6 +1342,7 @@
 "Use a learned fact once %lld chats show it" = "Gelernte Tatsache verwenden, sobald %lld Chats sie zeigen";
 "Use headphones: the model hears its own voice from the speakers." = "Verwenden Sie Kopfhörer: Das Modell hört seine eigene Stimme über die Lautsprecher.";
 "Used" = "Verwendet";
+"Used by %@." = "Verwendet von %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Wird von Bildgenerierung, Musik und Voice Lab verwendet, die sie herunterladen. Sie werden ebenfalls im Models-Ordner unter ihren Hugging Face-Namen abgelegt.";
 "Uses the internet" = "Verwendet das Internet";
 "Verbose server logging" = "Ausführliche Serverprotokollierung";
@@ -1356,7 +1368,7 @@
 "Waiting for the chat or a generator to finish" = "Warten auf den Chat oder einen Generator, der fertig wird";
 "Waiting to be sent: %@" = "Wartend auf Versand: %@";
 "Waits for %@ to be loaded." = "Wartet, bis %@ geladen ist.";
-"Waits for a model to be loaded." = "Wartet, bis ein Modell geladen ist.";
+"Waits for a model: start one to read your chats." = "Wartet auf ein Modell: Starte eins, um deine Chats zu lesen.";
 "Waits for a picture or song to finish." = "Wartet, bis ein Bild oder Song fertig ist.";
 "Waits for the model to be free." = "Wartet, bis das Modell frei ist.";
 "Waits for the model to be loaded." = "Wartet, bis das Modell geladen ist.";
