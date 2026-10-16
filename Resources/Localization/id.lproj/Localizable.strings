@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (milik LM Studio, dibagikan dengannya)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ sudah ada dan bukan milik LLMTray. Hapus dulu untuk memasang milik LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ sudah ada dan mengarah ke %@. Hapus dulu untuk memasang milik LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ tidak dapat membaca obrolan untuk memori: model lain membaca obrolannya.";
 "%@ didn't download: %@" = "%@ tidak diunduh: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ adalah tautan ke folder yang tidak tersedia: sambungkan disknya, atau hapus tautan tersebut.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d obrolan sedang menjawab; pembacaannya diantrekan setelah selesai.";
 "%d chats queued; reading starts now if the model is free." = "%d obrolan diantrekan; pembacaan dimulai sekarang jika model bebas.";
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
+"%d parts of chats wait to be read." = "%d bagian chat menunggu untuk dibaca.";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld masih dapat dibatalkan dari Pengaturan > Files.";
 "%lld downloads" = "%lld unduhan";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld berkas tidak dapat diindeks";
 "%lld interrupted: look at them in Finder" = "%lld terhenti: lihat di Finder";
 "%lld items put back under their names." = "%lld item dikembalikan ke nama aslinya.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld catatan yang dipelajari dan belum Anda setujui akan dihapus. Catatan yang Anda tulis, edit, sematkan, atau setujui tetap disimpan.";
 "%lld more" = "%lld lagi";
 "%lld more…" = "%lld lagi…";
 "%lld need a look: see the list." = "%lld perlu diperiksa: lihat daftarnya.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld baru sejak Anda membuka daftar: tidak dicentang sampai Anda mencentangnya.";
 "%lld of 5 stars" = "%lld dari 5 bintang";
 "%lld pages" = "%lld halaman";
-"%lld parts of chats wait to be read." = "%lld bagian obrolan menunggu dibaca.";
 "%lld pictures" = "%lld gambar";
 "%lld pictures added: kept for documents, not searched." = "%lld gambar ditambahkan: disimpan untuk dokumen, tidak dicari.";
 "%lld requests" = "%lld permintaan";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "Chat proyek %@";
 "Chats outside projects" = "Chat di luar proyek";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chat dimulai dengan catatan singkat tentang Anda dan pekerjaan Anda: jawaban seperti apa yang Anda sukai, apa yang sedang Anda kerjakan, apa yang pernah Anda koreksi. Hanya catatan yang muat dalam batas yang dikirim, dan hanya di chat milik LLMTray sendiri -- tidak pernah ke app yang menggunakan API, tidak pernah dalam Chat sementara. Semuanya tetap di komputer ini.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Chat tidak akan mendapatkannya lagi. Ini tidak dapat dibatalkan. Tentang Anda tetap ada (kosongkan kolomnya untuk menghapusnya). Jika dibaca lagi, chat Anda dipelajari lagi dari awal; hanya dilupakan, yang dibaca sebelumnya tidak dibaca lagi.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chat, proyek, profil, serta model gambar, musik, suara, dan embedding dari versi di ipsupport.us sekarang ada di sini. Folder yang pernah Anda beri akses, dan folder model chat Anda, memerlukan konfirmasi Anda lagi.";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Setiap permintaan yang dijawab server, dari chat dan dari aplikasi serta agen lain lewat API, disimpan di Mac ini. Median per model dan pengaturan.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Setiap obrolan tersimpan dibaca dari awal untuk catatan, menggunakan yang Anda tulis di sana. Ini berjalan di latar belakang dan mungkin memerlukan waktu.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Setiap chat yang disimpan dibaca lagi dari awal. Catatan yang sudah ada dikonfirmasi, bukan digandakan.";
 "Everything in that folder is here already." = "Semua di folder itu sudah ada di sini.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Persis apa yang dikirim LLMTray ke ipsupport.us, per bidang. Tidak ada yang lain keluar dari Mac Anda.";
 "Experimental — English only" = "Eksperimental — hanya Bahasa Inggris";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "Untuk jawaban lebih cepat (spekulatif decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Untuk model dengan drafter terbitan (Gemma 4 26B) atau kepala MTP sendiri (mis. Qwen 3.5 kami, diunduh bersamaan): komponen tersebut menebak token ke depan dan model utama memeriksanya dalam satu kali proses. Keluaran sama, lebih cepat. Satu permintaan mendapatkannya sendiri; jika beberapa sekaligus mereka berbagi batch tanpa drafter.";
 "Forget" = "Lupakan";
-"Forget Everything…" = "Lupakan Semuanya…";
-"Forget What Was Learned…" = "Lupakan yang Dipelajari…";
-"Forget and Read All Chats Again" = "Lupakan dan Baca Semua obrolan Lagi";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Melupakan setiap catatan yang dipelajari yang belum Anda tulis, edit, sematkan, atau setujui, serta yang menunggu untuk dibaca. Setelah itu, obrolan Anda dapat dibaca lagi dengan aturan saat ini -- bukan yang ditandai “Jangan Ingat”, dan saat memori nonaktif, tidak sebelum Anda menjawab apakah ingin membaca hal yang dikatakan sementara itu.";
+"Forget Everything" = "Lupakan semuanya";
+"Forget Everything and Read Chats Again" = "Lupakan semuanya dan baca Chat lagi";
+"Forget What Was Learned" = "Lupakan yang dipelajari";
+"Forget What Was Learned and Read Chats Again" = "Lupakan yang dipelajari dan baca Chat lagi";
+"Forget…" = "Lupakan…";
 "Found after an interruption" = "Ditemukan setelah terhenti";
 "Founding Supporters" = "Penyokong Pendiri";
 "Free disk space" = "Ruang disk tersedia";
@@ -613,7 +611,6 @@
 "Later" = "Nanti";
 "Launch at login" = "Buka saat masuk";
 "Launch at login: %@" = "Buka saat masuk: %@";
-"Learn from Past Chats Now" = "Pelajari dari Chat Lama Sekarang";
 "Learned from chats" = "Dipelajari dari obrolan";
 "Learning" = "Pembelajaran";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Pembelajaran dari obrolan memerlukan %@ (%@), model embedding yang memberi tahu catatan mana yang mengatakan hal yang sama dengan kata lain atau dalam bahasa lain. Model ini diunduh sekali ke komputer ini dan digunakan bersama berkas proyek.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memori tidak akan mempelajari apa pun lagi darinya. Catatan yang sudah diajarkannya juga dapat dihapus, kecuali yang Anda edit, sematkan, atau setujui.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "Memori memuatnya sendiri setelah LLMTray tidak aktif selama %d menit.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memori membaca obrolan hanya mulai pesan pertama setelah mengenalinya. Ini juga membaca setiap obrolan tersimpan dari awalnya -- yang Anda tulis sebelum memori dinyalakan -- di latar belakang, saat model bebas. Obrolan yang ditandai “Jangan Ingat” dilewati.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Memori tetap berada di Mac ini: catatan disimpan dalam file di sini dan tidak pernah diunggah atau dibagikan. Catatan hanya masuk ke prompt obrolan LLMTray Anda -- bukan ke app yang menggunakan API, bukan ke chat sementara.";
 "Memory was off. Read what was said meanwhile?" = "Memori mati. Baca yang dikatakan sementara itu?";
 "Memory: %d" = "Memori: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Mati: hanya Mac ini. Aktif: siapa pun di jaringan Anda, jadi hanya pada jaringan yang Anda percaya.";
 "Older" = "Lebih lama";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Sekali bayar: Kopi $5, Penyokong Pro $25, Penyokong Pendiri $150.";
-"Only Forget" = "Hanya Lupakan";
 "Only From Now On" = "Hanya Mulai Sekarang";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Hanya jika Anda mau: obrolan mendapatkannya lebih dulu, tidak pernah kedaluwarsa, dan pembelajaran tidak pernah mengubahnya. Tetap berada di komputer ini.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
 "PDF · %lld pages" = "PDF · %lld halaman";
 "Past %lld messages" = "%lld pesan terakhir";
-"Past chats" = "Obrolan lama";
 "Pause" = "Jeda";
 "Pause Indexing" = "Jeda Pengindeksan";
 "Pause download" = "Jeda pengunduhan.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "Indeks ulang %@";
 "Re-index this file" = "Indeks ulang berkas ini";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Mencakup %1$lld subfolder (%2$@): file‑filenya dikeluarkan dari sana.";
-"Read All Chats Again" = "Baca Semua obrolan Lagi";
-"Read All Chats Again…" = "Baca Semua obrolan Lagi…";
+"Read Everything Again" = "Baca semuanya lagi";
 "Read It Too" = "Baca Juga";
-"Read Them" = "Baca Semuanya";
+"Read Past Chats…" = "Baca Chat terdahulu…";
+"Read What Wasn't Read" = "Baca yang belum dibaca";
 "Read a chat after %lld quiet minutes" = "Baca obrolan setelah %lld menit tanpa aktivitas";
 "Reading a chat…" = "Membaca obrolan…";
 "Reading a prompt: up to %lld%" = "Membaca prompt: hingga %lld%";
+"Reading chats" = "Membaca chat";
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Reads chats with" = "Membaca obrolan dengan";
 "Ready." = "Siap.";
@@ -983,6 +978,7 @@
 "Save" = "Simpan";
 "Save As…" = "Simpan Sebagai…";
 "Save memory" = "Hemat memori";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Chat yang disimpan dibaca di latar belakang untuk catatan, berdasarkan yang Anda tulis di sana. Jika dibaca lagi, catatan yang sudah ada dikonfirmasi, tidak digandakan. Chat yang ditandai “Jangan Ingat” dilewati.";
 "Saved chats will show up here." = "Chat tersimpan akan tampil di sini.";
 "Saved in your Keychain" = "Tersimpan di Keychain Anda";
 "Save…" = "Simpan…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Mulai LLMTray secara otomatis saat Anda masuk ke Mac ini.";
 "Start Server" = "Mulai Server";
 "Start a new saved chat (⌘N) to add files to a project." = "Mulai obrolan tersimpan baru (⌘N) untuk menambahkan berkas ke proyek.";
-"Start over" = "Mulai lagi";
 "Start server" = "Mulai server.";
 "Start talking" = "Mulai berbicara";
 "Start the server first." = "Mulai server terlebih dahulu.";
@@ -1297,6 +1292,7 @@
 "Total time" = "Total waktu";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Permintaan bersamaan: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
 "Try Again" = "Coba Lagi";
+"Try It Again" = "Coba Lagi";
 "Turn On" = "Nyalakan";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "Selamat datang di LLMTray";
 "What can you do?" = "Apa yang bisa Anda lakukan?";
 "What chats get" = "Yang diterima obrolan";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "Yang diterima obrolan, cara chat dibaca, berapa lama catatan bertahan. Default cocok untuk kebanyakan orang.";
 "What decides which models run well here." = "Yang menentukan model mana yang berjalan baik di sini.";
 "What else" = "Lainnya";
 "What happened?" = "Apa yang terjadi?";
 "What the model says appears here." = "Apa yang dikatakan model akan muncul di sini.";
 "What this chat knows about you from earlier chats" = "Yang diketahui obrolan ini tentang Anda dari obrolan sebelumnya";
 "What was copied before stays; importing again goes on from there. %@" = "Yang sudah disalin sebelumnya tetap ada; impor ulang akan dilanjutkan dari situ. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Yang dipelajari: yang dipelajari oleh memori catatan yang belum Anda tulis, edit, sematkan, atau setujui. Semuanya: setiap catatan kecuali Tentang Anda. Keduanya tidak dapat dibatalkan.";
 "What you corrected before, so it isn't repeated." = "Hal yang pernah Anda koreksi, agar tidak terulang.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Apa yang Anda lakukan, dipisahkan dari kemungkinan maknanya. Dikirim sebagai dugaan.";
 "What you do" = "Yang Anda lakukan";

@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (تابع لـ LM Studio، مُشترك معه)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "المسار %@ موجود بالفعل وليس تابعًا لـ LLMTray. أزله أولاً لتثبيت إصدار LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "المسار %@ موجود بالفعل ويشير إلى %@. أزله أولاً لتثبيت إصدار LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "تعذّرت على %@ قراءة الدردشات من أجل الذاكرة: يقرأ نموذج آخر دردشاته.";
 "%@ didn't download: %@" = "لم يتم تنزيل %@: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‏%@ رابط لمجلد غير متاح: صِل القرص الخاص به، أو أزل الرابط.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ مُقيَّد: اقبل ترخيصه على huggingface.co/%@، ثم أضف رمز Hugging Face في الإعدادات → Models.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d دردشات تجيب الآن: ستُوضَع قراءتها في الانتظار حتى تنتهي.";
 "%d chats queued; reading starts now if the model is free." = "%d دردشات في الانتظار؛ تبدأ القراءة الآن إذا كان النموذج متاحًا.";
 "%d overridden, rest from Default · %@" = "%d متجاوز، والباقي من Default · %@";
+"%d parts of chats wait to be read." = "هناك %d جزءًا من الدردشات بانتظار القراءة.";
 "%lld MB" = "%lld م.ب";
 "%lld can still be undone from Settings > Files." = "لا يزال يمكن التراجع عن %lld من الإعدادات > الملفات.";
 "%lld downloads" = "%lld تنزيلات";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "تعذر فهرسة %lld ملفًا";
 "%lld interrupted: look at them in Finder" = "%lld مقطوعة: راجعها في Finder";
 "%lld items put back under their names." = "أُعيد وضع %lld عناصر تحت أسمائها.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "تُحذف %lld من الملاحظات المتعلّمة التي لم توافق عليها. وتبقى الملاحظات التي كتبتها أو عدّلتها أو ثبّتّها أو وافقت عليها.";
 "%lld more" = "المزيد: %lld";
 "%lld more…" = "المزيد: %lld…";
 "%lld need a look: see the list." = "%lld تحتاج إلى معاينة: راجع القائمة.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld جديدة منذ فتحك للقائمة: غير محددة حتى تحددها.";
 "%lld of 5 stars" = "%lld من 5 نجوم";
 "%lld pages" = "%lld صفحة";
-"%lld parts of chats wait to be read." = "تنتظر %lld أجزاء من الدردشات القراءة.";
 "%lld pictures" = "%lld صورة";
 "%lld pictures added: kept for documents, not searched." = "تمت إضافة %lld صورة: محفوظة للمستندات، غير قابلة للبحث.";
 "%lld requests" = "%lld طلبات";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "دردشات المشروع %@";
 "Chats outside projects" = "الدردشات خارج المشاريع";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "تبدأ الدردشات بملاحظات قصيرة عنك وعن عملك: كيف تفضّل الإجابات، وما تعمل عليه، وما صححته سابقًا. تُرسل فقط الملاحظات التي تناسب الميزانية، وفقط في دردشات LLMTray نفسها -- ولا تُرسل أبدًا إلى التطبيقات التي تستخدم API، ولا في دردشة مؤقتة. يبقى كل شيء على هذا الكمبيوتر.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "لن تعود «الدردشات» تحصل عليها. لا يمكن التراجع عن هذا. يبقى «عنك» (امسح حقوله لإزالته). عند القراءة من جديد، يُعاد التعلّم من «الدردشات» من البداية؛ وإلا فسيجري النسيان فقط، وما قُرئ من قبل لن يُقرأ مرة أخرى.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "المحادثات والمشاريع والملفات الشخصية ونماذج الصورة والموسيقى والصوت والتضمين من النسخة من ipsupport.us موجودة هنا الآن. المجلدات التي منحتها إذناً لها، ومجلد نماذج الدردشة لديك، تحتاج موافقتك مرة أخرى.";
 "Check Again" = "تحقق مجددًا";
 "Check Now" = "تحقق الآن";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "تحصل كل محادثة في المشروع على كامل نص الملف؛ البحث على الويب وتوليد الصور أو الموسيقى متوقفان في تلك المحادثات طالما الملف مثبت.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "كل طلب يجيب عنه الخادم، من الدردشة ومن التطبيقات والوكلاء الأخرى عبر الواجهة البرمجية، محفوظ على هذا الـ Mac. الوسيط لكل نموذج وإعدادات.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "تُقرأ كل دردشة محفوظة من بدايتها للملاحظات، باستخدام ما كتبته فيها. تعمل في الخلفية وقد تستغرق بعض الوقت.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "تُقرأ كل دردشة محفوظة مرة أخرى من بدايتها. وتُؤكَّد «الملاحظات» الموجودة بالفعل، ولا تُكرَّر.";
 "Everything in that folder is here already." = "كل شيء في ذلك المجلد موجود هنا بالفعل.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "بالضبط ما يرسله LLMTray إلى ipsupport.us، حقلًا بحقل. لا شيء آخر يغادر جهاز Mac الخاص بك.";
 "Experimental — English only" = "تجريبي — الإنجليزية فقط";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "لإجابات أسرع (توقّع فك التشفير)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "للنماذج التي لديها مُولد مسودات منشور (Gemma 4 26B) أو رأس MTP خاص بها (نماذج Qwen 3.5 الخاصة بنا التي تم تنزيلها معها): يتوقع الرموز مقدمًا ويتحقّق النموذج الرئيسي منها في مرور واحد. نفس المخرجات، أسرع. الطلب الواحد يحصل عليه عندما يكون وحيدًا؛ مع عدة طلبات في آن واحد يشاركون الدفعة دون الحاجة إليه.";
 "Forget" = "نسيان";
-"Forget Everything…" = "نسيان كل شيء…";
-"Forget What Was Learned…" = "نسيان ما تم تعلّمه…";
-"Forget and Read All Chats Again" = "نسيان وقراءة كل الدردشات مجددًا";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "ينسى كل ملاحظة متعلّمة لم تكتبها أو تعدّلها أو تثبّتها أو توافق عليها، وما ينتظر القراءة. بعد ذلك يمكن قراءة دردشاتك مجددًا بالقواعد الحالية — باستثناء ما تم تعليمه «عدم التذكّر»، وكذلك، أثناء إيقاف الذاكرة، قبل أن تجيب عمّا إذا كان يجب قراءة ما قيل في تلك الأثناء.";
+"Forget Everything" = "نسيان كل شيء";
+"Forget Everything and Read Chats Again" = "نسيان كل شيء وقراءة الدردشات مرة أخرى";
+"Forget What Was Learned" = "نسيان ما تم تعلّمه";
+"Forget What Was Learned and Read Chats Again" = "نسيان ما تم تعلّمه وقراءة الدردشات مرة أخرى";
+"Forget…" = "نسيان…";
 "Found after an interruption" = "تم العثور عليها بعد انقطاع";
 "Founding Supporters" = "الراعون المؤسسون";
 "Free disk space" = "مساحة القرص الحرة";
@@ -613,7 +611,6 @@
 "Later" = "لاحقًا";
 "Launch at login" = "الفتح عند تسجيل الدخول";
 "Launch at login: %@" = "فتح عند تسجيل الدخول: %@";
-"Learn from Past Chats Now" = "تعلّم من الدردشات السابقة الآن";
 "Learned from chats" = "ما تم تعلّمه من الدردشات";
 "Learning" = "التعلّم";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "يتطلب التعلّم من الدردشات %@ (%@)، وهو نموذج تضمين يحدد أي الملاحظات تقول الشيء نفسه بكلمات أخرى أو بلغة أخرى. يتم تنزيله إلى هذا الكمبيوتر مرة واحدة ويُستخدم مع ملفات المشروع.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "لن تتعلم الذاكرة أي شيء آخر منها. ويمكن أن تُزال الملاحظات التي علّمتها سابقًا أيضًا، باستثناء ما عدّلته أو ثبّته أو وافقت عليه.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "تقوم الذاكرة بتحميله تلقائيًا بعد أن يبقى LLMTray بدون نشاط لمدة %d دقيقة.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "تقرأ الذاكرة الدردشة فقط من أول رسالة بعد أن تعرّفت عليها. يقرأ هذا أيضًا كل دردشة محفوظة من بدايتها — ما كتبته قبل تفعيل الذاكرة — في الخلفية، عندما يكون النموذج متاحًا. تُتخطى الدردشات المحددة بـ «لا تتذكر».";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "تبقى الذاكرة على هذا الـ Mac: تُحفظ الملاحظات في ملف هنا ولا تُرفع أو تُشارك أبدًا. ولا تُضاف إلا إلى موجه دردشات LLMTray — وليس إلى التطبيقات التي تستخدم API، ولا إلى الدردشات المؤقتة.";
 "Memory was off. Read what was said meanwhile?" = "كانت الذاكرة متوقفة. هل تريد قراءة ما قيل في هذه الأثناء؟";
 "Memory: %d" = "الذاكرة: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "متوقف: هذا الـ Mac فقط. مفعل: أي شخص على شبكتك، لذا فعّله فقط على الشبكات التي تثق بها.";
 "Older" = "أقدم";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "مرة واحدة: قهوة $5، راعٍ محترف $25، راعٍ مؤسس $150.";
-"Only Forget" = "نسيان فقط";
 "Only From Now On" = "من الآن فصاعدًا فقط";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "خاص بالنماذج المقيَّدة فقط (Llama، بعض مستودعات Gemma وFLUX): اقبل ترخيص النموذج في صفحته على Hugging Face، ثم ألصق رمز قراءة هنا. يُخزَّن في Keychain ويُرسل فقط إلى huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "اختياري فقط: تحصل عليه الدردشات أولًا، ولا تنتهي صلاحيته أبدًا، ولا يغيّره التعلم أبدًا. يبقى على هذا الكمبيوتر.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
 "PDF · %lld pages" = "PDF · %lld صفحة";
 "Past %lld messages" = "آخر %lld رسالة";
-"Past chats" = "الدردشات السابقة";
 "Pause" = "إيقاف مؤقت";
 "Pause Indexing" = "إيقاف الفهرسة مؤقتًا";
 "Pause download" = "أوقف التنزيل مؤقتًا.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "أعِد فهرسة %@";
 "Re-index this file" = "أعد فهرسة هذا الملف";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "يتعمق في %1$lld مجلدًا فرعيًا (%2$@): تُستخرج ملفاتها.";
-"Read All Chats Again" = "إعادة قراءة كل الدردشات";
-"Read All Chats Again…" = "إعادة قراءة كل الدردشات…";
+"Read Everything Again" = "قراءة كل شيء مرة أخرى";
 "Read It Too" = "اقرأه أيضًا";
-"Read Them" = "اقرأها";
+"Read Past Chats…" = "قراءة الدردشات السابقة…";
+"Read What Wasn't Read" = "قراءة ما لم يُقرأ";
 "Read a chat after %lld quiet minutes" = "قراءة الدردشة بعد %lld دقائق من الهدوء";
 "Reading a chat…" = "جارٍ قراءة دردشة…";
 "Reading a prompt: up to %lld%" = "قراءة المطالبة: حتى %lld%";
+"Reading chats" = "قراءة الدردشات";
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Reads chats with" = "يقرأ الدردشات باستخدام";
 "Ready." = "جاهز.";
@@ -983,6 +978,7 @@
 "Save" = "حفظ";
 "Save As…" = "حفظ باسم…";
 "Save memory" = "توفير الذاكرة";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "تُقرأ الدردشات المحفوظة لاستخراج ملاحظات في الخلفية، من ما كتبته هناك. عند القراءة مرة أخرى، تُؤكَّد الملاحظات الموجودة بالفعل ولا تُضاعَف. تُتخطّى الدردشات المعلَّمة «عدم التذكّر».";
 "Saved chats will show up here." = "ستظهر الدردشات المحفوظة هنا.";
 "Saved in your Keychain" = "محفوظ في Keychain";
 "Save…" = "حفظ…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "شغّل LLMTray تلقائيًا عند تسجيل الدخول إلى هذا الـ Mac.";
 "Start Server" = "بدء الخادم";
 "Start a new saved chat (⌘N) to add files to a project." = "ابدأ محادثة محفوظة جديدة (⌘N) لإضافة ملفات إلى مشروع.";
-"Start over" = "ابدأ من جديد";
 "Start server" = "ابدأ الخادم.";
 "Start talking" = "ابدأ التحدّث";
 "Start the server first." = "ابدأ الخادم أولًا.";
@@ -1297,6 +1292,7 @@
 "Total time" = "الزمن الإجمالي";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "يجرب 1 و2 و4 و8 طلبات في آن واحد وحجم خطوة التعبئة المسبقة (256–4096) مقابل النموذج الجاري، مع إعادة تشغيل الخادم بين كل تجربة. الطلبات المتزامنة: أقل عدد يصل إلى 90% من أفضل سرعة إجمالية (زيادة العدد تكلف ذاكرة دون فائدة كبيرة)؛ التعبئة المسبقة: الأسرع.";
 "Try Again" = "حاول مرة أخرى";
+"Try It Again" = "حاول مرة أخرى";
 "Turn On" = "تشغيل";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "يحوِّل نص الملفات إلى متجهات للبحث بحسب المعنى على هذا الـMac. إزالته تحتفظ بالفهارس: عندها تُبحث الملفات بكلماتها حتى يعاد تنزيله.";
 "Tweak…" = "تعديل…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "مرحباً بك في LLMTray";
 "What can you do?" = "ماذا تستطيع أن تفعل؟";
 "What chats get" = "ما تتلقاه الدردشات";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "ما تتلقاه الدردشات، وكيفية قراءة الدردشات، ومدة بقاء الملاحظات. الإعدادات الافتراضية مناسبة لمعظم الأشخاص.";
 "What decides which models run well here." = "ما يحدد أي النماذج تعمل جيداً هنا.";
 "What else" = "ماذا أيضاً";
 "What happened?" = "ماذا حدث؟";
 "What the model says appears here." = "ما يقوله النموذج سيظهر هنا.";
 "What this chat knows about you from earlier chats" = "ما تعرفه هذه الدردشة عنك من دردشات سابقة";
 "What was copied before stays; importing again goes on from there. %@" = "ما تم نسخه سابقاً يبقى؛ الاستيراد مرة أخرى يستأنف من هناك. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "ما تم تعلّمه: ملاحظات تعلّمتها ذاكرة الملاحظات ولم تكتبها أنت أو تحرّرها أو تثبّتها أو توافق عليها. كل شيء: كل ملاحظة باستثناء عنك. لا يمكن التراجع عن أيٍّ منهما.";
 "What you corrected before, so it isn't repeated." = "ما صححته سابقًا، حتى لا يتكرر.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "ما فعلته، مع إبقائه منفصلًا عما قد يعنيه. يُرسل كتخمين.";
 "What you do" = "ما تفعله";

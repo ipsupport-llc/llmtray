@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (של LM Studio, משותף לו)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ כבר קיים ואינו שייך ל‑LLMTray. הסר אותו תחילה כדי להתקין את של LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ כבר קיים ומצביע אל %@. הסר אותו תחילה כדי להתקין את של LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ לא הצליח לקרוא צ׳אטים לצורך הזיכרון: מודל אחר קורא את הצ׳אטים שלו.";
 "%@ didn't download: %@" = "%@ לא הורד: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‎%@ הוא קישור לתיקיה שאינה זמינה: חבר/י את הדיסק שלה או הסר/י את הקישור.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d צ׳אטים עונים: הקריאה שלהם תיכנס לתור כשהם יסיימו.";
 "%d chats queued; reading starts now if the model is free." = "%d צ׳אטים בתור; הקריאה תתחיל עכשיו אם המודל פנוי.";
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
+"%d parts of chats wait to be read." = "‏%d חלקים מתוך צ'אטים ממתינים לקריאה.";
 "%lld MB" = "%lld מ״ב";
 "%lld can still be undone from Settings > Files." = "עדיין ניתן לבטל את %lld דרך הגדרות > קבצים.";
 "%lld downloads" = "%lld הורדות";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "לא ניתן לאנדקס %lld קבצים";
 "%lld interrupted: look at them in Finder" = "%lld נקטעו: הסתכל ב־Finder";
 "%lld items put back under their names." = "%lld פריטים הוחזרו לשמותיהם.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld הערות שנלמדו ולא אישרת יימחקו. הערות שכתבת, ערכת, הצמדת או אישרת יישארו.";
 "%lld more" = "%lld נוספים";
 "%lld more…" = "%lld נוספים…";
 "%lld need a look: see the list." = "יש לבדוק %lld: ראה את הרשימה.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld חדשים מאז פתיחת הרשימה: מסומנים כלא מסומנים עד שתסמן אותם.";
 "%lld of 5 stars" = "%lld מתוך 5 כוכבים";
 "%lld pages" = "%lld עמודים";
-"%lld parts of chats wait to be read." = "%lld חלקים מצ׳אטים ממתינים לקריאה.";
 "%lld pictures" = "%lld תמונות";
 "%lld pictures added: kept for documents, not searched." = "נוספו %lld תמונות: נשמרות למסמכים, לא נבחנות בחיפוש.";
 "%lld requests" = "%lld בקשות";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "צ'אטים של הפרויקט %@";
 "Chats outside projects" = "צ'אטים מחוץ לפרויקטים";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "צ'אטים מתחילים בהערות קצרות עליך ועל העבודה שלך: איך אתה מעדיף תשובות, על מה אתה עובד, ומה תיקנת בעבר. נשלחות רק הערות שנכנסות לתקציב, ורק בצ'אטים של LLMTray עצמה -- אף פעם לא ליישומים שמשתמשים ב-API, ואף פעם לא בצ'אטים זמניים. הכול נשאר במחשב הזה.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "הצ'אטים לא יקבלו אותם יותר. אי אפשר לבטל את הפעולה הזו. ״עליך״ נשאר (כדי להסיר אותו, נקה את השדות שלו). בקריאה מחדש, הצ'אטים שלך יילמדו מחדש; רק מה שנשכח — מה שנקרא קודם לא ייקרא שוב.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "הצ'אטים, הפרוייקטים, הפרופילים והמודלים לתמונות, מוסיקה, קול והטמעות מהגרסה מ‑ipsupport.us נמצאים כאן כעת. התיקיות שנתת להן גישה, ותיקיית מודלי הצ'אט שלך, נדרשות אישורך שוב.";
 "Check Again" = "בדוק שוב";
 "Check Now" = "בדוק כעת";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "כל צ׳אט שמור נקרא מההתחלה לצורך הערות, באמצעות מה שכתבת בו. הפעולה רצה ברקע ועשויה להימשך זמן מה.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "כל צ׳אט שמור נקרא שוב מההתחלה. הערות שכבר קיימות מאושרות, ולא מוכפלות.";
 "Everything in that folder is here already." = "הכל בתיקיה הזו כבר כאן.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "בדיוק מה ש‑LLMTray שולח אל ipsupport.us, שדה אחר שדה. שום דבר אחר לא יוצא מהמחשב.";
 "Experimental — English only" = "ניסיוני — אנגלית בלבד";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "למודלים עם drafter שפורסם (Gemma 4 26B) או עם MTP head משלהם (מודלי Qwen 3.5 שלנו, שהורדו יחד אתם): הוא מנחש טוקנים קדימה והמודל הראשי מאשר אותם במעבר אחד. אותו פלט, מהר יותר. בקשה משתמשת בו כשהיא לבד; כשיש כמה בקשות יחד הן חולקות את ה-batch בלעדיו.";
 "Forget" = "שכח";
-"Forget Everything…" = "שכח הכול…";
-"Forget What Was Learned…" = "שכח את מה שנלמד…";
-"Forget and Read All Chats Again" = "שכח וקרא שוב את כל הצ׳אטים";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "שוכח כל הערה שנלמדה ושלא כתבת, ערכת, הצמדת או אישרת, ואת מה שממתין לקריאה. לאחר מכן אפשר לקרוא שוב את הצ׳אטים שלך לפי הכללים הנוכחיים -- לא כאלה שסומנו „אל תזכור”, ולא, בזמן שהזיכרון היה כבוי, לפני שתענה אם לקרוא את מה שנאמר בינתיים.";
+"Forget Everything" = "שכח הכול";
+"Forget Everything and Read Chats Again" = "שכח הכול וקרא שוב את הצ'אטים";
+"Forget What Was Learned" = "שכח את מה שנלמד";
+"Forget What Was Learned and Read Chats Again" = "שכח את מה שנלמד וקרא שוב את הצ'אטים";
+"Forget…" = "שכח…";
 "Found after an interruption" = "נמצאו אחרי הפרעה";
 "Founding Supporters" = "תומכי ביסוס";
 "Free disk space" = "שטח דיסק פנוי";
@@ -613,7 +611,6 @@
 "Later" = "מאוחר יותר";
 "Launch at login" = "פתח בעת ההתחברות";
 "Launch at login: %@" = "התפתח בכניסה: %@";
-"Learn from Past Chats Now" = "ללמוד מצ'אטים קודמים עכשיו";
 "Learned from chats" = "נלמד מצ׳אטים";
 "Learning" = "למידה";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "למידה מצ׳אטים דורשת את %@ (%@), דגם הטמעה שמזהה אילו הערות אומרות אותו דבר במילים אחרות או בשפה אחרת. הוא יורד למחשב הזה פעם אחת ומשותף עם קבצי פרויקט.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "הזיכרון לא ילמד ממנו עוד. גם הערות שכבר לימד יכולות להימחק, חוץ מאלה שערכת, נעצת או אישרת.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "זיכרון טוען אותו בעצמו אחרי ש-LLMTray לא היה בשימוש במשך %d דקות.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "זיכרון קורא צ׳אט רק מההודעה הראשונה אחרי שהוא פגש אותו. פעולה זו קוראת גם כל צ׳אט שמור מההתחלה — מה שכתבת לפני שזיכרון הופעל — ברקע, כשהמודל פנוי. צ'אטים שמסומנים „לא לזכור” ידולגו.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "הזיכרון נשאר ב‑Mac הזה: ההערות נשמרות כאן בקובץ ולעולם לא מועלות או משותפות. הן נכנסות רק להנחיה של צ׳אטים ב‑LLMTray -- לא ליישומים שמשתמשים ב‑API, ולא לצ'אט זמני.";
 "Memory was off. Read what was said meanwhile?" = "זיכרון היה כבוי. לקרוא את מה שנאמר בינתיים?";
 "Memory: %d" = "זיכרון: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "כבוי: רק Mac זה. דלוק: כל מי ברשת שלך, לכן הפעל רק ברשתות שאתה סומך עליהן.";
 "Older" = "ישנים יותר";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "תשלום חד־פעמי: קפה $5, תומך פרו $25, תומך מייסד $150.";
-"Only Forget" = "שכח בלבד";
 "Only From Now On" = "רק מעכשיו";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "רק למודלים מוגבלים (Llama, חלק מהרפוזיטוריות של Gemma ו‑FLUX): קבל את רישיון המודל בעמוד ה‑Hugging Face שלו, ואז הדבק כאן אסימון קריאה. נשמר ב‑Keychain ונשלח רק ל‑huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "רק אם ברצונך: צ׳אטים מקבלים את זה קודם, זה אף פעם לא פג, והלמידה אף פעם לא משנה את זה. זה נשאר במחשב הזה.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "מחליף את שפת macOS עבור LLMTray בלבד. ייכנס לתוקף לאחר הפעלה מחדש של LLMTray. טקסט שלא תורגם יוצג באנגלית.";
 "PDF · %lld pages" = "PDF · %lld עמודים";
 "Past %lld messages" = "%lld ההודעות האחרונות";
-"Past chats" = "צ׳אטים קודמים";
 "Pause" = "השהה";
 "Pause Indexing" = "השהה אינדוקס";
 "Pause download" = "משהה את ההורדה.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "אונדקס מחדש %@";
 "Re-index this file" = "אונדקס את הקובץ שוב";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "נכנס ל־%1$lld תיקיות משנה (%2$@): הקבצים שלהן יוצאו מהן.";
-"Read All Chats Again" = "קרא שוב את כל הצ׳אטים";
-"Read All Chats Again…" = "קרא שוב את כל הצ׳אטים…";
+"Read Everything Again" = "קרא הכול שוב";
 "Read It Too" = "קרא גם את זה";
-"Read Them" = "לקרוא אותם";
+"Read Past Chats…" = "קרא צ'אטים קודמים…";
+"Read What Wasn't Read" = "קרא את מה שלא נקרא";
 "Read a chat after %lld quiet minutes" = "קרא צ׳אט אחרי %lld דקות שקטות";
 "Reading a chat…" = "קורא צ׳אט…";
 "Reading a prompt: up to %lld%" = "קריאת פקודה: עד %lld%";
+"Reading chats" = "קריאת צ'אטים";
 "Reading what's installed…" = "קורא מה מותקן…";
 "Reads chats with" = "קורא צ׳אטים באמצעות";
 "Ready." = "מוכן.";
@@ -983,6 +978,7 @@
 "Save" = "שמור";
 "Save As…" = "שמור בשם…";
 "Save memory" = "חסוך זיכרון";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "צ'אטים שמורים נקראים ברקע כדי ליצור הערות, לפי מה שכתבת שם. בקריאה חוזרת, הערות שכבר קיימות מאושרות ולא מוכפלות. צ'אטים שמסומנים ״לא לזכור״ מדולגים.";
 "Saved chats will show up here." = "צ'אטים שנשמרו יופיעו כאן.";
 "Saved in your Keychain" = "שמור ב‑Keychain שלך";
 "Save…" = "שמור…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "הפעלת LLMTray אוטומטית בעת ההתחברות ל-Mac זה.";
 "Start Server" = "הפעל שרת";
 "Start a new saved chat (⌘N) to add files to a project." = "התחל צ'אט שמור חדש (⌘N) כדי להוסיף קבצים לפרויקט.";
-"Start over" = "התחל מחדש";
 "Start server" = "מפעיל את השרת.";
 "Start talking" = "התחל לדבר";
 "Start the server first." = "יש להפעיל את השרת תחילה.";
@@ -1297,6 +1292,7 @@
 "Total time" = "זמן כולל";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "בודק 1, 2, 4 ו-8 בקשות בבת אחת ו-prefill-step-size (256–4096) מול המודל הרץ, ומפעיל מחדש את השרת בין הבדיקות. בקשות בו־זמניות: המספר הקטן ביותר שמגיע ל-90% מהמהירות הכוללת הטובה ביותר (יותר בקשות צורכות זיכרון תמורת שיפור קטן); prefill: הערך המהיר ביותר.";
 "Try Again" = "נסה שוב";
+"Try It Again" = "לנסות שוב";
 "Turn On" = "הפעל";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "ברוכים הבאים ל‑LLMTray";
 "What can you do?" = "מה אתה יכול לעשות?";
 "What chats get" = "מה צ׳אטים מקבלים";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "מה צ׳אטים מקבלים, איך צ׳אטים נקראים, כמה זמן הערות נשמרות. ברירות המחדל מתאימות לרוב האנשים.";
 "What decides which models run well here." = "מה קובע אילו מודלים ירוצו כאן היטב.";
 "What else" = "מה עוד";
 "What happened?" = "מה קרה?";
 "What the model says appears here." = "מה שהמודל אומר יופיע כאן.";
 "What this chat knows about you from earlier chats" = "מה הצ׳אט הזה יודע עליך מצ׳אטים קודמים";
 "What was copied before stays; importing again goes on from there. %@" = "מה שהועתק קודם נשאר; ייבוא חוזר ימשיך משם. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "מה שנלמד: דברים שזיכרון ההערות למד ושלא כתבת, ערכת, הצמדת או אישרת. הכול: כל הערה מלבד עליך. אי אפשר לבטל אף אחת מהפעולות.";
 "What you corrected before, so it isn't repeated." = "מה שתיקנת בעבר, כדי שזה לא יחזור.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "מה שעשית, בנפרד ממה שאולי משתמע ממנו. נשלח כהשערה.";
 "What you do" = "מה עיסוקך";

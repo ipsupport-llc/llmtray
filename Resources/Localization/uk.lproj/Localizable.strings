@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio, спільно з ним)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ уже існує й не належить LLMTray. Видаліть його спочатку, щоб установити LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ уже існує й посилається на %@. Видаліть його спочатку, щоб установити LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ не вдалося прочитати чати для пам’яті: інша модель читає його чати.";
 "%@ didn't download: %@" = "%@ не завантажено: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ — посилання на папку, яка недоступна: підключіть диск або видаліть посилання.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ має обмеження: прийміть ліцензію на huggingface.co/%@, потім додайте токен Hugging Face у Налаштування → Models.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d чатів відповідають; для них читання буде поставлено в чергу після завершення.";
 "%d chats queued; reading starts now if the model is free." = "%d чатів у черзі; читання почнеться зараз, якщо модель вільна.";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
+"%d parts of chats wait to be read." = "На читання очікує %d частин чатів.";
 "%lld MB" = "%lld МБ";
 "%lld can still be undone from Settings > Files." = "%lld ще можна скасувати в розділі «Налаштування › Файли».";
 "%lld downloads" = "%lld завантажень";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld файлів не вдалося індексувати";
 "%lld interrupted: look at them in Finder" = "%lld перервано: перегляньте їх у Finder";
 "%lld items put back under their names." = "%lld елементів повернуто під їхні імена.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld вивчені нотатки, які ви не схвалили, буде видалено. Нотатки, які ви написали, відредагували, закріпили або схвалили, залишаться.";
 "%lld more" = "ще %lld";
 "%lld more…" = "Ще %lld…";
 "%lld need a look: see the list." = "%lld потребують перегляду: див. список.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld нових від моменту відкриття списку: не відмічені, поки ви не позначите їх.";
 "%lld of 5 stars" = "%lld із 5 зірок";
 "%lld pages" = "%lld сторінок";
-"%lld parts of chats wait to be read." = "%lld частин чатів очікують на прочитання.";
 "%lld pictures" = "%lld зображень";
 "%lld pictures added: kept for documents, not searched." = "Додано зображень: %lld. Вони зберігаються для документів, у пошуку не беруть участі.";
 "%lld requests" = "запитів: %lld";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "Чати проєкту %@";
 "Chats outside projects" = "Чати поза проєктами";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Чати починаються з коротких нотаток про вас і вашу роботу: які відповіді вам подобаються, над чим ви працюєте, що ви виправляли раніше. Надсилаються лише нотатки, що вкладаються в бюджет, і лише у власних чатах LLMTray — ніколи в програми, що використовують API, і ніколи в тимчасові чати. Усе залишається на цьому комп’ютері.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Чати більше їх не отримуватимуть. Це не можна скасувати. «Про вас» лишається (щоб прибрати, очистьте його поля). Якщо прочитати знову, ваші чати буде вивчено заново; забувається лише це, а прочитане раніше не читається знову.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Чати, проєкти, профілі та моделі зображень, музики, голосу й ембедингів із версії з ipsupport.us тепер тут. Папки, яким ви надали доступ цій версії, та ваша папка з моделями чатів потребують повторного підтвердження.";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Кожен чат у цьому проєкті отримує ці інструкції після системного підказу в описі моделі. Зміни діють з наступного повідомлення.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Кожен запит, на який відповів сервер, — з чату та від інших застосунків і агентів через API — зберігається на цьому Mac. Медіани за моделлю й налаштуваннями.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Кожен збережений чат читається від початку для нотаток, використовуючи те, що ви там написали. Це виконується у фоновому режимі й може тривати певний час.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Кожен збережений чат знову читається від початку. Нотатки, які вже є, підтверджуються, а не дублюються.";
 "Everything in that folder is here already." = "Усе з цієї папки вже тут.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Точний вміст, який LLMTray надсилає на ipsupport.us — поле за полем. Нічого іншого не покидає ваш Mac.";
 "Experimental — English only" = "Експериментальна — тільки англійська";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "Для швидших відповідей (спекулятивне декодування)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Для моделей із опублікованим drafter (Gemma 4 26B) або власною MTP-головою (наші Qwen 3.5, завантажені разом): він передбачає токени наперед, а основна модель перевіряє їх за один прохід. Та сама відповідь, швидше. Запит отримує це, коли він один; при кількох одночасно вони ділять пакет без нього.";
 "Forget" = "Забути";
-"Forget Everything…" = "Забути все…";
-"Forget What Was Learned…" = "Забути вивчене…";
-"Forget and Read All Chats Again" = "Забути й перечитати всі чати";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Забуває кожну вивчену нотатку, яку ви не написали, не відредагували, не закріпили або не схвалили, а також те, що очікує на читання. Потім ваші чати можна перечитати за поточними правилами — крім позначених «Не запам’ятовувати» і, якщо пам’ять була вимкнена, не раніше ніж ви відповісте, чи читати сказане за цей час.";
+"Forget Everything" = "Забути все";
+"Forget Everything and Read Chats Again" = "Забути все й знову прочитати чати";
+"Forget What Was Learned" = "Забути вивчене";
+"Forget What Was Learned and Read Chats Again" = "Забути вивчене й знову прочитати чати";
+"Forget…" = "Забути…";
 "Found after an interruption" = "Знайдено після перерви";
 "Founding Supporters" = "Засновники-спонсори";
 "Free disk space" = "Вільне місце на диску";
@@ -613,7 +611,6 @@
 "Later" = "Пізніше";
 "Launch at login" = "Запускати під час входу";
 "Launch at login: %@" = "Відкривати при вході: %@";
-"Learn from Past Chats Now" = "Навчитися з минулих чатів зараз";
 "Learned from chats" = "Запам’ятоване з чатів";
 "Learning" = "Навчання";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Для навчання з чатів потрібна %@ (%@) — модель вбудовування, яка визначає, які нотатки передають те саме іншими словами або іншою мовою. Вона завантажується на цей комп’ютер один раз і спільно використовується з файлами проєкту.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Пам'ять під контекст попередніх розмов, щоб продовжений чат не перечитував усю історію. Обмежена, щоб не зростати, доки в сервера не скінчиться пам'ять.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Пам’ять більше нічого з нього не засвоює. Нотатки, яких він уже навчив, також можуть зникнути, крім тих, які ви відредагували, закріпили або схвалили.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "Пам’ять завантажує її автоматично після %d хв. бездіяльності LLMTray.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Пам’ять читає чат лише з першого повідомлення після того, як натрапила на нього. Це також читає кожен збережений чат від початку — те, що ви написали до ввімкнення пам’яті, — у фоновому режимі, коли модель вільна. Чати, позначені «Не запам’ятовувати», пропускаються.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Пам’ять залишається на цьому Mac: нотатки зберігаються у файлі тут і ніколи не вивантажуються й не поширюються. Вони потрапляють лише в промпт ваших чатів LLMTray — не в програми, що використовують API, і не в тимчасові чати.";
 "Memory was off. Read what was said meanwhile?" = "Пам’ять була вимкнена. Прочитати сказане за цей час?";
 "Memory: %d" = "Пам’ять: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Вимкнено: лише цей Mac. Увімкнено: будь‑хто в мережі — тож лише в мережах, яким ви довіряєте.";
 "Older" = "Старіші";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Разовий внесок: Кава $5, Pro Supporter $25, Founding Supporter $150.";
-"Only Forget" = "Лише забути";
 "Only From Now On" = "Лише відтепер";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Лише для обмежених моделей (Llama, деякі Gemma і репозиторії FLUX): прийміть ліцензію на сторінці моделі на Hugging Face, потім вставте тут токен для читання. Зберігається в Keychain, надсилається лише на huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Лише якщо хочете: чати отримують це насамперед, воно ніколи не спливає, і навчання ніколи його не змінює. Воно залишається на цьому комп’ютері.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "PDF · %lld pages" = "PDF · %lld сторінок";
 "Past %lld messages" = "Понад %lld повідомлень";
-"Past chats" = "Минулі чати";
 "Pause" = "Призупинити";
 "Pause Indexing" = "Пауза індексації";
 "Pause download" = "Призупинити завантаження";
@@ -901,13 +895,14 @@
 "Re-index %@" = "Переіндексувати %@";
 "Re-index this file" = "Переіндексувати цей файл";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Проникає в %1$lld підпапок (%2$@): їхні файли витягуються.";
-"Read All Chats Again" = "Прочитати всі чати знову";
-"Read All Chats Again…" = "Прочитати всі чати знову…";
+"Read Everything Again" = "Знову прочитати все";
 "Read It Too" = "Прочитати також";
-"Read Them" = "Прочитати їх";
+"Read Past Chats…" = "Прочитати попередні чати…";
+"Read What Wasn't Read" = "Прочитати непрочитане";
 "Read a chat after %lld quiet minutes" = "Читати чат після %lld хвилин тиші";
 "Reading a chat…" = "Читання чату…";
 "Reading a prompt: up to %lld%" = "Читання підказки: до %lld%";
+"Reading chats" = "Читання чатів";
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
 "Reads chats with" = "Читає чати за допомогою";
 "Ready." = "Готово.";
@@ -983,6 +978,7 @@
 "Save" = "Зберегти";
 "Save As…" = "Зберегти як…";
 "Save memory" = "Заощадити пам’ять";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Збережені чати у фоновому режимі читаються для нотаток на основі того, що ви там написали. Під час повторного читання наявні нотатки підтверджуються, а не дублюються. Чати, позначені «Don't Remember», пропускаються.";
 "Saved chats will show up here." = "Збережені чати з’являться тут.";
 "Saved in your Keychain" = "Збережено в Keychain";
 "Save…" = "Зберегти…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
 "Start a new saved chat (⌘N) to add files to a project." = "Почніть новий збережений чат (⌘N), щоб додати файли до проєкту.";
-"Start over" = "Почати знову";
 "Start server" = "Запустити сервер";
 "Start talking" = "Почніть говорити";
 "Start the server first." = "Спершу запустіть сервер.";
@@ -1297,6 +1292,7 @@
 "Total time" = "Загальний час";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Пробує 1, 2, 4 і 8 одночасних запитів і prefill-step-size (256–4096) на запущеній моделі, перезапускаючи сервер між спробами. Паралельні запити: найменша кількість, що дає 90% найкращої сумарної швидкості (більше — зайва пам’ять майже без виграшу); prefill: найшвидший.";
 "Try Again" = "Спробувати ще";
+"Try It Again" = "Спробувати ще раз";
 "Turn On" = "Увімкнути";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Перетворює текст файлів у вектори для пошуку за значенням на цьому Mac. Видалення самої моделі не торкається індексів: файли потім шукатимуться за словами, доки модель не буде знову завантажена.";
 "Tweak…" = "Налаштувати…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "Ласкаво просимо до LLMTray";
 "What can you do?" = "Що ти вмієш?";
 "What chats get" = "Що отримують чати";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "Що отримують чати, як читаються чати і як довго діють нотатки. Типові параметри підходять більшості людей.";
 "What decides which models run well here." = "Що вирішує, які моделі тут працюють добре.";
 "What else" = "Що ще";
 "What happened?" = "Що сталося?";
 "What the model says appears here." = "Тут відображається те, що каже модель.";
 "What this chat knows about you from earlier chats" = "Що цей чат знає про вас із попередніх чатів";
 "What was copied before stays; importing again goes on from there. %@" = "Те, що вже скопіювано, залишається; повторний імпорт продовжиться з цього місця. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Вивчене: пам’ять нотаток, яку ви не писали, не редагували, не закріплювали й не схвалювали. Усе: усі нотатки, крім «Про вас». Жодну з цих дій не можна скасувати.";
 "What you corrected before, so it isn't repeated." = "Що ви виправляли раніше, щоб це не повторювалося.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Що ви зробили, окремо від можливого значення. Надсилається як припущення.";
 "What you do" = "Чим ви займаєтеся";

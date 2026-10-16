@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@（LM Studioと共有）";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ は既に存在しますが LLMTray のものではありません。LLMTray をインストールするには先に削除してください。";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ は既に存在し %@ を指しています。LLMTray をインストールするには先に削除してください。";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@はメモリ用にチャットを読み込めません。別のモデルがそのチャットを読み込んでいます。";
 "%@ didn't download: %@" = "%@ をダウンロードできませんでした: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ は利用できないフォルダへのリンクです。ディスクを接続するか、リンクを削除してください。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ は制限付きです: huggingface.co/%@ でライセンスを承諾し、設定 → Models に Hugging Face トークンを追加してください。";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d件のチャットが応答中です。完了後に順番待ちに追加されます。";
 "%d chats queued; reading starts now if the model is free." = "%d件のチャットを順番待ちに追加しました。モデルが空いていれば、読み取りを開始します。";
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
+"%d parts of chats wait to be read." = "チャットの%d件の内容が読み取り待ちです。";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lldはまだ「設定」>「ファイル」から取り消せます。";
 "%lld downloads" = "%lld回のダウンロード";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld 件をインデックスできませんでした";
 "%lld interrupted: look at them in Finder" = "%lld 件が中断されました：Finder で確認してください";
 "%lld items put back under their names." = "%lld 項目が元の名前の下に戻されました。";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "承認していない学習済みノート %lld 件は削除されます。自分で書いた、編集した、ピン留めした、または承認したノートは残ります。";
 "%lld more" = "あと %lld";
 "%lld more…" = "あと%lld件…";
 "%lld need a look: see the list." = "%lld 件を確認してください：リストを参照してください。";
 "%lld new since you opened the list: unticked until you tick them." = "リストを開いてから %lld 件が新規追加されました：チェックするまで未選択のままです。";
 "%lld of 5 stars" = "5点中%lld点";
 "%lld pages" = "%lld ページ";
-"%lld parts of chats wait to be read." = "チャットの%lld件の部分が読み取り待ちです。";
 "%lld pictures" = "%lld 枚の画像";
 "%lld pictures added: kept for documents, not searched." = "%lld 枚の画像を追加しました：文書用に保存され、検索はされません。";
 "%lld requests" = "%lld 件のリクエスト";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "プロジェクト%@のチャット";
 "Chats outside projects" = "プロジェクト外のチャット";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "チャットは、あなたと仕事についての短いノートから始まります：回答の好み、取り組んでいること、以前に修正したこと。予算内に収まるノートだけが送信され、送信先はLLMTray自身のチャットだけです。APIを使うアプリには送信されず、一時チャットにも送信されません。すべてこのコンピュータ上に残ります。";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "チャットでは今後それらは使われなくなります。これは取り消せません。「あなたについて」は残ります（削除するには各フィールドを消去してください）。再度読むと、チャットは最初から新たに学習されます。忘れられるだけで、前に読んだ内容が再び読まれることはありません。";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us のバージョンからのチャット、プロジェクト、プロファイル、画像・音楽・音声・埋め込みモデルがここに移されました。以前アクセスを許可したフォルダとチャットモデルのフォルダは、再度許可が必要です。";
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "プロジェクト内のすべてのチャットがファイル全体のテキストを取得します。ファイルがピン留めされている間、そのチャットでは Web 検索や画像・音楽生成は無効になります。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "保存済みのすべてのチャットを先頭から読み取り、そこに書いた内容を使ってメモを作成します。バックグラウンドで実行され、時間がかかる場合があります。";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "保存済みの各チャットは、先頭からもう一度読み直されます。すでにあるノートは確認され、重複して追加されることはありません。";
 "Everything in that folder is here already." = "そのフォルダ内のものはすでにここにあります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
 "Experimental — English only" = "実験的 — 英語のみ";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "公開された drafter（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデルではモデルと一緒にダウンロードされます）では、先読みでトークンを予測し、メインモデルが一度のパスで検証します。出力は同じで高速です。単独のリクエストではこれを使用し、複数のリクエストが同時にある場合はこれを使わずにバッチを共有します。";
 "Forget" = "忘れる";
-"Forget Everything…" = "すべて忘れる…";
-"Forget What Was Learned…" = "学習した内容を忘れる…";
-"Forget and Read All Chats Again" = "忘れてすべてのチャットを再度読み込む";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "あなたが書いた、編集した、ピン留めした、または承認したもの以外のすべての学習済みノートと、読み込み待ちの内容を忘れます。その後、現在のルールでチャットを再度読み込めます。ただし、「記憶しない」とマークされたものは対象外です。また、メモリがオフの間に話された内容を読み込むかどうかに答えるまでは、その期間の内容も対象外です。";
+"Forget Everything" = "すべて忘れる";
+"Forget Everything and Read Chats Again" = "すべて忘れてチャットを再度読む";
+"Forget What Was Learned" = "学習した内容を忘れる";
+"Forget What Was Learned and Read Chats Again" = "学習した内容を忘れてチャットを再度読む";
+"Forget…" = "忘れる…";
 "Found after an interruption" = "中断後に見つかった項目";
 "Founding Supporters" = "創設支援者";
 "Free disk space" = "空きディスク容量";
@@ -613,7 +611,6 @@
 "Later" = "あとで";
 "Launch at login" = "ログイン時に起動";
 "Launch at login: %@" = "ログイン時に起動: %@";
-"Learn from Past Chats Now" = "過去のチャットから今すぐ学習";
 "Learned from chats" = "チャットから学習";
 "Learning" = "学習";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "チャットからの学習には、どのノートが別の言い回しや別の言語で同じことを述べているかを判定する埋め込みモデル、%@（%@）が必要です。一度このコンピュータにダウンロードされ、プロジェクトファイルと共有されます。";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "メモリはこのチャットからこれ以上学習しません。すでに教えたノートも削除できます。ただし、編集、ピン留め、または承認したものは除きます。";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTrayが%d分間アイドル状態になると、メモリが自動的に読み込みます。";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "メモリは、そのチャットに出会った後の最初のメッセージからのみチャットを読み取ります。これは、メモリがオンになる前に書いた内容も含め、保存済みのすべてのチャットを先頭からバックグラウンドで読み取ります（モデルが空いている間）。「Don't Remember」とマークされたチャットはスキップされます。";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "メモリはこのMac内に留まります。ノートはここにあるファイルに保存され、アップロードまたは共有されることはありません。ノートはLLMTrayのチャットのプロンプトにのみ入ります。APIを使用するアプリには送信されず、一時チャットにも入りません。";
 "Memory was off. Read what was said meanwhile?" = "メモリがオフでした。その間の内容を読み取りますか？";
 "Memory: %d" = "メモリ：%d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "オフ：この Mac のみ。オン：ネットワーク上の全員が利用可能になるため、信頼できるネットワークでのみ有効にしてください。";
 "Older" = "以前";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一回限り：Coffee $5、Pro Supporter $25、Founding Supporter $150。";
-"Only Forget" = "忘れるだけ";
 "Only From Now On" = "今後のみ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "制限付きモデルのみ (Llama、一部の Gemma と FLUX リポジトリ): Hugging Face ページでライセンスを承諾し、読み取り用トークンをここに貼り付けてください。トークンは Keychain に保存され、huggingface.co にのみ送信されます。";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "必要な場合のみ入力してください。チャットではこの内容が最初に使用され、有効期限はなく、学習によって変更されることもありません。このコンピュータ上に保持されます。";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
 "PDF · %lld pages" = "PDF · %lldページ";
 "Past %lld messages" = "過去 %lld 件のメッセージ";
-"Past chats" = "過去のチャット";
 "Pause" = "一時停止";
 "Pause Indexing" = "インデックスを一時停止";
 "Pause download" = "ダウンロードを一時停止します。";
@@ -901,13 +895,14 @@
 "Re-index %@" = "%@ を再インデックス";
 "Re-index this file" = "このファイルを再インデックス";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld 個のサブフォルダ（%2$@）を確認します: そこからファイルは取り出されます。";
-"Read All Chats Again" = "すべてのチャットを再度読む";
-"Read All Chats Again…" = "すべてのチャットを再度読む…";
+"Read Everything Again" = "すべて再度読む";
 "Read It Too" = "これも読み取る";
-"Read Them" = "読み取る";
+"Read Past Chats…" = "過去のチャットを読む…";
+"Read What Wasn't Read" = "未読分を読む";
 "Read a chat after %lld quiet minutes" = "%lld分間動きがなければチャットを読み取る";
 "Reading a chat…" = "チャットを読み込み中…";
 "Reading a prompt: up to %lld%" = "プロンプト読み取り: 最大 %lld%";
+"Reading chats" = "チャットの読み取り";
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Reads chats with" = "チャットの読み取りに使用";
 "Ready." = "準備完了。";
@@ -983,6 +978,7 @@
 "Save" = "保存";
 "Save As…" = "別名で保存…";
 "Save memory" = "メモリを節約";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "保存したチャットは、そこであなたが書いた内容から、バックグラウンドでノート用に読み取られます。再度読むと、すでにあるノートは重複せず、確認だけされます。「Don't Remember」が付いたチャットはスキップされます。";
 "Saved chats will show up here." = "保存したチャットはここに表示されます。";
 "Saved in your Keychain" = "Keychain に保存されました";
 "Save…" = "保存…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "この Mac にログインしたときに LLMTray を自動的に起動します。";
 "Start Server" = "サーバを起動";
 "Start a new saved chat (⌘N) to add files to a project." = "プロジェクトにファイルを追加するには、新しい保存済みチャット（⌘N）を開始してください。";
-"Start over" = "最初からやり直す";
 "Start server" = "サーバを起動します。";
 "Start talking" = "話し始める";
 "Start the server first." = "先にサーバを起動してください。";
@@ -1297,6 +1292,7 @@
 "Total time" = "合計時間";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。同時リクエスト数：最良の合計速度の 90% に達する最小数（それ以上はメモリ使用量が増える割に効果が小さい）。prefill：最速となる値。";
 "Try Again" = "再試行";
+"Try It Again" = "再試行";
 "Turn On" = "オンにする";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "LLMTray へようこそ";
 "What can you do?" = "何ができますか？";
 "What chats get" = "チャットに送信される内容";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "「チャットに送信される内容」、チャットの読み取り方法、「ノートの有効期間」。デフォルト設定はほとんどの人に適しています。";
 "What decides which models run well here." = "どのモデルがここでうまく動くかを決める要素です。";
 "What else" = "その他";
 "What happened?" = "何が起きましたか？";
 "What the model says appears here." = "モデルの発言はここに表示されます。";
 "What this chat knows about you from earlier chats" = "このチャットが以前のチャットから知っているあなたについての情報";
 "What was copied before stays; importing again goes on from there. %@" = "これまでにコピーされたものはそのまま残ります；再度インポートするとそこから続行します。 %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "学習した内容: ノートの記憶が学習した内容のうち、あなたが書いた、編集した、ピン留めした、または承認したものではない内容。すべて: 「あなたについて」を除くすべてのノート。どちらも取り消せません。";
 "What you corrected before, so it isn't repeated." = "以前に修正した内容。繰り返されないようにします。";
 "What you did, kept apart from what it may mean. Sent as a guess." = "あなたが行ったことを、その意味と分けて保持します。推測として送信されます。";
 "What you do" = "職業や活動";
