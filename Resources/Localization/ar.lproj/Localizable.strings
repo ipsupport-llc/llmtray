@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "بعد %lld دقيقة من الخمول";
 "After %lld min" = "بعد %lld دقيقة";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "بعد إجابة الدردشة الأولى، يقدّم النموذج عنوانًا قصيرًا لقائمة الدردشات (طلب قصير إضافي). إيقاف: بداية الرسالة الأولى. إعادة تسمية الدردشة تعمل دائمًا.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "بعد أن تقرأ الدردشة نصًا من خارجها (رسالة بريد، ملف، الويب)، سيُطلب الإذن لكل استدعاء على أي حال.";
 "Air quality" = "جودة الهواء";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "الاسم المستعار: اسم «model» الذي ترسله أدوات أخرى إلى API الخاص بـ LLMTray للحصول على هذا النموذج. ملف التعريف: ملف إعدادات هذا النموذج.";
 "All" = "الكل";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "التحقق أيضًا عند بدء LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "يقوم أيضًا بتحرير الصور — إحدى الصور من المحادثة أو التي تُرفقها. تستغرق عمليات التحرير بضع دقائق.";
 "Always" = "دائماً";
+"Always Allow" = "السماح دائماً";
+"Always Allow %@" = "السماح دائماً لـ %@";
+"Always Allow Everything from %@" = "السماح دائماً بكل شيء من %@";
 "An OpenAI-compatible API on localhost for other apps." = "API متوافق مع OpenAI على localhost لتطبيقات أخرى.";
 "An alias: the alias itself, not what it points to." = "اختصار: الاختصار نفسه، وليس ما يشير إليه.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "محرر أو وكيل أو سكربت يطلب نموذجاً مختلفاً عن المحمّل. التبديل يفرغ النموذج المحمّل — وكذلك الدردشة. اسأل أولاً: إشعار مع خيارات Switch / Keep؛ عدم الرد خلال دقيقة يعتبر Keep. عند اختيار Keep: يحصل العميل على خطأ يذكر النموذج المحمّل. دردشة التطبيق نفسها تتحوّل دائماً.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "اسأل عن أي شيء، أو جرّب أحد هذه:";
 "Ask anything." = "اسأل عن أي شيء.";
 "Ask first" = "اسأل أولاً";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "طُلب رغم أنك سمحت به: لم يستجب الخادم عند التحقق من أدواته للتو (راجع السجل الخاص به في الإعدادات › الأدوات).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "طُلب رغم أنك سمحت به: قرأ هذا الدور البريد أو الملفات أو الويب، ويمكن لهذا الاستدعاء إجراء تغييرات أو الانتقال إلى الويب.";
 "Assistant" = "المساعد";
 "At most %d characters: a note is one short statement." = "%d حرفًا كحد أقصى: الملاحظة عبارة قصيرة واحدة.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "تقرير واحد كحد أقصى يومياً إلى ipsupport.us، يغطي يومًا واحدًا مضى. يُرسل أي يوم لم يُرسل بعد عند التشغيل التالي، حتى 7 أيام إلى الخلف. إيقاف هذا الخيار يحذف ما لم يُرسل.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "النماذج الموجودة: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "تعمل النماذج على هذا الـ Mac. دردشاتك لا تغادره؛ فقط أدوات الويب، إذا شغّلتها، تتصل بالإنترنت.";
 "Models: %@ · free: %@" = "نماذج: %@ · مساحة حرة: %@";
+"More" = "المزيد";
 "Move %1$@ to %2$@" = "نقل %1$@ إلى %2$@";
 "Move %@ to the Trash" = "نقل %@ إلى Trash";
 "Move this model to the Trash?" = "هل تريد نقل هذا النموذج إلى سلة المحذوفات؟";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "جارٍ قراءة دردشة…";
 "Reading a prompt: up to %lld%" = "قراءة المطالبة: حتى %lld%";
 "Reading chats" = "قراءة الدردشات";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "القراءة على هذا الـ Mac لا تطلب الإذن أبداً بعد السماح بها. بعد أن تقرأ الدردشة بريداً أو ملفاً أو الويب، سيُطلب الإذن مع ذلك لأي تغيير (إرسال أو نقل أو حذف) أو لأي استدعاء إلى خادم على الويب.";
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Reads Only" = "القراءة فقط";
 "Reads chats with" = "يقرأ الدردشات باستخدام";

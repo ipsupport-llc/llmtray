@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "유휴 상태가 %lld분 지난 후";
 "After %lld min" = "%lld분 후";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "새 채팅의 첫 응답 후 모델이 채팅 목록에 표시할 짧은 제목을 생성합니다(짧은 추가 요청 하나). 끄기: 첫 메시지의 시작 부분을 사용합니다. 채팅 이름 변경은 언제나 가능합니다.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "채팅이 외부 텍스트(메일, 파일, 웹)를 읽은 후에도 모든 호출은 계속 확인을 요청합니다.";
 "Air quality" = "대기 질";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "별칭: 다른 도구가 이 모델을 사용하려고 LLMTray의 API로 보내는 “model” 이름입니다. 프로필: 이 모델이 사용하는 설정 프로필입니다.";
 "All" = "모두";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "LLMTray 시작 시에도 확인";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "채팅의 이미지나 첨부한 이미지를 편집할 수 있습니다. 편집에는 몇 분이 걸립니다.";
 "Always" = "항상";
+"Always Allow" = "항상 허용";
+"Always Allow %@" = "%@ 항상 허용";
+"Always Allow Everything from %@" = "%@의 모든 항목 항상 허용";
 "An OpenAI-compatible API on localhost for other apps." = "로컬호스트에서 다른 앱이 사용하는 OpenAI 호환 API.";
 "An alias: the alias itself, not what it points to." = "에일리어스: 가리키는 대상이 아닌 에일리어스 자체입니다.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "편집기, 에이전트 또는 스크립트가 현재 로드된 모델과 다른 모델을 요청합니다. 전환하면 로드된 모델(채팅 포함)이 언로드됩니다. 먼저 묻기: Switch / Keep가 있는 알림; 1분 내 응답 없음은 Keep으로 처리됩니다. Keep: 클라이언트에 로드된 모델 이름을 포함한 오류가 반환됩니다. 앱 자체 채팅은 항상 전환됩니다.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "무엇이든 물어보거나 다음을 시도해 보세요:";
 "Ask anything." = "무엇이든 물어보세요.";
 "Ask first" = "먼저 묻기";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "허용했는데도 다시 묻는 이유: 방금 서버의 도구를 확인할 때 응답이 없었습니다(로그는 설정 › 도구에서 확인).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "허용했는데도 다시 묻는 이유: 이번 턴에서 메일, 파일 또는 웹을 읽었고, 이 호출은 내용을 변경하거나 웹으로 연결됩니다.";
 "Assistant" = "어시스턴트";
 "At most %d characters: a note is one short statement." = "최대 %d자: 메모는 짧은 문장 하나입니다.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.us로 하루에 최대 한 번, 지난 하루를 대상으로 보고합니다. 전송되지 않은 하루는 다음 실행 시 전송되며 최대 7일 전까지 포함됩니다. 이를 끄면 전송되지 않은 데이터는 삭제됩니다.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "발견된 모델: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "모델은 이 Mac에서 실행됩니다. 채팅은 Mac을 벗어나지 않으며, 웹 도구만 켜면 인터넷에 접속할 수 있습니다.";
 "Models: %@ · free: %@" = "모델: %@ · 여유: %@";
+"More" = "더 보기";
 "Move %1$@ to %2$@" = "%1$@을(를) %2$@로 이동";
 "Move %@ to the Trash" = "%@을(를) 휴지통으로 이동";
 "Move this model to the Trash?" = "이 모델을 휴지통으로 옮기시겠습니까?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "채팅 읽는 중…";
 "Reading a prompt: up to %lld%" = "프롬프트 읽기: 최대 %lld%";
 "Reading chats" = "대화 읽기";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "이 Mac에서 읽기는 한 번 허용하면 다시 묻지 않습니다. 채팅이 메일, 파일 또는 웹을 읽은 뒤에는 변경(보내기, 이동, 삭제)이나 웹의 서버 호출은 그래도 다시 묻습니다.";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Reads Only" = "읽기만";
 "Reads chats with" = "채팅을 읽을 모델";

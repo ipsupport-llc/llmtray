@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "אחרי %lld דקות ללא פעילות";
 "After %lld min" = "לאחר %lld דק׳";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "לאחר התשובה הראשונה בצ'אט חדש, המודל נותן לו כותרת קצרה לרשימת הצ'אטים (בקשה קצרה נוספת). כבוי: תחילת ההודעה הראשונה. שינוי שם צ'אט תמיד פועל.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "אחרי שהצ׳אט קורא טקסט חיצוני (מייל, קובץ, האינטרנט), כל קריאה עדיין דורשת אישור.";
 "Air quality" = "איכות אוויר";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "כינוי: שם ה־“model” שכלים אחרים שולחים ל־API של LLMTray כדי לקבל את המודל הזה. פרופיל: פרופיל ההגדרות שבו המודל הזה משתמש.";
 "All" = "הכול";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "גם עורך תמונות — מתמונה מהשיחה או אחת שמצורפת. עריכות לוקחות כמה דקות.";
 "Always" = "תמיד";
+"Always Allow" = "אפשר תמיד";
+"Always Allow %@" = "אפשר תמיד %@";
+"Always Allow Everything from %@" = "אפשר תמיד הכול מ-%@";
 "An OpenAI-compatible API on localhost for other apps." = "API תואם OpenAI ב‑localhost עבור אפליקציות אחרות.";
 "An alias: the alias itself, not what it points to." = "קיצור דרך (alias): הקיצור עצמו, לא למה שהוא מפנה.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "עורך, סוכן או סקריפט מבקשים מודל שונה מהטעון. החלפה תסיר את המודל הטעון — גם הצ'אט. שאל קודם: הודעה עם 'Switch' / 'Keep'; ללא תשובה בדקה נחשבת 'Keep'. 'Keep': הלקוח מקבל שגיאה שמציינת את המודל הטעון. הצ'אט של האפליקציה תמיד מחליף.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "שאל כל דבר, או נסה אחד מהבאים:";
 "Ask anything." = "אפשר לשאול הכול.";
 "Ask first" = "שאל קודם";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "התבקשה הרשאה אף שכבר אפשרת זאת: השרת לא ענה כשנבדקו הכלים שלו זה עתה (ראה את היומן שלו ב״הגדרות › כלים״).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "התבקשה הרשאה אף שכבר אפשרת זאת: בתור הזה נקראו דוא״ל, קבצים או האינטרנט, והקריאה הזאת יכולה לשנות דברים או לפנות לאינטרנט.";
 "Assistant" = "העוזר";
 "At most %d characters: a note is one short statement." = "עד %d תווים: הערה היא משפט קצר אחד.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "דוח אחד לכל היותר ביום, עבור יום עבר אחד, נשלח ל-ipsupport.us. יום שלא נשלח יישלח בהשקה הבאה, עד 7 ימים אחורה. כיבוי האפשרות מוחק מה שלא נשלח.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "מודלים שנמצאו: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "מודלים רצים על Mac זה. הצ'אטים לא עוזבים אותו; רק כלי רשת, אם תדליקו אותם, ניגשים לאינטרנט.";
 "Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
+"More" = "עוד";
 "Move %1$@ to %2$@" = "העבר %1$@ אל %2$@";
 "Move %@ to the Trash" = "העבר %@ אל ה־Trash";
 "Move this model to the Trash?" = "להעביר דגם זה לפח?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "קורא צ׳אט…";
 "Reading a prompt: up to %lld%" = "קריאת פקודה: עד %lld%";
 "Reading chats" = "קריאת צ'אטים";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "אחרי שאישרת, קריאה ב־ה-Mac הזה לא מבקשת שוב. אחרי שהצ׳אט קורא דוא״ל, קובץ או את האינטרנט, עדיין תתבקש הרשאה לשינוי (שליחה, העברה, מחיקה) או לקריאה לשרת באינטרנט.";
 "Reading what's installed…" = "קורא מה מותקן…";
 "Reads Only" = "קריאה בלבד";
 "Reads chats with" = "קורא צ׳אטים באמצעות";

@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "Sau %lld phút không hoạt động";
 "After %lld min" = "Sau %lld phút";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Sau khi cuộc trò chuyện mới nhận được câu trả lời đầu tiên, mô hình sẽ gán một tiêu đề ngắn cho danh sách trò chuyện (một truy vấn phụ ngắn). Tắt: bắt đầu của tin nhắn đầu tiên. Đổi tên trò chuyện luôn hoạt động.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Sau khi Trò chuyện đọc văn bản bên ngoài (thư, tệp, web), mọi lệnh gọi vẫn đều phải hỏi.";
 "Air quality" = "Chất lượng không khí";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Bí danh: tên “model” mà các công cụ khác gửi đến API của LLMTray để lấy mô hình này. Hồ sơ: hồ sơ cài đặt mà mô hình này sử dụng.";
 "All" = "Tất cả";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Cũng chỉnh sửa ảnh — ảnh từ cuộc trò chuyện hoặc ảnh bạn đính kèm. Việc chỉnh sửa mất vài phút.";
 "Always" = "Luôn";
+"Always Allow" = "Luôn cho phép";
+"Always Allow %@" = "Luôn cho phép %@";
+"Always Allow Everything from %@" = "Luôn cho phép mọi thứ từ %@";
 "An OpenAI-compatible API on localhost for other apps." = "Một API tương thích OpenAI trên localhost cho các app khác.";
 "An alias: the alias itself, not what it points to." = "Một bí danh: chính bí danh, không phải thứ nó trỏ tới.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Một trình soạn thảo, tác nhân hoặc script yêu cầu mô hình khác với mô hình đang tải. Chuyển sẽ tháo mô hình đã tải — cả cuộc trò chuyện cũng vậy. Hỏi trước: hiện thông báo với Switch / Keep; không trả lời trong một phút tính là Keep. Keep: client sẽ nhận lỗi kèm tên mô hình đang tải. Chat của app luôn chuyển.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "Hỏi bất cứ điều gì, hoặc thử một trong những gợi ý sau:";
 "Ask anything." = "Hỏi bất cứ điều gì.";
 "Ask first" = "Hỏi trước";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "Vẫn hỏi dù bạn đã cho phép: máy chủ không phản hồi khi các công cụ của nó vừa được kiểm tra (xem nhật ký của máy chủ trong Cài đặt › Công cụ).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "Vẫn hỏi dù bạn đã cho phép: lượt này đã đọc thư, tệp hoặc web, và lần gọi này có thể thay đổi nội dung hoặc truy cập web.";
 "Assistant" = "Trợ lý";
 "At most %d characters: a note is one short statement." = "Tối đa %d ký tự: ghi chú là một câu ngắn.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Tối đa một báo cáo mỗi ngày, mỗi báo cáo bao gồm một ngày trước gửi tới ipsupport.us. Ngày chưa gửi sẽ được gửi vào lần khởi chạy tiếp theo, tối đa 7 ngày trước. Tắt tính năng này sẽ xóa các báo chưa gửi.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "Tìm được mô hình: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Mô hình chạy trên Mac này. Cuộc trò chuyện của bạn không rời máy; chỉ các công cụ web, nếu bật, mới truy cập internet.";
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
+"More" = "Thêm";
 "Move %1$@ to %2$@" = "Di chuyển %1$@ tới %2$@";
 "Move %@ to the Trash" = "Di chuyển %@ vào Trash";
 "Move this model to the Trash?" = "Chuyển mô hình này vào Thùng Rác?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "Đang đọc Trò chuyện…";
 "Reading a prompt: up to %lld%" = "Đọc prompt: tối đa %lld%";
 "Reading chats" = "Đọc Trò chuyện";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Việc đọc trên Máy Mac này sẽ không bao giờ hỏi lại sau khi được cho phép. Tuy nhiên, sau khi Trò chuyện đọc thư, tệp hoặc web, mọi thay đổi (gửi, di chuyển, xóa) hoặc lệnh gọi đến máy chủ trên web vẫn sẽ được hỏi.";
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Reads Only" = "Chỉ đọc";
 "Reads chats with" = "Đọc trò chuyện bằng";

@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "После %lld мин простоя";
 "After %lld min" = "Через %lld мин";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "После первого ответа в новом чате модель присваивает ему короткое название для списка чатов (ещё один короткий запрос). Выключено: начало первого сообщения. Переименование чата всегда работает.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "После того как Чат прочитает внешний текст (письмо, файл, веб-страницу), каждый вызов всё равно запрашивается.";
 "Air quality" = "Качество воздуха";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Алиас — имя в поле «model», которое другие программы отправляют в API LLMTray, чтобы получить эту модель. Профиль — какой профиль настроек использует модель.";
 "All" = "Все";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "Также проверять при запуске LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Также умеет редактировать изображения — из чата или прикреплённые вами. Редактирование занимает несколько минут.";
 "Always" = "Всегда";
+"Always Allow" = "Всегда разрешать";
+"Always Allow %@" = "Всегда разрешать %@";
+"Always Allow Everything from %@" = "Всегда разрешать всё от %@";
 "An OpenAI-compatible API on localhost for other apps." = "OpenAI‑совместимый API на localhost для других приложений.";
 "An alias: the alias itself, not what it points to." = "Алиас: сам алиас, а не объект, на который он указывает.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Редактор, агент или скрипт запрашивает модель, отличную от загруженной. Переключение выгружает текущую модель и связанную с ней переписку. Сначала спрашивать: уведомление с вариантами Switch / Keep; отсутствие ответа в течение минуты считается Keep. Keep: клиенту возвращается ошибка с указанием загруженной модели. Собственный чат приложения всегда переключается.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "Спросите что угодно или попробуйте одно из предложений:";
 "Ask anything." = "Спросите что угодно.";
 "Ask first" = "Спрашивать сначала";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "Запрошено, хотя вы это разрешили: сервер не ответил при недавней проверке его инструментов (см. журнал в «Настройки» › «Инструменты»).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "Запрошено, хотя вы это разрешили: в этом ходе уже были прочитаны почта, файлы или веб-страницы, а этот вызов может что-то изменить или обращается к вебу.";
 "Assistant" = "Ассистент";
 "At most %d characters: a note is one short statement." = "Не более %d символов: заметка — это одно короткое утверждение.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не более одного отчёта в день, охватывающего предыдущие сутки, отправляется на ipsupport.us. Неприведённый в тот день отчёт отправляется при следующем запуске — не позднее чем за 7 дней. Отключение удаляет несохранённые отчёты.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "Найдено моделей: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Модели работают на этом Mac. Чаты не покидают его; в интернет выходят только веб‑инструменты, если вы их включите.";
 "Models: %@ · free: %@" = "Модели: %@ · свободно: %@";
+"More" = "Подробнее";
 "Move %1$@ to %2$@" = "Переместить %1$@ в %2$@";
 "Move %@ to the Trash" = "Переместить %@ в Корзину";
 "Move this model to the Trash?" = "Переместить эту модель в Корзину?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "Чтение чата…";
 "Reading a prompt: up to %lld%" = "Чтение подсказки: до %lld%";
 "Reading chats" = "Чтение чатов";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Чтение на этом Mac после разрешения больше не запрашивается. Но после того, как Чат прочитает почту, файл или веб-страницу, изменение (отправка, перемещение, удаление) или обращение к серверу в интернете всё равно будет запрошено.";
 "Reading what's installed…" = "Чтение установленных компонентов…";
 "Reads Only" = "Только чтение";
 "Reads chats with" = "Читает чаты с помощью";
