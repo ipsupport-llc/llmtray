@@ -401,10 +401,10 @@
 "Downloading…" = "جارٍ التنزيل…";
 "Downloads" = "التنزيلات";
 "Downloads waiting: %lld" = "تنزيلات قيد الانتظار: %lld";
-"Drag .mcpb files here to install" = "اسحب ملفات .mcpb إلى هنا لتثبيتها";
 "Drag chats here, or use a chat's menu" = "اسحب المحادثات هنا، أو استخدم قائمة المحادثة";
 "Drag chats or files here, or use a chat's menu" = "اسحب المحادثات أو الملفات إلى هنا، أو استخدم قائمة المحادثة";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "اسحب المستندات إلى هذه المحادثة: تُضاف إلى المشروع ويجيب النموذج منها.";
+"Drop .mcpb files here to install" = "أفلت ملفات .mcpb هنا لتثبيتها";
 "Drop chats here to move them to the project" = "إفلت المحادثات هنا لنقلها إلى المشروع";
 "Drop chats or files here to add them to the project" = "إفلت المحادثات أو الملفات هنا لإضافتها إلى المشروع";
 "Drop files here" = "إفلت الملفات هنا";
@@ -522,6 +522,7 @@
 "Getting Started" = "البدء";
 "Getting started" = "البدء";
 "Getting…" = "جارٍ التنزيل…";
+"Give the chat more tools" = "امنح الدردشة مزيدًا من الأدوات";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "يمنح النموذج أداة generate_image (يتطلب نموذجًا يستدعي الأدوات). في المرة الأولى، يتم تنزيل نموذج الصور.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "يوفر للنموذج أداة generate_music: أغنية بكلمات مغناة أو مقطوعة موسيقية بناءً على وصف (ACE-Step 1.5، رخصة MIT؛ تقريبًا 20 ثانية من الوقت لتوليد 30 ثانية من الموسيقى). عند الاستخدام الأول، يتم تنزيل النموذج.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "يوفر للنموذج أداة edit_image: تُغيّر صورة من المحادثة — إما واحدة أرفقتها أو تم إنشاؤها هنا. يتطلب تشغيل توليد الصور. النموذج الخاص به يُحمّل عند اختيارك له.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "المحادثات الأطول أسهل في النافذة: المشاريع والملفات وكل محادثة في الشريط الجانبي.";
 "MTP drafter: speeds up %@, same answers" = "مُسودِّد MTP: يسرّع %@، مع نفس الإجابات";
 "Made for programming and agents: coding tools and the OpenAI API." = "مصمم للبرمجة والوكيلات: أدوات برمجية وOpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "البريد والملاحظات والتقويمات والملفات والخدمات. تسألك الدردشة قبل كل استدعاء.";
 "Maintenance" = "الصيانة";
 "Make a 30-second calm lo-fi instrumental for studying" = "أنشئ مقطعًا هادئًا lo-fi مدته 30 ثانية للمذاكرة";
 "Make a Document…" = "إنشاء مستند…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "سجل الخادم";
 "Server log" = "سجل الخادم";
 "Server settings changed -- restart to apply them." = "تغيّرت إعدادات الخادم — أعد التشغيل لتطبيقها.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "تمنح الخوادم الدردشة مزيدًا من الأدوات: البريد والملاحظات والتقويمات والملفات والخدمات. تطلب الدردشة إذنك قبل كل استدعاء.";
 "Set Up LLMTray" = "إعداد LLMTray";
 "Set Up LLMTray…" = "إعداد LLMTray…";
 "Setting up image generation (first time only)…" = "جارٍ إعداد توليد الصور (لأول مرة فقط)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "غير مستخدم من أي نموذج";
 "npx, uvx, or a full path" = "npx أو uvx أو مسار كامل";
 "off" = "إيقاف";
+"or choose a file…" = "أو اختر ملفًا…";
 "outcome unknown -- check before trying again" = "النتيجة غير معروفة -- تحقّق قبل المحاولة مرة أخرى";
 "over 50 MB" = "أكبر من 50 ميجابايت";
 "prompt %.0f tok/s" = "الموجّه %.0f رمز/ث";

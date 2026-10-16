@@ -401,10 +401,10 @@
 "Downloading…" = "Descargando…";
 "Downloads" = "Descargas";
 "Downloads waiting: %lld" = "Descargas en espera: %lld";
-"Drag .mcpb files here to install" = "Arrastra archivos .mcpb aquí para instalarlos";
 "Drag chats here, or use a chat's menu" = "Arrastra conversaciones aquí, o usa el menú de una conversación";
 "Drag chats or files here, or use a chat's menu" = "Arrastra conversaciones o archivos aquí, o usa el menú de una conversación";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Arrastra documentos a este chat: se añaden al proyecto y el modelo responde a partir de ellos.";
+"Drop .mcpb files here to install" = "Suelta aquí los archivos .mcpb para instalarlos";
 "Drop chats here to move them to the project" = "Suelta conversaciones aquí para moverlas al proyecto";
 "Drop chats or files here to add them to the project" = "Suelta conversaciones o archivos aquí para añadirlos al proyecto";
 "Drop files here" = "Suelta archivos aquí";
@@ -522,6 +522,7 @@
 "Getting Started" = "Primeros pasos";
 "Getting started" = "Primeros pasos";
 "Getting…" = "Obteniendo…";
+"Give the chat more tools" = "Dar más herramientas al Chat";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Da al modelo la herramienta generate_image (requiere un modelo que use herramientas). La primera vez se descarga el modelo de imágenes.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Proporciona al modelo la herramienta generate_music: una canción con letra cantada o un instrumental a partir de una descripción (ACE-Step 1.5, licencia MIT; unos 20 segundos para 30 segundos de música). La primera vez se descarga el modelo.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Proporciona al modelo una herramienta edit_image: modifica una imagen del chat — una que hayas adjuntado o una generada aquí. Requiere la generación de imágenes activada. Usa su propio modelo, que se descarga al seleccionarlo.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Los chats largos son más cómodos en la ventana: proyectos, archivos y cada conversación en una barra lateral.";
 "MTP drafter: speeds up %@, same answers" = "Borrador MTP: acelera %@, mismas respuestas";
 "Made for programming and agents: coding tools and the OpenAI API." = "Diseñada para programación y agentes: herramientas de código y la API de OpenAI.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Correo, notas, calendarios, archivos y servicios. El Chat te pide permiso antes de cada llamada.";
 "Maintenance" = "Mantenimiento";
 "Make a 30-second calm lo-fi instrumental for studying" = "Crear un instrumental lo-fi calmado de 30 segundos para estudiar";
 "Make a Document…" = "Crear documento…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Registro del servidor";
 "Server log" = "Registro del servidor";
 "Server settings changed -- restart to apply them." = "Los ajustes del servidor cambiaron: reinicia para aplicarlos.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Los servidores dan al Chat más herramientas: correo, notas, calendarios, archivos y servicios. El Chat te pregunta antes de cada llamada.";
 "Set Up LLMTray" = "Configurar LLMTray";
 "Set Up LLMTray…" = "Configurar LLMTray…";
 "Setting up image generation (first time only)…" = "Configurando la generación de imagen (solo la primera vez)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "no lo usa ningún modelo";
 "npx, uvx, or a full path" = "npx, uvx o una ruta completa";
 "off" = "desactivado";
+"or choose a file…" = "o elige un archivo…";
 "outcome unknown -- check before trying again" = "resultado desconocido; compruébalo antes de volver a intentarlo";
 "over 50 MB" = "más de 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";

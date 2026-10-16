@@ -401,10 +401,10 @@
 "Downloading…" = "正在下載…";
 "Downloads" = "下載項目";
 "Downloads waiting: %lld" = "等待下載：%lld";
-"Drag .mcpb files here to install" = "將 .mcpb 檔案拖移到此處以安裝";
 "Drag chats here, or use a chat's menu" = "將聊天拖放到此處，或使用聊天的選單";
 "Drag chats or files here, or use a chat's menu" = "將聊天或檔案拖到此處，或使用聊天選單";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "將文件拖到此聊天：它們會加入專案，模型會從中回覆。";
+"Drop .mcpb files here to install" = "將 .mcpb 檔案拖放到這裡以安裝";
 "Drop chats here to move them to the project" = "將聊天放到此處以移至專案";
 "Drop chats or files here to add them to the project" = "將聊天或檔案放到此處以加入專案";
 "Drop files here" = "將檔案放到此處";
@@ -522,6 +522,7 @@
 "Getting Started" = "開始使用";
 "Getting started" = "開始使用";
 "Getting…" = "取得中…";
+"Give the chat more tools" = "為聊天加入更多工具";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "為模型提供 generate_image 工具（需要支援工具呼叫的模型）。首次使用時會下載影像模型。";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "提供模型 generate_music 工具：可依描述產生帶歌詞的歌曲或純樂器曲（ACE-Step 1.5，MIT 授權；大約需 20 秒產生 30 秒音樂）。首次使用會下載模型。";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "為模型新增 edit_image 工具：可修改對話中的圖片——你附加的或在此生成的。需啟用圖片生成功能。它使用自己的模型，選擇時會下載。";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "較長的對話在視窗中較為方便：專案、檔案與每個對話都會顯示於側欄。";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter：加速 %@，答案相同";
 "Made for programming and agents: coding tools and the OpenAI API." = "為程式開發與代理設計：含程式工具與 OpenAI API。";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "郵件、備忘錄、行事曆、檔案和服務。聊天會在每次呼叫前先詢問你。";
 "Maintenance" = "維護";
 "Make a 30-second calm lo-fi instrumental for studying" = "製作 30 秒用於學習的寧靜 lo-fi 器樂曲";
 "Make a Document…" = "建立文件…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "伺服器記錄";
 "Server log" = "伺服器記錄";
 "Server settings changed -- restart to apply them." = "伺服器設定已更改，重新啟動後才會套用。";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "伺服器可為聊天提供更多工具：郵件、備忘錄、行事曆、檔案、服務。聊天會在每次呼叫前先詢問你。";
 "Set Up LLMTray" = "設定 LLMTray";
 "Set Up LLMTray…" = "設定 LLMTray…";
 "Setting up image generation (first time only)…" = "正在設定影像生成功能（僅首次）…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "未被任何模型使用";
 "npx, uvx, or a full path" = "npx、uvx 或完整路徑";
 "off" = "關閉";
+"or choose a file…" = "或選擇檔案⋯";
 "outcome unknown -- check before trying again" = "結果不明——請先檢查，再試一次";
 "over 50 MB" = "超過 50 MB";
 "prompt %.0f tok/s" = "提示 %.0f tok/s";

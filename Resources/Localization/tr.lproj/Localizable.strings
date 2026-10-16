@@ -401,10 +401,10 @@
 "Downloading…" = "İndiriliyor…";
 "Downloads" = "İndirmeler";
 "Downloads waiting: %lld" = "Bekleyen indirmeler: %lld";
-"Drag .mcpb files here to install" = "Yüklemek için .mcpb dosyalarını buraya sürükleyin";
 "Drag chats here, or use a chat's menu" = "Sohbetleri buraya sürükleyin veya bir sohbetin menüsünü kullanın";
 "Drag chats or files here, or use a chat's menu" = "Sohbetleri ya da dosyaları buraya sürükleyin veya bir sohbetin menüsünü kullanın";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Belgeleri bu sohbete sürükleyin: projeye eklenirler ve model bunlardan yanıt verir.";
+"Drop .mcpb files here to install" = "Yüklemek için .mcpb dosyalarını buraya bırakın";
 "Drop chats here to move them to the project" = "Sohbetleri projeye taşımak için buraya bırakın";
 "Drop chats or files here to add them to the project" = "Sohbetleri veya dosyaları projeye eklemek için buraya bırakın";
 "Drop files here" = "Dosyaları buraya bırakın";
@@ -522,6 +522,7 @@
 "Getting Started" = "Başlarken";
 "Getting started" = "Başlarken";
 "Getting…" = "Alınıyor…";
+"Give the chat more tools" = "Sohbet’e daha fazla araç ekleyin";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Modele generate_music aracını ekler: tanıma dayalı şarkı (sözlü) veya enstrümantal parça üretir (ACE-Step 1.5, MIT lisansı; yaklaşık 30 saniye için 20 saniye). İlk kullanımda model indirilir.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Modele edit_image aracını sağlar: sohbetten alınan, eklediğiniz veya burada oluşturulan bir resmi değiştirir. Resim oluşturma açık olmalı. Kendi modeli vardır; seçtiğinizde indirilir.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Uzun sohbetler pencereye daha uygun: projeler, dosyalar ve tüm sohbetler bir kenar çubuğunda.";
 "MTP drafter: speeds up %@, same answers" = "MTP taslaklayıcı: %@’yi hızlandırır, yanıtlar aynı";
 "Made for programming and agents: coding tools and the OpenAI API." = "Programlama ve ajanlar için hazırlanmıştır: kodlama araçları ve OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, Notlar, Takvim, dosyalar ve servisler. Sohbet her çağrıdan önce size sorar.";
 "Maintenance" = "Bakım";
 "Make a 30-second calm lo-fi instrumental for studying" = "Çalışma için 30 saniyelik sakin bir lo‑fi enstrümantal yapın";
 "Make a Document…" = "Belge Oluştur…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Sunucu Günlüğü";
 "Server log" = "Sunucu günlüğü";
 "Server settings changed -- restart to apply them." = "Sunucu ayarları değişti; uygulamak için yeniden başlatın.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Sunucular Sohbet'e daha fazla araç sağlar: e-posta, notlar, takvimler, dosyalar, servisler. Sohbet her çağrıdan önce size sorar.";
 "Set Up LLMTray" = "LLMTray'ı Kur";
 "Set Up LLMTray…" = "LLMTray'ı Kur…";
 "Setting up image generation (first time only)…" = "Görüntü oluşturma ayarlanıyor (sadece ilk sefer)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "hiçbir model tarafından kullanılmıyor";
 "npx, uvx, or a full path" = "npx, uvx veya tam yol";
 "off" = "kapalı";
+"or choose a file…" = "veya bir dosya seçin…";
 "outcome unknown -- check before trying again" = "sonuç bilinmiyor -- yeniden denemeden önce denetleyin";
 "over 50 MB" = "50 MB'tan büyük";
 "prompt %.0f tok/s" = "istem %.0f tok/sn";

@@ -401,10 +401,10 @@
 "Downloading…" = "Téléchargement…";
 "Downloads" = "Téléchargements";
 "Downloads waiting: %lld" = "Téléchargements en attente : %lld";
-"Drag .mcpb files here to install" = "Faites glisser des fichiers .mcpb ici pour les installer";
 "Drag chats here, or use a chat's menu" = "Faites glisser les conversations ici, ou utilisez le menu d’une conversation";
 "Drag chats or files here, or use a chat's menu" = "Glissez des conversations ou fichiers ici, ou utilisez le menu d'une conversation";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Faites glisser des documents sur cette conversation : ils sont ajoutés au projet et le modèle répond à partir d’eux.";
+"Drop .mcpb files here to install" = "Déposez les fichiers .mcpb ici pour les installer";
 "Drop chats here to move them to the project" = "Déposez des conversations ici pour les déplacer vers le projet";
 "Drop chats or files here to add them to the project" = "Déposez des conversations ou fichiers ici pour les ajouter au projet";
 "Drop files here" = "Déposez des fichiers ici";
@@ -522,6 +522,7 @@
 "Getting Started" = "Premiers pas";
 "Getting started" = "Premiers pas";
 "Getting…" = "Obtention…";
+"Give the chat more tools" = "Donnez plus d’outils au Chat";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Ajoute au modèle un outil generate_image (nécessite un modèle compatible avec les appels d’outils). La première fois, le modèle d’image est téléchargé.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Fournit au modèle un outil generate_music : une chanson avec paroles chantées ou un instrumental à partir d'une description (ACE-Step 1.5, licence MIT ; environ 20 secondes pour 30 secondes de musique). Lors du premier usage, le modèle est téléchargé.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Ajoute au modèle un outil edit_image : il modifie une image de la conversation — une que vous avez jointe ou une générée ici. Nécessite que la génération d’images soit activée. Utilise son propre modèle, téléchargé lorsque vous le choisissez.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Les conversations longues sont plus faciles dans la fenêtre : projets, fichiers et chaque discussion dans une barre latérale.";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter a0: accélère %@, mêmes réponses";
 "Made for programming and agents: coding tools and the OpenAI API." = "Conçu pour la programmation et les agents : outils de codage et OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, notes, calendriers, fichiers et services. Le Chat vous demande votre autorisation avant chaque appel.";
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Créer un instrumental lo-fi calme de 30 secondes pour étudier";
 "Make a Document…" = "Créer un document…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Journal du serveur";
 "Server log" = "Journal du serveur";
 "Server settings changed -- restart to apply them." = "Les réglages du serveur ont été modifiés : redémarrez pour les appliquer.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Les serveurs donnent plus d’outils au Chat : e-mails, notes, calendriers, fichiers, services. Le Chat vous demande votre autorisation avant chaque appel.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Configuration de la génération d’images (une seule fois)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "utilisé par aucun modèle";
 "npx, uvx, or a full path" = "npx, uvx ou un chemin complet";
 "off" = "désactivé";
+"or choose a file…" = "ou choisissez un fichier…";
 "outcome unknown -- check before trying again" = "résultat inconnu — vérifiez avant de réessayer";
 "over 50 MB" = "plus de 50 Mo";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";

@@ -401,10 +401,10 @@
 "Downloading…" = "Mengunduh…";
 "Downloads" = "Unduhan";
 "Downloads waiting: %lld" = "Unduhan menunggu: %lld";
-"Drag .mcpb files here to install" = "Seret file .mcpb ke sini untuk memasang";
 "Drag chats here, or use a chat's menu" = "Seret percakapan ke sini, atau gunakan menu percakapan";
 "Drag chats or files here, or use a chat's menu" = "Seret obrolan atau berkas ke sini, atau gunakan menu obrolan";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Seret dokumen ke obrolan ini: dokumen akan bergabung ke proyek, dan model menjawab berdasarkan dokumen tersebut.";
+"Drop .mcpb files here to install" = "Jatuhkan file .mcpb di sini untuk menginstal";
 "Drop chats here to move them to the project" = "Jatuhkan obrolan di sini untuk memindahkannya ke proyek";
 "Drop chats or files here to add them to the project" = "Jatuhkan obrolan atau berkas di sini untuk menambahkannya ke proyek";
 "Drop files here" = "Jatuhkan berkas di sini";
@@ -522,6 +522,7 @@
 "Getting Started" = "Memulai";
 "Getting started" = "Memulai";
 "Getting…" = "Mengambil…";
+"Give the chat more tools" = "Tambahkan lebih banyak alat ke Obrolan";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Memberi model alat generate_music: lagu dengan lirik bernyanyi, atau instrumental, dari deskripsi (ACE-Step 1.5, lisensi MIT; sekitar 20 detik untuk 30 detik musik). Pada percobaan pertama, model akan diunduh.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Memberi model alat edit_image: mengubah gambar dari obrolan — yang Anda lampirkan atau yang dibuat di sini. Membutuhkan fitur pembuatan gambar aktif. Model tersendiri, diunduh saat Anda memilihnya.";
@@ -677,6 +678,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Obrolan panjang lebih mudah di jendela: proyek, file, dan tiap obrolan di sidebar.";
 "MTP drafter: speeds up %@, same answers" = "Penyusun MTP: mempercepat %@, jawaban tetap sama";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dibuat untuk pemrograman dan agen: alat pengkodean dan OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, catatan, kalender, file, dan layanan. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
 "Maintenance" = "Pemeliharaan";
 "Make a 30-second calm lo-fi instrumental for studying" = "Buat instrumental lo-fi tenang 30 detik untuk belajar";
 "Make a Document…" = "Buat Dokumen…";
@@ -1051,7 +1053,6 @@
 "Server Log" = "Log Server";
 "Server log" = "Log server";
 "Server settings changed -- restart to apply them." = "Pengaturan server berubah — mulai ulang untuk menerapkannya.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Server memberi Obrolan lebih banyak alat: email, catatan, kalender, file, layanan. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Menyiapkan pembuatan gambar (hanya pertama kali)…";
@@ -1557,6 +1558,7 @@
 "not used by any model" = "tidak digunakan oleh model mana pun";
 "npx, uvx, or a full path" = "npx, uvx, atau path lengkap";
 "off" = "mati";
+"or choose a file…" = "atau pilih file…";
 "outcome unknown -- check before trying again" = "hasil tidak diketahui -- periksa sebelum mencoba lagi";
 "over 50 MB" = "lebih dari 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/d";
