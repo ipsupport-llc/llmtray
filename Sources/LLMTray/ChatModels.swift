@@ -116,6 +116,8 @@ struct ChatMessage: Identifiable, Equatable {
     // message before it (ProjectFilesNote) -- told to the model with it,
     // shown under the bubble, saved with it.
     var projectFilesAdded: [String] = []
+    /// The MCP calls behind this answer (adr/0027), one line each under it.
+    var mcpCalls: [MCPCallRecord] = []
     // A "tool" result refusing a call (see ToolResult.refused): left out of
     // the history of later turns. Not saved (tool messages never are).
     var isRefusal: Bool = false
@@ -273,6 +275,9 @@ struct ChatSettings {
     var toolLoading: [String: ToolLoading] = ToolGroups.builtIn
     /// The on-demand groups this chat has loaded (load_tools, the + menu).
     var loadedToolGroups: Set<String> = []
+    /// MCP servers' tools may be declared (adr/0027): a saved chat; never a
+    /// temporary one.
+    var mcpChat = false
     /// The profile's name, for an answer's details.
     var profileName: String?
 

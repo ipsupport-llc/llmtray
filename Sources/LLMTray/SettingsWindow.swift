@@ -4,7 +4,7 @@ import LLMTrayCore
 
 /// The panes of the Settings window, in toolbar order.
 enum SettingsPane: String, CaseIterable {
-    case general, models, profiles, folders, memory, voice, server, benchmark, updates
+    case general, models, profiles, folders, tools, memory, voice, server, benchmark, updates
 
     /// Localized via Localizable.strings (keys are the English titles).
     var title: String {
@@ -13,6 +13,7 @@ enum SettingsPane: String, CaseIterable {
         case .models: return NSLocalizedString("Models", comment: "Settings pane")
         case .profiles: return NSLocalizedString("Profiles", comment: "Settings pane")
         case .folders: return NSLocalizedString("Files", comment: "Settings pane")
+        case .tools: return NSLocalizedString("Tools", comment: "Settings pane")
         case .memory: return NSLocalizedString("Memory", comment: "Settings pane")
         case .voice: return NSLocalizedString("Voice", comment: "Settings pane")
         case .server: return NSLocalizedString("Server", comment: "Settings pane")
@@ -27,6 +28,7 @@ enum SettingsPane: String, CaseIterable {
         case .models: return "square.stack.3d.up"
         case .profiles: return "slider.horizontal.3"
         case .folders: return "doc.on.doc"
+        case .tools: return "puzzlepiece.extension"
         case .memory: return "brain"
         case .voice: return "waveform"
         case .server: return "server.rack"
@@ -100,6 +102,7 @@ final class SettingsWindowController: NSWindowController {
         case .models: ModelsPane()
         case .profiles: ProfilesPane()
         case .folders: FoldersPane()
+        case .tools: ToolsPane()
         case .memory: MemoryPane()
         case .voice: VoicePane()
         case .server: ServerPane()

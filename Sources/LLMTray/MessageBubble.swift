@@ -190,6 +190,10 @@ struct MessageBubble: View {
                 }
             }
 
+            if !message.mcpCalls.isEmpty {
+                MCPCallLines(records: message.mcpCalls)
+            }
+
             ForEach(sources, id: \.self) { source in
                 Text(verbatim: source)
                     .font(.caption)
