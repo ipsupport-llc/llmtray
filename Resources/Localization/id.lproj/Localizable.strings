@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "Setelah %lld menit tidak aktif";
 "After %lld min" = "Setelah %lld menit";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Setelah jawaban pertama dari chat baru, model memberi judul singkat untuk daftar chat (satu permintaan tambahan singkat). Mati: awal pesan pertama. Mengganti nama chat selalu berhasil.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Setelah Obrolan membaca teks dari luar (mail, file, web), setiap panggilan tetap akan diminta.";
 "Air quality" = "Kualitas udara";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: nama “model” yang dikirim alat lain ke API LLMTray untuk mendapatkan model ini. Profil: profil pengaturan yang digunakan model ini.";
 "All" = "Semua";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "Periksa juga saat LLMTray dimulai";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Juga mengedit gambar — satu dari obrolan atau yang Anda lampirkan. Pengeditan memakan beberapa menit.";
 "Always" = "Selalu";
+"Always Allow" = "Selalu Izinkan";
+"Always Allow %@" = "Selalu Izinkan %@";
+"Always Allow Everything from %@" = "Selalu Izinkan Semua dari %@";
 "An OpenAI-compatible API on localhost for other apps." = "API kompatibel OpenAI di localhost untuk aplikasi lain.";
 "An alias: the alias itself, not what it points to." = "Alias: alias itu sendiri, bukan apa yang ditunjuknya.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Sebuah editor, agen, atau skrip yang meminta model selain yang sedang dimuat. Beralih akan memuat keluar model yang dimuat — begitu juga chat. Tanyakan dulu: notifikasi dengan Opsi Beralih / Pertahankan; tanpa jawaban dalam satu menit dianggap Pertahankan. Pertahankan: klien menerima kesalahan yang menyebutkan model yang dimuat. Chat bawaan aplikasi selalu beralih.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "Tanyakan apa saja, atau coba salah satu berikut:";
 "Ask anything." = "Tanyakan apa saja.";
 "Ask first" = "Tanyakan dulu";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "Tetap diminta meskipun sudah Anda izinkan: server tidak menjawab saat alatnya baru saja diperiksa (lihat lognya di Pengaturan › Alat).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "Tetap diminta meskipun sudah Anda izinkan: giliran ini telah membaca email, file, atau web, dan panggilan ini dapat mengubah sesuatu atau menuju ke web.";
 "Assistant" = "Asisten";
 "At most %d characters: a note is one short statement." = "Maksimal %d karakter: catatan adalah satu pernyataan singkat.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Maksimal satu laporan per hari, mencakup satu hari sebelumnya, dikirim ke ipsupport.us. Hari yang belum dikirim akan dimasukkan pada peluncuran berikutnya, hingga 7 hari sebelumnya. Mematikan ini menghapus yang belum dikirim.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "Model ditemukan: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Model dijalankan di Mac ini. Obrolan Anda tidak keluar; hanya alat web, jika diaktifkan, yang mengakses internet.";
 "Models: %@ · free: %@" = "Model: %@ · tersisa: %@";
+"More" = "Lainnya";
 "Move %1$@ to %2$@" = "Pindahkan %1$@ ke %2$@";
 "Move %@ to the Trash" = "Pindahkan %@ ke Trash";
 "Move this model to the Trash?" = "Pindahkan model ini ke Sampah?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "Membaca obrolan…";
 "Reading a prompt: up to %lld%" = "Membaca prompt: hingga %lld%";
 "Reading chats" = "Membaca chat";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Membaca di Mac Ini tidak pernah ditanyakan lagi setelah diizinkan. Setelah Obrolan membaca email, file, atau web, perubahan (kirim, pindahkan, hapus) atau panggilan ke server di web tetap akan diminta.";
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Reads Only" = "Hanya Baca";
 "Reads chats with" = "Membaca obrolan dengan";

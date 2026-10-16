@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "%lld分アイドル状態の後";
 "After %lld min" = "%lld分後";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "新しいチャットの最初の応答後、モデルがチャット一覧用の短いタイトルを自動で付けます（短い追加リクエストが発生します）。オフ：最初のメッセージの先頭をタイトルに使用します。チャットの名前変更は常に可能です。";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "チャットが外部のテキスト（メール、ファイル、Web）を読んだあとでも、呼び出しのたびに確認します。";
 "Air quality" = "空気質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "エイリアス: ほかのツールがこのモデルを使うために LLMTray の API へ送る「model」名です。プロファイル: このモデルで使う設定プロファイルです。";
 "All" = "すべて";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "チャット内の画像、または添付した画像を編集できます。編集には数分かかります。";
 "Always" = "常に";
+"Always Allow" = "常に許可";
+"Always Allow %@" = "%@を常に許可";
+"Always Allow Everything from %@" = "%@からのすべてを常に許可";
 "An OpenAI-compatible API on localhost for other apps." = "他のアプリ向けにローカルホストで OpenAI 互換の API を提供します。";
 "An alias: the alias itself, not what it points to." = "エイリアス：エイリアス自体が対象で、指す先は対象になりません。";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "編集中のエディタ、エージェント、またはスクリプトが現在読み込まれているものと異なるモデルを要求する場合。切り替えると読み込まれているモデル（チャットも含む）はアンロードされます。先に確認する: 「切り替え / 維持」の通知を表示。1分間未回答なら「維持」とみなします。「維持」の場合、クライアントには読み込まれているモデル名を伝えるエラーが返ります。アプリ内のチャットは常に切り替えます。";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "何でも質問するか、こちらを試してみてください：";
 "Ask anything." = "何でも聞いてください。";
 "Ask first" = "事前に確認";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "許可していても確認されます: 先ほどそのツールを確認したときにサーバが応答しませんでした（ログは「設定」＞「ツール」を参照）。";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "許可していても確認されます: このターンではメール、ファイル、またはWebを読み取っており、この呼び出しは変更を加えるか、Webにアクセスします。";
 "Assistant" = "アシスタント";
 "At most %d characters: a note is one short statement." = "%d文字以内：ノートは短い文を1つだけにしてください。";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.usへ送信するのは1日につき最大1件で、対象は直近1日分です。未送信の分は次回起動時に送信され、最大7日分まで遡ります。オフにすると未送信のデータは削除されます。";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "見つかったモデル: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "モデルはこの Mac 上で実行されます。チャットデータは外部に出ません。ウェブツールを有効にした場合のみインターネットに接続します。";
 "Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
+"More" = "さらに表示";
 "Move %1$@ to %2$@" = "%1$@ を %2$@ に移動";
 "Move %@ to the Trash" = "%@ をゴミ箱に移動";
 "Move this model to the Trash?" = "このモデルをゴミ箱に移動しますか？";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "チャットを読み込み中…";
 "Reading a prompt: up to %lld%" = "プロンプト読み取り: 最大 %lld%";
 "Reading chats" = "チャットの読み取り";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "このMac上での読み取りは、一度許可すれば以後確認されません。チャットがメール、ファイル、またはWebを読み取ったあとは、変更（送信、移動、削除）やWeb上のサーバへの呼び出しについては引き続き確認されます。";
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Reads Only" = "読み取りのみ";
 "Reads chats with" = "チャットの読み取りに使用";

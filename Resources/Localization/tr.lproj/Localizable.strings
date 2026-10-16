@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "%lld dakika boşta kaldıktan sonra";
 "After %lld min" = "%lld dk sonra";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Yeni sohbetin ilk yanıtından sonra model, sohbetler listesi için kısa bir başlık belirler (kısa ek bir istek). Kapalı: ilk mesajın başı kullanılır. Sohbetin adını yeniden verme her zaman çalışır.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Sohbet dış metinleri (bir e-posta, bir dosya, web) okuduktan sonra da her çağrı için yine sorulur.";
 "Air quality" = "Hava kalitesi";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Takma ad: Diğer araçların bu modeli almak için LLMTray API’sine gönderdiği “model” adı. Profil: Bu modelin kullandığı ayarlar profili.";
 "All" = "Tümü";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Ayrıca resimleri düzenler — sohbetten alınan veya eklediğiniz bir resmi. Düzenlemeler birkaç dakika sürer.";
 "Always" = "Her zaman";
+"Always Allow" = "Her zaman izin ver";
+"Always Allow %@" = "%@ için her zaman izin ver";
+"Always Allow Everything from %@" = "%@ kaynaklı her şeye her zaman izin ver";
 "An OpenAI-compatible API on localhost for other apps." = "Diğer uygulamalar için localhost'ta OpenAI uyumlu bir API.";
 "An alias: the alias itself, not what it points to." = "Bir alias: alias'ın kendisi, işaret ettiği öğe değil.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Yüklü olandan farklı bir modeli isteyen bir düzenleyici, agent veya betik. Değiştirdiğinizde yüklü olan boşaltılır — sohbet de dahil. Önce sor: Switch / Keep içeren bir bildirim; bir dakika içinde yanıtlanmazsa Keep sayılır. Keep: istemciye, yüklü modeli belirten bir hata döner. Uygulamanın kendi sohbeti her zaman değişir.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "Her şeyi sorun veya bunlardan birini deneyin:";
 "Ask anything." = "Her şeyi sorabilirsiniz.";
 "Ask first" = "Önce sor";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "İzin vermiş olsanız da soruldu: sunucunun araçları az önce denetlendiğinde sunucu yanıt vermedi (günlüğüne Ayarlar › Araçlar bölümünden bakın).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "İzin vermiş olsanız da soruldu: bu turda posta, dosyalar veya web okundu ve bu çağrı değişiklik yapabilir ya da web'e gider.";
 "Assistant" = "Asistan";
 "At most %d characters: a note is one short statement." = "En fazla %d karakter: not, kısa bir ifadedir.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.us adresine en fazla günde bir rapor gönderilir; her rapor bir önceki günü kapsar. Gönderilmeyen bir gün, sonraki açılışta gönderilir; en fazla 7 güne kadar geriye gider. Bunu kapatmak gönderilmeyen verileri siler.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "Bulunan modeller: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Modeller bu Mac'te çalışır. Sohbetleriniz buradan çıkmaz; yalnızca web araçları açıksa internete erişir.";
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
+"More" = "Daha Fazla";
 "Move %1$@ to %2$@" = "%1$@ öğesini %2$@ konumuna taşı";
 "Move %@ to the Trash" = "%@ öğesini Çöp'e taşı";
 "Move this model to the Trash?" = "Bu modeli Çöp Kutusu'na taşımak istiyor musunuz?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "Sohbet okunuyor…";
 "Reading a prompt: up to %lld%" = "İsteme okuma: en fazla %lld%";
 "Reading chats" = "Sohbetleri okuma";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Bu Mac'te okumaya izin verildikten sonra bir daha sorulmaz. Sohbet bir postayı, bir dosyayı veya web'i okuduktan sonra, değişiklik (gönderme, taşıma, silme) ya da web'deki bir sunucuya çağrı yine de sorulur.";
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Reads Only" = "Yalnızca Okuma";
 "Reads chats with" = "Sohbetleri şununla okur";

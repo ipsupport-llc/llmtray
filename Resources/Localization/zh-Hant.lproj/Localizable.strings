@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "閒置 %lld 分鐘後";
 "After %lld min" = "%lld 分鐘後";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "當新對話收到第一次回答後，模型會為它在對話列表中自動產生一個短標題（需額外一次短請求）。關閉：使用第一則訊息開頭。重新命名對話永遠可用。";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "在聊天讀取外部文字（郵件、檔案、網頁）後，仍會就每次呼叫詢問。";
 "Air quality" = "空氣品質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "別名：其他工具傳送給 LLMTray API 以取得此模型的「model」名稱。設定檔：此模型使用的設定檔。";
 "All" = "全部";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "LLMTray 啟動時也檢查";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "也能編輯圖片——來自對話或你附加的圖片。編輯需要幾分鐘。";
 "Always" = "永遠";
+"Always Allow" = "永遠允許";
+"Always Allow %@" = "永遠允許 %@";
+"Always Allow Everything from %@" = "永遠允許來自 %@ 的所有內容";
 "An OpenAI-compatible API on localhost for other apps." = "在本機提供與 OpenAI 相容的 API，供其他應用程式使用。";
 "An alias: the alias itself, not what it points to." = "別名（alias）：只有別名本身，指向的對象不會移動。";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "編輯器、代理或腳本請求與目前不同的模型。切換會卸載已載入的模型（聊天也會）。先詢問：顯示含「切換／保留」的通知；1 分鐘未回覆視為保留。選擇保留：用戶端會收到指出已載入模型的錯誤。本應用內的聊天會自動切換。";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "問任何問題，或嘗試下列範例：";
 "Ask anything." = "有問題都可以問。";
 "Ask first" = "先詢問";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "儘管你已允許，仍會詢問：剛才檢查其工具時，伺服器沒有回應（請參閱「設定」›「工具」中的日誌）。";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "儘管你已允許，仍會詢問：此回合已讀取郵件、檔案或網頁，而這次呼叫可能會變更內容，或連到網頁。";
 "Assistant" = "助理";
 "At most %d characters: a note is one short statement." = "最多 %d 個字元：一則附註是一句簡短陳述。";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "每天最多傳送一份報告，涵蓋過去一天，送至 ipsupport.us。未傳送的日資料會在下次啟動時一併送出，最多回溯 7 天。關閉此功能會刪除尚未傳送的資料。";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "找到的模型：%lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "模型在此 Mac 上執行。聊天不會離開此裝置；只有你啟用的網路工具會連上網際網路。";
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
+"More" = "更多";
 "Move %1$@ to %2$@" = "將 %1$@ 移到 %2$@";
 "Move %@ to the Trash" = "將 %@ 移到垃圾桶";
 "Move this model to the Trash?" = "要將此模型移到資源回收筒嗎？";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "正在讀取聊天…";
 "Reading a prompt: up to %lld%" = "讀取提示：最多 %lld%";
 "Reading chats" = "讀取對話";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "在這台 Mac 上讀取，一經允許後便不會再詢問。聊天讀取郵件、檔案或網頁後，若要進行變更（傳送、移動、刪除）或呼叫網頁上的伺服器，仍會詢問。";
 "Reading what's installed…" = "正在讀取已安裝項目…";
 "Reads Only" = "只讀取";
 "Reads chats with" = "使用以下模型讀取聊天";

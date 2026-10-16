@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "%lld निष्क्रिय मिनटों के बाद";
 "After %lld min" = "%lld मिनट बाद";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "नई चैट के पहले उत्तर के बाद, मॉडल चैट सूची के लिए एक छोटा शीर्षक देता है (एक छोटा अतिरिक्त अनुरोध)। बंद: पहले संदेश की शुरुआत। चैट का नाम बदलना हमेशा काम करता है।";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "चैट के बाहर का पाठ (मेल, फ़ाइल, वेब) पढ़ने के बाद भी, हर call के लिए फिर भी पूछा जाता है।";
 "Air quality" = "वायु गुणवत्ता";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "उपनाम: इस मॉडल को पाने के लिए दूसरे टूल LLMTray के API को भेजा जाने वाला “model” नाम। प्रोफ़ाइल: यह मॉडल कौन-सी सेटिंग्स प्रोफ़ाइल इस्तेमाल करता है।";
 "All" = "सभी";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "LLMTray शुरू होने पर भी जाँचें";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "छवियों को भी संपादित करता है — चैट से किसी एक या आप जो जोड़ते हैं। संपादित करने में कुछ मिनट लगते हैं।";
 "Always" = "हमेशा";
+"Always Allow" = "हमेशा अनुमत करें";
+"Always Allow %@" = "%@ को हमेशा अनुमत करें";
+"Always Allow Everything from %@" = "%@ से सब कुछ हमेशा अनुमत करें";
 "An OpenAI-compatible API on localhost for other apps." = "अन्य ऐप्स के लिए localhost पर OpenAI‑अनुकूल API।";
 "An alias: the alias itself, not what it points to." = "एक उपनाम: स्वयं उपनाम, जिस पर यह इशारा करता है वह नहीं।";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "एक एडिटर, एजेंट या स्क्रिप्ट जो लोड किए गए मॉडल के अलावा किसी अन्य मॉडल की मांग करता है। स्विच करने से लोड किया गया मॉडल—and चैट भी—अनलोड हो जाएगा। पहले पूछें: एक सूचना जिसमें Switch / Keep दिखेगा; एक मिनट में अनुत्तरित रहने पर Keep माना जाएगा। Keep चुनने पर क्लाइंट को लोड किए गए मॉडल का नाम बताते हुए त्रुटि मिलती है। ऐप की अपनी चैट हमेशा स्विच होती है।";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "कुछ भी पूछें, या इनमें से आज़माएँ:";
 "Ask anything." = "कुछ भी पूछें।";
 "Ask first" = "पहले पूछें";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "आपके अनुमत करने के बावजूद पूछा गया: अभी इसके टूल जाँचे जाने पर सर्वर ने जवाब नहीं दिया (इसका लॉग सेटिंग्स › टूल में देखें)।";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "आपके अनुमत करने के बावजूद पूछा गया: इस बारी में मेल, फ़ाइलें या वेब पढ़ा गया है, और यह कॉल चीज़ों में बदलाव कर सकती है या वेब पर जाती है।";
 "Assistant" = "सहायक";
 "At most %d characters: a note is one short statement." = "अधिकतम %d वर्ण: नोट एक छोटा कथन होता है।";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "दिन में अधिकतम एक रिपोर्ट ipsupport.us पर भेजी जाती है, जो पिछले एक दिन को कवर करती है। भेजी न गई तारीख अगली बार लॉन्च पर भेजी जाएगी, अधिकतम 7 दिन पीछे तक। इसे बंद करने पर भेजी न गई रिपोर्टें हटा दी जाएँगी।";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "मॉडल मिले: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "मॉडल इस Mac पर चलते हैं। आपकी चैट्स यहां से बाहर नहीं जातीं; केवल वेब टूल्स, अगर आप उन्हें चालू करें, इंटरनेट तक पहुँचते हैं।";
 "Models: %@ · free: %@" = "मॉडल: %@ · खाली: %@";
+"More" = "और";
 "Move %1$@ to %2$@" = "%1$@ को %2$@ में स्थानांतरित करें";
 "Move %@ to the Trash" = "%@ को Trash में भेजें";
 "Move this model to the Trash?" = "क्या इस मॉडल को ट्रैश में भेजना है?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "चैट पढ़ी जा रही है…";
 "Reading a prompt: up to %lld%" = "प्रॉम्प्ट पढ़ना: अधिकतम %lld%";
 "Reading chats" = "चैट पढ़ना";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "यह Mac पर पढ़ने के लिए, एक बार अनुमति देने के बाद फिर कभी नहीं पूछा जाता। चैट द्वारा मेल, फ़ाइल या वेब पढ़ लेने के बाद भी, किसी बदलाव (भेजना, स्थानांतरित करना, हटाना) या वेब पर किसी सर्वर को कॉल करने के लिए फिर भी पूछा जाता है।";
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Reads Only" = "केवल पढ़ना";
 "Reads chats with" = "चैट इससे पढ़ता है";

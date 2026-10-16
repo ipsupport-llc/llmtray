@@ -140,7 +140,6 @@
 "After %lld idle minutes" = "Tras %lld minutos de inactividad";
 "After %lld min" = "Tras %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Después de la primera respuesta de un chat nuevo, el modelo le asigna un título breve para la lista de chats (una solicitud adicional corta). Desactivado: el inicio del primer mensaje. Renombrar un chat siempre funciona.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Después de que el Chat lea texto externo (un correo, un archivo o la web), se preguntará igualmente por cada llamada.";
 "Air quality" = "Calidad del aire";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: el nombre «model» que otras herramientas envían a la API de LLMTray para obtener este modelo. Perfil: qué perfil de ajustes usa el modelo.";
 "All" = "Todo";
@@ -166,6 +165,9 @@
 "Also check when LLMTray starts" = "Comprobar también al iniciar LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "También edita imágenes: una del chat o una que adjuntes. Las ediciones tardan unos minutos.";
 "Always" = "Siempre";
+"Always Allow" = "Permitir siempre";
+"Always Allow %@" = "Permitir siempre %@";
+"Always Allow Everything from %@" = "Permitir siempre todo de %@";
 "An OpenAI-compatible API on localhost for other apps." = "Una API compatible con OpenAI en localhost para otras apps.";
 "An alias: the alias itself, not what it points to." = "Un alias: el alias en sí, no lo que señala.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Un editor, un agente o un script que solicite un modelo distinto del cargado. Cambiar descarga el modelo cargado — también el chat. Preguntar primero: una notificación con Cambiar / Mantener; si no se responde en un minuto cuenta como Mantener. Mantener: el cliente recibe un error que indica el modelo cargado. El chat de la app siempre cambia.";
@@ -199,6 +201,8 @@
 "Ask anything, or try one of these:" = "Pregunta lo que quieras, o prueba una de estas:";
 "Ask anything." = "Pregunta lo que quieras.";
 "Ask first" = "Preguntar primero";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "Se pidió aunque lo permitiste: el servidor no respondió cuando se comprobaron sus herramientas hace un momento (consulta su registro en Ajustes › Herramientas).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "Se pidió aunque lo permitiste: este turno ha leído correo, archivos o la web, y esta llamada puede cambiar cosas o va a la web.";
 "Assistant" = "Asistente";
 "At most %d characters: a note is one short statement." = "Como máximo %d caracteres: una nota es una afirmación breve.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Como máximo un informe al día, que cubre un día anterior, enviado a ipsupport.us. Un día no enviado se incluirá en el siguiente inicio, hasta 7 días atrás. Al desactivar esto se eliminan los datos no enviados.";
@@ -722,6 +726,7 @@
 "Models found: %lld" = "Modelos encontrados: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Los modelos se ejecutan en este Mac. Tus chats no salen de él; solo las herramientas web, si las activas, acceden a Internet.";
 "Models: %@ · free: %@" = "Modelos: %@ · libre: %@";
+"More" = "Más";
 "Move %1$@ to %2$@" = "Mover %1$@ a %2$@";
 "Move %@ to the Trash" = "Mover %@ a la Papelera";
 "Move this model to the Trash?" = "¿Mover este modelo a la Papelera?";
@@ -952,6 +957,7 @@
 "Reading a chat…" = "Leyendo un Chat…";
 "Reading a prompt: up to %lld%" = "Lectura de prompt: hasta %lld%";
 "Reading chats" = "Lectura de chats";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Leer en Este Mac nunca vuelve a pedir permiso una vez permitido. Después de que el Chat lea un correo, un archivo o la web, se pedirá igualmente un cambio (enviar, mover, eliminar) o una llamada a un servidor en la web.";
 "Reading what's installed…" = "Leyendo lo instalado…";
 "Reads Only" = "Solo leer";
 "Reads chats with" = "Lee los Chat con";
