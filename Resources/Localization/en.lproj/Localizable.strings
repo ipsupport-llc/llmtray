@@ -399,10 +399,10 @@
 "Downloading…" = "Downloading…";
 "Downloads" = "Downloads";
 "Downloads waiting: %lld" = "Downloads waiting: %lld";
-"Drag .mcpb files here to install" = "Drag .mcpb files here to install";
 "Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
 "Drag chats or files here, or use a chat's menu" = "Drag chats or files here, or use a chat's menu";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Drag documents onto this chat: they join the project, and the model answers from them.";
+"Drop .mcpb files here to install" = "Drop .mcpb files here to install";
 "Drop chats here to move them to the project" = "Drop chats here to move them to the project";
 "Drop chats or files here to add them to the project" = "Drop chats or files here to add them to the project";
 "Drop files here" = "Drop files here";
@@ -520,6 +520,7 @@
 "Getting Started" = "Getting Started";
 "Getting started" = "Getting started";
 "Getting…" = "Getting…";
+"Give the chat more tools" = "Give the chat more tools";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
@@ -675,6 +676,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Longer chats are easier in the window: projects, files and every chat in a sidebar.";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: speeds up %@, same answers";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
+"Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, notes, calendars, files and services. The chat asks you before each call.";
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make a Document…" = "Make a Document…";
@@ -1049,7 +1051,6 @@
 "Server Log" = "Server Log";
 "Server log" = "Server log";
 "Server settings changed -- restart to apply them." = "Server settings changed -- restart to apply them.";
-"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Setting up image generation (first time only)…";
@@ -1555,6 +1556,7 @@
 "not used by any model" = "not used by any model";
 "npx, uvx, or a full path" = "npx, uvx, or a full path";
 "off" = "off";
+"or choose a file…" = "or choose a file…";
 "outcome unknown -- check before trying again" = "outcome unknown -- check before trying again";
 "over 50 MB" = "over 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";
