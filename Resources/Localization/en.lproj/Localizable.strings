@@ -11,7 +11,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";
 "%1$@ couldn't be updated: %2$@" = "%1$@ couldn't be updated: %2$@";
 "%1$@ items, %2$@" = "%1$@ items, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ was installed but didn't start: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ wasn't installed: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: the command %2$@ wasn't found.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld copies differ from their originals, so they aren't duplicates: %2$@";
@@ -677,6 +677,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
 "Loading %@…" = "Loading %@…";
 "Loading the voice model…" = "Loading the voice model…";
+"Loading…" = "Loading…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Log" = "Log";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
@@ -815,6 +816,7 @@
 "Notes in" = "Notes in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
 "Nothing" = "Nothing";
+"Nothing found for “%@”." = "Nothing found for “%@”.";
 "Nothing left to read: every chat was read from its start." = "Nothing left to read: every chat was read from its start.";
 "Nothing logged yet." = "Nothing logged yet.";
 "Nothing new to import" = "Nothing new to import";
@@ -1046,6 +1048,7 @@
 "Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
+"Searching the registry…" = "Searching the registry…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
 "Seen in" = "Seen in";
 "Select All" = "Select All";
@@ -1278,6 +1281,7 @@
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The project's files, and Add Files…" = "The project's files, and Add Files…";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "The registry checks who published a name, not what the code does. The chat asks you before each call.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "The registry didn't answer in 30 seconds. Try again in a moment.";
 "The reply was cut at its length limit." = "The reply was cut at its length limit.";
 "The report" = "The report";
 "The reports" = "The reports";

@@ -345,7 +345,13 @@ private struct DiscoverView: View {
                 }
                 HStack {
                     Text("From the MCP Registry").font(.headline)
-                    if loading { ProgressView().controlSize(.small) }
+                    if loading {
+                        ProgressView().controlSize(.small)
+                        Text(query.isEmpty ? "Loading…" : "Searching the registry…").font(.callout).foregroundStyle(.secondary)
+                    }
+                }
+                if !loading, error == nil, entries.isEmpty, !query.isEmpty {
+                    Text(String(format: NSLocalizedString("Nothing found for “%@”.", comment: "MCP catalog: search words"), query)).foregroundStyle(.secondary)
                 }
                 Text("The registry checks who published a name, not what the code does. The chat asks you before each call.")
                     .font(.caption).foregroundStyle(.secondary)
@@ -389,16 +395,26 @@ private struct DiscoverView: View {
         return MCPHub.commandsAllowed
     }
 
+    /// The registry's search can take half a minute: results that don't
+    /// match the words typed now are never shown (nor left on screen).
     private func search() async {
+        let words = query
+        entries = []
+        error = nil
         loading = true
-        defer { loading = false }
+        var request = URLRequest(url: MCPRegistry.searchURL(words, limit: 40))
+        request.timeoutInterval = 30
         do {
-            let (data, _) = try await URLSession.shared.data(from: MCPRegistry.searchURL(query, limit: 40))
+            let (data, _) = try await URLSession.shared.data(for: request)
+            guard words == query, !Task.isCancelled else { return }
             entries = MCPRegistry.parse(data, available: Set(runners.keys)).entries
-            error = nil
         } catch {
-            self.error = error.localizedDescription
+            guard words == query, !Task.isCancelled else { return }
+            self.error = (error as? URLError)?.code == .timedOut
+                ? NSLocalizedString("The registry didn't answer in 30 seconds. Try again in a moment.", comment: "MCP catalog")
+                : error.localizedDescription
         }
+        loading = false
     }
 
     private func installFeatured(_ item: MCPFeatured.Item) {

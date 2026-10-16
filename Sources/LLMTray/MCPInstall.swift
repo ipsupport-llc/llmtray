@@ -116,8 +116,10 @@ final class MCPInstaller: ObservableObject {
         config.enabled = true
         hub.update(config)
         if let error = await hub.startForReview(config.id) {
-            message = String(format: NSLocalizedString("%1$@ was installed but didn't start: %2$@", comment: "MCP install"), found.name, error)
-            hub.setEnabled(config.id, false)
+            // Nothing left behind that doesn't work: taken out again, with why.
+            hub.remove(config.id)
+            message = String(format: NSLocalizedString("%1$@ wasn't installed: %2$@.", comment: "MCP install"), found.name,
+                             error.replacingOccurrences(of: "The server stopped: ", with: ""))
             return
         }
         // Installing it was the review (the user's call): its tools as listed now.
