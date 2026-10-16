@@ -89,11 +89,6 @@ struct ToolsPane: View {
             }
             return true
         }
-        .overlay {
-            if dropTargeted {
-                RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor, lineWidth: 2).padding(6)
-            }
-        }
         .sheet(item: $sheet) { sheet in
             switch sheet {
             case .command: AddServerSheet(kind: .command) { found in self.sheet = nil; install(found, origin: nil, source: nil) }
@@ -112,38 +107,64 @@ struct ToolsPane: View {
     }
 
     private var installed: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                let shown = hub.servers.filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) }
-                if hub.servers.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call.")
-                            .foregroundStyle(.secondary)
-                        Button("Discover Servers") { tab = .discover }
-                    }
-                    .padding(20)
-                } else {
-                    HStack {
-                        Text("Server").frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Runs").frame(width: 90, alignment: .leading)
-                        Text("Status").frame(width: 60, alignment: .leading)
-                        Color.clear.frame(width: 190)
-                    }
-                    .font(.callout).foregroundStyle(.secondary)
-                    .padding(.horizontal, 20).padding(.vertical, 8)
-                    Divider().padding(.horizontal, 12)
-                    ForEach(shown) { server in
-                        ServerRow(server: server, configure: { sheet = .configure(server.id) })
-                        Divider().padding(.horizontal, 12)
-                    }
-                }
-                if MCPHub.commandsAllowed {
-                    Label("Drag .mcpb files here to install", systemImage: "lightbulb")
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    let shown = hub.servers.filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) }
+                    if !hub.servers.isEmpty {
+                        HStack {
+                            Text("Server").frame(maxWidth: .infinity, alignment: .leading)
+                            Text("Runs").frame(width: 90, alignment: .leading)
+                            Text("Status").frame(width: 60, alignment: .leading)
+                            Color.clear.frame(width: 190)
+                        }
                         .font(.callout).foregroundStyle(.secondary)
-                        .padding(20)
+                        .padding(.horizontal, 20).padding(.vertical, 8)
+                        Divider().padding(.horizontal, 12)
+                        ForEach(shown) { server in
+                            ServerRow(server: server, configure: { sheet = .configure(server.id) })
+                            Divider().padding(.horizontal, 12)
+                        }
+                    }
+                    // The rest of the pane: where a bundle is dropped (the
+                    // App Store build installs none: only its empty state).
+                    if MCPHub.commandsAllowed || hub.servers.isEmpty {
+                        dropZone
+                            .frame(maxWidth: .infinity, minHeight: 160, maxHeight: .infinity)
+                            .padding(20)
+                    }
                 }
+                .frame(minHeight: geo.size.height)
             }
         }
+    }
+
+    private var dropZone: some View {
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .strokeBorder(dropTargeted ? Color.accentColor : Color.secondary.opacity(0.35),
+                          style: StrokeStyle(lineWidth: dropTargeted ? 2 : 1.5, dash: [7, 5]))
+            .background(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(dropTargeted ? Color.accentColor.opacity(0.08) : Color.clear))
+            .overlay {
+                VStack(spacing: 10) {
+                    Image(systemName: hub.servers.isEmpty ? "puzzlepiece.extension" : "square.and.arrow.down")
+                        .font(.system(size: 34, weight: .light))
+                        .foregroundStyle(dropTargeted ? Color.accentColor : Color.secondary)
+                    if hub.servers.isEmpty {
+                        Text("Give the chat more tools").font(.title3.weight(.semibold))
+                        Text("Mail, notes, calendars, files and services. The chat asks you before each call.")
+                            .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        Button("Discover Servers") { tab = .discover }.controlSize(.large)
+                    }
+                    if MCPHub.commandsAllowed {
+                        Text("Drop .mcpb files here to install").font(hub.servers.isEmpty ? .callout : .body.weight(.medium))
+                            .foregroundStyle(hub.servers.isEmpty ? .secondary : .primary)
+                        Button("or choose a file…") { pickBundle() }.buttonStyle(.link).font(.callout)
+                    }
+                }
+                .padding(24)
+            }
+            .animation(.easeOut(duration: 0.15), value: dropTargeted)
     }
 
     private func install(_ found: MCPImport.Found, origin: String?, source: MCPSource?) {
@@ -227,7 +248,7 @@ private struct ServerRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            ServerIcon(icon: server.icon, name: server.name)
+            ServerIcon(icon: server.iconPath, name: server.name)
             VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 6) {
                     Text(server.name).font(.body.weight(.medium))
@@ -705,7 +726,7 @@ private struct ConfigureSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             if let server {
                 HStack(spacing: 10) {
-                    ServerIcon(icon: server.icon, name: server.name, size: 44)
+                    ServerIcon(icon: server.iconPath, name: server.name, size: 44)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 6) {
                             Text(server.name).font(.headline)
@@ -872,3 +893,14 @@ private struct ToolReviewRow: View {
     }
 }
 
+
+extension MCPServerConfig {
+    /// Its icon, or a bundle's icon.png when none was recorded (installed
+    /// before icons were kept).
+    @MainActor var iconPath: String? {
+        if let icon { return icon }
+        guard let folder = workingDirectory, folder.hasPrefix(MCPHub.bundlesFolder.path + "/") else { return nil }
+        let file = (folder as NSString).appendingPathComponent("icon.png")
+        return FileManager.default.fileExists(atPath: file) ? file : nil
+    }
+}
