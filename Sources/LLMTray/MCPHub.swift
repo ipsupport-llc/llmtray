@@ -159,6 +159,19 @@ final class MCPHub: ObservableObject {
         update(config)
     }
 
+    /// Several at once: every action of `tools` (or the tool itself, one
+    /// without actions) to run without asking, or to be asked again.
+    func setRunWithoutAsking(_ id: UUID, tools: [MCP.Tool], _ on: Bool) {
+        guard var config = server(id) else { return }
+        for tool in tools where config.reviewed[tool.name] == tool.definitionHash {
+            for action in tool.actionField?.values.map(Optional.some) ?? [nil] {
+                let key = MCPApproval.key(tool: tool.name, action: action)
+                if on { config.runWithoutAsking[key] = tool.definitionHash } else { config.runWithoutAsking.removeValue(forKey: key) }
+            }
+        }
+        update(config)
+    }
+
     // MARK: Tools for the chat
 
     /// The groups the chat sees: one per server switched on with tools
