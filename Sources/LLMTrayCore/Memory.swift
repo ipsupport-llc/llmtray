@@ -336,9 +336,10 @@ public enum MemoryText {
     /// than an instruction ("Stay calm and go straight to the fix").
     public static func readsAsReply(_ text: String) -> Bool {
         let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if t.hasSuffix("?") { return true }
+        // A question -- not an instruction ending in an example one ("ask: …?").
+        if t.hasSuffix("?"), !t.contains(":") { return true }
         let lower = t.lowercased()
-        let starts = ["i ", "i'd ", "i'll ", "i'm ", "i’d ", "i’ll ", "i’m ", "sure", "of course", "happy to", "glad to",
+        let starts = ["i ", "i'd ", "i'll ", "i'm ", "i’d ", "i’ll ", "i’m ", "sure,", "sure ", "of course", "happy to", "glad to",
                       "я ", "конечно", "с удовольствием", "рад ", "буду рад", "охотно", "звичайно", "із задоволенням"]
         return starts.contains { lower.hasPrefix($0) }
     }
