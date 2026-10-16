@@ -137,6 +137,22 @@ through the card (0027): signing in grants nothing to the chat by itself.
    headers; DCR remains the fallback if the site is down).
 4. Live: a public OAuth MCP server (a test one first), then the user's.
 
+## As built (2026-10-16)
+
+- Live discovery: Notion, Linear, Sentry (metadata documents, DCR, `iss`);
+  Atlassian (2025-03-26, no resource metadata: its origin is the issuer);
+  Asana (resource metadata naming its host root: the root of the server's
+  own origin is accepted, nothing else). Slack has no registration: the
+  user's own app (client id and secret, the secret in the Keychain and sent
+  only to the token endpoint, `client_secret_post`), a fixed loopback port
+  (33418) and a per-issuer callback path they register, shown in Configure.
+- MCP requests follow no redirects; OAuth secrets are never sent as
+  headers; a token goes only to a server its resource covers, and a changed
+  server URL drops the sign-in and the user's app credentials with it.
+- Private-network protection checks host names (registration, token,
+  revocation and metadata requests); resolved addresses (DNS rebinding) are
+  not checked yet.
+
 ## Not now
 
 Signing in to a command (stdio) server (they take keys by environment);

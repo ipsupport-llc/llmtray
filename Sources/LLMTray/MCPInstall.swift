@@ -115,7 +115,7 @@ final class MCPInstaller: ObservableObject {
         config.answers = prepared.answers
         config.enabled = true
         hub.update(config)
-        if let error = await hub.startForReview(config.id) {
+        if let error = await startOrSignIn(config.id) {
             // Nothing left behind that doesn't work: taken out again, with why.
             hub.remove(config.id)
             message = String(format: NSLocalizedString("%1$@ wasn't installed: %2$@.", comment: "MCP install"), found.name,
@@ -167,6 +167,44 @@ final class MCPInstaller: ObservableObject {
         hub.update(config)
         await hub.stop(id)
         if config.enabled { _ = try? await hub.connect(id) }
+    }
+
+    /// Starts a server; one that asks to sign in (a web server, adr/0028)
+    /// opens the browser, then starts again. nil, or why it didn't.
+    func startOrSignIn(_ id: UUID) async -> String? {
+        await hub.stop(id)
+        do {
+            _ = try await hub.connect(id, forReview: true)
+            return nil
+        } catch MCPError.unauthorized(let header) {
+            do {
+                try await MCPSignIn.shared.signIn(id, challenge: MCPOAuth.parseChallenge(header))
+            } catch {
+                return error is CancellationError ? NSLocalizedString("the sign-in was cancelled", comment: "MCP") : error.localizedDescription
+            }
+            return await hub.startForReview(id)
+        } catch {
+            return hub.redact(error.localizedDescription, hub.server(id))
+        }
+    }
+
+    /// Sign In, asked for: the browser opens whatever the server answers
+    /// unsigned (some list their tools to anyone), then it starts again.
+    func signInNow(_ id: UUID) async -> String? {
+        await hub.stop(id)
+        var challenge: MCPOAuth.Challenge?
+        do {
+            _ = try await hub.connect(id, forReview: true)
+        } catch MCPError.unauthorized(let header) {
+            challenge = MCPOAuth.parseChallenge(header)
+        } catch {}
+        await hub.stop(id)
+        do {
+            try await MCPSignIn.shared.signIn(id, challenge: challenge)
+        } catch {
+            return error is CancellationError ? NSLocalizedString("the sign-in was cancelled", comment: "MCP") : error.localizedDescription
+        }
+        return await hub.startForReview(id)
     }
 
     // MARK: Updates

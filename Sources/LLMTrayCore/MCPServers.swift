@@ -35,6 +35,10 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     public var answers: [String: String] = [:]
     /// Its icon: an https URL, or a file in its bundle folder.
     public var icon: String?
+    /// A web server's sign-in (adr/0028); nil: none.
+    public var oauth: MCPOAuthState?
+    /// A client id the user pasted, for a server that pre-registers clients.
+    public var oauthClientID: String?
     /// Tool name → the definition hash the user reviewed. A tool missing
     /// here, or with another hash now, is hidden until reviewed again.
     public var reviewed: [String: String] = [:]
@@ -67,7 +71,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
-             origin, description, version, source, answers, icon, reviewed, reviewedReadOnly, runWithoutAsking, tools, modelNames, added
+             origin, description, version, source, answers, icon, oauth, oauthClientID, reviewed, reviewedReadOnly, runWithoutAsking, tools, modelNames, added
     }
 
     /// Fields added later read as their defaults: an older file still loads.
@@ -91,6 +95,8 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
         source = try c.decodeIfPresent(MCPSource.self, forKey: .source)
         answers = try c.decodeIfPresent([String: String].self, forKey: .answers) ?? [:]
         icon = try c.decodeIfPresent(String.self, forKey: .icon)
+        oauth = try c.decodeIfPresent(MCPOAuthState.self, forKey: .oauth)
+        oauthClientID = try c.decodeIfPresent(String.self, forKey: .oauthClientID)
         reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
         reviewedReadOnly = try c.decodeIfPresent([String: Bool].self, forKey: .reviewedReadOnly) ?? [:]
         runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
@@ -515,4 +521,26 @@ extension MCPServerConfig {
     /// Published by IPSupport (adr/0027): by its recorded source only;
     /// everything else is third-party.
     public var isFromIPSupport: Bool { MCPVendor.isIPSupport(source) }
+}
+
+/// A web server's sign-in (adr/0028), the parts that aren't secret: who
+/// signs in, our client id there, what was asked for. Tokens are in the
+/// Keychain.
+public struct MCPOAuthState: Codable, Equatable, Sendable {
+    public var metadata: MCPOAuth.ServerMetadata
+    public var clientID: String
+    public var registration: MCPOAuth.Registration
+    public var resource: String
+    public var scope: String?
+    public var needsSignIn: Bool
+
+    public init(metadata: MCPOAuth.ServerMetadata, clientID: String, registration: MCPOAuth.Registration, resource: String,
+                scope: String?, needsSignIn: Bool) {
+        self.metadata = metadata
+        self.clientID = clientID
+        self.registration = registration
+        self.resource = resource
+        self.scope = scope
+        self.needsSignIn = needsSignIn
+    }
 }
