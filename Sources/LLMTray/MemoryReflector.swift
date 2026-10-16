@@ -255,7 +255,6 @@ final class MemoryReflector: ObservableObject {
     /// A pass's outcome on the queue: true to go on with the next batch,
     /// false when the loop stops for now (it's poked again as needed).
     private func handle(_ outcome: Outcome, of batch: MemoryBatch, model: String) -> Bool {
-        noteReader(model, outcome: outcome)
         let memory = MemoryManager.shared
         // Every queue write checked: one that doesn't reach the disk
         // stops the loop (else the same batch would be read again now).
@@ -263,6 +262,7 @@ final class MemoryReflector: ObservableObject {
         switch outcome {
         case .done:
             notBefore[batch.id] = nil
+            noteReader(model, outcome: outcome, batch: batch.id)
             return true
         case .later(let reason):
             status = .waiting(reason)
@@ -278,6 +278,12 @@ final class MemoryReflector: ObservableObject {
             NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
             var failures = 0
             guard memory.change({ failures = $0.failBatch(batch.id) }) else { waitForStorage(saving); return false }
+            // Its reader set aside: every batch, this one too, tries again
+            // with another model, at once.
+            if noteReader(model, outcome: outcome, batch: batch.id) {
+                notBefore = [:]
+                return true
+            }
             // In the server log, where it can be seen (not the chat's words).
             server?.appendLog("--- memory: a part of a chat couldn't be read (\(reason)); "
                 + (failures >= Self.maxAttempts ? "given up after \(failures) tries ---\n" : "tried again later ---\n"))
@@ -320,8 +326,10 @@ final class MemoryReflector: ObservableObject {
         UserDefaults.standard[Pref.memoryUnfitReaders] = set.sorted().joined(separator: "\n")
     }
 
-    /// Unreadable replies in a row, by model.
-    private var unreadable: [String: Int] = [:]
+    /// Batches whose replies couldn't be read, in a row (no batch read
+    /// since), by model: different batches, so one batch's cut-off reply
+    /// can't set a model aside.
+    private var unreadable: [String: Set<Int>] = [:]
     static let unfitAfter = 3
 
     /// A model whose replies can't be read again and again (a small one
@@ -329,21 +337,26 @@ final class MemoryReflector: ObservableObject {
     /// theirs go to another model, and the batches it failed get their
     /// tries back. Not the user's fixed choice silently: it's said in the
     /// server log and Settings, where it can be undone.
-    private func noteReader(_ model: String, outcome: Outcome) {
-        guard model != AppleSystemModel.id else { return }
+    /// True when the model was set aside now.
+    @discardableResult
+    private func noteReader(_ model: String, outcome: Outcome, batch: Int) -> Bool {
+        guard model != AppleSystemModel.id else { return false }
         switch outcome {
-        case .done:
-            unreadable[model] = 0
         case .failed(let reason) where reason.hasPrefix("unreadable"):
-            unreadable[model, default: 0] += 1
-            guard unreadable[model]! >= Self.unfitAfter else { return }
-            unreadable[model] = 0
+            unreadable[model, default: []].insert(batch)
+            guard unreadable[model]!.count >= Self.unfitAfter else { return false }
+            unreadable[model] = nil
             Self.setUnfit(model, true)
             MemoryManager.shared.change { $0.resetFailures() }
             server?.appendLog("--- memory: \(Self.displayName(model)) can't read chats for memory (its replies couldn't be read); "
                 + "another model reads them (Settings › Memory) ---\n")
+            return true
+        case .done, .failed:
+            // A batch read, or one that failed otherwise: not in a row.
+            unreadable[model] = nil
+            return false
         default:
-            break
+            return false
         }
     }
 
