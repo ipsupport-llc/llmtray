@@ -816,7 +816,7 @@
 "Notes in" = "Notes in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
 "Nothing" = "Nothing";
-"Nothing found for “%lld”." = "Nothing found for “%lld”.";
+"Nothing found for “%@”." = "Nothing found for “%@”.";
 "Nothing left to read: every chat was read from its start." = "Nothing left to read: every chat was read from its start.";
 "Nothing logged yet." = "Nothing logged yet.";
 "Nothing new to import" = "Nothing new to import";

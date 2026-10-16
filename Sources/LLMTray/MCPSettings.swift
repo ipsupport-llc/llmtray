@@ -351,7 +351,7 @@ private struct DiscoverView: View {
                     }
                 }
                 if !loading, error == nil, entries.isEmpty, !query.isEmpty {
-                    Text("Nothing found for “\(query)”.").foregroundStyle(.secondary)
+                    Text(String(format: NSLocalizedString("Nothing found for “%@”.", comment: "MCP catalog: search words"), query)).foregroundStyle(.secondary)
                 }
                 Text("The registry checks who published a name, not what the code does. The chat asks you before each call.")
                     .font(.caption).foregroundStyle(.secondary)
