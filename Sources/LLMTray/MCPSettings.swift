@@ -98,7 +98,7 @@ struct ToolsPane: View {
                 found.forEach { install($0, origin: NSLocalizedString("Pasted config", comment: "MCP server origin"), source: nil) }
             }
             case .asks(let found, let origin, let source):
-                AsksSheet(found: found) { values in
+                AsksSheet(found: found, approved: MCPVendor.isIPSupport(source)) { values in
                     Task { await installer.finish(found, values: values, origin: origin, source: source) }
                 }
             case .configure(let id): ConfigureSheet(serverID: id)
@@ -338,6 +338,7 @@ private struct DiscoverView: View {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(featured, id: \.bundleURL) { item in
                             Card(icon: item.iconURL, title: item.title, description: item.description, publisher: item.publisher,
+                                 approved: MCPVendor.isIPSupport(MCPSource.githubRelease(url: item.bundleURL)),
                                  state: state(source: MCPSource.githubRelease(url: item.bundleURL), name: item.title),
                                  install: { installFeatured(item) })
                         }
@@ -353,12 +354,12 @@ private struct DiscoverView: View {
                 if !loading, error == nil, entries.isEmpty, !query.isEmpty {
                     Text(String(format: NSLocalizedString("Nothing found for “%@”.", comment: "MCP catalog: search words"), query)).foregroundStyle(.secondary)
                 }
-                Text("The registry checks who published a name, not what the code does. The chat asks you before each call.")
-                    .font(.caption).foregroundStyle(.secondary)
+                ThirdPartyNote(text: NSLocalizedString("Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call.", comment: "MCP: no-warranty note"))
                 if let error { Text(error).foregroundStyle(.orange).font(.callout) }
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(entries) { entry in
                         Card(icon: entry.iconURL, title: entry.title, description: entry.description, publisher: entry.publisher,
+                             approved: MCPVendor.isIPSupport(registryName: entry.name),
                              state: entryState(entry), install: { install(entry) })
                     }
                 }
@@ -460,6 +461,7 @@ private struct DiscoverView: View {
         let title: String
         let description: String
         let publisher: String
+        let approved: Bool
         let state: CardState
         let install: () -> Void
 
@@ -474,7 +476,11 @@ private struct DiscoverView: View {
                             Label("Installed", systemImage: "checkmark").font(.caption).foregroundStyle(.green)
                             Text("·").foregroundStyle(.secondary)
                         }
-                        Text("by \(publisher)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        if approved {
+                            Label("by IPSupport", systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(Color.accentColor).lineLimit(1)
+                        } else {
+                            Text("by \(publisher) · third-party").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        }
                     }
                     if case .needs(let what) = state {
                         Text(String(format: NSLocalizedString("Needs %@", comment: "MCP catalog"), what)).font(.caption).foregroundStyle(.orange)
@@ -679,6 +685,7 @@ private struct AskField: View {
 /// settings, then Install.
 private struct AsksSheet: View {
     let found: MCPImport.Found
+    var approved = false
     let install: ([String: String]) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var values: [String: String] = [:]
@@ -692,6 +699,9 @@ private struct AsksSheet: View {
                     Text(found.name).font(.headline)
                     if let description = found.description { Text(description).font(.callout).foregroundStyle(.secondary).lineLimit(3) }
                 }
+            }
+            if !approved {
+                ThirdPartyNote(text: NSLocalizedString("Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk.", comment: "MCP: no-warranty note"))
             }
             Form {
                 ForEach(found.asks, id: \.key) { ask in
@@ -751,11 +761,17 @@ private struct ConfigureSheet: View {
                             if let v = server.version { Text(v).font(.caption).foregroundStyle(.secondary) }
                         }
                         if let d = server.description { Text(d).font(.callout).foregroundStyle(.secondary).lineLimit(3) }
+                        if server.isFromIPSupport {
+                            Label("by IPSupport", systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(Color.accentColor)
+                        }
                     }
                     Spacer()
                     Toggle("On", isOn: Binding(get: { server.enabled }, set: { hub.setEnabled(serverID, $0) }))
                         .toggleStyle(.switch)
                         .disabled(server.visibleTools.isEmpty || !MCPHub.runsHere(server))
+                }
+                if !server.isFromIPSupport {
+                    ThirdPartyNote(text: NSLocalizedString("Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk.", comment: "MCP: no-warranty note"))
                 }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
@@ -943,5 +959,17 @@ extension MCPServerConfig {
         guard let folder = workingDirectory, folder.hasPrefix(MCPHub.bundlesFolder.path + "/") else { return nil }
         let file = (folder as NSString).appendingPathComponent("icon.png")
         return FileManager.default.fileExists(atPath: file) ? file : nil
+    }
+}
+
+/// The no-warranty line for servers not published by IPSupport.
+private struct ThirdPartyNote: View {
+    let text: String
+
+    var body: some View {
+        Label(text, systemImage: "exclamationmark.shield")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }

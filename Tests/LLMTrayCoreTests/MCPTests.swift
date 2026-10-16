@@ -119,6 +119,23 @@ final class MCPTests: XCTestCase {
         XCTAssertFalse(MCPSource.isNewer("1.2.0-beta.2", than: "1.2.0"))
     }
 
+    func testIPSupportOnlyByVerifiedIdentity() {
+        XCTAssertTrue(MCPVendor.isIPSupport(gitHubURL: "https://github.com/ipsupport-llc/apple-mail-mcp"))
+        XCTAssertFalse(MCPVendor.isIPSupport(gitHubURL: "https://github.com/ipsupport-llc-evil/x"))
+        XCTAssertFalse(MCPVendor.isIPSupport(gitHubURL: "https://evil.example/github.com/ipsupport-llc/x"))
+        XCTAssertFalse(MCPVendor.isIPSupport(gitHubURL: "https://fakegithub.com/ipsupport-llc/x"))
+        XCTAssertFalse(MCPVendor.isIPSupport(gitHubURL: "see github.com/ipsupport-llc/ for details"))
+        XCTAssertTrue(MCPVendor.isIPSupport(registryName: "io.github.ipsupport-llc/apple-mail"))
+        XCTAssertFalse(MCPVendor.isIPSupport(registryName: "io.github.someone/ipsupport-llc"))
+        var config = MCPServerConfig(name: "x", key: "x", kind: .command)
+        config.origin = "https://github.com/ipsupport-llc/apple-mail-mcp"   // free text: not proof
+        XCTAssertFalse(config.isFromIPSupport)
+        config.source = .githubRelease(owner: "ipsupport-llc", repo: "apple-mail-mcp", asset: "a.mcpb")
+        XCTAssertTrue(config.isFromIPSupport)
+        config.source = .registry(name: "io.github.evil/x")
+        XCTAssertFalse(config.isFromIPSupport)
+    }
+
     func testSecretLookingNames() {
         XCTAssertTrue(MCPServerConfig.looksSecret("GITHUB_TOKEN"))
         XCTAssertTrue(MCPServerConfig.looksSecret("Authorization"))
