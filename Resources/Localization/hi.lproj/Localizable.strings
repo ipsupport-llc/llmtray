@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · चल रहा है";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "“%@” इस उत्तर के संदर्भित होने के बाद से बदल गया है: पृष्ठ %lld अब अलग तरह से दिख सकता है।";
 "\"%@\" is no longer in the project." = "“%@” अब प्रोजेक्ट में नहीं है।";
 "%.0f%% from drafts" = "%.0f%% ड्राफ़्ट से";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@ और %2$lld और";
 "%1$@ asks for %2$@" = "%1$@ ने %2$@ मांगा है";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ ने %2$@ मांगा है। स्विच करने से अभी लोड किया गया मॉडल अनलोड हो जाएगा।";
+"%1$@ couldn't be updated: %2$@" = "%1$@ अपडेट नहीं हो सका: %2$@";
 "%1$@ items, %2$@" = "%1$@ आइटम, %2$@";
+"%1$@ was installed but didn't start: %2$@" = "%1$@ इंस्टॉल हो गया, लेकिन शुरू नहीं हुआ: %2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@: कमांड %2$@ नहीं मिला.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld कॉपीज़ की मूल फ़ाइलों से तुलना नहीं हो सकी, इसलिए वे अनचेक्ड कर दी गईं: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld कॉपीज़ उनकी मूल फ़ाइलों से भिन्न हैं, इसलिए वे डुप्लिकेट नहीं हैं: %2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "%lld अनुरोध";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld अनुरोध प्रगति में (एक साथ उत्तर दिए जाते हैं, अधिकतम «समवर्ती अनुरोध» के मान तक)";
 "%lld s" = "%lld स";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld टूल नए हैं या बदले गए हैं: समीक्षा होने तक चैट से छिपे रहेंगे।";
-"%lld tools%@" = "%lld टूल%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld टूल सर्वर पर नए या बदले गए हैं: आपके स्वीकार करने तक चैट में छिपे रहेंगे।";
+"%lld tools changed on the server: Configure to accept them." = "%lld टूल सर्वर पर बदले गए हैं: उन्हें स्वीकार करने के लिए कॉन्फ़िगर करें।";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-बिट";
 "(Please attach the report file shown in Finder.)" = "(कृपया Finder में दिख रही रिपोर्ट फ़ाइल संलग्न करें।)";
@@ -112,13 +113,12 @@
 "About LLMTray" = "LLMTray के बारे में";
 "About you" = "आपके बारे में";
 "About you and your work: what you do, what you use." = "आपके और आपके काम के बारे में: आप क्या करते हैं, क्या इस्तेमाल करते हैं।";
+"Accept" = "स्वीकार करें";
 "Add" = "जोड़ें";
-"Add %@" = "%@ जोड़ें";
 "Add Files to “%@”…" = "“%@” में फ़ाइलें जोड़ें…";
 "Add Files…" = "फाइलें जोड़ें…";
 "Add Note…" = "नोट जोड़ें…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "एक परियोजना में PDF, Word और टेक्स्ट फ़ाइलें जोड़ें। इसकी चैट्स उन्हें खोजती हैं और पृष्ठ का हवाला देती हैं; किसी फ़ाइल को पिन करें ताकि उसकी पूरी सामग्री बातचीत में बनी रहे।";
-"Add Server" = "सर्वर जोड़ें";
 "Add a Command Server" = "एक कमांड सर्वर जोड़ें";
 "Add a Command…" = "एक कमांड जोड़ें…";
 "Add a URL Server" = "एक URL सर्वर जोड़ें";
@@ -191,7 +191,6 @@
 "Apps & agents" = "ऐप्स और एजेंट";
 "Apps and agents" = "ऐप्स और एजेंट";
 "Arguments, one per line" = "आर्ग्युमेंट, हर पंक्ति में एक";
-"Arguments…" = "आर्ग्युमेंट…";
 "Ask Later" = "बाद में पूछें";
 "Ask about LLMTray" = "LLMTray के बारे में पूछें";
 "Ask again in two weeks" = "दो हफ्ते बाद फिर पूछें";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "सुझावित से बड़ा: उत्तर बेहतर, पर धीमा, और अन्य ऐप्स के लिए कम मेमोरी बचती है।";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us से आए संस्करण के चैट, प्रोजेक्ट, प्रोफ़ाइल, छवि, संगीत, वॉइस और एम्बेडिंग मॉडल तथा सेटिंग्स लाता है (पहले उसे बंद करें)। यहाँ के चैट और मॉडल बने रहते हैं; उसकी सेटिंग्स इन्हें बदल देंगी। मॉडल अतिरिक्त डिस्क स्थान नहीं लेते। चैट मॉडल आपके models फ़ोल्डर में रहते हैं: Settings › Models में चुनें।";
 "Browse Hugging Face…" = "Hugging Face ब्राउज़ करें…";
-"Browse the Catalog…" = "कैटलॉग ब्राउज़ करें…";
 "Built into macOS · LLMTray's chat only" = "macOS में शामिल · केवल LLMTray की चैट";
 "Cached" = "कैश्ड";
 "Calculator" = "कैलकुलेटर";
@@ -301,7 +299,6 @@
 "Coffee" = "कॉफ़ी";
 "Comes with %@" = "%@ के साथ आता है";
 "Command" = "कमांड";
-"Command servers don't run in this version of LLMTray." = "LLMTray के इस संस्करण में कमांड सर्वर नहीं चलते।";
 "Command-line tool" = "कमांड‑लाइन टूल";
 "Compact" = "कॉम्पैक्ट";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "संकुचन लंबी चैट के बीच के हिस्से को मॉडल द्वारा लिखे गए एक सारांश से बदल देता है। शुरुआत के इतने संदेश शब्दशः रखे जाते हैं।";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "चैट में इतने से अधिक संदेश होने पर उसे अपने आप संकुचित करता है। चैट में “संकुचित करें” बटन फिर भी काम करता है।";
 "Composing…" = "रचना हो रही है…";
 "Concurrent requests" = "समवर्ती अनुरोध";
-"Connects to" = "इससे कनेक्ट होता है";
+"Configure" = "कॉन्फ़िगर करें";
+"Connect Again" = "फिर कनेक्ट करें";
+"Connecting…" = "कनेक्ट हो रहा है…";
 "Context" = "प्रसंग";
 "Continue" = "जारी रखें";
 "Copied" = "कॉपी किया गया";
@@ -362,6 +361,8 @@
 "Deny" = "अस्वीकार करें";
 "Describe a picture, drawn on this Mac" = "इस Mac पर बनाई गई तस्वीर का वर्णन करें";
 "Diagnostics" = "डायग्नॉस्टिक्स";
+"Discover" = "खोजें";
+"Discover Servers" = "सर्वर खोजें";
 "Disk usage" = "डिस्क उपयोग";
 "Dismiss" = "बंद करें";
 "Document: %@" = "दस्तावेज़: %@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "दस्तावेज़ इस चैट के साथ प्रोजेक्ट में जाते हैं; छवियाँ आपके संदेश में जाती हैं।";
 "Documents tools" = "दस्तावेज़ उपकरण";
 "Doesn't open at login" = "लॉगिन पर नहीं खुलता";
+"Doesn't run in this version of LLMTray." = "LLMTray के इस संस्करण में नहीं चलता।";
 "Don't Add" = "जोड़ें न";
 "Don't Ask Again" = "फिर न पूछें";
 "Don't Remember This Chat…" = "यह चैट याद न रखें…";
@@ -399,6 +401,7 @@
 "Downloading…" = "डाउनलोड हो रहा है…";
 "Downloads" = "Downloads";
 "Downloads waiting: %lld" = "प्रतीक्षारत डाउनलोड: %lld";
+"Drag .mcpb files here to install" = "इंस्टॉल करने के लिए .mcpb फ़ाइलें यहाँ खींचें";
 "Drag chats here, or use a chat's menu" = "यहाँ चैट्स खींचें, या किसी चैट के मेनू का उपयोग करें";
 "Drag chats or files here, or use a chat's menu" = "यहाँ चैट्स या फाइलें खींचें, या किसी चैट के मेनू का उपयोग करें";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "दस्तावेज़ इस चैट पर खींचें: वे प्रोजेक्ट में जुड़ते हैं और मॉडल उनसे उत्तर देता है।";
@@ -494,7 +497,7 @@
 "Free disk space" = "खाली डिस्क स्पेस";
 "Free on disk: %@ · your models: %@" = "डिस्क पर खाली: %@ · आपके मॉडल: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "इतने समय तक कोई अनुरोध न आने पर लोड किए गए मॉडल द्वारा रखी गई मेमोरी खाली करता है। अगले अनुरोध पर यह अपने आप फिर लोड होता है, सामान्य लोडिंग विलंब के साथ।";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "आधिकारिक MCP Registry से। Registry यह जाँचती है कि नाम किसने प्रकाशित किया, यह नहीं कि कोड क्या करता है: किसी सर्वर को चालू करने से पहले उसकी समीक्षा करें।";
+"From the MCP Registry" = "MCP Registry से";
 "Full" = "पूर्ण";
 "Full duplex" = "पूर्ण डुप्लेक्स";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "पूर्ण डुप्लेक्स: कभी भी बोलें, मॉडल बोलते हुए आपको सुनता है — इसके लिए रीयल-टाइम चलाने में सक्षम Mac चाहिए। वॉकी-टॉकी: बोलें, Done दबाएँ, फिर सुनें। Automatic Voice Lab शुरू होने पर इस Mac की मापी गई गति से चुनता है।";
@@ -529,7 +532,6 @@
 "Help" = "मदद";
 "Help improve LLMTray?" = "LLMTray में सुधार करने में मदद करें?";
 "Hide" = "छिपाएँ";
-"Hide Log" = "लॉग छिपाएँ";
 "Hide chats" = "चैट छुपाएँ";
 "Hide the reasoning" = "तर्क छिपाएँ";
 "Hide these steps for good" = "इन चरणों को हमेशा के लिए छिपाएँ";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "इसकी सेटिंग्स भी आ गईं; Hugging Face token को सेटिंग्स › मॉडल में फिर से दर्ज करना होगा।";
 "Its settings were the same as these already." = "इसके सेटिंग्स पहले से यहीं जैसी थीं।";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "इसके सेटिंग्स आयात नहीं हुए: ~/Library/Preferences में %@ नहीं है।";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "इसकी सेटिंग्स, secrets और (बंडल के लिए) इसकी फ़ाइलें हट जाएँगी। चैट अपने पिछले कॉल का रिकॉर्ड रखती हैं।";
 "KV cache" = "KV कैश";
 "KV group size" = "KV समूह आकार";
 "Keep" = "रखें";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "पहले %lld संदेश रखें";
 "Keep last messages: %lld" = "आखिरी %lld संदेश रखें";
 "Keep the loaded model" = "लोड किया गया मॉडल रखें";
-"Keeps crashing: off until started again (see its log)." = "बार-बार क्रैश हो रहा है: फिर से शुरू करने तक बंद रहेगा (इसका लॉग देखें)।";
+"Keeps crashing -- see its log." = "बार-बार क्रैश हो रहा है -- इसका लॉग देखें।";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "क्वांटाइज़ करने से पहले संदर्भ के पहले N टोकन को पूरी precision पर रखता है। ज़्यादा मान लंबे प्रॉम्प्ट पर सटीकता बढ़ाता है, लेकिन मेमोरी बचत कम करता है।";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "यह पोर्ट बरकरार रखता है। अगर किसी अन्य ऐप ने वास्तव में यह पोर्ट ले रखा है तो सर्वर तब तक शुरू नहीं होगा जब तक आप Settings में पोर्ट बदल नहीं लेते।";
 "Kept free: %lld MB" = "खाली रखा गया: %lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "सीखने के लिए एम्बेडिंग मॉडल चाहिए (सेटिंग्स › मेमोरी)।";
 "Leave a Review" = "समीक्षा छोड़ें";
 "Length" = "लंबाई";
-"Less" = "कम";
 "Let chats make documents" = "चैट को दस्तावेज़ बनाने दें";
 "Let chats work in folders" = "चैट को फ़ोल्डरों में काम करने दें";
 "Let coding agents and scripts use your models." = "कोडिंग एजेंट और स्क्रिप्ट्स को आपके मॉडल उपयोग करने दें।";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "सुझावित से हल्का: तेज़ और अन्य ऐप्स के लिए मेमोरी छोड़ता है, पर इसके उत्तर सरल होते हैं।";
 "Like LLMTray?" = "LLMTray पसंद है?";
 "Likes" = "लाइक्स";
-"List Again" = "फिर सूचीबद्ध करें";
 "List my name" = "मेरा नाम सूचीबद्ध करें";
 "List my name in Supporters" = "मेरे नाम को Supporters में सूचीबद्ध करें";
 "Listening…" = "सुन रहा है…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "लंबी बातचीत और पिन की गई फ़ाइलें हर बार फिर से पढ़ी जाने के बजाय कैश से आती हैं।";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "लंबी बातचीत विंडो में आसान होती है: प्रोजेक्ट, फ़ाइलें और हर चैट साइडबार में।";
-"MCP Servers" = "MCP सर्वर";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: %@ को तेज़ करता है, उत्तर वही";
 "Made for programming and agents: coding tools and the OpenAI API." = "प्रोग्रामिंग और एजेंट्स के लिए बनाया गया: कोडिंग टूल और OpenAI API।";
 "Maintenance" = "रखरखाव";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "अभी कोई नोट नहीं है। वह जोड़ें जो हर चैट को पता होना चाहिए: “रूसी में संक्षिप्त उत्तर दें”, “मैं ESP32 स्पीकर बनाता हूँ”。";
 "No requests yet." = "अभी कोई अनुरोध नहीं।";
 "No runs yet." = "अभी तक कोई रन नहीं।";
-"No servers yet." = "अभी कोई सर्वर नहीं है।";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "कोई सब्सक्रिप्शन नहीं। कोई फीचर लॉक नहीं। अगर LLMTray आपके लिए उपयोगी है तो विकास का समर्थन करें।";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "इस Mac की मेमोरी के लिए कोई सुझाव नहीं। मॉडल के लिए Hugging Face ब्राउज़ करें।";
 "No thanks" = "नहीं, धन्यवाद";
@@ -792,13 +789,13 @@
 "No update check at launch" = "लॉन्च पर अपडेट जांच नहीं";
 "No usage statistics" = "कोई उपयोग आँकड़े नहीं";
 "Non-commercial license: read it on the model card before using the model." = "गैर‑व्यावसायिक लाइसेंस: मॉडल का उपयोग करने से पहले मॉडल कार्ड पर पढ़ें।";
+"None" = "कोई नहीं";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "अभी तक कुछ नहीं। एक चैट या एक अनुरोध के लिए दिए गए अनुमति यहाँ सूचीबद्ध नहीं होते: वे उसी के साथ समाप्त हो जाती हैं।";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "डिस्क स्पेस पर्याप्त नहीं: वॉइस मॉडल को %1$@ चाहिए, %2$@ खाली है।";
 "Not enough free disk space for this model." = "इस मॉडल के लिए डिस्क पर पर्याप्त खाली जगह नहीं है।";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "डिस्क में पर्याप्त खाली स्थान नहीं: %@ को लगभग %@ चाहिए, %@ खाली है।";
 "Not identical to %@: not a duplicate." = "%@ के समान नहीं: डुप्लिकेट नहीं।";
 "Not indexed" = "अनुक्रमित नहीं";
-"Not reviewed yet: review it to see its tools." = "अभी समीक्षा नहीं हुई है: इसके टूल देखने के लिए इसकी समीक्षा करें।";
 "Not sent any more. Bring one back, or it's deleted later." = "अब नहीं भेजा जाता। किसी एक को वापस लाएँ, नहीं तो वह बाद में हटा दिया जाएगा।";
 "Not sent yet: waits for another chat to show it, or your approval." = "अभी भेजा नहीं गया: किसी दूसरी चैट में दिखने, या आपकी मंज़ूरी की प्रतीक्षा करता है।";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "अभी समर्थित नहीं: %@। यह संस्करण text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML और स्प्रेडशीट (xlsx, ods) को इंडेक्स करता है, और चित्र (png, jpg, heic, webp, tiff, gif) रखता है।";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "पढ़ने के लिए कुछ बाकी नहीं: हर चैट शुरुआत से पढ़ी जा चुकी है।";
 "Nothing logged yet." = "अभी तक कुछ भी लॉग नहीं हुआ है।";
 "Nothing new to import" = "इम्पोर्ट करने के लिए कुछ नया नहीं है";
-"Nothing runs yet: next you start it once and review its tools." = "अभी तक कुछ भी नहीं चलता: अगला कदम है इसे एक बार शुरू करना और इसके टूल की समीक्षा करना।";
 "Nothing sent yet." = "अभी कुछ भी नहीं भेजा गया।";
 "Nothing to change." = "बदलने के लिए कुछ नहीं।";
 "Nothing to pin until the file has been read" = "फ़ाइल पढ़े बिना पिन करने के लिए कुछ भी नहीं";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "बंद होने पर, केवल यह Mac सर्वर तक पहुँच सकता है। चालू होने पर, आपके नेटवर्क पर मौजूद अन्य डिवाइस भी पहुँच सकते हैं — नेटवर्क पर कोई भी; इसलिए केवल भरोसेमंद नेटवर्क पर ही चालू करें।";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "बंद: केवल यही Mac। चालू: आपके नेटवर्क का कोई भी, इसलिए केवल उन नेटवर्क्स पर चालू करें जिन पर आप भरोसा करते हैं।";
 "Older" = "पुराना";
+"On" = "चालू";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "एक बार: कॉफ़ी $5, प्रो समर्थक $25, फाउंडिंग समर्थक $150।";
 "Only From Now On" = "केवल अब से";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "केवल सीमित मॉडल के लिए (Llama, कुछ Gemma और FLUX रिपोज): इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें, फिर यहाँ read token चिपकाएँ। Keychain में सुरक्षित रखा जाएगा, केवल huggingface.co को भेजा जाता है।";
@@ -954,7 +951,6 @@
 "Ready." = "तैयार।";
 "Ready. This is the Full build: the runtime is included." = "तैयार। यह Full बिल्ड है: runtime शामिल है।";
 "Reasoning" = "तर्क";
-"Recent" = "हाल के";
 "Recent changes" = "हाल के परिवर्तन";
 "Recently updated" = "हाल ही में अपडेट हुआ";
 "Recommended" = "अनुशंसित";
@@ -981,7 +977,6 @@
 "Remove recording" = "रिकॉर्डिंग हटाएं";
 "Remove this file from the project?" = "क्या इस फाइल को प्रोजेक्ट से हटाया जाए?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम और इमेज जनरेशन (इसका रनटाइम और इमेज मॉडल) %@ से हटाता है। अगली बार सर्वर शुरू होने पर या जब इमेज जनरेशन चालू किया जाएगा, तब इन्हें पुनः सेट किया जाएगा। सेव किए गए चैट और प्रोफ़ाइल बरकरार रखे जाएंगे।";
-"Remove…" = "हटाएं…";
 "Rename" = "नाम बदलें";
 "Rename %1$@ to %2$@" = "%1$@ का नाम बदलकर %2$@ करें";
 "Rename Profile" = "प्रोफ़ाइल का नाम बदलें";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "नई सेटिंग्स के साथ मॉडल प्रक्रिया रीस्टार्ट करता है (रीलोड होने में कुछ सेकंड लगेंगे)।";
 "Restore" = "बहाल करें";
 "Restore Purchases" = "खरीदारी पुनर्स्थापित करें";
-"Results" = "परिणाम";
 "Resume" = "वापस चालू करें";
 "Resume Download" = "डाउनलोड पुनरारंभ करें";
 "Resume Indexing" = "इंडेक्सिंग फिर से शुरू करें";
 "Resume download" = "डाउनलोड फिर से शुरू करें।";
 "Retry" = "फिर कोशिश करें";
 "Review" = "समीक्षा";
-"Review…" = "समीक्षा…";
 "Revoke" = "रद्द करें";
 "Revoke %@" = "%@ रद्द करें";
 "Right after each answer" = "हर जवाब के तुरंत बाद";
 "Room in each chat: %lld tokens" = "हर चैट में जगह: %lld टोकन";
 "Run benchmark" = "बेंचमार्क चलाएँ";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU मेमोरी सीमा बढ़ाने के लिए इसे Terminal में चलाएँ; Mac रीस्टार्ट होने पर यह रीसेट हो जाता है।";
-"Run without asking" = "बिना पूछे चलाएँ";
-"Run without asking:" = "बिना पूछे चलाएँ:";
 "Running" = "चल रहा है";
 "Running — %@ on :%lld" = "चल रहा है — %@ :%lld पर";
 "Running…" = "चल रहा है…";
-"Runs this command" = "यह कमांड चलाता है";
+"Runs" = "चलता है";
 "Runtime data" = "रनटाइम डेटा";
 "Same as LLMTray" = "LLMTray जैसा";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "केवल उन सबसे संभावित टोकन से सैंपल करता है जिनकी संभावनाओं का योग इस मान तक होता है। 1.0 इसे बंद करता है।";
@@ -1060,7 +1051,7 @@
 "Server Log" = "सर्वर लॉग";
 "Server log" = "सर्वर लॉग";
 "Server settings changed -- restart to apply them." = "सर्वर सेटिंग्स बदल गई हैं — इन्हें लागू करने के लिए रीस्टार्ट करें।";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "ऐसे सर्वर जो चैट को और टूल देते हैं: mail, notes, calendars, files, services। हर एक केवल आपकी समीक्षा के बाद चलता है, + मेनू से चैट में लोड होता है (या जब मॉडल पूछता है), और हर कॉल से पहले आपसे पूछता है, जब तक आप किसी टूल को बिना पूछे चलाने की अनुमति न दें।";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "सर्वर चैट को और टूल देते हैं: मेल, नोट्स, कैलेंडर, फ़ाइलें, सेवाएँ। हर कॉल से पहले चैट आपसे पूछती है।";
 "Set Up LLMTray" = "LLMTray सेट अप करें";
 "Set Up LLMTray…" = "LLMTray सेट अप करें…";
 "Setting up image generation (first time only)…" = "Image generation की सेटअप कर रहा है (केवल पहली बार)…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "चैट विंडो दिखाएँ";
 "Show Files" = "फाइलें दिखाएँ";
 "Show Less" = "कम दिखाएँ";
+"Show Log…" = "लॉग दिखाएँ…";
 "Show Next Tab" = "अगला टैब दिखाएँ";
 "Show Previous Tab" = "पिछला टैब दिखाएँ";
 "Show Reports…" = "रिपोर्ट दिखाएँ…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "रुकावट टाइमआउट: %lld सेकंड";
 "Start" = "आरंभ";
-"Start Again" = "फिर आरंभ करें";
 "Start LLMTray automatically when you log in to this Mac." = "इस Mac में लॉग इन करते समय LLMTray अपने-आप शुरू करें।";
 "Start Server" = "सर्वर शुरू करें";
 "Start a new saved chat (⌘N) to add files to a project." = "प्रोजेक्ट में फ़ाइलें जोड़ने के लिए नया सहेजा गया चैट शुरू करें (⌘N)।";
-"Start and Review" = "आरंभ करें और समीक्षा करें";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "यह क्या देता है, यह देखने के लिए इसे एक बार शुरू करें। इसे शुरू करने से कुछ भी अनुमत नहीं होता; जब तक आप इसे चालू नहीं करते, चैट इसका उपयोग नहीं कर सकती।";
 "Start server" = "सर्वर शुरू करें।";
 "Start talking" = "बोलना शुरू करें";
 "Start the server first." = "पहले सर्वर शुरू करें।";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "शुरू होगा %.0f s में…";
 "Starting…" = "शुरू हो रहा है…";
 "Startup" = "स्टार्टअप";
+"Status" = "स्थिति";
 "Staying up to date" = "अप‑टू‑डेट रहना";
 "Stays in its project" = "अपने प्रोजेक्ट में रहता है";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "अपने प्रोजेक्ट में रहता है: प्रोजेक्ट की चैट वही देखती हैं जो उस प्रोजेक्ट में सीखा गया था, और प्रोजेक्ट के बाहर की चैट वही देखती हैं जो उनके बाहर सीखा गया था। सभी चैट द्वारा शेयर किया गया: हर चैट कहीं भी सीखी गई हर चीज़ देखती है (प्रोजेक्ट के नोट्स केवल तब, जब “प्रोजेक्ट में याद रखें” चालू हो)। आप जो खुद लिखते हैं (“आपके बारे में”, सभी चैट के लिए नोट्स), वह दोनों ही स्थितियों में हर जगह दिखता है।";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "ऐप की भाषा (सिर्फ भाषा, क्षेत्र नहीं)।";
 "The app's name." = "ऐप का नाम।";
 "The base profile: every other profile inherits from it." = "मूल प्रोफ़ाइल: बाकी सभी प्रोफ़ाइल इससे इनहेरिट करती हैं।";
-"The bundle couldn't be downloaded." = "बंडल डाउनलोड नहीं किया जा सका।";
-"The bundle's address isn't https." = "बंडल का पता https नहीं है।";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "चैट %1$@ (%2$@) को प्रोजेक्ट में कॉपी करने का अनुरोध कर रहा है। इसके बाद प्रोजेक्ट की हर चैट इसमें खोज कर सकती है।";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "चैट %1$@ (%2$@) को प्रोजेक्ट में कॉपी करने का अनुरोध करता है। इसके बाद प्रोजेक्ट की हर चैट इसे दस्तावेज़ों में इस्तेमाल कर सकती है।";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "चैट मॉडल जो लिखा है उसे PDF के रूप में व्यवस्थित कर सकता है — एक रिपोर्ट, पत्र, नोट्स, या चालान — तालिकाओं और चार्ट के साथ। PDF तब तक चैट में रहता है जब तक आप उसे खोलते, सहेजते या प्रोजेक्ट में जोड़ते नहीं। इसके लिए कुछ डाउनलोड नहीं होता; यह सुविधा अस्थायी चैट में उपलब्ध नहीं है।";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "प्रोजेक्ट में जोड़ी गई फाइलों की कॉपी और उनके इंडेक्स साथ होते हैं। किसी प्रोजेक्ट की अपनी कॉपियाँ उसकी Files विंडो में दिखाई जाती हैं; प्रोजेक्ट हटाने पर वे भी हट जाते हैं।";
 "The day the counts are for." = "जिस दिन के लिए काउंट हैं।";
 "The download didn't start." = "डाउनलोड शुरू नहीं हुआ।";
-"The download doesn't match what the registry lists for it." = "डाउनलोड, Registry में इसके लिए दी गई जानकारी से मेल नहीं खाता।";
 "The download failed: %@" = "डाउनलोड विफल रहा: %@";
 "The download stopped." = "डाउनलोड रुक गया।";
 "The downloaded embedder files don't match their checksums: %@" = "डाउनलोड किए गए embedder फ़ाइलों की checksums मेल नहीं खाती हैं: %@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "जब से आपने योजना देखी है यह बदल गई है: इसे फिर से देखें।";
 "The port and network access can change only while the server is stopped." = "पोर्ट और नेटवर्क एक्सेस केवल सर्वर बंद होने पर ही बदल सकते हैं।";
 "The project's files, and Add Files…" = "प्रोजेक्ट की फ़ाइलें, और “फाइलें जोड़ें…”";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registry यह जाँचता है कि कोई नाम किसने प्रकाशित किया, यह नहीं कि कोड क्या करता है। हर कॉल से पहले चैट आपसे पूछती है।";
 "The reply was cut at its length limit." = "उत्तर उसकी लंबाई सीमा पर काट दिया गया था।";
 "The report" = "रिपोर्ट";
 "The reports" = "रिपोर्टें";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "सर्वर इस मॉडल का उपयोग कर रहा है या किसी अनुरोध में व्यस्त है: इसे बंद करें (या कोई और मॉडल चुनें), या जब तक यह निष्क्रिय न हो तब तक प्रतीक्षा करें।";
 "The server log" = "सर्वर लॉग";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "सर्वर इन आर्ग्युमेंट्स में दिखने से ज़्यादा कर सकता है (mail reply के recipients और quoted text Mail से आते हैं)।";
+"The server says this only reads." = "सर्वर के अनुसार, यह केवल पढ़ता है।";
 "The server starts once %@ is downloaded" = "सर्वर तभी शुरू होगा जब %@ डाउनलोड हो जाएगा";
 "The server starts with %@" = "सर्वर %@ से शुरू होता है";
 "The settings here were kept." = "यहाँ की सेटिंग्स रखी गईं।";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "सोचने का प्रयास: उत्तर देने से पहले मॉडल कितनी देर तक सोच सकता है।";
 "Thinking…" = "सोच रहा है…";
 "Thinking… %@ s of reply ready" = "सोच रहा है… %@ सैकंड का उत्तर तैयार";
+"This Mac" = "यह Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "यह Mac मॉडल को ~%@× रीयल-टाइम पर चलाता है: पहले बोलें, फिर सुनें।";
+"This can change things." = "यह बदलाव कर सकता है।";
 "This chat knows" = "यह चैट जानती है";
 "This chat may use" = "यह चैट उपयोग कर सकता है";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "इसे सूचीबद्ध नहीं किया जा सका: भुगतान नहीं मिला या नाम अस्वीकार कर दिया गया।";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें।";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "इस मॉडल के कार्ड में %@ सूचीबद्ध नहीं है: यह उसमें चैट ठीक से नहीं पढ़ सकता और और भी खराब नोट्स लिख सकता है।";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "इस प्रोफ़ाइल की फ़ाइल पढ़ी नहीं जा सकती, इसलिए इसे यहां संपादित नहीं किया जा सकता। फ़ाइल ठीक करें या हटाएं, फिर सेटिंग्स फिर से खोलें।";
+"This tool" = "यह टूल";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "यह संस्करण text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML और स्प्रेडशीट (xlsx, ods) फ़ाइलों को इंडेक्स करता है और चित्र दस्तावेज़ों के लिए रखता है; फोल्डर और छिपी हुई फाइलें जोड़ी नहीं जा सकतीं।";
 "This version of LLMTray can't send reviews. Please update the app." = "इस संस्करण की LLMTray समीक्षाएँ नहीं भेज सकती। कृपया ऐप अपडेट करें।";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "यह LLMTray संस्करण अपना रनटाइम Python के साथ सेट करता है। python.org या Homebrew से Python इंस्टॉल करें और फिर पुन: जाँच करें। या LLMTray‑Full उपयोग करें, जिसमें आवश्यक सभी चीजें शामिल हैं।";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "टूल उपयोग नियम";
 "Tools" = "टूल";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "मॉडल इन-ऐप चैट में इन टूल्स को कॉल कर सकता है (इसके लिए tool-calling मॉडल चाहिए)। वेब टूल मॉडल के प्रश्न को सार्वजनिक सेवा पर भेजते हैं (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); स्थानीय टूल कभी भी Mac से बाहर नहीं जाते।";
-"Tools…" = "टूल…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "विषय";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "चलते मॉडल पर एक साथ 1, 2, 4 और 8 अनुरोधों और prefill-step-size (256–4096) को आज़माता है, हर परीक्षण के बीच सर्वर को रीस्टार्ट करता है। समवर्ती अनुरोध: वह न्यूनतम संख्या जो सर्वश्रेष्ठ कुल गति के 90% तक पहुँचती है (अधिक संख्या से मेमोरी खर्च बढ़ता है, लाभ कम मिलता है); prefill: सबसे तेज़।";
 "Try Again" = "पुन: प्रयास करें";
 "Try It Again" = "फिर से कोशिश करें";
+"Turn Off" = "बंद करें";
 "Turn On" = "चालू करें";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "अपडेट चैनल: Beta";
 "Update channel: Stable" = "अपडेट चैनल: Stable";
 "Update failed: %@" = "अपडेट असफल: %@";
+"Update to %@" = "%@ में अपडेट करें";
 "Updates" = "अपडेट";
 "Usage statistics" = "उपयोग सांख्यिकियाँ";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "उपयोग सांख्यिकी बंद हैं: कुछ भी भेजा नहीं जाता। यह रिपोर्ट ऐसी दिखेगी यदि आप उन्हें चालू करते हैं (तब ID बनाया जाता है)।";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "मॉडल लोड होने की प्रतीक्षा करता है।";
 "Walkie-talkie" = "वॉकी-टॉकी";
 "Weather" = "मौसम";
+"Web" = "वेब";
 "Web search" = "वेब खोज";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "वेब सर्च, समाचार, Wikipedia, मौसम और अधिक। मॉडल की क्वेरी उन सेवाओं पर जाती हैं।";
 "Web tools" = "वेब टूल्स";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (Recommended)";
+"a new setting (%@): uninstall and install it again to give it" = "एक नई सेटिंग (%@): इसे देने के लिए, इसे अनइंस्टॉल करें और फिर से इंस्टॉल करें";
 "always" = "हमेशा";
 "and %lld more" = "और %lld अन्य";
 "at least %1$@ items, %2$@" = "कम से कम %1$@ आइटम, %2$@";
 "at least %@" = "कम से कम %@";
 "building %@" = "बिल्ड कर रहा है %@";
+"by %lld" = "%lld द्वारा";
 "calls tools" = "टूल्स कॉल करता है";
 "can look" = "देख सकता है";
 "can look and propose changes" = "देख सकता है और परिवर्तन सुझा सकता है";
@@ -1573,11 +1569,11 @@
 "removing" = "हटा रहा है";
 "rename %lld" = "%lld का नाम बदलें";
 "search by words only" = "केवल शब्दों से खोजें";
+"something LLMTray can't run" = "कुछ ऐसा जिसे LLMTray चला नहीं सकता";
 "the download finished incomplete" = "डाउनलोड अधूरा हुआ";
 "the installed version didn't change" = "इंस्टॉल किया गया संस्करण नहीं बदला";
 "the model" = "मॉडल";
 "the model runtime isn't installed yet" = "मॉडल runtime अभी इंस्टॉल नहीं हुआ है";
-"the server says it only reads" = "सर्वर कहता है कि यह केवल पढ़ता है";
 "then" = "फिर";
 "this call only" = "केवल इस कॉल के लिए";
 "tight fit" = "सख्त फ़िट";

@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · виконується";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "«%@» змінилося з часу, коли ця відповідь посилалася на нього: сторінка %lld тепер може читатися інакше.";
 "\"%@\" is no longer in the project." = "«%@» більше не входить до проєкту.";
 "%.0f%% from drafts" = "%.0f%% з чернеток";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@ і ще %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запитує %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запитує %2$@. Переключення розвантажить поточну модель.";
+"%1$@ couldn't be updated: %2$@" = "Не вдалося оновити %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ предметів, %2$@";
+"%1$@ was installed but didn't start: %2$@" = "%1$@ було встановлено, але не запущено: %2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@: команду %2$@ не знайдено.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "Не вдалося порівняти %1$lld копій з оригіналами, тому вони зняті з відмітки: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld копій відрізняються від оригіналів, тому вони не є дублікатами: %2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "запитів: %lld";
 "%lld requests in flight (answered together up to Concurrent requests)" = "Запитів у роботі: %lld (одночасно — до значення «Паралельні запити»)";
 "%lld s" = "%lld с";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld нових або змінених інструментів: приховано від чату, доки ви їх не переглянете.";
-"%lld tools%@" = "%lld інструментів%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld інструментів на сервері — нові або змінені: їх приховано в Чаті, доки ви їх не приймете.";
+"%lld tools changed on the server: Configure to accept them." = "На сервері змінено %lld інструментів: налаштуйте, щоб прийняти їх.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld біт";
 "(Please attach the report file shown in Finder.)" = "(Будь ласка, додайте файл звіту, показаний у Finder.)";
@@ -112,13 +113,12 @@
 "About LLMTray" = "Про LLMTray";
 "About you" = "Про вас";
 "About you and your work: what you do, what you use." = "Про вас і вашу роботу: що ви робите й чим користуєтеся.";
+"Accept" = "Прийняти";
 "Add" = "Додати";
-"Add %@" = "Додати %@";
 "Add Files to “%@”…" = "Додати файли до «%@»…";
 "Add Files…" = "Додати файли…";
 "Add Note…" = "Додати нотатку…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Додайте PDF, Word та текстові файли до проєкту. Чати шукають у них і цитують сторінки; закріпіть файл, щоб увесь його вміст був у розмові.";
-"Add Server" = "Додати сервер";
 "Add a Command Server" = "Додати сервер команд";
 "Add a Command…" = "Додати команду…";
 "Add a URL Server" = "Додати сервер URL";
@@ -191,7 +191,6 @@
 "Apps & agents" = "Додатки й агенти";
 "Apps and agents" = "Додатки й агенти";
 "Arguments, one per line" = "Аргументи, по одному в рядку";
-"Arguments…" = "Аргументи…";
 "Ask Later" = "Запитати пізніше";
 "Ask about LLMTray" = "Запитайте про LLMTray";
 "Ask again in two weeks" = "Запитати знову через два тижні";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Більше за рекомендований: кращі відповіді, але повільніше й менше пам’яті лишається для інших програм.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Імпортує чати, проєкти, профілі, моделі для зображень, музики, голосу та ембедингів і налаштування з версії з ipsupport.us (завершіть її спочатку). Чати й моделі тут збережено; її налаштування замінять ці. Моделі не займають додаткового місця на диску. Моделі чатів лишаються в папці моделей: виберіть її в Settings › Models.";
 "Browse Hugging Face…" = "Відкрити Hugging Face…";
-"Browse the Catalog…" = "Переглянути каталог…";
 "Built into macOS · LLMTray's chat only" = "Вбудовано в macOS · лише для Чату LLMTray";
 "Cached" = "У кеші";
 "Calculator" = "Калькулятор";
@@ -301,7 +299,6 @@
 "Coffee" = "Кава";
 "Comes with %@" = "Постачається з %@";
 "Command" = "Команда";
-"Command servers don't run in this version of LLMTray." = "Сервери команд не працюють у цій версії LLMTray.";
 "Command-line tool" = "Інструмент командного рядка";
 "Compact" = "Стиснути";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Стиснення замінює середину довгого чату одним переказом, який пише модель. Стільки повідомлень на початку зберігаються дослівно.";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Стискає чат автоматично, коли в ньому стає більше повідомлень. Кнопка «Стиснути» в чаті працює в будь-якому разі.";
 "Composing…" = "Компонується…";
 "Concurrent requests" = "Паралельні запити";
-"Connects to" = "Підключається до";
+"Configure" = "Налаштувати";
+"Connect Again" = "Під’єднатися знову";
+"Connecting…" = "Під’єднання…";
 "Context" = "Контекст";
 "Continue" = "Продовжити";
 "Copied" = "Скопійовано";
@@ -362,6 +361,8 @@
 "Deny" = "Відхилити";
 "Describe a picture, drawn on this Mac" = "Описати зображення, намальоване на цьому Mac";
 "Diagnostics" = "Діагностика";
+"Discover" = "Пошук";
+"Discover Servers" = "Знайти сервери";
 "Disk usage" = "Використання диска";
 "Dismiss" = "Закрити";
 "Document: %@" = "Документ: %@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "Документи додаються в проєкт разом із цим чатом; зображення — у ваше повідомлення.";
 "Documents tools" = "Інструменти документів";
 "Doesn't open at login" = "Не відкривати при вході";
+"Doesn't run in this version of LLMTray." = "Не працює в цій версії LLMTray.";
 "Don't Add" = "Не додавати";
 "Don't Ask Again" = "Не питати більше";
 "Don't Remember This Chat…" = "Не запам’ятовувати цей чат…";
@@ -399,6 +401,7 @@
 "Downloading…" = "Завантаження…";
 "Downloads" = "Завантаження";
 "Downloads waiting: %lld" = "Черга завантажень: %lld";
+"Drag .mcpb files here to install" = "Перетягніть сюди файли .mcpb, щоб установити";
 "Drag chats here, or use a chat's menu" = "Перетягніть чати сюди або скористайтеся меню чату";
 "Drag chats or files here, or use a chat's menu" = "Перетягніть чати або файли сюди або використайте меню чату";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Перетягніть документи в цей чат: вони додаються до проєкту, і модель відповідає на їхній основі.";
@@ -494,7 +497,7 @@
 "Free disk space" = "Вільне місце на диску";
 "Free on disk: %@ · your models: %@" = "Вільно на диску: %@ · ваші моделі: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "З офіційного реєстру MCP. Реєстр перевіряє, хто опублікував назву, а не що робить код: перегляньте сервер, перш ніж увімкнути його.";
+"From the MCP Registry" = "З реєстру MCP";
 "Full" = "Повний";
 "Full duplex" = "Повний дуплекс";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Повний дуплекс: говоріть у будь‑який момент, модель чує вас під час власної промови — потребує Mac, що це підтримує в реальному часі. Режим \"рація\": говоріть, натисніть \"Done\", потім слухайте. \"Автоматично\" вибирає режим за виміряною швидкістю цього Mac при запуску Voice Lab.";
@@ -529,7 +532,6 @@
 "Help" = "Довідка";
 "Help improve LLMTray?" = "Допомогти покращити LLMTray?";
 "Hide" = "Сховати";
-"Hide Log" = "Сховати журнал";
 "Hide chats" = "Сховати чати";
 "Hide the reasoning" = "Приховати обґрунтування";
 "Hide these steps for good" = "Назавжди сховати ці кроки";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Її налаштування також перенесено; токен Hugging Face потрібно знову ввести в розділі «Налаштування › Моделі».";
 "Its settings were the same as these already." = "Її налаштування вже збігалися з поточними.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Її налаштування не імпортовано: це не %@ у ~/Library/Preferences.";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "Тут зберігаються його налаштування, секрети й, для пакета, файли. Чати зберігають свій запис попередніх викликів.";
 "KV cache" = "KV-кеш";
 "KV group size" = "Група KV";
 "Keep" = "Зберегти";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "Перших повідомлень зберігати: %lld";
 "Keep last messages: %lld" = "Останніх повідомлень зберігати: %lld";
 "Keep the loaded model" = "Зберегти завантажену модель";
-"Keeps crashing: off until started again (see its log)." = "Постійно аварійно завершується: вимкнено, доки не буде запущено знову (див. журнал).";
+"Keeps crashing -- see its log." = "Постійно аварійно завершується — див. його журнал.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Закріплює цей порт. Якщо інша програма вже його використовує, сервер не запуститься, доки ви не зміните порт у Параметрах.";
 "Kept free: %lld MB" = "Залишено вільними: %lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "Для навчання потрібна модель вбудовування («Налаштування» › «Пам’ять»).";
 "Leave a Review" = "Залишити відгук";
 "Length" = "Довжина";
-"Less" = "Менше";
 "Let chats make documents" = "Дозволити чатам створювати документи";
 "Let chats work in folders" = "Дозволити чатам працювати в папках";
 "Let coding agents and scripts use your models." = "Дозволити кодувальним агентам і скриптам використовувати ваші моделі.";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Менше за рекомендований: швидше й залишає пам’ять для інших програм, але відповіді простіші.";
 "Like LLMTray?" = "Сподобається LLMTray?";
 "Likes" = "Лайки";
-"List Again" = "Показати список знову";
 "List my name" = "Додати моє ім’я";
 "List my name in Supporters" = "Додати моє ім’я до Supporters";
 "Listening…" = "Прослуховування…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Пише в лог кожен згенерований токен (DEBUG). Лише для налагодження процесу моделі — сповільнює роботу. Діє з наступного запуску сервера.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Довгі розмови та закріплені файли беруться з кешу, а не читаються заново кожного ходу.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Триваліші розмови зручніше вести у вікні: проєкти, файли й кожна розмова в бічній панелі.";
-"MCP Servers" = "Сервери MCP";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: пришвидшує %@, ті самі відповіді";
 "Made for programming and agents: coding tools and the OpenAI API." = "Створено для програмування й агентів: інструменти для кодування та OpenAI API.";
 "Maintenance" = "Обслуговування";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Нотаток ще немає. Додайте те, що має знати кожен чат: «Відповідь російською, коротко», «Я збираю динамік на ESP32».";
 "No requests yet." = "Запитів поки немає.";
 "No runs yet." = "Прогонів ще не було.";
-"No servers yet." = "Серверів ще немає.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Без підписок. Без блокування функцій. Підтримайте розвиток, якщо LLMTray вам корисний.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Немає рекомендацій для пам’яті цього Mac. Пошукайте модель на Hugging Face.";
 "No thanks" = "Ні, дякую";
@@ -792,13 +789,13 @@
 "No update check at launch" = "Не перевіряти оновлення при запуску";
 "No usage statistics" = "Без статистики використання";
 "Non-commercial license: read it on the model card before using the model." = "Некомерційна ліцензія: ознайомтеся з нею на картці моделі перед використанням.";
+"None" = "Немає";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Ще немає. Дозволи для одного чату або одного запиту тут не списуються: вони закінчуються разом із ним.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Недостатньо місця на диску: голосова модель потребує %1$@, вільно %2$@.";
 "Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостатньо вільного місця на диску: %@ потребує приблизно %@, вільно %@.";
 "Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
 "Not indexed" = "Не проіндексовано";
-"Not reviewed yet: review it to see its tools." = "Ще не переглянуто: перегляньте, щоб побачити його інструменти.";
 "Not sent any more. Bring one back, or it's deleted later." = "Більше не надсилається. Відновіть нотатку, інакше її буде видалено пізніше.";
 "Not sent yet: waits for another chat to show it, or your approval." = "Ще не надіслано: очікує, доки це з’явиться в іншому чаті або ви схвалите.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Поки не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods) і зберігає зображення (png, jpg, heic, webp, tiff, gif).";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "Нічого більше читати: кожен чат прочитано від початку.";
 "Nothing logged yet." = "У журналі ще нічого немає.";
 "Nothing new to import" = "Немає нічого нового для імпорту";
-"Nothing runs yet: next you start it once and review its tools." = "Поки що нічого не виконується: далі запустіть один раз і перегляньте його інструменти.";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
 "Nothing to pin until the file has been read" = "Нічого закріплювати, поки файл не буде прочитано";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Вимк. — до сервера підключається лише цей Mac. Увімк. — будь-які пристрої у вашій мережі, тому вмикайте лише в довірених мережах.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Вимкнено: лише цей Mac. Увімкнено: будь‑хто в мережі — тож лише в мережах, яким ви довіряєте.";
 "Older" = "Старіші";
+"On" = "Увімк.";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Разовий внесок: Кава $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Лише відтепер";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Лише для обмежених моделей (Llama, деякі Gemma і репозиторії FLUX): прийміть ліцензію на сторінці моделі на Hugging Face, потім вставте тут токен для читання. Зберігається в Keychain, надсилається лише на huggingface.co.";
@@ -954,7 +951,6 @@
 "Ready." = "Готово.";
 "Ready. This is the Full build: the runtime is included." = "Готово. Це збірка Full: runtime включено.";
 "Reasoning" = "Міркування";
-"Recent" = "Нещодавні";
 "Recent changes" = "Останні зміни";
 "Recently updated" = "Нещодавно оновлено";
 "Recommended" = "Рекомендовано";
@@ -981,7 +977,6 @@
 "Remove recording" = "Вилучити запис";
 "Remove this file from the project?" = "Видалити цей файл із проєкту?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Видаляє завантажений runtime mlx-lm та моделі генерації зображень (runtime і моделі зображень) з %@. Вони будуть знову встановлені при наступному запуску сервера або коли генерація зображень буде увімкнена. Збережені чати та профілі зберігаються.";
-"Remove…" = "Вилучити…";
 "Rename" = "Перейменувати";
 "Rename %1$@ to %2$@" = "Перейменувати %1$@ на %2$@";
 "Rename Profile" = "Перейменувати профіль";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "Перезапускає процес моделі з новими налаштуваннями (завантаження займе кілька секунд).";
 "Restore" = "Відновити";
 "Restore Purchases" = "Відновити покупки";
-"Results" = "Результати";
 "Resume" = "Продовжити";
 "Resume Download" = "Продовжити завантаження";
 "Resume Indexing" = "Продовжити індексацію";
 "Resume download" = "Продовжити завантаження";
 "Retry" = "Повторити";
 "Review" = "Відгук";
-"Review…" = "Відгук…";
 "Revoke" = "Скасувати доступ";
 "Revoke %@" = "Скасувати доступ до %@";
 "Right after each answer" = "Одразу після кожної відповіді";
 "Room in each chat: %lld tokens" = "Місце в кожному чаті: %lld токенів";
 "Run benchmark" = "Запустити бенчмарк";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Запустіть у Terminal, щоб підняти ліміт пам’яті GPU; при перезавантаженні Mac ліміт скинеться.";
-"Run without asking" = "Запускати без запиту";
-"Run without asking:" = "Запускати без запиту:";
 "Running" = "Запущена";
 "Running — %@ on :%lld" = "Працює — %@ на :%lld";
 "Running…" = "Виконується…";
-"Runs this command" = "Запускає цю команду";
+"Runs" = "Запуски";
 "Runtime data" = "Дані рантайму";
 "Same as LLMTray" = "Як у LLMTray";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Вибирає лише з найімовірніших токенів, сумарна ймовірність яких не більша за це значення. 1.0 — вимкнено.";
@@ -1060,7 +1051,7 @@
 "Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Налаштування сервера змінилися — перезапустіть, щоб застосувати.";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "Сервери, які дають чату більше інструментів: пошта, нотатки, календарі, файли, служби. Кожен із них запускається лише після вашого перегляду, завантажується в чат із меню + (або коли попросить модель) і перед кожним викликом питає підтвердження, якщо ви не дозволили інструменту запускатися без запиту.";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Сервери надають Чату більше інструментів: пошта, нотатки, календарі, файли, сервіси. Чат запитує вас перед кожним викликом.";
 "Set Up LLMTray" = "Налаштувати LLMTray";
 "Set Up LLMTray…" = "Налаштувати LLMTray…";
 "Setting up image generation (first time only)…" = "Налаштування генерації зображень (тільки вперше)…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "Показати вікно чату";
 "Show Files" = "Показати файли";
 "Show Less" = "Показати менше";
+"Show Log…" = "Показати журнал…";
 "Show Next Tab" = "Показати наступну вкладку";
 "Show Previous Tab" = "Показати попередню вкладку";
 "Show Reports…" = "Показати звіти…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Стабільний";
 "Stall timeout: %lld s" = "Таймаут зависання: %lld с";
 "Start" = "Почати";
-"Start Again" = "Почати знову";
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
 "Start a new saved chat (⌘N) to add files to a project." = "Почніть новий збережений чат (⌘N), щоб додати файли до проєкту.";
-"Start and Review" = "Почати й Відгук";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "Запустіть один раз, щоб побачити, що він пропонує. Сам запуск нічого не дозволяє; чат не зможе використовувати його, доки ви не ввімкнете його.";
 "Start server" = "Запустити сервер";
 "Start talking" = "Почніть говорити";
 "Start the server first." = "Спершу запустіть сервер.";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "Початок через %.0f с…";
 "Starting…" = "Запуск…";
 "Startup" = "Запуск";
+"Status" = "Стан";
 "Staying up to date" = "Оновлення";
 "Stays in its project" = "Залишається у своєму проєкті";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Залишається у своєму проєкті: чати проєкту бачать запам’ятоване в цьому проєкті, чати поза проєктами — запам’ятоване поза ними. Спільно для всіх чатів: кожен чат бачить усе, що було запам’ятовано будь-де (нотатки проєкту — лише коли ввімкнено «Запам’ятовувати в проєктах»). Те, що ви пишете самі («Про вас», нотатки для всіх чатів), видно всюди в обох режимах.";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "Мова додатка (лише мова, без регіону).";
 "The app's name." = "Назва додатка.";
 "The base profile: every other profile inherits from it." = "Базовий профіль: усі інші успадковуються від нього.";
-"The bundle couldn't be downloaded." = "Не вдалося завантажити пакет.";
-"The bundle's address isn't https." = "Адреса пакета не є https.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Чат просить скопіювати %1$@ (%2$@) у проєкт. Тоді кожен чат цього проєкту зможе його шукати.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Чат просить скопіювати %1$@ (%2$@) у проєкт. Після цього кожен чат проєкту зможе використовувати його в документах.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Модель може оформити написане в PDF — звіт, лист, нотатки, рахунок — із таблицями та діаграмами. PDF залишається в чаті, доки ви його не відкриєте, не збережете або не додасте до проєкту. Нічого не завантажується; у тимчасових чатах недоступно.";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Копії файлів, доданих до проєктів, та їхні індекси разом. Файли проєкту показуються у вікні Files; видалення проєкту видаляє їх.";
 "The day the counts are for." = "День, за який підрахунок.";
 "The download didn't start." = "Завантаження не почалося.";
-"The download doesn't match what the registry lists for it." = "Завантажений файл не відповідає тому, що вказано для нього в реєстрі.";
 "The download failed: %@" = "Завантаження не вдалося: %@";
 "The download stopped." = "Завантаження зупинено.";
 "The downloaded embedder files don't match their checksums: %@" = "Завантажені файли embedder не відповідають їх контрольним сумам: %@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "План змінився з моменту вашого перегляду: перевірте його ще раз.";
 "The port and network access can change only while the server is stopped." = "Порт і доступ до мережі можна змінювати лише коли сервер зупинено.";
 "The project's files, and Add Files…" = "Файли проєкту та «Додати файли…»";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Реєстр перевіряє, хто опублікував назву, а не що робить код. Чат запитує вас перед кожним викликом.";
 "The reply was cut at its length limit." = "Відповідь була обрізана через обмеження довжини.";
 "The report" = "Звіт";
 "The reports" = "Звіти";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Сервер використовує цю модель або обробляє запит: зупиніть його (або оберіть іншу модель) або зачекайте, доки він не стане неактивним.";
 "The server log" = "Серверний лог";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "Сервер може робити більше, ніж показано в цих аргументах (одержувачі відповіді на лист і цитований текст беруться з Mail).";
+"The server says this only reads." = "Сервер повідомляє, що це лише читає.";
 "The server starts once %@ is downloaded" = "Сервер запуститься після завантаження %@";
 "The server starts with %@" = "Сервер запускається з %@";
 "The settings here were kept." = "Поточні налаштування збережено.";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "Зусилля на міркування: як довго модель може міркувати перед відповіддю";
 "Thinking…" = "Думаю…";
 "Thinking… %@ s of reply ready" = "Мислю… готово %@ с відповіді";
+"This Mac" = "Цей Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Цей Mac запускає модель приблизно @%@× реальному часі: говоріть, потім слухайте.";
+"This can change things." = "Це може щось змінювати.";
 "This chat knows" = "Цей чат знає";
 "This chat may use" = "Цей чат може використовувати";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Не вдалося додати: платіж не знайдено або ім’я відхилено.";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "У картці цієї моделі не вказано %@: вона може погано читати чати цією мовою й писати гірші нотатки.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
+"This tool" = "Цей інструмент";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods), а зображення зберігає для документів; папки та приховані файли додати не можна.";
 "This version of LLMTray can't send reviews. Please update the app." = "Ця версія LLMTray не може надсилати відгуки. Оновіть програму.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Ця версія LLMTray налаштовує середовище виконання через Python. Встановіть Python із python.org або через Homebrew, потім повторіть перевірку. Або використайте LLMTray‑Full, яка містить усе потрібне.";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "Правило інструментів";
 "Tools" = "Інструменти";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Інструменти, які модель може викликати в чаті додатка (потрібна модель із викликом інструментів). Веб‑інструменти надсилають запит моделі до відповідного публічного сервісу (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); локальні інструменти ніколи не покидають Mac.";
-"Tools…" = "Інструменти…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "Тема";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Пробує 1, 2, 4 і 8 одночасних запитів і prefill-step-size (256–4096) на запущеній моделі, перезапускаючи сервер між спробами. Паралельні запити: найменша кількість, що дає 90% найкращої сумарної швидкості (більше — зайва пам’ять майже без виграшу); prefill: найшвидший.";
 "Try Again" = "Спробувати ще";
 "Try It Again" = "Спробувати ще раз";
+"Turn Off" = "Вимкнути";
 "Turn On" = "Увімкнути";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Перетворює текст файлів у вектори для пошуку за значенням на цьому Mac. Видалення самої моделі не торкається індексів: файли потім шукатимуться за словами, доки модель не буде знову завантажена.";
 "Tweak…" = "Налаштувати…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "Канал оновлень: Beta";
 "Update channel: Stable" = "Канал оновлень: Stable";
 "Update failed: %@" = "Оновлення не вдалося: %@";
+"Update to %@" = "Оновити до %@";
 "Updates" = "Оновлення";
 "Usage statistics" = "Статистика використання";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Статистика використання вимкнена: нічого не надсилається. Ось як виглядав би звіт, якби ви ввімкнули її (ID буде створено тоді).";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "Очікує, доки модель буде завантажено.";
 "Walkie-talkie" = "Рація";
 "Weather" = "Погода";
+"Web" = "Веб";
 "Web search" = "Веб‑пошук";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "Пошук в інтернеті, новини, Wikipedia, погода та інше. Запити моделі відправляються до цих сервісів.";
 "Web tools" = "Інтернет‑інструменти";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
+"a new setting (%@): uninstall and install it again to give it" = "новий параметр (%@): видаліть і встановіть знову, щоб надати його";
 "always" = "завжди";
 "and %lld more" = "і ще %lld";
 "at least %1$@ items, %2$@" = "щонайменше %1$@ предметів, %2$@";
 "at least %@" = "щонайменше %@";
 "building %@" = "збирання %@";
+"by %lld" = "від %lld";
 "calls tools" = "викликає інструменти";
 "can look" = "може переглядати";
 "can look and propose changes" = "може переглядати й пропонувати зміни";
@@ -1573,11 +1569,11 @@
 "removing" = "видалення";
 "rename %lld" = "перейменувати %lld";
 "search by words only" = "пошук лише за словами";
+"something LLMTray can't run" = "щось, що LLMTray не може запустити";
 "the download finished incomplete" = "завантаження завершилося неповністю";
 "the installed version didn't change" = "інстальована версія не змінилася";
 "the model" = "модель";
 "the model runtime isn't installed yet" = "час виконання моделі ще не встановлено";
-"the server says it only reads" = "сервер вказує, що лише читає";
 "then" = "тоді";
 "this call only" = "тільки для цього виклику";
 "tight fit" = "щільне розміщення";

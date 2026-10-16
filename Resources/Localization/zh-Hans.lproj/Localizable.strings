@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · 运行中";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" 自本答案引用以来已发生更改：第 %lld 页的内容现在可能不同。";
 "\"%@\" is no longer in the project." = "\"%@\" 不再在项目中。";
 "%.0f%% from drafts" = "%.0f%% 来自草稿";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@，另有 %2$lld 项";
 "%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
+"%1$@ couldn't be updated: %2$@" = "无法更新 %1$@：%2$@";
 "%1$@ items, %2$@" = "%1$@ 项，%2$@";
+"%1$@ was installed but didn't start: %2$@" = "%1$@ 已安装，但未启动：%2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@：找不到命令 %2$@。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 个副本无法与原件比较，已取消勾选：%2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 个副本与原件不同，因此不是重复项：%2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "%lld 个请求";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld 个正在处理的请求（最多同时按“并发请求”一起回答）";
 "%lld s" = "%lld 秒";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld 个工具为新增或已更改：在评价前对聊天隐藏。";
-"%lld tools%@" = "%lld 个工具%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "服务器上有 %lld 个工具为新增或已更改：在你接受前，它们会在聊天中隐藏。";
+"%lld tools changed on the server: Configure to accept them." = "服务器上有 %lld 个工具已更改：请配置以接受它们。";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位";
 "(Please attach the report file shown in Finder.)" = "（请在 Finder 中附加显示的报告文件。）";
@@ -112,13 +113,12 @@
 "About LLMTray" = "关于 LLMTray";
 "About you" = "关于你";
 "About you and your work: what you do, what you use." = "关于你和你的工作：你做什么、使用什么。";
+"Accept" = "接受";
 "Add" = "添加";
-"Add %@" = "添加 %@";
 "Add Files to “%@”…" = "将文件添加到“%@”…";
 "Add Files…" = "添加文件…";
 "Add Note…" = "添加笔记…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "向项目添加 PDF、Word 和文本文件。聊天会搜索它们并引用页码；将文件固定可将其全部保留在对话中。";
-"Add Server" = "添加服务器";
 "Add a Command Server" = "添加命令服务器";
 "Add a Command…" = "添加命令…";
 "Add a URL Server" = "添加 URL 服务器";
@@ -191,7 +191,6 @@
 "Apps & agents" = "应用与代理";
 "Apps and agents" = "应用与代理";
 "Arguments, one per line" = "参数，每行一个";
-"Arguments…" = "参数…";
 "Ask Later" = "稍后询问";
 "Ask about LLMTray" = "询问 LLMTray";
 "Ask again in two weeks" = "两周后再次询问";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "比推荐的更大：回答更好，但更慢，会占用更多内存，留给其他应用的内存更少。";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "从 ipsupport.us 的版本导入对话、项目、配置文件、图像、音乐、语音与向量（embedding）模型以及设置（请先退出该版本）。此处的对话与模型将保留；其设置会替换为此处设置。模型不会占用额外磁盘空间。聊天模型保存在你的模型文件夹：在“设置 › Models”中选择。";
 "Browse Hugging Face…" = "浏览 Hugging Face…";
-"Browse the Catalog…" = "浏览目录…";
 "Built into macOS · LLMTray's chat only" = "macOS 内建 · 仅限 LLMTray 的聊天";
 "Cached" = "已缓存";
 "Calculator" = "计算器";
@@ -301,7 +299,6 @@
 "Coffee" = "咖啡";
 "Comes with %@" = "随 %@ 附带";
 "Command" = "命令";
-"Command servers don't run in this version of LLMTray." = "此版本的 LLMTray 不运行命令服务器。";
 "Command-line tool" = "命令行工具";
 "Compact" = "紧凑";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "压缩会将长聊天的中间部分替换为一段由模型编写的摘要。开头这么多条消息会逐字保留。";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "聊天消息数超过此数量后自动压缩。无论此设置如何，聊天中的“压缩”按钮都可使用。";
 "Composing…" = "正在创作…";
 "Concurrent requests" = "并发请求";
-"Connects to" = "连接到";
+"Configure" = "配置";
+"Connect Again" = "重新连接";
+"Connecting…" = "正在连接…";
 "Context" = "上下文";
 "Continue" = "继续";
 "Copied" = "已复制";
@@ -362,6 +361,8 @@
 "Deny" = "拒绝";
 "Describe a picture, drawn on this Mac" = "描述在此 Mac 上绘制的图片";
 "Diagnostics" = "诊断";
+"Discover" = "发现";
+"Discover Servers" = "发现服务器";
 "Disk usage" = "磁盘使用情况";
 "Dismiss" = "关闭";
 "Document: %@" = "文档：%@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "文档会随本聊天一起放入项目；图像会插入到你的消息中。";
 "Documents tools" = "文档工具";
 "Doesn't open at login" = "登录时不打开";
+"Doesn't run in this version of LLMTray." = "无法在此版本的 LLMTray 中运行。";
 "Don't Add" = "不添加";
 "Don't Ask Again" = "不再询问";
 "Don't Remember This Chat…" = "不记住此聊天…";
@@ -399,6 +401,7 @@
 "Downloading…" = "正在下载…";
 "Downloads" = "下载";
 "Downloads waiting: %lld" = "等待下载：%lld 个";
+"Drag .mcpb files here to install" = "将 .mcpb 文件拖到这里以安装";
 "Drag chats here, or use a chat's menu" = "将聊天拖到此处，或使用聊天的菜单";
 "Drag chats or files here, or use a chat's menu" = "将聊天或文件拖到此处，或使用聊天菜单";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "将文档拖到此对话：它们会加入项目，模型会基于这些文档回答。";
@@ -494,7 +497,7 @@
 "Free disk space" = "可用磁盘空间";
 "Free on disk: %@ · your models: %@" = "磁盘可用：%@ · 你的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "在这么长时间没有请求后，释放已加载模型占用的内存。下次请求时会自动重新加载，并产生正常的加载延迟。";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "来自官方 MCP Registry。该注册表会核查名称由谁发布，不会核查代码的作用：请先评价服务器，再将其打开。";
+"From the MCP Registry" = "来自 MCP Registry";
 "Full" = "完整";
 "Full duplex" = "全双工";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "全双工：随时说话，模型在说话时也能听到你——需支持实时运行的 Mac。对讲机模式：说话后按“完成”再听。自动根据本机在 Voice Lab 启动时测得的速度选择。";
@@ -529,7 +532,6 @@
 "Help" = "帮助";
 "Help improve LLMTray?" = "帮助改进 LLMTray？";
 "Hide" = "隐藏";
-"Hide Log" = "隐藏日志";
 "Hide chats" = "隐藏对话";
 "Hide the reasoning" = "隐藏推理过程";
 "Hide these steps for good" = "永久隐藏这些步骤";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "它的设置也已一并迁移；需要在设置 › 模型中重新输入 Hugging Face 令牌。";
 "Its settings were the same as these already." = "其设置与当前设置相同。";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "未导入其设置：~/Library/Preferences 中的 %@ 不是该项。";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "其设置、私密信息以及（对于 bundle）其文件会被移除。对话会保留过去调用的记录。";
 "KV cache" = "KV 缓存";
 "KV group size" = "KV 组大小";
 "Keep" = "保持";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "保留开头消息：%lld";
 "Keep last messages: %lld" = "保留末尾消息：%lld";
 "Keep the loaded model" = "保持已加载的模型";
-"Keeps crashing: off until started again (see its log)." = "持续崩溃：在再次启动前将保持关闭（请查看其日志）。";
+"Keeps crashing -- see its log." = "持续崩溃——请查看其日志。";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "保留此端口。如果另一个应用确实占用，服务器不会启动，直到你在“设置”中更改端口。";
 "Kept free: %lld MB" = "保留空闲：%lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "学习需要嵌入模型（设置 › 内存）。";
 "Leave a Review" = "留下评价";
 "Length" = "长度";
-"Less" = "更少";
 "Let chats make documents" = "允许聊天生成文档";
 "Let chats work in folders" = "允许聊天在文件夹中工作";
 "Let coding agents and scripts use your models." = "允许代码代理和脚本使用你的模型。";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "比推荐的更轻：更快，为其他应用保留更多内存，但回答更简单。";
 "Like LLMTray?" = "喜欢 LLMTray？";
 "Likes" = "点赞";
-"List Again" = "重新列出";
 "List my name" = "列出我的名字";
 "List my name in Supporters" = "在赞助者中列出我的名字";
 "Listening…" = "正在监听…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "长对话和已固定文件从缓存读取，无需每次都重新读取。";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "较长的对话在窗口中更便捷：侧栏显示项目、文件和所有对话。";
-"MCP Servers" = "MCP 服务器";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter：加速 %@，答案不变";
 "Made for programming and agents: coding tools and the OpenAI API." = "为编程与 agent 设计：包含编码工具并支持 OpenAI API。";
 "Maintenance" = "维护";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "还没有笔记。添加每个聊天都应知道的内容：“用俄语简短回答”、“我在制作 ESP32 扬声器”。";
 "No requests yet." = "还没有请求。";
 "No runs yet." = "尚无运行记录。";
-"No servers yet." = "还没有服务器。";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "无订阅。无功能锁定。如果 LLMTray 对你有用，可支持开发。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "无法为此 Mac 的内存提供建议。请在 Hugging Face 浏览模型。";
 "No thanks" = "不用了";
@@ -792,13 +789,13 @@
 "No update check at launch" = "启动时不检查更新";
 "No usage statistics" = "不发送使用统计";
 "Non-commercial license: read it on the model card before using the model." = "非商业许可：使用前请在模型卡上阅读。";
+"None" = "无";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "尚无。对单个聊天或请求的授权不会列在此处：它们随之结束。";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "磁盘空间不足：语音模型需要 %1$@，可用空间为 %2$@。";
 "Not enough free disk space for this model." = "磁盘可用空间不足，无法安装此模型。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁盘空间不足：%@ 需要约 %@，当前可用 %@。";
 "Not identical to %@: not a duplicate." = "与 %@ 不相同：不是重复项。";
 "Not indexed" = "未索引";
-"Not reviewed yet: review it to see its tools." = "尚未评价：请先评价以查看其工具。";
 "Not sent any more. Bring one back, or it's deleted later." = "不再发送。请恢复其中一条，否则稍后会被删除。";
 "Not sent yet: waits for another chat to show it, or your approval." = "尚未发送：等待另一个聊天也出现，或等待你批准。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "暂不支持：%@。此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods），并保留图片（png、jpg、heic、webp、tiff、gif）。";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "没有剩余内容可读取：每个聊天都已从开头读取。";
 "Nothing logged yet." = "还没有日志。";
 "Nothing new to import" = "无可导入的新内容";
-"Nothing runs yet: next you start it once and review its tools." = "尚未运行任何内容：接下来先启动一次并评价其工具。";
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
 "Nothing to pin until the file has been read" = "在文件被读取之前无法置顶任何内容";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "关闭时，只有这台 Mac 可以访问服务器。开启时，网络中的其他设备也可以访问——包括网络上的任何人，因此仅在你信任的网络上开启。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "关闭：仅限此 Mac。打开：局域网内任何人可用，仅在你信任的网络上开启。";
 "Older" = "更早";
+"On" = "开";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一次性：咖啡 $5，专业赞助者 $25，创始赞助者 $150。";
 "Only From Now On" = "仅从现在开始";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
@@ -954,7 +951,6 @@
 "Ready." = "已就绪。";
 "Ready. This is the Full build: the runtime is included." = "已就绪。此为 Full 版本：包含运行时。";
 "Reasoning" = "推理";
-"Recent" = "最近使用";
 "Recent changes" = "最近更改";
 "Recently updated" = "最近更新";
 "Recommended" = "推荐";
@@ -981,7 +977,6 @@
 "Remove recording" = "移除录音";
 "Remove this file from the project?" = "是否从项目中移除此文件？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "从 %@ 删除已下载的 mlx-lm 运行时和图像生成功能（包括运行时和图像模型）。下一次服务器启动或启用图像生成功能时会重新设置。已保存的聊天和配置档会保留。";
-"Remove…" = "移除…";
 "Rename" = "重命名";
 "Rename %1$@ to %2$@" = "将 %1$@ 重命名为 %2$@";
 "Rename Profile" = "重命名配置文件";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "使用新设置重启模型进程（重新加载需几秒钟）。";
 "Restore" = "恢复";
 "Restore Purchases" = "恢复购买";
-"Results" = "结果";
 "Resume" = "继续";
 "Resume Download" = "继续下载";
 "Resume Indexing" = "继续建立索引";
 "Resume download" = "继续下载。";
 "Retry" = "重试";
 "Review" = "评价";
-"Review…" = "评价…";
 "Revoke" = "撤销";
 "Revoke %@" = "撤销 %@";
 "Right after each answer" = "每次回答后立即";
 "Room in each chat: %lld tokens" = "每个聊天中的空间：%lld 个 token";
 "Run benchmark" = "运行基准测试";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在终端中运行以提高 GPU 内存限制；Mac 重启后会重置。";
-"Run without asking" = "运行前不询问";
-"Run without asking:" = "运行前不询问：";
 "Running" = "正在运行";
 "Running — %@ on :%lld" = "正在运行 — %@，端口 :%lld";
 "Running…" = "正在运行…";
-"Runs this command" = "运行此命令";
+"Runs" = "运行次数";
 "Runtime data" = "运行时数据";
 "Same as LLMTray" = "与 LLMTray 相同";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "仅从概率累计达到此值的最可能词元中采样。1.0 表示关闭。";
@@ -1060,7 +1051,7 @@
 "Server Log" = "服务器日志";
 "Server log" = "服务器日志";
 "Server settings changed -- restart to apply them." = "服务器设置已更改，请重启服务器以应用更改。";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "为聊天提供更多工具的服务器：邮件、备忘录、日历、文件、服务。每个服务器都只会在你评价后运行，可从 + 菜单载入到聊天中（或在模型请求时载入），并且每次调用前都会先询问你，除非你允许某个工具在不询问的情况下运行。";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "服务器可为聊天提供更多工具：邮件、备忘录、日历、文件、服务。聊天会在每次调用前征求你的同意。";
 "Set Up LLMTray" = "设置 LLMTray";
 "Set Up LLMTray…" = "设置 LLMTray…";
 "Setting up image generation (first time only)…" = "正在设置图像生成（仅首次）…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "显示对话窗口";
 "Show Files" = "显示文件";
 "Show Less" = "显示更少";
+"Show Log…" = "显示日志…";
 "Show Next Tab" = "显示下一个标签页";
 "Show Previous Tab" = "显示上一个标签页";
 "Show Reports…" = "显示报告…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "停滞超时：%lld 秒";
 "Start" = "开始";
-"Start Again" = "重新开始";
 "Start LLMTray automatically when you log in to this Mac." = "登录这台 Mac 时自动打开 LLMTray。";
 "Start Server" = "启动服务器";
 "Start a new saved chat (⌘N) to add files to a project." = "开始新的已保存聊天（⌘N）以将文件添加到项目。";
-"Start and Review" = "开始并评价";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "先启动一次以查看它提供什么。启动它本身不会授予任何权限；在你打开它之前，聊天无法使用它。";
 "Start server" = "启动服务器。";
 "Start talking" = "开始说话";
 "Start the server first." = "请先启动服务器。";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "将在 %.0f 秒后开始…";
 "Starting…" = "正在启动…";
 "Startup" = "启动";
+"Status" = "状态";
 "Staying up to date" = "保持最新";
 "Stays in its project" = "留在其项目中";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "留在其项目中：项目中的聊天会看到在该项目中学习到的内容，项目外的对话会看到在项目外学习到的内容。由所有聊天共享：每个聊天都会看到在任何位置学习到的所有内容（项目备注仅在“在项目中记住”开启时可见）。你自己写的内容（“关于你”、所有聊天的备注）无论哪种方式都会在所有位置可见。";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "应用的语言（仅语言，不含地区）。";
 "The app's name." = "应用名称。";
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
-"The bundle couldn't be downloaded." = "无法下载该 bundle。";
-"The bundle's address isn't https." = "该 bundle 的地址不是 https。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天请求将 %1$@（%2$@）复制到项目中。项目中的所有聊天都可以搜索该内容。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "该聊天请求将 %1$@（%2$@）复制到项目中。项目的每个聊天随后都可以在文档中使用它。";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以将其输出排版为 PDF（如报告、信函、笔记、发票），并可包含表格和图表。该 PDF 会保留在聊天中，直到你打开、保存或添加到项目。无需为此下载任何内容；此功能在临时对话中不可用。";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "添加到项目的文件副本及其索引将存放于一起。项目自己的文件会在其“文件”窗口显示；删除项目会删除这些内容。";
 "The day the counts are for." = "计数所属日期。";
 "The download didn't start." = "下载未开始。";
-"The download doesn't match what the registry lists for it." = "下载内容与注册表中列出的内容不匹配。";
 "The download failed: %@" = "下载失败：%@";
 "The download stopped." = "下载已停止。";
 "The downloaded embedder files don't match their checksums: %@" = "下载的嵌入器文件校验和不匹配：%@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "计划自你查看后已更改：请再次审查。";
 "The port and network access can change only while the server is stopped." = "端口和网络访问仅可在服务器停止时更改。";
 "The project's files, and Add Files…" = "项目的文件，以及“添加文件…”";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "注册表会检查名称由谁发布，而不会检查代码的作用。聊天会在每次调用前征求你的同意。";
 "The reply was cut at its length limit." = "回复因长度限制被截断。";
 "The report" = "报告";
 "The reports" = "报告";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "服务器正在使用此模型或正忙于处理请求：请停止它（或选择其他模型），或等到空闲。";
 "The server log" = "服务器日志";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "服务器实际执行的内容可能多于这些参数所显示的内容（邮件回复的收件人和引用文本来自 Mail）。";
+"The server says this only reads." = "服务器称此项仅进行读取。";
 "The server starts once %@ is downloaded" = "在 %@ 下载完成后服务器将启动";
 "The server starts with %@" = "服务器使用 %@ 启动";
 "The settings here were kept." = "此处的设置已保留。";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "思考强度：模型在回答前可以思考多久。";
 "Thinking…" = "正在思考…";
 "Thinking… %@ s of reply ready" = "思考中… 已准备 %@ 秒回复";
+"This Mac" = "这台 Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "此 Mac 以约 %@× 实时运行模型：先说话，然后聆听。";
+"This can change things." = "此项可以进行更改。";
 "This chat knows" = "此聊天知道";
 "This chat may use" = "此聊天可使用";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "无法列出：未找到付款或名称被拒绝。";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "这个模型的卡片未列出 %@：它可能无法很好地读取这种语言的聊天，写出的笔记也会更差。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
+"This tool" = "此工具";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）文件，并保留图片供文档使用；文件夹和隐藏文件无法添加。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 无法发送评论。请更新应用。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 设置运行时。请从 python.org 或 Homebrew 安装 Python，然后重试。或使用包含所需全部内容的 LLMTray-Full。";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "工具使用规则";
 "Tools" = "工具";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型可在应用内聊天中调用的工具（需支持调用工具的模型）。网页版工具会将模型的查询发送到相应的公共服务（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本地工具的数据不会离开这台 Mac。";
-"Tools…" = "工具…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "主题";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "对运行中的模型分别尝试 1、2、4、8 个并发请求和 prefill-step-size（256–4096），每次尝试后重启服务器。并发请求：选择达到最佳总速度 90% 的最小并发数（更高并发对内存开销大但收益小）；prefill：选择最快的值。";
 "Try Again" = "重试";
 "Try It Again" = "重试";
+"Turn Off" = "关闭";
 "Turn On" = "开启";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "更新通道：Beta";
 "Update channel: Stable" = "更新通道：Stable";
 "Update failed: %@" = "更新失败：%@";
+"Update to %@" = "更新到 %@";
 "Updates" = "更新";
 "Usage statistics" = "使用统计";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "使用统计已关闭：不会发送任何内容。开启后报告将类似于下列内容（ID 会在那时生成）。";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "等待模型加载完成。";
 "Walkie-talkie" = "对讲机";
 "Weather" = "天气";
+"Web" = "网页";
 "Web search" = "网络搜索";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "网络搜索、新闻、维基百科、天气等。模型的查询会发送到这些服务。";
 "Web tools" = "网络工具";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ 混合（推荐）";
+"a new setting (%@): uninstall and install it again to give it" = "一项新设置（%@）：卸载并重新安装它，以授予它";
 "always" = "始终";
 "and %lld more" = "以及另外 %lld 个";
 "at least %1$@ items, %2$@" = "至少 %1$@ 项，%2$@";
 "at least %@" = "至少 %@";
 "building %@" = "正在构建 %@";
+"by %lld" = "由 %lld 提供";
 "calls tools" = "调用工具";
 "can look" = "可查看";
 "can look and propose changes" = "可查看并建议更改";
@@ -1573,11 +1569,11 @@
 "removing" = "正在移除";
 "rename %lld" = "重命名 %lld 项";
 "search by words only" = "仅按文字搜索";
+"something LLMTray can't run" = "LLMTray 无法运行的内容";
 "the download finished incomplete" = "下载未完成";
 "the installed version didn't change" = "已安装的版本未更改";
 "the model" = "模型";
 "the model runtime isn't installed yet" = "模型运行时尚未安装";
-"the server says it only reads" = "服务器表示它只会读取";
 "then" = "然后";
 "this call only" = "仅此调用";
 "tight fit" = "空间紧张";

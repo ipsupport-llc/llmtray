@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · berjalan";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" telah berubah sejak jawaban ini mengutipnya: halaman %lld mungkin terbaca berbeda sekarang.";
 "\"%@\" is no longer in the project." = "\"%@\" sudah tidak ada lagi dalam proyek.";
 "%.0f%% from drafts" = "%.0f%% dari draf";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@ dan %2$lld lagi";
 "%1$@ asks for %2$@" = "%1$@ meminta %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ meminta %2$@. Beralih akan memuat keluar model yang sedang dimuat.";
+"%1$@ couldn't be updated: %2$@" = "%1$@ tidak dapat diperbarui: %2$@";
 "%1$@ items, %2$@" = "%1$@ item, %2$@";
+"%1$@ was installed but didn't start: %2$@" = "%1$@ terpasang tetapi tidak dimulai: %2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@: perintah %2$@ tidak ditemukan.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld salinan tidak dapat dibandingkan dengan aslinya, jadi tidak dicentang: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld salinan berbeda dari aslinya, jadi bukan duplikat: %2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "%lld permintaan";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld permintaan sedang berjalan (dijawab bersama hingga batas «Permintaan bersamaan»)";
 "%lld s" = "%lld dtk";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld alat baru atau berubah: disembunyikan dari obrolan sampai ditinjau.";
-"%lld tools%@" = "%lld alat%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld alat baru atau berubah di server: disembunyikan dari Obrolan sampai Anda menerimanya.";
+"%lld tools changed on the server: Configure to accept them." = "%lld alat berubah di server: Konfigurasikan untuk menerimanya.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Harap lampirkan file laporan yang ditampilkan di Finder.)";
@@ -112,13 +113,12 @@
 "About LLMTray" = "Mengenai LLMTray";
 "About you" = "Tentang Anda";
 "About you and your work: what you do, what you use." = "Tentang Anda dan pekerjaan Anda: apa yang Anda lakukan, apa yang Anda gunakan.";
+"Accept" = "Terima";
 "Add" = "Tambah";
-"Add %@" = "Tambah %@";
 "Add Files to “%@”…" = "Tambahkan Berkas ke “%@”…";
 "Add Files…" = "Tambah Berkas…";
 "Add Note…" = "Tambah Catatan…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Tambahkan file PDF, Word, dan teks ke proyek. Percakapan dalam proyek akan mencari dan mengutip halaman; sematkan file untuk menyertakan seluruh isinya dalam percakapan.";
-"Add Server" = "Tambah Server";
 "Add a Command Server" = "Tambah Server Perintah";
 "Add a Command…" = "Tambah Perintah…";
 "Add a URL Server" = "Tambah Server URL";
@@ -191,7 +191,6 @@
 "Apps & agents" = "Aplikasi & agen";
 "Apps and agents" = "Aplikasi dan agen";
 "Arguments, one per line" = "Argumen, satu per baris";
-"Arguments…" = "Argumen…";
 "Ask Later" = "Tanya Nanti";
 "Ask about LLMTray" = "Tanya tentang LLMTray";
 "Ask again in two weeks" = "Tanyakan lagi dalam dua minggu";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Lebih besar dari yang disarankan: jawaban lebih baik, tetapi lebih lambat dan menyisakan lebih sedikit memori untuk aplikasi lain.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Mentransfer obrolan, proyek, profil, serta model gambar, musik, suara, dan embedding beserta pengaturan dari versi di ipsupport.us (tutup terlebih dahulu). Obrolan dan model di sini tetap ada; pengaturannya yang akan menggantikan. Model tidak memerlukan ruang disk tambahan. Model obrolan tetap berada di folder model Anda: pilih di Pengaturan › Models.";
 "Browse Hugging Face…" = "Telusuri Hugging Face…";
-"Browse the Catalog…" = "Telusuri Katalog…";
 "Built into macOS · LLMTray's chat only" = "Bawaan macOS · hanya Obrolan LLMTray";
 "Cached" = "Tersimpan";
 "Calculator" = "Kalkulator";
@@ -301,7 +299,6 @@
 "Coffee" = "Kopi";
 "Comes with %@" = "Disertakan dengan %@";
 "Command" = "Perintah";
-"Command servers don't run in this version of LLMTray." = "Server perintah tidak berjalan di versi LLMTray ini.";
 "Command-line tool" = "Alat baris perintah";
 "Compact" = "Ringkas";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Pemadatan mengganti bagian tengah obrolan panjang dengan satu ringkasan yang ditulis model. Sebanyak ini pesan di awal dipertahankan kata demi kata.";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Memadatkan obrolan secara otomatis setelah melewati jumlah pesan ini. Tombol Padatkan di obrolan tetap berfungsi.";
 "Composing…" = "Menyusun…";
 "Concurrent requests" = "Permintaan bersamaan";
-"Connects to" = "Terhubung ke";
+"Configure" = "Konfigurasikan";
+"Connect Again" = "Hubungkan Lagi";
+"Connecting…" = "Menghubungkan…";
 "Context" = "Konteks";
 "Continue" = "Lanjutkan";
 "Copied" = "Disalin";
@@ -362,6 +361,8 @@
 "Deny" = "Tolak";
 "Describe a picture, drawn on this Mac" = "Jelaskan gambar yang digambar di Mac ini";
 "Diagnostics" = "Diagnostik";
+"Discover" = "Temukan";
+"Discover Servers" = "Temukan Server";
 "Disk usage" = "Penggunaan disk";
 "Dismiss" = "Tutup";
 "Document: %@" = "Dokumen: %@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "Dokumen dimasukkan ke proyek bersama obrolan ini; gambar dimasukkan ke pesan Anda.";
 "Documents tools" = "Alat Dokumen";
 "Doesn't open at login" = "Tidak dibuka saat masuk";
+"Doesn't run in this version of LLMTray." = "Tidak berjalan di versi LLMTray ini.";
 "Don't Add" = "Jangan Tambahkan";
 "Don't Ask Again" = "Jangan Tanyakan Lagi";
 "Don't Remember This Chat…" = "Jangan Ingat Obrolan Ini…";
@@ -399,6 +401,7 @@
 "Downloading…" = "Mengunduh…";
 "Downloads" = "Unduhan";
 "Downloads waiting: %lld" = "Unduhan menunggu: %lld";
+"Drag .mcpb files here to install" = "Seret file .mcpb ke sini untuk memasang";
 "Drag chats here, or use a chat's menu" = "Seret percakapan ke sini, atau gunakan menu percakapan";
 "Drag chats or files here, or use a chat's menu" = "Seret obrolan atau berkas ke sini, atau gunakan menu obrolan";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "Seret dokumen ke obrolan ini: dokumen akan bergabung ke proyek, dan model menjawab berdasarkan dokumen tersebut.";
@@ -494,7 +497,7 @@
 "Free disk space" = "Ruang disk tersedia";
 "Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "Dari MCP Registry resmi. Registry memeriksa siapa yang menerbitkan sebuah nama, bukan apa yang dilakukan kodenya: tinjau server sebelum Anda menyalakannya.";
+"From the MCP Registry" = "Dari MCP Registry";
 "Full" = "Penuh";
 "Full duplex" = "Dupleks penuh";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Duplex penuh: bicara kapan saja, model mendengar saat berbicara — memerlukan Mac yang mampu menjalankan secara waktu nyata. Walkie‑talkie: bicara, tekan Selesai, lalu dengarkan. Otomatis memilih berdasarkan kecepatan terukur Mac ini saat Voice Lab dimulai.";
@@ -529,7 +532,6 @@
 "Help" = "Bantuan";
 "Help improve LLMTray?" = "Bantu perbaiki LLMTray?";
 "Hide" = "Sembunyikan";
-"Hide Log" = "Sembunyikan Log";
 "Hide chats" = "Sembunyikan chat";
 "Hide the reasoning" = "Sembunyikan alasan";
 "Hide these steps for good" = "Sembunyikan langkah‑langkah ini secara permanen";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Pengaturannya ikut dibawa; token Hugging Face harus dimasukkan lagi di Pengaturan › Models.";
 "Its settings were the same as these already." = "Pengaturannya sudah sama dengan yang ada di sini.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Pengaturannya tidak diimpor: itu bukan %@ di ~/Library/Preferences.";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "Tempat pengaturan, rahasia, dan (untuk bundel) file-nya disimpan. Chat menyimpan catatan panggilan sebelumnya.";
 "KV cache" = "Cache KV";
 "KV group size" = "Ukuran grup KV";
 "Keep" = "Pertahankan";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "Pertahankan pesan pertama: %lld";
 "Keep last messages: %lld" = "Pertahankan pesan terakhir: %lld";
 "Keep the loaded model" = "Pertahankan model yang dimuat";
-"Keeps crashing: off until started again (see its log)." = "Terus mogok: nonaktif sampai dimulai lagi (lihat log-nya).";
+"Keeps crashing -- see its log." = "Terus mogok -- lihat log-nya.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Menyimpan port ini. Jika aplikasi lain benar‑benar menggunakannya, server tidak akan mulai sampai Anda mengubah port di Pengaturan.";
 "Kept free: %lld MB" = "Disisakan: %lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "Pembelajaran memerlukan model embedding (Pengaturan › Memori).";
 "Leave a Review" = "Tinggalkan Ulasan";
 "Length" = "Panjang";
-"Less" = "Lebih Sedikit";
 "Let chats make documents" = "Izinkan obrolan membuat dokumen";
 "Let chats work in folders" = "Izinkan chat bekerja di folder";
 "Let coding agents and scripts use your models." = "Biarkan agen pengkodean dan skrip menggunakan model Anda.";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Lebih ringan dari yang disarankan: lebih cepat dan menyisakan memori untuk aplikasi lain, tetapi jawabannya lebih sederhana.";
 "Like LLMTray?" = "Suka LLMTray?";
 "Likes" = "Suka";
-"List Again" = "Tampilkan Lagi";
 "List my name" = "Cantumkan nama saya";
 "List my name in Supporters" = "Cantumkan nama saya di Penyokong";
 "Listening…" = "Mendengarkan…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Percakapan panjang dan file yang disematkan diambil dari cache sehingga tidak dibaca ulang setiap giliran.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Obrolan panjang lebih mudah di jendela: proyek, file, dan tiap obrolan di sidebar.";
-"MCP Servers" = "Server MCP";
 "MTP drafter: speeds up %@, same answers" = "Penyusun MTP: mempercepat %@, jawaban tetap sama";
 "Made for programming and agents: coding tools and the OpenAI API." = "Dibuat untuk pemrograman dan agen: alat pengkodean dan OpenAI API.";
 "Maintenance" = "Pemeliharaan";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Belum ada catatan. Tambah hal yang perlu diketahui setiap obrolan: “Jawab dalam bahasa Rusia, singkat”, “Saya membuat speaker ESP32”.";
 "No requests yet." = "Belum ada permintaan.";
 "No runs yet." = "Belum ada yang dijalankan.";
-"No servers yet." = "Belum ada server.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Tanpa langganan. Tanpa fitur terkunci. Dukung pengembangan jika LLMTray berguna bagi Anda.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Tidak ada saran untuk memori Mac ini. Jelajahi Hugging Face untuk model.";
 "No thanks" = "Tidak, terima kasih";
@@ -792,13 +789,13 @@
 "No update check at launch" = "Tidak memeriksa pembaruan saat diluncurkan";
 "No usage statistics" = "Tanpa statistik penggunaan";
 "Non-commercial license: read it on the model card before using the model." = "Lisensi non-komersial: baca di model card sebelum menggunakan model.";
+"None" = "Tidak Ada";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Belum ada. Izin untuk satu chat atau satu permintaan tidak tercantum di sini: izin berakhir bersamanya.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Ruang disk tidak cukup: model suara membutuhkan %1$@, hanya tersisa %2$@.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Ruang disk tidak cukup: %@ memerlukan sekitar %@, tersedia %@.";
 "Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
 "Not indexed" = "Belum diindeks";
-"Not reviewed yet: review it to see its tools." = "Belum ditinjau: tinjau untuk melihat alatnya.";
 "Not sent any more. Bring one back, or it's deleted later." = "Tidak dikirim lagi. Kembalikan salah satu, atau akan dihapus nanti.";
 "Not sent yet: waits for another chat to show it, or your approval." = "Belum dikirim: menunggu obrolan lain menunjukkannya, atau persetujuan Anda.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods), serta menyimpan gambar (png, jpg, heic, webp, tiff, gif).";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "Tidak ada lagi yang perlu dibaca: setiap obrolan sudah dibaca dari awalnya.";
 "Nothing logged yet." = "Belum ada yang dicatat.";
 "Nothing new to import" = "Tidak ada yang baru untuk diimport";
-"Nothing runs yet: next you start it once and review its tools." = "Belum ada yang berjalan: selanjutnya mulai sekali dan tinjau alatnya.";
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
 "Nothing to pin until the file has been read" = "Tidak ada yang dapat dipin sampai berkas dibaca";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Mati: hanya Mac ini yang dapat mengakses server. Nyala: perangkat lain di jaringan Anda juga dapat mengaksesnya — siapa pun di jaringan itu, jadi gunakan hanya di jaringan yang Anda percayai.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Mati: hanya Mac ini. Aktif: siapa pun di jaringan Anda, jadi hanya pada jaringan yang Anda percaya.";
 "Older" = "Lebih lama";
+"On" = "Aktif";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Sekali bayar: Kopi $5, Penyokong Pro $25, Penyokong Pendiri $150.";
 "Only From Now On" = "Hanya Mulai Sekarang";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
@@ -954,7 +951,6 @@
 "Ready." = "Siap.";
 "Ready. This is the Full build: the runtime is included." = "Siap. Ini adalah build Full: runtime sudah disertakan.";
 "Reasoning" = "Penalaran";
-"Recent" = "Terbaru";
 "Recent changes" = "Perubahan terbaru";
 "Recently updated" = "Baru diperbarui";
 "Recommended" = "Direkomendasikan";
@@ -981,7 +977,6 @@
 "Remove recording" = "Hapus rekaman";
 "Remove this file from the project?" = "Hapus berkas ini dari proyek?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Menghapus runtime mlx-lm yang diunduh dan komponen pembuatan gambar (runtime dan model gambar) dari %@. Mereka akan diatur ulang saat server dimulai berikutnya, atau saat pembuatan gambar diaktifkan. Riwayat chat dan profil yang disimpan tetap dipertahankan.";
-"Remove…" = "Hapus…";
 "Rename" = "Ubah Nama";
 "Rename %1$@ to %2$@" = "Ganti nama %1$@ menjadi %2$@";
 "Rename Profile" = "Ganti Nama Profil";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "Memulai ulang proses model dengan pengaturan baru (perlu beberapa detik untuk memuat ulang).";
 "Restore" = "Pulihkan";
 "Restore Purchases" = "Pulihkan Pembelian";
-"Results" = "Hasil";
 "Resume" = "Lanjutkan";
 "Resume Download" = "Lanjutkan Unduhan";
 "Resume Indexing" = "Lanjutkan Pengindeksan";
 "Resume download" = "Lanjutkan pengunduhan.";
 "Retry" = "Coba Lagi";
 "Review" = "Ulasan";
-"Review…" = "Ulasan…";
 "Revoke" = "Cabut";
 "Revoke %@" = "Cabut %@";
 "Right after each answer" = "Tepat setelah setiap jawaban";
 "Room in each chat: %lld tokens" = "Ruang di setiap obrolan: %lld token";
 "Run benchmark" = "Jalankan benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Jalankan di Terminal untuk menaikkan batas memori GPU; akan kembali saat Mac di-restart.";
-"Run without asking" = "Jalankan tanpa bertanya";
-"Run without asking:" = "Jalankan tanpa bertanya:";
 "Running" = "Berjalan";
 "Running — %@ on :%lld" = "Berjalan — %@ di :%lld";
 "Running…" = "Berjalan…";
-"Runs this command" = "Menjalankan perintah ini";
+"Runs" = "Berjalan";
 "Runtime data" = "Data runtime";
 "Same as LLMTray" = "Sama seperti LLMTray";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Mengambil sampel hanya dari token paling mungkin yang total probabilitasnya mencapai nilai ini. 1.0 menonaktifkannya.";
@@ -1060,7 +1051,7 @@
 "Server Log" = "Log Server";
 "Server log" = "Log server";
 "Server settings changed -- restart to apply them." = "Pengaturan server berubah — mulai ulang untuk menerapkannya.";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "Server yang memberi obrolan lebih banyak alat: mail, catatan, kalender, file, layanan. Masing-masing hanya berjalan setelah Anda meninjaunya, dimuat ke obrolan dari menu + (atau saat model memintanya), dan akan meminta Anda sebelum setiap panggilan kecuali Anda mengizinkan alat berjalan tanpa bertanya.";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "Server memberi Obrolan lebih banyak alat: email, catatan, kalender, file, layanan. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Menyiapkan pembuatan gambar (hanya pertama kali)…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "Tampilkan Jendela Chat";
 "Show Files" = "Tampilkan Berkas";
 "Show Less" = "Tampilkan Lebih Sedikit";
+"Show Log…" = "Tampilkan Log…";
 "Show Next Tab" = "Tampilkan Tab Berikutnya";
 "Show Previous Tab" = "Tampilkan Tab Sebelumnya";
 "Show Reports…" = "Tampilkan Laporan…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Waktu tunggu mandek: %lld dtk";
 "Start" = "Mulai";
-"Start Again" = "Mulai Lagi";
 "Start LLMTray automatically when you log in to this Mac." = "Mulai LLMTray secara otomatis saat Anda masuk ke Mac ini.";
 "Start Server" = "Mulai Server";
 "Start a new saved chat (⌘N) to add files to a project." = "Mulai obrolan tersimpan baru (⌘N) untuk menambahkan berkas ke proyek.";
-"Start and Review" = "Mulai dan Ulasan";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "Mulai sekali untuk melihat apa yang ditawarkannya. Memulainya tidak mengizinkan apa pun; obrolan tidak dapat menggunakannya sampai Anda menyalakannya.";
 "Start server" = "Mulai server.";
 "Start talking" = "Mulai berbicara";
 "Start the server first." = "Mulai server terlebih dahulu.";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "Mulai dalam %.0f s…";
 "Starting…" = "Memulai…";
 "Startup" = "Saat Memulai";
+"Status" = "Status";
 "Staying up to date" = "Tetap terbaru";
 "Stays in its project" = "Tetap di proyeknya";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "Tetap di proyeknya: obrolan proyek melihat apa yang dipelajari di proyek tersebut, Chat di luar proyek melihat apa yang dipelajari di luar proyek. Dibagikan oleh semua obrolan: setiap obrolan melihat semua yang dipelajari di mana saja (catatan proyek hanya saat Ingat di proyek menyala). Apa pun yang Anda tulis sendiri (Tentang Anda, catatan untuk Semua obrolan) terlihat di mana saja dalam kedua mode.";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "Bahasa aplikasi (hanya bahasa, bukan wilayah).";
 "The app's name." = "Nama aplikasi.";
 "The base profile: every other profile inherits from it." = "Profil dasar: setiap profil lain mewarisinya.";
-"The bundle couldn't be downloaded." = "Bundel tidak dapat diunduh.";
-"The bundle's address isn't https." = "Alamat bundel bukan https.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Obrolan meminta menyalin %1$@ (%2$@) ke dalam proyek. Setiap obrolan di proyek tersebut lalu dapat mencarinya.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Obrolan meminta untuk menyalin %1$@ (%2$@) ke proyek. Setiap obrolan dalam proyek kemudian dapat menggunakannya dalam dokumen.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Model chat dapat menata hasil tulisannya sebagai PDF — laporan, surat, catatan, faktur — lengkap dengan tabel dan grafik. PDF tetap berada di obrolan sampai Anda membukanya, menyimpannya, atau menambahkannya ke proyek. Tidak ada yang diunduh untuk fitur ini; fitur ini tidak tersedia dalam chat sementara.";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Salinan berkas yang ditambahkan ke proyek, beserta indeksnya, bersama-sama. Berkas milik proyek ditampilkan di jendela Files; menghapus proyek akan menghapusnya.";
 "The day the counts are for." = "Hari yang dihitung.";
 "The download didn't start." = "Unduhan tidak dimulai.";
-"The download doesn't match what the registry lists for it." = "Unduhan tidak cocok dengan yang dicantumkan registry untuknya.";
 "The download failed: %@" = "Unduhan gagal: %@";
 "The download stopped." = "Unduhan berhenti.";
 "The downloaded embedder files don't match their checksums: %@" = "File embedder yang diunduh tidak cocok dengan checksum mereka: %@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "Rencana berubah sejak Anda melihatnya: tinjau lagi.";
 "The port and network access can change only while the server is stopped." = "Port dan akses jaringan hanya dapat diubah saat server dihentikan.";
 "The project's files, and Add Files…" = "Berkas proyek, dan Tambahkan Berkas…";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registri memeriksa siapa yang memublikasikan nama, bukan apa yang dilakukan kode. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
 "The reply was cut at its length limit." = "Balasan terpotong karena batas panjang.";
 "The report" = "Laporannya";
 "The reports" = "Laporan";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Server sedang menggunakan model ini atau sibuk memproses permintaan: hentikan (atau pilih model lain), atau tunggu hingga idle.";
 "The server log" = "Log server";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "Server mungkin melakukan lebih banyak daripada yang ditunjukkan argumen ini (penerima dan teks kutipan pada balasan mail berasal dari Mail).";
+"The server says this only reads." = "Server menyatakan ini hanya membaca.";
 "The server starts once %@ is downloaded" = "Server dimulai setelah %@ diunduh";
 "The server starts with %@" = "Server dimulai dengan %@";
 "The settings here were kept." = "Pengaturan di sini dipertahankan.";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "Upaya berpikir: berapa lama model boleh berpikir sebelum menjawab.";
 "Thinking…" = "Berpikir…";
 "Thinking… %@ s of reply ready" = "Memikirkan… %@ s balasan siap";
+"This Mac" = "Mac Ini";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Mac ini menjalankan model sekitar ~%@× waktu nyata: bicara, lalu dengarkan.";
+"This can change things." = "Ini dapat mengubah sesuatu.";
 "This chat knows" = "Obrolan ini tahu";
 "This chat may use" = "Chat ini boleh menggunakan";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Ini tidak dapat dicantumkan: pembayaran tidak ditemukan, atau nama ditolak.";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "Kartu model ini tidak mencantumkan %@: model mungkin kurang baik membaca Obrolan dalam bahasa itu dan menulis catatan yang lebih buruk.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
+"This tool" = "Alat ini";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Versi ini mengindeks file teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods) serta menyimpan gambar untuk dokumen; folder dan file tersembunyi tidak dapat ditambahkan.";
 "This version of LLMTray can't send reviews. Please update the app." = "Versi LLMTray ini tidak dapat mengirim ulasan. Silakan perbarui aplikasi.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Versi LLMTray ini menyiapkan runtime menggunakan Python. Instal Python dari python.org atau Homebrew, lalu periksa lagi. Atau gunakan LLMTray-Full yang sudah menyertakan semua yang diperlukan.";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "Aturan penggunaan alat";
 "Tools" = "Alat";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Alat yang dapat dipanggil model dalam obrolan aplikasi (membutuhkan model pemanggil alat). Alat web mengirim kueri model ke layanan publik tersebut (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); alat lokal tidak pernah meninggalkan Mac.";
-"Tools…" = "Alat…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "Topik";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Permintaan bersamaan: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
 "Try Again" = "Coba Lagi";
 "Try It Again" = "Coba Lagi";
+"Turn Off" = "Matikan";
 "Turn On" = "Nyalakan";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "Saluran pembaruan: Beta";
 "Update channel: Stable" = "Saluran pembaruan: Stable";
 "Update failed: %@" = "Pembaruan gagal: %@";
+"Update to %@" = "Perbarui ke %@";
 "Updates" = "Pembaruan";
 "Usage statistics" = "Statistik penggunaan";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Statistik penggunaan dimatikan: tidak ada yang dikirim. Ini tampilan laporan jika Anda mengaktifkannya (ID dibuat saat itu).";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "Menunggu model dimuat.";
 "Walkie-talkie" = "Walkie‑talkie";
 "Weather" = "Cuaca";
+"Web" = "Web";
 "Web search" = "Pencarian web";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "Pencarian web, berita, Wikipedia, cuaca, dan lain-lain. Kuery model akan dikirim ke layanan tersebut.";
 "Web tools" = "Alat web";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ campuran (direkomendasikan)";
+"a new setting (%@): uninstall and install it again to give it" = "pengaturan baru (%@): hapus lalu pasang lagi untuk memberikannya";
 "always" = "selalu";
 "and %lld more" = "dan %lld lainnya";
 "at least %1$@ items, %2$@" = "setidaknya %1$@ item, %2$@";
 "at least %@" = "setidaknya %@";
 "building %@" = "membangun %@";
+"by %lld" = "oleh %lld";
 "calls tools" = "memanggil alat";
 "can look" = "bisa melihat";
 "can look and propose changes" = "bisa melihat dan mengusulkan perubahan";
@@ -1573,11 +1569,11 @@
 "removing" = "menghapus";
 "rename %lld" = "ganti nama %lld";
 "search by words only" = "cari hanya dengan kata";
+"something LLMTray can't run" = "sesuatu yang tidak dapat dijalankan oleh LLMTray";
 "the download finished incomplete" = "unduhan selesai tidak lengkap";
 "the installed version didn't change" = "versi yang terinstal tidak berubah";
 "the model" = "model";
 "the model runtime isn't installed yet" = "runtime model belum terpasang";
-"the server says it only reads" = "server mengatakan hanya membaca";
 "then" = "lalu";
 "this call only" = "hanya panggilan ini";
 "tight fit" = "muat pas";

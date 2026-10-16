@@ -2,7 +2,6 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
-" · running" = " · 実行中";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "この回答で引用した「%@」は変更されています：ページ %lld の内容が現在とは異なる可能性があります。";
 "\"%@\" is no longer in the project." = "「%@」はプロジェクトに含まれていません。";
 "%.0f%% from drafts" = "ドラフト由来 %.0f%%";
@@ -11,7 +10,9 @@
 "%1$@ and %2$lld more" = "%1$@ 他 %2$lld 件";
 "%1$@ asks for %2$@" = "%1$@ が %2$@ を要求しています";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ が %2$@ を要求しています。切り替えると現在読み込まれているモデルはアンロードされます。";
+"%1$@ couldn't be updated: %2$@" = "%1$@をアップデートできませんでした: %2$@";
 "%1$@ items, %2$@" = "%1$@ 個、%2$@";
+"%1$@ was installed but didn't start: %2$@" = "%1$@はインストールされましたが、起動しませんでした: %2$@";
 "%1$@: the command %2$@ wasn't found." = "%1$@：コマンド %2$@ が見つかりませんでした。";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "元のファイルと比較できなかったものが %1$lld 個あるため、選択解除されました: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "元と異なるコピーが %1$lld 個あるため、重複として扱われません: %2$@";
@@ -71,8 +72,8 @@
 "%lld requests" = "%lld 件のリクエスト";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld 件の進行中リクエスト（「同時リクエスト数」の設定値まで同時に処理）";
 "%lld s" = "%lld 秒";
-"%lld tools new or changed: hidden from the chat until reviewed." = "%lld 個のツールが新規または変更あり：レビューするまでチャットには表示されません。";
-"%lld tools%@" = "%lld 個のツール%@";
+"%lld tools are new or changed on the server: hidden from the chat until you accept them." = "サーバ上の%lld個のツールは新規または変更ありです: 承認するまでチャットに表示されません。";
+"%lld tools changed on the server: Configure to accept them." = "サーバ上の%lld個のツールが変更されました: 受け入れるには設定してください。";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lldビット";
 "(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
@@ -112,13 +113,12 @@
 "About LLMTray" = "LLMTrayについて";
 "About you" = "あなたについて";
 "About you and your work: what you do, what you use." = "あなたと仕事について：していること、使っているもの。";
+"Accept" = "承認";
 "Add" = "追加";
-"Add %@" = "%@を追加";
 "Add Files to “%@”…" = "“%@”にファイルを追加…";
 "Add Files…" = "ファイルを追加…";
 "Add Note…" = "ノートを追加…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF、Word、テキストファイルをプロジェクトに追加できます。チャットはそれらを検索してページを引用します。ファイルをピン留めすると会話内で全体を保持します。";
-"Add Server" = "サーバを追加";
 "Add a Command Server" = "コマンドサーバを追加";
 "Add a Command…" = "コマンドを追加…";
 "Add a URL Server" = "URLサーバを追加";
@@ -191,7 +191,6 @@
 "Apps & agents" = "アプリとエージェント";
 "Apps and agents" = "アプリとエージェント";
 "Arguments, one per line" = "引数、1行に1つ";
-"Arguments…" = "引数…";
 "Ask Later" = "後で尋ねる";
 "Ask about LLMTray" = "LLMTray に関して質問する";
 "Ask again in two weeks" = "2週間後に再度確認します";
@@ -230,7 +229,6 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "推奨より大きい：より良い応答だが遅く、他のアプリに使えるメモリが少なくなります。";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us 版からチャット、プロジェクト、プロファイル、画像・音楽・音声・埋め込みモデルおよび設定を取り込みます（先に終了してください）。こちらのチャットとモデルは残り、取り込まれる設定がこれを置き換えます。モデルは追加のディスク容量を要しません。チャットモデルは models フォルダに残ります：設定 › Models で選択してください。";
 "Browse Hugging Face…" = "Hugging Faceをブラウズ…";
-"Browse the Catalog…" = "カタログを表示…";
 "Built into macOS · LLMTray's chat only" = "macOSに内蔵 · LLMTrayのチャットのみ";
 "Cached" = "キャッシュ済み";
 "Calculator" = "計算機";
@@ -301,7 +299,6 @@
 "Coffee" = "コーヒー";
 "Comes with %@" = "%@に付属";
 "Command" = "コマンド";
-"Command servers don't run in this version of LLMTray." = "このバージョンのLLMTrayではコマンドサーバは実行できません。";
 "Command-line tool" = "コマンドラインツール";
 "Compact" = "コンパクト";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "圧縮では、長いチャットの中間部分がモデルの作成した1つの要約に置き換えられます。冒頭のこの数のメッセージは一字一句そのまま保持されます。";
@@ -311,7 +308,9 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "メッセージ数がこの数を超えると、チャットを自動的に圧縮します。チャット内の「圧縮」ボタンは、この設定にかかわらず使用できます。";
 "Composing…" = "作成中…";
 "Concurrent requests" = "同時リクエスト数";
-"Connects to" = "接続先";
+"Configure" = "設定";
+"Connect Again" = "再接続";
+"Connecting…" = "接続中…";
 "Context" = "コンテキスト";
 "Continue" = "続ける";
 "Copied" = "コピー済み";
@@ -362,6 +361,8 @@
 "Deny" = "拒否";
 "Describe a picture, drawn on this Mac" = "この Mac に描かれた画像を説明する";
 "Diagnostics" = "診断";
+"Discover" = "検出";
+"Discover Servers" = "サーバを検出";
 "Disk usage" = "ディスク使用量";
 "Dismiss" = "閉じる";
 "Document: %@" = "ドキュメント：%@";
@@ -374,6 +375,7 @@
 "Documents go into a project with this chat; images go into your message." = "ドキュメントはこのチャットとともにプロジェクトに入ります。画像はメッセージに添付されます。";
 "Documents tools" = "ドキュメントツール";
 "Doesn't open at login" = "ログイン時に開かない";
+"Doesn't run in this version of LLMTray." = "このバージョンのLLMTrayでは実行できません。";
 "Don't Add" = "追加しない";
 "Don't Ask Again" = "今後尋ねない";
 "Don't Remember This Chat…" = "このチャットを記憶しない…";
@@ -399,6 +401,7 @@
 "Downloading…" = "ダウンロード中…";
 "Downloads" = "ダウンロード";
 "Downloads waiting: %lld" = "待機中のダウンロード: %lld";
+"Drag .mcpb files here to install" = "インストールするには、.mcpbファイルをここにドラッグしてください";
 "Drag chats here, or use a chat's menu" = "ここにチャットをドラッグするか、チャットのメニューを使ってください";
 "Drag chats or files here, or use a chat's menu" = "チャットかファイルをここにドラッグするか、チャットのメニューを使ってください";
 "Drag documents onto this chat: they join the project, and the model answers from them." = "このチャットに書類をドラッグするとプロジェクトに追加され、モデルはそれらを参照して回答します。";
@@ -494,7 +497,7 @@
 "Free disk space" = "空きディスク容量";
 "Free on disk: %@ · your models: %@" = "ディスクの空き: %@ · あなたのモデル: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "リクエストがないままこの時間が経過したら、読み込まれたモデルが保持しているメモリを解放します。次のリクエスト時に自動的に再読み込みされ、通常の読み込み待ち時間が発生します。";
-"From the official MCP Registry. The registry checks who published a name, not what the code does: review a server before you turn it on." = "公式のMCP Registryから取得します。Registryが確認するのは名前の公開元であり、コードの動作ではありません。オンにする前にサーバをレビューしてください。";
+"From the MCP Registry" = "MCP Registryから";
 "Full" = "フル";
 "Full duplex" = "フルデュプレックス";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "フルデュプレックス：いつでも話せます。モデルは発話中でもあなたの声を聞きます — リアルタイムで動作する Mac が必要です。ウォーキートーキー：話して Done を押し、その後に聞きます。Automatic は Voice Lab 起動時にこの Mac の測定速度で選択されます。";
@@ -529,7 +532,6 @@
 "Help" = "ヘルプ";
 "Help improve LLMTray?" = "LLMTrayの改善に協力しますか？";
 "Hide" = "非表示";
-"Hide Log" = "ログを非表示";
 "Hide chats" = "チャットを非表示";
 "Hide the reasoning" = "推論を非表示";
 "Hide these steps for good" = "この手順を今後表示しない";
@@ -610,7 +612,6 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "設定も引き継がれました。ただし、Hugging Face トークンは「設定」›「モデル」で再入力する必要があります。";
 "Its settings were the same as these already." = "その設定はすでにこちらと同じでした。";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "その設定は取り込まれませんでした：~/Library/Preferences の %@ ではありません。";
-"Its settings, secrets and (for a bundle) its files go. Chats keep their record of past calls." = "設定、シークレット、（バンドルの場合は）そのファイルは削除されます。チャットには過去の呼び出しの記録が残ります。";
 "KV cache" = "KVキャッシュ";
 "KV group size" = "KVグループサイズ";
 "Keep" = "維持";
@@ -621,7 +622,7 @@
 "Keep first messages: %lld" = "最初のメッセージを保持: %lld";
 "Keep last messages: %lld" = "最後のメッセージを保持: %lld";
 "Keep the loaded model" = "読み込まれているモデルを維持";
-"Keeps crashing: off until started again (see its log)." = "クラッシュを繰り返しているため、再度開始するまでオフです（ログを確認してください）。";
+"Keeps crashing -- see its log." = "繰り返しクラッシュしています — ログを確認してください。";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量子化前に、コンテキストの先頭Nトークンをフル精度で保持します。値を高くすると、長いプロンプトの精度は上がりますが、メモリ節約効果は下がります。";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "このポートを維持します。他のアプリが実際に使用している場合、サーバは起動しません。設定でポートを変更してください。";
 "Kept free: %lld MB" = "確保済み: %lld MB";
@@ -647,7 +648,6 @@
 "Learning needs the embedding model (Settings › Memory)." = "学習には埋め込みモデルが必要です（設定 › メモリ）。";
 "Leave a Review" = "レビューを書く";
 "Length" = "長さ";
-"Less" = "簡易表示";
 "Let chats make documents" = "チャットでドキュメントを作成できるようにする";
 "Let chats work in folders" = "チャットにフォルダ操作を許可";
 "Let coding agents and scripts use your models." = "コーディングエージェントやスクリプトにモデルの利用を許可します。";
@@ -660,7 +660,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "推奨より軽い：高速で他のアプリにメモリを残しますが、応答はより簡素になります。";
 "Like LLMTray?" = "LLMTrayはいかがですか？";
 "Likes" = "いいね";
-"List Again" = "再度一覧表示";
 "List my name" = "名前を掲載";
 "List my name in Supporters" = "Supportersに名前を掲載";
 "Listening…" = "聴いています…";
@@ -676,7 +675,6 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "長い会話とピン留めファイルは毎ターン読み直されず、キャッシュから取得されます。";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "長いチャットはウインドウで管理すると便利です：サイドバーにプロジェクト、ファイル、すべてのチャットを表示します。";
-"MCP Servers" = "MCPサーバ";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter：%@を高速化、回答は同じ";
 "Made for programming and agents: coding tools and the OpenAI API." = "プログラミングとエージェント向け：コーディングツールと the OpenAI API。";
 "Maintenance" = "メンテナンス";
@@ -784,7 +782,6 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "ノートはまだありません。すべてのチャットに知らせたいことを追加します：「ロシア語で簡潔に回答」「ESP32スピーカーを作っています」。";
 "No requests yet." = "まだリクエストはありません。";
 "No runs yet." = "実行履歴はまだありません。";
-"No servers yet." = "サーバはまだありません。";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "購読なし。機能ロックなし。LLMTrayが役立つと思ったら開発を支援してください。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "この Mac のメモリに対する提案はありません。Hugging Face でモデルを探してください。";
 "No thanks" = "結構です";
@@ -792,13 +789,13 @@
 "No update check at launch" = "起動時に更新を確認しない";
 "No usage statistics" = "使用状況の統計を送信しない";
 "Non-commercial license: read it on the model card before using the model." = "非商用ライセンス: モデルを使用する前にモデルカードで確認してください。";
+"None" = "なし";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "まだありません。単一のチャットやリクエストに対する許可はここに表示されません：そのチャット／リクエストの終了で消えます。";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "ディスク容量が不足しています：音声モデルに %1$@ が必要ですが、空きは %2$@ です。";
 "Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "空きディスク容量が不足しています：%@ は約 %@ が必要で、%@ の空きがあります。";
 "Not identical to %@: not a duplicate." = "%@ と同一ではないため、重複ではありません。";
 "Not indexed" = "未インデックス";
-"Not reviewed yet: review it to see its tools." = "まだレビューされていません。ツールを表示するにはレビューしてください。";
 "Not sent any more. Bring one back, or it's deleted later." = "もう送信されません。戻さない場合、後で削除されます。";
 "Not sent yet: waits for another chat to show it, or your approval." = "まだ送信されていません。別のチャットにも現れるか、あなたが承認するまで待機します。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "未対応: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化し、画像 (png, jpg, heic, webp, tiff, gif) は保存します。";
@@ -811,7 +808,6 @@
 "Nothing left to read: every chat was read from its start." = "読み取るものは残っていません。すべてのチャットを先頭から読み取り済みです。";
 "Nothing logged yet." = "ログはまだありません。";
 "Nothing new to import" = "新しい項目はありません";
-"Nothing runs yet: next you start it once and review its tools." = "まだ実行されていません。次に一度開始して、そのツールをレビューしてください。";
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
 "Nothing to pin until the file has been read" = "ファイルが読み取られるまでピン留めできません";
@@ -828,6 +824,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "オフ：この Mac のみ。オン：ネットワーク上の全員が利用可能になるため、信頼できるネットワークでのみ有効にしてください。";
 "Older" = "以前";
+"On" = "オン";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一回限り：Coffee $5、Pro Supporter $25、Founding Supporter $150。";
 "Only From Now On" = "今後のみ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "制限付きモデルのみ (Llama、一部の Gemma と FLUX リポジトリ): Hugging Face ページでライセンスを承諾し、読み取り用トークンをここに貼り付けてください。トークンは Keychain に保存され、huggingface.co にのみ送信されます。";
@@ -954,7 +951,6 @@
 "Ready." = "準備完了。";
 "Ready. This is the Full build: the runtime is included." = "準備完了。これは Full ビルドで、ランタイムが同梱されています。";
 "Reasoning" = "推論";
-"Recent" = "最近使った項目";
 "Recent changes" = "最近の変更";
 "Recently updated" = "最近更新";
 "Recommended" = "推奨";
@@ -981,7 +977,6 @@
 "Remove recording" = "録音を削除";
 "Remove this file from the project?" = "このファイルをプロジェクトから削除しますか？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
-"Remove…" = "削除…";
 "Rename" = "名称変更";
 "Rename %1$@ to %2$@" = "%1$@ の名前を %2$@ に変更";
 "Rename Profile" = "プロファイル名を変更";
@@ -1004,26 +999,22 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "新しい設定でモデルプロセスを再起動します（再読み込みに数秒かかります）。";
 "Restore" = "復元";
 "Restore Purchases" = "購入を復元";
-"Results" = "結果";
 "Resume" = "再開";
 "Resume Download" = "ダウンロードを再開";
 "Resume Indexing" = "インデックスを再開";
 "Resume download" = "ダウンロードを再開します。";
 "Retry" = "再試行";
 "Review" = "レビュー";
-"Review…" = "レビュー…";
 "Revoke" = "取り消す";
 "Revoke %@" = "%@を取り消す";
 "Right after each answer" = "各回答の直後";
 "Room in each chat: %lld tokens" = "各チャットの余裕：%lldトークン";
 "Run benchmark" = "ベンチマークを実行";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU メモリ制限を上げるには Terminal で実行してください；Mac を再起動するとリセットされます。";
-"Run without asking" = "確認せずに実行";
-"Run without asking:" = "確認せずに実行:";
 "Running" = "実行中";
 "Running — %@ on :%lld" = "実行中 — %@（:%lld）";
 "Running…" = "実行中…";
-"Runs this command" = "このコマンドを実行";
+"Runs" = "実行";
 "Runtime data" = "ランタイムデータ";
 "Same as LLMTray" = "LLMTrayと同じ";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "確率の合計がこの値に達する、最も可能性の高いトークンからのみサンプリングします。1.0 でオフになります。";
@@ -1060,7 +1051,7 @@
 "Server Log" = "サーバログ";
 "Server log" = "サーバログ";
 "Server settings changed -- restart to apply them." = "サーバ設定が変更されました。適用するには再起動してください。";
-"Servers that give the chat more tools: mail, notes, calendars, files, services. Each one runs only after you review it, loads into a chat from the + menu (or when the model asks), and asks you before every call unless you let a tool run without asking." = "チャットにメール、メモ、カレンダー、ファイル、サービスなどのツールを追加するサーバです。各サーバはレビュー後にのみ実行され、+ メニューからチャットに読み込まれます（またはモデルが要求したとき）。また、ツールを確認なしで実行するよう許可しないかぎり、呼び出しのたびに確認があります。";
+"Servers give the chat more tools: mail, notes, calendars, files, services. The chat asks you before each call." = "サーバにより、チャットでメール、メモ、カレンダー、ファイル、サービスなどのツールを使えるようになります。チャットは呼び出しのたびに確認します。";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "画像生成を設定しています（初回のみ）…";
@@ -1081,6 +1072,7 @@
 "Show Chat Window" = "チャットウインドウを表示";
 "Show Files" = "ファイルを表示";
 "Show Less" = "簡易表示";
+"Show Log…" = "ログを表示…";
 "Show Next Tab" = "次のタブを表示";
 "Show Previous Tab" = "前のタブを表示";
 "Show Reports…" = "レポートを表示…";
@@ -1119,12 +1111,9 @@
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "ストールタイムアウト: %lld秒";
 "Start" = "開始";
-"Start Again" = "再度開始";
 "Start LLMTray automatically when you log in to this Mac." = "この Mac にログインしたときに LLMTray を自動的に起動します。";
 "Start Server" = "サーバを起動";
 "Start a new saved chat (⌘N) to add files to a project." = "プロジェクトにファイルを追加するには、新しい保存済みチャット（⌘N）を開始してください。";
-"Start and Review" = "開始してレビュー";
-"Start it once to see what it offers. Nothing is allowed by starting it; the chat can't use it until you turn it on." = "何を提供するかを確認するには、一度開始してください。開始しても何も許可されません。オンにするまでチャットでは使えません。";
 "Start server" = "サーバを起動します。";
 "Start talking" = "話し始める";
 "Start the server first." = "先にサーバを起動してください。";
@@ -1133,6 +1122,7 @@
 "Starting in %.0f s…" = "あと %.0f 秒で開始…";
 "Starting…" = "起動中…";
 "Startup" = "起動";
+"Status" = "ステータス";
 "Staying up to date" = "最新の状態を維持";
 "Stays in its project" = "プロジェクト内に保持";
 "Stays in its project: a project's chats see what was learned in that project, chats outside projects what was learned outside them. Shared by all chats: every chat sees everything learned anywhere (a project's notes only while Remember in projects is on). What you write yourself (About you, notes for all chats) is seen everywhere either way." = "プロジェクト内に保持：プロジェクトのチャットではそのプロジェクトで学習された内容が表示され、プロジェクト外のチャットではプロジェクト外で学習された内容が表示されます。すべてのチャットで共有：すべてのチャットで、どこで学習された内容でもすべて表示されます（プロジェクトのメモは「プロジェクトで記憶」がオンの間のみ）。自分で書いた内容（「あなたについて」、すべてのチャット用のメモ）は、どちらの場合もすべての場所で表示されます。";
@@ -1201,8 +1191,6 @@
 "The app's language (the language only, not the region)." = "アプリの言語（地域は含みません）。";
 "The app's name." = "アプリ名。";
 "The base profile: every other profile inherits from it." = "基本プロファイルです。ほかのすべてのプロファイルはこれを継承します。";
-"The bundle couldn't be downloaded." = "バンドルをダウンロードできませんでした。";
-"The bundle's address isn't https." = "バンドルのアドレスは https ではありません。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "チャットが %1$@（%2$@）をプロジェクトにコピーするよう要求しています。プロジェクト内のすべてのチャットから検索できるようになります。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "このチャットは %1$@（%2$@）をプロジェクトにコピーすることを要求しています。するとプロジェクト内のすべてのチャットが文書で利用できます。";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "チャットモデルは作成した内容をPDFとしてレイアウトできます — レポート、手紙、メモ、請求書など。表やグラフも含められます。PDFは開く、保存、プロジェクトに追加するまでチャット内に残ります。この機能のためにダウンロードするものはありません。一時チャットでは利用できません。";
@@ -1218,7 +1206,6 @@
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "プロジェクトに追加されたファイルのコピーとそのインデックスです。プロジェクト固有のものは Files ウィンドウに表示され、プロジェクトを削除するとこれらも削除されます。";
 "The day the counts are for." = "集計対象の日付。";
 "The download didn't start." = "ダウンロードが開始されませんでした。";
-"The download doesn't match what the registry lists for it." = "ダウンロードした内容が、Registry に記載されているものと一致しません。";
 "The download failed: %@" = "ダウンロードに失敗しました：%@";
 "The download stopped." = "ダウンロードが停止しました。";
 "The downloaded embedder files don't match their checksums: %@" = "ダウンロードした埋め込み器ファイルのチェックサムが一致しません: %@";
@@ -1278,6 +1265,7 @@
 "The plan changed since you looked at it: review it again." = "表示してから計画が変更されました：再度確認してください。";
 "The port and network access can change only while the server is stopped." = "ポートとネットワークアクセスはサーバー停止中にのみ変更できます。";
 "The project's files, and Add Files…" = "プロジェクトのファイル、及び「ファイルを追加…」";
+"The registry checks who published a name, not what the code does. The chat asks you before each call." = "レジストリが確認するのは、名前の公開元であり、コードの動作ではありません。チャットは呼び出しのたびに確認します。";
 "The reply was cut at its length limit." = "返信が長さの上限で切られました。";
 "The report" = "レポート";
 "The reports" = "レポート";
@@ -1295,6 +1283,7 @@
 "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "サーバーがこのモデルを使用中、またはリクエストで忙しいです：停止する（または別のモデルを選ぶ）か、アイドルになるまで待ってください。";
 "The server log" = "サーバーログ";
 "The server may do more than these arguments show (a mail reply's recipients and quoted text come from Mail)." = "この引数から分かる以上のことをサーバが行う場合があります（メール返信の宛先や引用テキストは Mail から渡されます）。";
+"The server says this only reads." = "サーバによれば、これは読み取りのみです。";
 "The server starts once %@ is downloaded" = "%@ のダウンロードが完了するとサーバーが起動します";
 "The server starts with %@" = "サーバーは %@ で起動します";
 "The settings here were kept." = "こちらの設定は保持されました。";
@@ -1315,7 +1304,9 @@
 "Thinking effort: how long the model may think before it answers" = "思考量：モデルが回答する前に思考できる時間の長さ";
 "Thinking…" = "考え中…";
 "Thinking… %@ s of reply ready" = "考え中… %@ 秒分の返信が準備できました";
+"This Mac" = "このMac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "この Mac はモデルを約 %@× 実時間で動作させます：話してから聞きます。";
+"This can change things." = "これは変更を加えることができます。";
 "This chat knows" = "このチャットが知っていること";
 "This chat may use" = "このチャットが使用可能";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "掲載できませんでした：支払いが見つからないか、名前が拒否されました。";
@@ -1329,6 +1320,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使用してください。";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "このモデルのカードには%@が記載されていません。その言語のチャットの読み取り精度が低く、メモの品質がさらに低くなる可能性があります。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "このプロファイルのファイルを読み込めないため、ここでは編集できません。ファイルを修正または削除してから、設定を開き直してください。";
+"This tool" = "このツール";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化し、画像は文書用に保存します。フォルダと隠しファイルは追加できません。";
 "This version of LLMTray can't send reviews. Please update the app." = "このバージョンのLLMTrayではレビューを送信できません。アプリをアップデートしてください。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "この LLMTray は Python でランタイムを設定します。python.org または Homebrew から Python をインストールしてから再確認してください。必要なものをすべて含む LLMTray‑Full を使うこともできます。";
@@ -1355,7 +1347,6 @@
 "Tool-use rule" = "ツール使用ルール";
 "Tools" = "ツール";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "モデルがアプリ内チャットで呼び出せるツール（ツール呼び出し対応モデルが必要）です。Webツールはモデルの問い合わせを該当の公開サービス（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）に送信します。ローカルのツールはMac外に出ません。";
-"Tools…" = "ツール…";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Topic" = "トピック";
@@ -1363,6 +1354,7 @@
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。同時リクエスト数：最良の合計速度の 90% に達する最小数（それ以上はメモリ使用量が増える割に効果が小さい）。prefill：最速となる値。";
 "Try Again" = "再試行";
 "Try It Again" = "再試行";
+"Turn Off" = "オフにする";
 "Turn On" = "オンにする";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
@@ -1394,6 +1386,7 @@
 "Update channel: Beta" = "アップデートチャネル：Beta";
 "Update channel: Stable" = "アップデートチャネル：Stable";
 "Update failed: %@" = "更新に失敗しました：%@";
+"Update to %@" = "%@にアップデート";
 "Updates" = "アップデート";
 "Usage statistics" = "使用統計";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "使用統計はオフです：何も送信されません。これが統計を有効にしたときのレポートの例です（ID はその時に作成されます）。";
@@ -1442,6 +1435,7 @@
 "Waits for the model to be loaded." = "モデルが読み込まれるまで待機します。";
 "Walkie-talkie" = "ウォーキートーキー";
 "Weather" = "天気";
+"Web" = "Web";
 "Web search" = "ウェブ検索";
 "Web search, news, Wikipedia, weather and more. The model's queries go to those services." = "ウェブ検索、ニュース、Wikipedia、天気など。モデルの問い合わせはそれらのサービスに送信されます。";
 "Web tools" = "ウェブツール";
@@ -1503,11 +1497,13 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed（推奨）";
+"a new setting (%@): uninstall and install it again to give it" = "新しい設定（%@）: これを付与するには、アンインストールしてもう一度インストールしてください";
 "always" = "常に";
 "and %lld more" = "ほか %lld 件";
 "at least %1$@ items, %2$@" = "少なくとも %1$@ 個、%2$@";
 "at least %@" = "少なくとも %@";
 "building %@" = "ビルド中: %@";
+"by %lld" = "作成者 %lld";
 "calls tools" = "ツールを呼び出す";
 "can look" = "参照できます";
 "can look and propose changes" = "参照および変更を提案できます";
@@ -1573,11 +1569,11 @@
 "removing" = "削除中";
 "rename %lld" = "%lld 件を名前変更";
 "search by words only" = "単語のみで検索";
+"something LLMTray can't run" = "LLMTrayで実行できないもの";
 "the download finished incomplete" = "ダウンロードが不完全に終了しました";
 "the installed version didn't change" = "インストールされているバージョンは変更されませんでした";
 "the model" = "モデル";
 "the model runtime isn't installed yet" = "モデル実行環境がまだインストールされていません";
-"the server says it only reads" = "サーバによると読み取り専用です";
 "then" = "その後";
 "this call only" = "この呼び出しのみ";
 "tight fit" = "ぴったり";
