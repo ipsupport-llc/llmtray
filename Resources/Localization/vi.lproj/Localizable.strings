@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ yêu cầu %2$@. Chuyển sẽ tháo mô hình đang tải.";
 "%1$@ couldn't be updated: %2$@" = "Không thể cập nhật %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ mục, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "Đã cài đặt %1$@ nhưng không khởi động được: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ chưa được cài đặt: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: không tìm thấy lệnh %2$@.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld bản sao không thể so sánh với bản gốc, nên đã bỏ chọn: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld bản sao khác với bản gốc, nên không phải trùng lặp: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Đang tải: %1$@ · đã chọn: %2$@";
 "Loading %@…" = "Đang tải %@…";
 "Loading the voice model…" = "Đang tải mô hình giọng nói…";
+"Loading…" = "Đang tải…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Tải ngay mô hình dùng gần nhất để sẵn sàng mà không cần nhấn Play.";
 "Log" = "Nhật ký";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
@@ -817,6 +818,7 @@
 "Notes in" = "Ghi chú bằng";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Các Ghi chú chỉ học từ Trò chuyện đã xóa sẽ bị xóa theo, trừ khi bạn đã sửa, ghim hoặc phê duyệt chúng.";
 "Nothing" = "Không có gì";
+"Nothing found for “%@”." = "Không tìm thấy gì cho “%@”.";
 "Nothing left to read: every chat was read from its start." = "Không còn gì để đọc: mọi Trò chuyện đã được đọc từ đầu.";
 "Nothing logged yet." = "Chưa có gì được ghi lại.";
 "Nothing new to import" = "Không có gì mới để import";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "Tìm kiếm theo ý nghĩa hiện tắt: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Tìm kiếm theo ý nghĩa dùng %@ (%@), đã tải về Mac này. Nếu không có, tệp chỉ được tìm theo từ; bạn có thể tải về sau tại đây.";
 "Search chats" = "Tìm trò chuyện";
+"Searching the registry…" = "Đang tìm kiếm trong registry…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Số giây trước khi bản nháp được thực hiện như hiện tại. 0: chờ bạn nhấn Tạo.";
 "Seen in" = "Được thấy trong";
 "Select All" = "Chọn tất cả";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "Cổng và quyền truy cập mạng chỉ thay đổi được khi server đang dừng.";
 "The project's files, and Add Files…" = "Tệp của dự án, và Thêm Tệp…";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Sổ đăng ký kiểm tra ai đã phát hành một tên, không kiểm tra mã thực hiện việc gì. Trò chuyện sẽ hỏi bạn trước mỗi lần gọi.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "Registry không phản hồi trong 30 giây. Hãy thử lại sau ít phút.";
 "The reply was cut at its length limit." = "Phản hồi bị cắt do vượt giới hạn độ dài.";
 "The report" = "Báo cáo";
 "The reports" = "Các báo cáo";

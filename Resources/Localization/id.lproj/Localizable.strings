@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ meminta %2$@. Beralih akan memuat keluar model yang sedang dimuat.";
 "%1$@ couldn't be updated: %2$@" = "%1$@ tidak dapat diperbarui: %2$@";
 "%1$@ items, %2$@" = "%1$@ item, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ terpasang tetapi tidak dimulai: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ tidak diinstal: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: perintah %2$@ tidak ditemukan.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld salinan tidak dapat dibandingkan dengan aslinya, jadi tidak dicentang: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld salinan berbeda dari aslinya, jadi bukan duplikat: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Dimuat: %1$@ · dipilih: %2$@";
 "Loading %@…" = "Memuat %@…";
 "Loading the voice model…" = "Memuat model suara…";
+"Loading…" = "Memuat…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Memuat model yang terakhir digunakan segera, sehingga siap tanpa menekan Play.";
 "Log" = "Log";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
@@ -817,6 +818,7 @@
 "Notes in" = "Catatan dalam";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Catatan yang dipelajari hanya dari obrolan yang dihapus akan ikut dihapus, kecuali yang Anda edit, sematkan, atau setujui.";
 "Nothing" = "Tidak Ada";
+"Nothing found for “%@”." = "Tidak ada yang ditemukan untuk “%@”.";
 "Nothing left to read: every chat was read from its start." = "Tidak ada lagi yang perlu dibaca: setiap obrolan sudah dibaca dari awalnya.";
 "Nothing logged yet." = "Belum ada yang dicatat.";
 "Nothing new to import" = "Tidak ada yang baru untuk diimport";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "Pencarian berdasarkan makna dimatikan untuk sekarang: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Pencarian berdasarkan makna menggunakan %@ (%@), sekarang diunduh ke Mac ini. Tanpa itu, berkas hanya dicari berdasarkan kata-kata; Anda dapat mengunduhnya di sini nanti.";
 "Search chats" = "Cari chat";
+"Searching the registry…" = "Mencari di registri…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Detik sebelum draf dijalankan sebagaimana adanya. 0: tunggu sampai Anda menekan Jalankan.";
 "Seen in" = "Terlihat di";
 "Select All" = "Pilih Semua";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "Port dan akses jaringan hanya dapat diubah saat server dihentikan.";
 "The project's files, and Add Files…" = "Berkas proyek, dan Tambahkan Berkas…";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Registri memeriksa siapa yang memublikasikan nama, bukan apa yang dilakukan kode. Obrolan akan meminta izin Anda sebelum setiap panggilan.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "Registri tidak menjawab dalam 30 detik. Coba lagi sebentar lagi.";
 "The reply was cut at its length limit." = "Balasan terpotong karena batas panjang.";
 "The report" = "Laporannya";
 "The reports" = "Laporan";

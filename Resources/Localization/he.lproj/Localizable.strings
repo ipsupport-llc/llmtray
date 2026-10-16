@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ מבקש את %2$@. החלפה תסיר את המודל הטעון כעת.";
 "%1$@ couldn't be updated: %2$@" = "לא ניתן היה לעדכן את %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ פריטים, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ הותקן אך לא הופעל: %2$@";
+"%1$@ wasn't installed: %2$@." = "‏%1$@ לא הותקן: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: הפקודה %2$@ לא נמצאה.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "לא ניתן להשוות %1$lld עותקים למקוריהם, לכן הם מסומנים כביטול: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld עותקים שונים מהממקור שלהם ולכן אינם עותקים כפולים: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "טעון: %1$@ · נבחר: %2$@";
 "Loading %@…" = "טוען %@…";
 "Loading the voice model…" = "טוען את מודל הקול…";
+"Loading…" = "טוען…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "טוען מיד את המודל האחרון שהיה בשימוש, כדי שיהיה מוכן בלי ללחוץ על Play.";
 "Log" = "יומן";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
@@ -817,6 +818,7 @@
 "Notes in" = "הערות ב־";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "הערות שנלמדו רק מצ׳אט שנמחק נמחקות איתו, אלא אם ערכת, נעצת או אישרת אותן.";
 "Nothing" = "ללא";
+"Nothing found for “%@”." = "לא נמצא דבר עבור „%@“.";
 "Nothing left to read: every chat was read from its start." = "לא נשאר מה לקרוא: כל צ׳אט נקרא מההתחלה.";
 "Nothing logged yet." = "עדיין לא נרשם דבר.";
 "Nothing new to import" = "אין משהו חדש לייבא";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "חיפוש לפי משמעות כבוי לעת עתה: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "חיפוש לפי משמעות משתמש ב־%@ (%@), שהורד עכשיו למחשב זה. בלעדיו מחפשים קבצים רק לפי מילים; ניתן להורידו כאן מאוחר יותר.";
 "Search chats" = "חפש צ'אטים";
+"Searching the registry…" = "מחפש ברישום…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "שניות לפני שהטיוטה ממשיכה כפי שהיא. 0: המתן עד שתלחץ 'צור'.";
 "Seen in" = "מוצג ב";
 "Select All" = "בחר הכל";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "הפורט וגישת הרשת ניתנים לשינוי רק כשהשרת עצור.";
 "The project's files, and Add Files…" = "קבצי הפרויקט, ו“הוסף קבצים…”";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "הרישום בודק מי פרסם שם, לא מה הקוד עושה. הצ׳אט מבקש ממך אישור לפני כל קריאה.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "לא התקבלה תשובה מהרישום בתוך 30 שניות. נסה שוב בעוד רגע.";
 "The reply was cut at its length limit." = "התשובה נחתכה בגלל מגבלת אורך.";
 "The report" = "הדוח";
 "The reports" = "הדוחות";

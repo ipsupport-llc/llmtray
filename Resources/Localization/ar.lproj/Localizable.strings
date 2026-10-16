@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ يطلب %2$@. التبديل يفرغ النموذج المحمّل حالياً.";
 "%1$@ couldn't be updated: %2$@" = "تعذر تحديث %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ عنصر، %2$@";
-"%1$@ was installed but didn't start: %2$@" = "تم تثبيت %1$@ لكنه لم يبدأ: %2$@";
+"%1$@ wasn't installed: %2$@." = "لم يتم تثبيت %1$@: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: تعذّر العثور على الأمر %2$@.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "لم أمكن مقارنة %1$lld نسخة بأصلها، فتم إلغاء تحديدها: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld نسخة تختلف عن أصلها، لذا ليست مكررة: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "محمل: %1$@ · مختار: %2$@";
 "Loading %@…" = "جارٍ تحميل %@…";
 "Loading the voice model…" = "جاري تحميل نموذج الصوت…";
+"Loading…" = "جارٍ التحميل…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "يحمّل آخر نموذج مستخدم فورًا، ليكون جاهزًا دون الضغط على Play.";
 "Log" = "السجل";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "يسجّل كل رمز يتم إنشاؤه (DEBUG). مخصص فقط لاستكشاف أخطاء عملية النموذج وإصلاحها -- فهو يبطئ الأداء. يسري عند بدء تشغيل الخادم التالي.";
@@ -817,6 +818,7 @@
 "Notes in" = "الملاحظات باللغة";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "تُحذف معها الملاحظات التي تم تعلّمها فقط من دردشة محذوفة، ما لم تكن قد عدّلتها أو ثبّتها أو وافقت عليها.";
 "Nothing" = "لا شيء";
+"Nothing found for “%@”." = "لم يتم العثور على أي شيء لـ %@.";
 "Nothing left to read: every chat was read from its start." = "لم يبقَ شيء لقراءته: قُرئت كل دردشة من بدايتها.";
 "Nothing logged yet." = "لا يوجد شيء في السجل بعد.";
 "Nothing new to import" = "لا يوجد شيء جديد للاستيراد";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "البحث بحسب المعنى معطّل الآن: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "البحث بحسب المعنى يستخدم %@ (%@)، تم تنزيله على هذا الـMac الآن. بدونه تُبحث الملفات بالكلمات فقط؛ يمكنك تنزيله لاحقًا من هنا.";
 "Search chats" = "بحث في الدردشات";
+"Searching the registry…" = "جارٍ البحث في السجل…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "ثوانٍ قبل أن ينفّذ المسودة كما هي. 0: الانتظار حتى تضغط إنشاء.";
 "Seen in" = "يظهر في";
 "Select All" = "تحديد الكل";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "لا يمكن تغيير المنفذ والوصول إلى الشبكة إلا بينما يكون الخادم متوقفًا.";
 "The project's files, and Add Files…" = "ملفات المشروع، و«إضافة ملفات…»";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "يتحقق السجل ممن نشر الاسم، لا مما يفعله الرمز. تطلب الدردشة إذنك قبل كل استدعاء.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "لم يستجب السجل خلال 30 ثانية. حاول مرة أخرى بعد قليل.";
 "The reply was cut at its length limit." = "تم قطع الرد عند الحد الأقصى للطول.";
 "The report" = "التقرير";
 "The reports" = "التقارير";

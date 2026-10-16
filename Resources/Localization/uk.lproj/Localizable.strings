@@ -13,7 +13,7 @@
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запитує %2$@. Переключення розвантажить поточну модель.";
 "%1$@ couldn't be updated: %2$@" = "Не вдалося оновити %1$@: %2$@";
 "%1$@ items, %2$@" = "%1$@ предметів, %2$@";
-"%1$@ was installed but didn't start: %2$@" = "%1$@ було встановлено, але не запущено: %2$@";
+"%1$@ wasn't installed: %2$@." = "%1$@ не було встановлено: %2$@.";
 "%1$@: the command %2$@ wasn't found." = "%1$@: команду %2$@ не знайдено.";
 "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "Не вдалося порівняти %1$lld копій з оригіналами, тому вони зняті з відмітки: %2$@";
 "%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld копій відрізняються від оригіналів, тому вони не є дублікатами: %2$@";
@@ -679,6 +679,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Завантажено: %1$@ · вибрано: %2$@";
 "Loading %@…" = "Завантаження %@…";
 "Loading the voice model…" = "Завантаження голосової моделі…";
+"Loading…" = "Завантаження…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Одразу завантажує останню модель, щоб не натискати Play.";
 "Log" = "Журнал";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Пише в лог кожен згенерований токен (DEBUG). Лише для налагодження процесу моделі — сповільнює роботу. Діє з наступного запуску сервера.";
@@ -817,6 +818,7 @@
 "Notes in" = "Нотатки мовою";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Нотатки, засвоєні лише з видаленого чату, видаляються разом із ним, якщо ви їх не відредагували, не закріпили або не схвалили.";
 "Nothing" = "Нічого";
+"Nothing found for “%@”." = "Для «%@» нічого не знайдено.";
 "Nothing left to read: every chat was read from its start." = "Нічого більше читати: кожен чат прочитано від початку.";
 "Nothing logged yet." = "У журналі ще нічого немає.";
 "Nothing new to import" = "Немає нічого нового для імпорту";
@@ -1048,6 +1050,7 @@
 "Search by meaning is off for now: %@" = "Пошук за значенням наразі вимкнено: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Пошук за значенням використовує %@ (%@), уже завантажено на цей Mac. Без нього файли шукаються лише за словами; ви можете завантажити його пізніше.";
 "Search chats" = "Пошук чатів";
+"Searching the registry…" = "Пошук у реєстрі…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Секунд до того, як чорновик буде виконано в поточному вигляді. 0 — чекати, поки ви натиснете «Створити».";
 "Seen in" = "Видно в";
 "Select All" = "Вибрати все";
@@ -1280,6 +1283,7 @@
 "The port and network access can change only while the server is stopped." = "Порт і доступ до мережі можна змінювати лише коли сервер зупинено.";
 "The project's files, and Add Files…" = "Файли проєкту та «Додати файли…»";
 "The registry checks who published a name, not what the code does. The chat asks you before each call." = "Реєстр перевіряє, хто опублікував назву, а не що робить код. Чат запитує вас перед кожним викликом.";
+"The registry didn't answer in 30 seconds. Try again in a moment." = "Реєстр не відповів за 30 секунд. Спробуйте ще раз за мить.";
 "The reply was cut at its length limit." = "Відповідь була обрізана через обмеження довжини.";
 "The report" = "Звіт";
 "The reports" = "Звіти";
