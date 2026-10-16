@@ -1280,7 +1280,6 @@
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The project's files, and Add Files…" = "The project's files, and Add Files…";
-"The registry checks who published a name, not what the code does. The chat asks you before each call." = "The registry checks who published a name, not what the code does. The chat asks you before each call.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "The registry didn't answer in 30 seconds. Try again in a moment.";
 "The reply was cut at its length limit." = "The reply was cut at its length limit.";
 "The report" = "The report";
@@ -1320,6 +1319,9 @@
 "Thinking effort: how long the model may think before it answers" = "Thinking effort: how long the model may think before it answers";
 "Thinking…" = "Thinking…";
 "Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
+"Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk." = "Third-party server, not by IPSupport. No warranty of any kind: you install and use it at your own risk.";
+"Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk." = "Third-party server, not by IPSupport. No warranty of any kind: you use it at your own risk.";
+"Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call." = "Third-party servers, not by IPSupport. The registry checks who published a name, not what the code does. No warranty of any kind: you install and use them at your own risk. The chat asks you before each call.";
 "This Mac" = "This Mac";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";
 "This can change things." = "This can change things.";
@@ -1520,7 +1522,8 @@
 "at least %1$@ items, %2$@" = "at least %1$@ items, %2$@";
 "at least %@" = "at least %@";
 "building %@" = "building %@";
-"by %lld" = "by %lld";
+"by %lld · third-party" = "by %lld · third-party";
+"by IPSupport" = "by IPSupport";
 "calls tools" = "calls tools";
 "can look" = "can look";
 "can look and propose changes" = "can look and propose changes";

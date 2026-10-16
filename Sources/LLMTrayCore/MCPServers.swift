@@ -481,3 +481,27 @@ public enum MCPSource: Codable, Equatable, Sendable {
         return b.pre && !a.pre
     }
 }
+
+/// Who stands behind a server: IPSupport's own (ipsupport-llc on GitHub or
+/// in the registry) or a third party, with no warranty from us.
+public enum MCPVendor {
+    public static let owner = "ipsupport-llc"
+
+    /// A GitHub URL or a registry name of ours.
+    public static func isIPSupport(_ text: String?) -> Bool {
+        guard let t = text?.lowercased() else { return false }
+        return t.hasPrefix("io.github.\(owner)/") || t.contains("github.com/\(owner)/")
+    }
+}
+
+extension MCPServerConfig {
+    /// Published by IPSupport (adr/0027): everything else is third-party.
+    public var isFromIPSupport: Bool {
+        switch source {
+        case .githubRelease(let owner, _, _)?: if owner.lowercased() == MCPVendor.owner { return true }
+        case .registry(let name)?: if MCPVendor.isIPSupport(name) { return true }
+        case nil: break
+        }
+        return MCPVendor.isIPSupport(origin)
+    }
+}
