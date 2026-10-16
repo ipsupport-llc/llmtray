@@ -743,8 +743,10 @@ final class RunnerProcess: @unchecked Sendable {
         self.maxLineBytes = maxLineBytes
     }
 
+    /// `inheritEnvironment` false: the child gets only `environment` (an MCP
+    /// server: adr/0027). `workingDirectory`: where it starts.
     static func spawn(_ executable: String, _ arguments: [String], environment: [String: String],
-                      maxLineBytes: Int) throws -> RunnerProcess {
+                      maxLineBytes: Int, inheritEnvironment: Bool = true, workingDirectory: String? = nil) throws -> RunnerProcess {
         var inPipe: [Int32] = [-1, -1], outPipe: [Int32] = [-1, -1], errPipe: [Int32] = [-1, -1]
         func fail() -> POSIXError { POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         guard pipe(&inPipe) == 0 else { throw fail() }
@@ -771,8 +773,9 @@ final class RunnerProcess: @unchecked Sendable {
         posix_spawn_file_actions_adddup2(&actions, inPipe[0], 0)
         posix_spawn_file_actions_adddup2(&actions, outPipe[1], 1)
         posix_spawn_file_actions_adddup2(&actions, errPipe[1], 2)
+        if let workingDirectory { posix_spawn_file_actions_addchdir_np(&actions, workingDirectory) }
 
-        var env = ProcessInfo.processInfo.environment
+        var env = inheritEnvironment ? ProcessInfo.processInfo.environment : [:]
         env.merge(environment) { $1 }
         let argv: [UnsafeMutablePointer<CChar>?] = ([executable] + arguments).map { strdup($0) } + [nil]
         let envp: [UnsafeMutablePointer<CChar>?] = env.map { strdup("\($0.key)=\($0.value)") } + [nil]
@@ -792,7 +795,9 @@ final class RunnerProcess: @unchecked Sendable {
 
     /// Starts the readers. `onExit` comes once, after the last line, with the
     /// wait status.
-    func start(onLine: @escaping (Data) -> Void, onExit: @escaping (Int32, String) -> Void) {
+    /// `onStderr`: each chunk of stderr as it comes (a server's log).
+    func start(onLine: @escaping (Data) -> Void, onExit: @escaping (Int32, String) -> Void,
+               onStderr: ((String) -> Void)? = nil) {
         let tail = StderrTail()
         let stderrDone = DispatchSemaphore(value: 0)
         let errThread = Thread { [stderrFD] in
@@ -803,6 +808,7 @@ final class RunnerProcess: @unchecked Sendable {
                 if n < 0 && errno == EINTR { continue }
                 if n <= 0 { break }
                 tail.append(buffer, n)
+                onStderr?(String(decoding: UnsafeBufferPointer(start: buffer, count: n), as: UTF8.self))
             }
             close(stderrFD)
             stderrDone.signal()
@@ -917,6 +923,13 @@ final class RunnerProcess: @unchecked Sendable {
             close(stdinFD)
             stdinOpen = false
         }
+    }
+
+    /// SIGTERM to the group, the polite stop (same rule as `kill`).
+    func terminate() {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        if !reaped { Darwin.kill(-pid, SIGTERM) }
     }
 
     /// SIGKILL to the group -- only while it's ours (a reaped pid can be reused).
