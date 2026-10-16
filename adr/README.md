@@ -32,5 +32,6 @@ here; this is where the history lives.
 | [0024](0024-memory.md) | Memory between chats: notes learned only from the user's own words, reconciled into one note per claim across languages and models, injected within a budget, aging by kind; opt-in, all local |
 | [0025](0025-apple-system-model.md) | Apple's on-device model (FoundationModels): memory's reader in-process, then a chat model served by the proxy itself; app only, no cloud, nothing to download |
 | [0027](0027-mcp-client.md) | MCP servers the user adds (command, URL, .mcpb, pasted config, the official registry) as on-demand tool groups; every call asked unless allowed per tool, all asked after outside text; own small client |
+| [0028](0028-mcp-oauth.md) | Web MCP servers signed in with OAuth (MCP Authorization spec): metadata discovery, client metadata document or DCR, PKCE + loopback redirect, tokens in the Keychain with refresh (proposed) |
 
 New ADR: next number, one topic, the decision first, then why.
