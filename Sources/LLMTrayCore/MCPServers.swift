@@ -27,6 +27,14 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     /// a registry name.
     public var origin: String?
     public var description: String?
+    /// The installed version (a bundle's manifest, a registry entry's).
+    public var version: String?
+    /// Where an update comes from; nil: added by hand, never updated.
+    public var source: MCPSource?
+    /// A bundle's settings as given (not the secret ones): kept for updates.
+    public var answers: [String: String] = [:]
+    /// Its icon: an https URL, or a file in its bundle folder.
+    public var icon: String?
     /// Tool name → the definition hash the user reviewed. A tool missing
     /// here, or with another hash now, is hidden until reviewed again.
     public var reviewed: [String: String] = [:]
@@ -55,7 +63,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
-             origin, description, reviewed, runWithoutAsking, tools, modelNames, added
+             origin, description, version, source, answers, icon, reviewed, runWithoutAsking, tools, modelNames, added
     }
 
     /// Fields added later read as their defaults: an older file still loads.
@@ -75,6 +83,10 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
         enabled = try c.decodeIfPresent(Bool.self, forKey: .enabled) ?? false
         origin = try c.decodeIfPresent(String.self, forKey: .origin)
         description = try c.decodeIfPresent(String.self, forKey: .description)
+        version = try c.decodeIfPresent(String.self, forKey: .version)
+        source = try c.decodeIfPresent(MCPSource.self, forKey: .source)
+        answers = try c.decodeIfPresent([String: String].self, forKey: .answers) ?? [:]
+        icon = try c.decodeIfPresent(String.self, forKey: .icon)
         reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
         runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
         tools = try c.decodeIfPresent([MCP.Tool].self, forKey: .tools) ?? []
@@ -187,6 +199,9 @@ public enum MCPImport {
         public var url = ""
         public var headers: [String: String] = [:]
         public var description: String?
+        public var version: String?
+        /// A bundle's icon file, or an https icon.
+        public var icon: String?
         public var workingDirectory: String?
         /// A bundle's settings to ask the user for (`user_config`).
         public var asks: [Ask] = []
@@ -199,11 +214,37 @@ public enum MCPImport {
 
     /// One `user_config` entry of a bundle.
     public struct Ask: Equatable, Sendable {
+        public enum Kind: String, Sendable { case string, number, boolean, directory, file }
         public var key: String
         public var title: String
         public var sensitive: Bool
         public var required: Bool
+        /// As text: "true" / "false" for a boolean, a path for a folder.
         public var defaultValue: String?
+        public var kind: Kind = .string
+        public var help: String?
+
+        public init(key: String, title: String, sensitive: Bool, required: Bool, defaultValue: String?,
+                    kind: Kind = .string, help: String? = nil) {
+            self.key = key
+            self.title = title
+            self.sensitive = sensitive
+            self.required = required
+            self.defaultValue = defaultValue
+            self.kind = kind
+            self.help = help
+        }
+    }
+
+    /// A manifest value as the text a placeholder becomes: true/false, a
+    /// whole number without ".0".
+    static func text(_ value: Any?) -> String? {
+        guard let value, !(value is NSNull) else { return nil }
+        if let n = value as? NSNumber {
+            if CFGetTypeID(n) == CFBooleanGetTypeID() { return n.boolValue ? "true" : "false" }
+            return n.doubleValue == n.doubleValue.rounded() ? String(n.int64Value) : n.stringValue
+        }
+        return "\(value)"
     }
 
     /// The common `{"mcpServers": {name: {command, args, env} | {url, headers}}}`
@@ -259,11 +300,14 @@ public enum MCPImport {
         f.arguments = (config["args"] as? [Any] ?? []).map { "\($0)" }
         f.environment = (config["env"] as? [String: Any] ?? [:]).mapValues { "\($0)" }
         f.description = m["description"] as? String
+        f.version = m["version"] as? String
+        if let icon = m["icon"] as? String, !icon.contains(".."), !icon.hasPrefix("/") { f.icon = (folder as NSString).appendingPathComponent(icon) }
         f.workingDirectory = folder
         for (key, value) in (m["user_config"] as? [String: Any] ?? [:]).sorted(by: { $0.key < $1.key }) {
             let v = value as? [String: Any] ?? [:]
             f.asks.append(Ask(key: key, title: (v["title"] as? String) ?? key, sensitive: v["sensitive"] as? Bool ?? false,
-                              required: v["required"] as? Bool ?? false, defaultValue: v["default"].map { "\($0)" }))
+                              required: v["required"] as? Bool ?? false, defaultValue: text(v["default"]),
+                              kind: Ask.Kind(rawValue: v["type"] as? String ?? "") ?? .string, help: v["description"] as? String))
         }
         // Every placeholder must be one we fill.
         for text in [f.command] + f.arguments + Array(f.environment.values) {
@@ -292,9 +336,10 @@ public enum MCPImport {
     /// The placeholders filled: the bundle's folder, the home folder, the
     /// user's answers.
     public static func fill(_ text: String, folder: String, home: String, answers: [String: String]) -> String {
-        var out = text.replacingOccurrences(of: "${__dirname}", with: folder).replacingOccurrences(of: "${HOME}", with: home)
+        var out = text
+        // Answers first (a default can say ${HOME}), then the paths.
         for (key, value) in answers { out = out.replacingOccurrences(of: "${user_config.\(key)}", with: value) }
-        return out
+        return out.replacingOccurrences(of: "${__dirname}", with: folder).replacingOccurrences(of: "${HOME}", with: home)
     }
 
     /// Unpacks a bundle (a zip) into `destination`, a new folder: entries
@@ -392,5 +437,42 @@ public struct MCPCallRecord: Codable, Equatable, Sendable {
         self.arguments = text.count > 2000 ? String(text.prefix(2000)) + "…" : text
         self.outcome = outcome
         self.date = date
+    }
+}
+
+/// Where an installed server's updates come from (adr/0027).
+public enum MCPSource: Codable, Equatable, Sendable {
+    /// A bundle in a GitHub repository's latest release.
+    case githubRelease(owner: String, repo: String, asset: String)
+    /// An entry of the official registry, and how it was installed.
+    case registry(name: String)
+
+    /// A Featured item's or a release URL's source:
+    /// https://github.com/<owner>/<repo>/releases/latest/download/<asset>
+    public static func githubRelease(url: String) -> MCPSource? {
+        guard let u = URL(string: url), u.host == "github.com" else { return nil }
+        let parts = u.path.split(separator: "/").map(String.init)
+        guard parts.count >= 6, parts[2] == "releases", parts[parts.count - 2] == "download" else { return nil }
+        return .githubRelease(owner: parts[0], repo: parts[1], asset: parts[parts.count - 1])
+    }
+
+    /// Whether `latest` is newer than `installed` (dotted numbers; a
+    /// leading "v" ignored; anything unreadable is "not newer").
+    public static func isNewer(_ latest: String, than installed: String?) -> Bool {
+        /// The numbers, and whether it's a prerelease (`-beta.1`).
+        func parts(_ v: String) -> (numbers: [Int], pre: Bool)? {
+            var t = v.hasPrefix("v") ? String(v.dropFirst()) : v
+            let pre = t.contains("-")
+            if let dash = t.firstIndex(of: "-") { t = String(t[..<dash]) }
+            let p = t.split(separator: ".").map { Int($0) }
+            return p.contains(nil) || p.isEmpty ? nil : (p.compactMap { $0 }, pre)
+        }
+        guard let installed, let a = parts(latest), let b = parts(installed) else { return false }
+        for i in 0..<max(a.numbers.count, b.numbers.count) {
+            let x = i < a.numbers.count ? a.numbers[i] : 0, y = i < b.numbers.count ? b.numbers[i] : 0
+            if x != y { return x > y }
+        }
+        // The same numbers: a release is newer than its prerelease.
+        return b.pre && !a.pre
     }
 }
