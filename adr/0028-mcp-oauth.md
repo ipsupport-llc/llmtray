@@ -1,6 +1,6 @@
 # 0028 — MCP servers on the web: signing in with OAuth
 
-**Status: proposed** (2026-10-16). The user's call: "давай сделаем … оаут".
+**Status: accepted** (2026-10-16, by the user). The user's call: "давай сделаем … оаут".
 Extends [0027](0027-mcp-client.md), whose "Not now" listed OAuth.
 
 ## Why
