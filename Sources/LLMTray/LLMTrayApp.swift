@@ -308,6 +308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Folder access (adr/0014): interrupted plans put right, when it's on.
         FolderAccessManager.shared.start()
         UsageTelemetry.shared.start()   // nothing unless the user opted in
+        MCPInstaller.shared.startChecking()   // MCP servers' updates: a notification (adr/0027)
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
         )

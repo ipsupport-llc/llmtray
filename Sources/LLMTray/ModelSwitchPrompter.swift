@@ -98,7 +98,9 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
     /// build): then only the header asks.
     private static var canNotify: Bool { Bundle.main.bundleIdentifier != nil && Bundle.main.bundleURL.pathExtension == "app" }
 
-    private func notify(_ request: Pending) {
+    /// The app's one notification delegate, set up before the first one any
+    /// part of it posts (this prompt, an MCP server's update).
+    func setUpNotifications() {
         guard Self.canNotify else { return }
         let center = UNUserNotificationCenter.current()
         if !didSetUpNotifications {
@@ -113,6 +115,12 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
                 intentIdentifiers: []
             )])
         }
+    }
+
+    private func notify(_ request: Pending) {
+        guard Self.canNotify else { return }
+        let center = UNUserNotificationCenter.current()
+        setUpNotifications()
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("Switch models?", comment: "model switch notification title")
         content.body = String(format: NSLocalizedString("%1$@ asks for %2$@. Switching unloads the model loaded now.", comment: "model switch notification: client, model"),
@@ -147,7 +155,12 @@ extension ModelSwitchPrompter: UNUserNotificationCenterDelegate {
             switch action {
             case Self.switchAction: ModelSwitchPrompter.shared.answer(true, for: id)
             case Self.keepAction: ModelSwitchPrompter.shared.answer(false, for: id)
-            default: break   // clicked: the popover's header has the choice
+            default:
+                // An MCP server's update: Settings › Tools, where Update is.
+                if response.notification.request.identifier.hasPrefix(MCPInstaller.notificationPrefix) {
+                    NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.tools.rawValue])
+                }
+                // Else clicked: the popover's header has the choice.
             }
         }
         completionHandler()

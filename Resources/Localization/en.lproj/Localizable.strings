@@ -4,6 +4,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" is no longer in the project.";
 "%.0f%% from drafts" = "%.0f%% from drafts";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ is available. Update it in Settings › Tools.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
@@ -1355,6 +1356,7 @@
 "Tool Settings…" = "Tool Settings…";
 "Tool call statistics" = "Tool call statistics";
 "Tool calls" = "Tool calls";
+"Tool server update" = "Tool server update";
 "Tool-use rule" = "Tool-use rule";
 "Tools" = "Tools";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.";

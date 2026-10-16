@@ -70,6 +70,18 @@ final class MCPHub: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         servers = (try? decoder.decode([MCPServerConfig].self, from: data)) ?? []
+        // Installed before the source and version were kept: a Featured
+        // bundle's (by where it came from), its version from its manifest.
+        for i in servers.indices where servers[i].source == nil {
+            if let item = MCPFeatured.items.first(where: { $0.repository == servers[i].origin }) {
+                servers[i].source = MCPSource.githubRelease(url: item.bundleURL)
+            }
+            if servers[i].version == nil, let folder = servers[i].workingDirectory,
+               let data = try? Data(contentsOf: URL(fileURLWithPath: folder).appendingPathComponent("manifest.json")),
+               let manifest = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+                servers[i].version = manifest["version"] as? String
+            }
+        }
         // Reviewed before the hint was kept: the hints as they are for the
         // definitions reviewed (unchanged since, by their hash).
         for i in servers.indices where servers[i].reviewedReadOnly.isEmpty && !servers[i].reviewed.isEmpty {
