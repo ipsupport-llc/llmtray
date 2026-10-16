@@ -791,7 +791,7 @@ private struct ConfigureSheet: View {
                                 Spacer()
                             }
                             .controlSize(.small)
-                            Text("After the chat reads outside text (a mail, a file, the web), every call is asked anyway.")
+                            Text("Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway.")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         ForEach(server.tools, id: \.name) { tool in

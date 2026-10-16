@@ -163,6 +163,17 @@ event, run a shell. The app can't know which tools are safe, so:
   read this turn -- else loading a mail server would switch off web search
   for the whole chat.
 
+**Reading on this Mac after outside text, and Always Allow (2026-10-16,
+the user).** "Everything" allowed still asked at the second step of every
+read ("accounts", then "messages"), the first result being mail. Now an
+allowance (Settings, Always Allow, Allow for This Chat) still holds after
+outside text for a tool the server marks read-only on a command server: what
+it reads comes back into the chat, its arguments go nowhere. A tool that
+changes things, or any tool of a server on the web, is asked after outside
+text, as before. The card gets **Always Allow <action>** (the same as
+Configure's checkbox); after outside text it, and Allow for This Chat, show
+only where an allowance would hold.
+
 ## The client
 
 - **Our own, small**, no package: JSON-RPC 2.0. Protocol versions

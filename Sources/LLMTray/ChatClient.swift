@@ -840,15 +840,21 @@ final class ChatClient: ObservableObject {
     func askMCP(_ request: MCPCallRequest, chatID: String, token: Int) async -> MCPCallChoice? {
         guard folderChatID == chatID, token == turnToken else { return nil }
         let key = MCPApproval.key(tool: request.tool.name, action: request.action)
-        if !request.afterOutsideText, request.chatAllowanceUsable,
+        if request.allowancesHold, request.chatAllowanceUsable,
            mcpChatAllowances[request.server.id]?[key] == request.tool.definitionHash { return .allowOnce }
         let prompt = MCPCallPrompt(request: request)
         mcpPrompt?.resolve(nil)
         mcpPrompt = prompt
         let answer = await prompt.decide()
         if mcpPrompt === prompt { mcpPrompt = nil }
-        if answer == .allowForChat, !request.afterOutsideText {
+        if answer == .allowForChat || answer == .allowAlways || answer == .allowServerAlways, request.allowancesHold {
             mcpChatAllowances[request.server.id, default: [:]][key] = request.tool.definitionHash
+        }
+        if answer == .allowAlways, request.allowancesHold {
+            MCPHub.shared.setRunWithoutAsking(request.server.id, tool: request.tool, action: request.action, true)
+        }
+        if answer == .allowServerAlways, request.allowancesHold, let server = MCPHub.shared.server(request.server.id) {
+            MCPHub.shared.setRunWithoutAsking(server.id, tools: server.visibleTools, true)
         }
         return answer
     }

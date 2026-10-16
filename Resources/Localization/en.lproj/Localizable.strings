@@ -138,7 +138,6 @@
 "After %lld idle minutes" = "After %lld idle minutes";
 "After %lld min" = "After %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.";
-"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "After the chat reads outside text (a mail, a file, the web), every call is asked anyway.";
 "Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
 "All" = "All";
@@ -164,6 +163,9 @@
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
 "Always" = "Always";
+"Always Allow" = "Always Allow";
+"Always Allow %@" = "Always Allow %@";
+"Always Allow Everything from %@" = "Always Allow Everything from %@";
 "An OpenAI-compatible API on localhost for other apps." = "An OpenAI-compatible API on localhost for other apps.";
 "An alias: the alias itself, not what it points to." = "An alias: the alias itself, not what it points to.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
@@ -197,6 +199,8 @@
 "Ask anything, or try one of these:" = "Ask anything, or try one of these:";
 "Ask anything." = "Ask anything.";
 "Ask first" = "Ask first";
+"Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools)." = "Asked although you allowed it: the server didn't answer when its tools were checked just now (see its log in Settings › Tools).";
+"Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web." = "Asked although you allowed it: this turn has read mail, files or the web, and this call can change things or goes to the web.";
 "Assistant" = "Assistant";
 "At most %d characters: a note is one short statement." = "At most %d characters: a note is one short statement.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
@@ -720,6 +724,7 @@
 "Models found: %lld" = "Models found: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet.";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
+"More" = "More";
 "Move %1$@ to %2$@" = "Move %1$@ to %2$@";
 "Move %@ to the Trash" = "Move %@ to the Trash";
 "Move this model to the Trash?" = "Move this model to the Trash?";
@@ -950,6 +955,7 @@
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading chats" = "Reading chats";
+"Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway." = "Reading on this Mac never asks once allowed. After the chat reads a mail, a file or the web, a change (send, move, delete) or a call to a server on the web is asked anyway.";
 "Reading what's installed…" = "Reading what's installed…";
 "Reads Only" = "Reads Only";
 "Reads chats with" = "Reads chats with";
