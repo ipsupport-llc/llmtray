@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" artık projede değil.";
 "%.0f%% from drafts" = "%%%.0f taslaklardan";
 "%.1f s" = "%.1f s";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ kullanılabilir. Ayarlar › Araçlar bölümünden güncelleyin.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ ve %2$lld tane daha";
 "%1$@ asks for %2$@" = "%1$@, %2$@ istiyor";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "Araç Ayarları…";
 "Tool call statistics" = "Araç çağrısı istatistikleri";
 "Tool calls" = "Araç çağrıları";
+"Tool server update" = "Araç sunucusu güncellemesi";
 "Tool-use rule" = "Araç kullanma kuralı";
 "Tools" = "Araçlar";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Modelin uygulama içi sohbette çağırabileceği araçlar (araç çağırabilen bir modele ihtiyaç vardır). Web araçları modelin sorgusunu ilgili kamu hizmetine gönderir (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); yerel araçlar asla Mac’ten çıkmaz.";

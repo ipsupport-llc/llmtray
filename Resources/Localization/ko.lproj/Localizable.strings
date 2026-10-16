@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\"는 더 이상 프로젝트에 없습니다.";
 "%.0f%% from drafts" = "초안에서 %.0f%%";
 "%.1f s" = "%.1f초";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "%1$@ %2$@ 버전을 사용할 수 있습니다. 설정 › 도구에서 업데이트하세요.";
 "%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ 및 %2$lld개 더";
 "%1$@ asks for %2$@" = "%1$@이(가) %2$@을(를) 요청합니다";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "도구 설정…";
 "Tool call statistics" = "도구 호출 통계";
 "Tool calls" = "도구 호출";
+"Tool server update" = "도구 서버 업데이트";
 "Tool-use rule" = "도구 사용 규칙";
 "Tools" = "도구";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "모델이 앱 내 채팅에서 호출할 수 있는 도구입니다(도구 호출을 지원하는 모델 필요). 웹 도구는 모델의 질의를 해당 공개 서비스(DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo)로 전송하며, 로컬 도구는 Mac을 벗어나지 않습니다.";

@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "「%@」已不再包含於專案中。";
 "%.0f%% from drafts" = "%.0f%% 來自草稿";
 "%.1f s" = "%.1f 秒";
+"%1$@ %2$@ is available. Update it in Settings › Tools." = "可使用 %1$@ %2$@。請在「設定」›「工具」中更新。";
 "%1$@ (%2$lld)" = "%1$@（%2$lld）";
 "%1$@ and %2$lld more" = "%1$@ 與其他 %2$lld 筆";
 "%1$@ asks for %2$@" = "%1$@ 請求 %2$@";
@@ -1357,6 +1358,7 @@
 "Tool Settings…" = "工具設定…";
 "Tool call statistics" = "工具呼叫統計";
 "Tool calls" = "工具呼叫";
+"Tool server update" = "工具伺服器更新";
 "Tool-use rule" = "工具使用規則";
 "Tools" = "工具";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型在內建聊天中可能呼叫的工具（需支援工具呼叫的模型）。網路工具會將模型的查詢傳送至該公開服務（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本機工具的資料絕不離開 Mac。";
