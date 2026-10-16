@@ -350,7 +350,12 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
             throw MCPError.sessionExpired
         }
         guard (200..<300).contains(http.statusCode) else {
-            throw MCPError.closed("HTTP \(http.statusCode)")
+            switch http.statusCode {
+            case 401, 403: throw MCPError.closed("it needs a sign-in or an API key (HTTP \(http.statusCode))")
+            case 402: throw MCPError.closed("it needs a paid account (HTTP 402)")
+            case 404: throw MCPError.closed("nothing answers at its address (HTTP 404)")
+            default: throw MCPError.closed("HTTP \(http.statusCode)")
+            }
         }
         if http.statusCode == 202 { return }
         let type = http.value(forHTTPHeaderField: "Content-Type")?.lowercased() ?? ""
