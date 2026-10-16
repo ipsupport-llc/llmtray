@@ -1,5 +1,6 @@
 import Foundation
 import LLMTrayCore
+import UserNotifications
 
 /// Installing, updating and configuring servers (adr/0027, as the user
 /// asked: Install is one click; asked only for what has no default).
@@ -167,6 +168,48 @@ final class MCPInstaller: ObservableObject {
     }
 
     // MARK: Updates
+
+    static let notificationPrefix = "mcp-update-"
+    private var checking: Task<Void, Never>?
+    private static let notifiedKey = "llmtray.mcp.notifiedUpdates"
+
+    /// A minute after launch, then daily: servers with a newer version get a
+    /// notification, once per version; a click opens Settings › Tools.
+    func startChecking() {
+        guard checking == nil else { return }
+        checking = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 60_000_000_000)
+            while !Task.isCancelled {
+                await self?.checkUpdates(force: true)
+                self?.notifyUpdates()
+                try? await Task.sleep(nanoseconds: 24 * 3_600_000_000_000)
+            }
+        }
+    }
+
+    private func notifyUpdates() {
+        guard Bundle.main.bundleIdentifier != nil, Bundle.main.bundleURL.pathExtension == "app" else { return }
+        let notified = UserDefaults.standard.dictionary(forKey: Self.notifiedKey) as? [String: String] ?? [:]
+        for (id, latest) in updates where notified[id.uuidString] != latest {
+            guard let server = hub.server(id) else { continue }
+            let content = UNMutableNotificationContent()
+            content.title = NSLocalizedString("Tool server update", comment: "MCP update notification title")
+            content.body = String(format: NSLocalizedString("%1$@ %2$@ is available. Update it in Settings › Tools.", comment: "MCP update notification: server, version"),
+                                  server.name, latest)
+            let request = UNNotificationRequest(identifier: Self.notificationPrefix + id.uuidString, content: content, trigger: nil)
+            Task {
+                let center = UNUserNotificationCenter.current()
+                guard (try? await center.requestAuthorization(options: [.alert])) == true else { return }
+                do {
+                    try await center.add(request)
+                    // Once per version, counted only when it was shown.
+                    var done = UserDefaults.standard.dictionary(forKey: Self.notifiedKey) as? [String: String] ?? [:]
+                    done[id.uuidString] = latest
+                    UserDefaults.standard.set(done, forKey: Self.notifiedKey)
+                } catch {}
+            }
+        }
+    }
 
     /// At most once an hour, when the Tools pane shows.
     func checkUpdates(force: Bool = false) async {
