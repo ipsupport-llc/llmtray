@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Dopo %lld minuti di inattività";
 "After %lld min" = "Dopo %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Dopo la prima risposta di una nuova chat, il modello le assegna un breve titolo per l'elenco chat (richiesta aggiuntiva breve). Off: l’inizio del primo messaggio. Rinominare una chat funziona sempre.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Dopo che la Chat ha letto testo esterno (un’e-mail, un file, il web), viene comunque chiesta conferma per ogni chiamata.";
 "Air quality" = "Qualità dell’aria";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: il nome “model” che altri strumenti inviano all’API di LLMTray per usare questo modello. Profilo: il profilo di impostazioni usato da questo modello.";
+"All" = "Tutto";
 "All chats" = "Tutte le chat";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tutto disattivato finché non lo attivi. I modelli vengono scaricati dopo Fine, uno alla volta.";
 "Allow" = "Consenti";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Ogni chat in questo progetto riceve queste istruzioni, dopo il prompt di sistema del profilo modello. Una modifica si applica dal messaggio successivo.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Tutte le chat del progetto ricevono il testo completo; la ricerca sul web e la generazione di immagini o musica sono disattivate in quelle chat finché un file è appuntato.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Ogni richiesta a cui il server risponde, della chat e di altre app e agenti tramite l’API, conservata su questo Mac. Mediane per modello e impostazioni.";
+"Everything" = "Tutto";
 "Everything in that folder is here already." = "Tutto il contenuto di quella cartella è già presente qui.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Esattamente ciò che LLMTray invia a ipsupport.us, campo per campo. Nient'altro lascia il tuo Mac.";
 "Experimental — English only" = "Sperimentale — solo inglese";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Le note non possono contenere link.";
 "Notes in" = "Note in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Le Note apprese solo da una chat eliminata vengono rimosse insieme a essa, a meno che tu non le abbia modificate, fissate o approvate.";
+"Nothing" = "Niente";
 "Nothing left to read: every chat was read from its start." = "Non resta nulla da leggere: ogni chat è stata letta dall’inizio.";
 "Nothing logged yet." = "Nessun log.";
 "Nothing new to import" = "Niente di nuovo da importare";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Lettura del prompt: fino al %lld%";
 "Reading chats" = "Lettura delle chat";
 "Reading what's installed…" = "Verifica dei componenti installati…";
+"Reads Only" = "Solo lettura";
 "Reads chats with" = "Legge le Chat con";
 "Ready." = "Pronto.";
 "Ready. This is the Full build: the runtime is included." = "Pronto. Questa è la build Full: il runtime è incluso.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Spazio in ogni chat: %lld token";
 "Run benchmark" = "Esegui benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Esegui nel Terminale per aumentare il limite di memoria GPU; si resetta al riavvio del Mac.";
+"Run without asking:" = "Esegui senza chiedere:";
 "Running" = "In esecuzione";
 "Running — %@ on :%lld" = "In esecuzione — %@ su :%lld";
 "Running…" = "In esecuzione…";

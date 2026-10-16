@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "%lld निष्क्रिय मिनटों के बाद";
 "After %lld min" = "%lld मिनट बाद";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "नई चैट के पहले उत्तर के बाद, मॉडल चैट सूची के लिए एक छोटा शीर्षक देता है (एक छोटा अतिरिक्त अनुरोध)। बंद: पहले संदेश की शुरुआत। चैट का नाम बदलना हमेशा काम करता है।";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "चैट के बाहर का पाठ (मेल, फ़ाइल, वेब) पढ़ने के बाद भी, हर call के लिए फिर भी पूछा जाता है।";
 "Air quality" = "वायु गुणवत्ता";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "उपनाम: इस मॉडल को पाने के लिए दूसरे टूल LLMTray के API को भेजा जाने वाला “model” नाम। प्रोफ़ाइल: यह मॉडल कौन-सी सेटिंग्स प्रोफ़ाइल इस्तेमाल करता है।";
+"All" = "सभी";
 "All chats" = "सभी चैट";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "जब तक आप चालू न करें, सब बंद हैं। मॉडल Finish के बाद एक‑एक करके डाउनलोड होंगे।";
 "Allow" = "अनुमत करें";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "इस प्रोजेक्ट की हर चैट को मॉडल प्रोफ़ाइल के सिस्टम प्रॉम्प्ट के बाद ये निर्देश मिलेंगे। बदलाव अगले संदेश से लागू होंगे।";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "प्रोजेक्ट की हर चैट को पूरी फ़ाइल का पाठ मिल जाएगा; फ़ाइल पिन की होने पर उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद हो जाएगा।";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "सर्वर जिस भी अनुरोध का उत्तर देता है — चैट का और API के ज़रिए दूसरे ऐप्स और एजेंटों का — इस Mac पर रखा जाता है। हर मॉडल और सेटिंग के लिए माध्यिका।";
+"Everything" = "सब कुछ";
 "Everything in that folder is here already." = "उस फ़ोल्डर की हर चीज़ पहले से ही यहाँ मौजूद है।";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray द्वारा ipsupport.us को भेजे जाने वाले बिल्कुल वही डेटा, फ़ील्ड दर फ़ील्ड। कुछ भी आपका Mac नहीं छोड़ता।";
 "Experimental — English only" = "प्रायोगिक — केवल अंग्रेज़ी";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "नोट में लिंक नहीं रखे जा सकते।";
 "Notes in" = "नोट की भाषा";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "केवल हटाई गई चैट से सीखे गए नोट उसके साथ चले जाते हैं, जब तक कि आपने उन्हें संपादित, पिन या स्वीकृत न किया हो।";
+"Nothing" = "कुछ नहीं";
 "Nothing left to read: every chat was read from its start." = "पढ़ने के लिए कुछ बाकी नहीं: हर चैट शुरुआत से पढ़ी जा चुकी है।";
 "Nothing logged yet." = "अभी तक कुछ भी लॉग नहीं हुआ है।";
 "Nothing new to import" = "इम्पोर्ट करने के लिए कुछ नया नहीं है";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "प्रॉम्प्ट पढ़ना: अधिकतम %lld%";
 "Reading chats" = "चैट पढ़ना";
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
+"Reads Only" = "केवल पढ़ना";
 "Reads chats with" = "चैट इससे पढ़ता है";
 "Ready." = "तैयार।";
 "Ready. This is the Full build: the runtime is included." = "तैयार। यह Full बिल्ड है: runtime शामिल है।";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "हर चैट में जगह: %lld टोकन";
 "Run benchmark" = "बेंचमार्क चलाएँ";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU मेमोरी सीमा बढ़ाने के लिए इसे Terminal में चलाएँ; Mac रीस्टार्ट होने पर यह रीसेट हो जाता है।";
+"Run without asking:" = "बिना पूछे चलाएँ:";
 "Running" = "चल रहा है";
 "Running — %@ on :%lld" = "चल रहा है — %@ :%lld पर";
 "Running…" = "चल रहा है…";

@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Après %lld minutes d’inactivité";
 "After %lld min" = "Après %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Après la première réponse d'une nouvelle conversation, le modèle lui attribue un titre court pour la liste des conversations (une brève requête supplémentaire). Désactivé : le début du premier message. Le renommage d'une conversation fonctionne toujours.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Après que le Chat a lu du texte externe (un e-mail, un fichier, le Web), chaque appel demande quand même une autorisation.";
 "Air quality" = "Qualité de l’air";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias : nom « model » que les autres outils envoient à l’API de LLMTray pour obtenir ce modèle. Profil : profil de réglages utilisé par ce modèle.";
+"All" = "Tout";
 "All chats" = "Tous les chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tout est désactivé sauf si vous l’activez. Les modèles se téléchargent après Terminer, un par un.";
 "Allow" = "Autoriser";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Chaque conversation de ce projet reçoit ces instructions, après l’invite système du profil de modèle. Une modification est appliquée au message suivant.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Tous les chats du projet reçoivent le texte complet ; la recherche web ainsi que la génération d’images ou de musique sont désactivées dans ces chats tant qu’un fichier est épinglé.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Chaque requête à laquelle le serveur répond, du chat et des autres apps et agents via l’API, conservée sur ce Mac. Médianes par modèle et réglages.";
+"Everything" = "Tout";
 "Everything in that folder is here already." = "Tout ce dossier est déjà présent ici.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactement ce que LLMTray envoie à ipsupport.us, champ par champ. Rien d'autre ne quitte votre Mac.";
 "Experimental — English only" = "Expérimental — anglais uniquement";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Les notes ne peuvent pas contenir de liens.";
 "Notes in" = "Notes en";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Les Notes apprises uniquement à partir d’un Chat supprimé sont supprimées avec lui, sauf si vous les avez modifiées, épinglées ou approuvées.";
+"Nothing" = "Rien";
 "Nothing left to read: every chat was read from its start." = "Plus rien à lire : chaque Chat a été lu depuis le début.";
 "Nothing logged yet." = "Rien dans le journal pour le moment.";
 "Nothing new to import" = "Rien de nouveau à importer";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Lecture d’un prompt : jusqu'à %lld%";
 "Reading chats" = "Lecture des conversations";
 "Reading what's installed…" = "Lecture des éléments installés…";
+"Reads Only" = "Lecture seule";
 "Reads chats with" = "Lit les Chat avec";
 "Ready." = "Prêt.";
 "Ready. This is the Full build: the runtime is included." = "Prêt. Il s’agit de la build Full : le runtime est inclus.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Place dans chaque chat : %lld tokens";
 "Run benchmark" = "Lancer le benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Exécutez‑le dans le Terminal pour augmenter la limite mémoire GPU ; elle revient à zéro au redémarrage du Mac.";
+"Run without asking:" = "Exécuter sans demander :";
 "Running" = "En cours";
 "Running — %@ on :%lld" = "En cours — %@ sur :%lld";
 "Running…" = "En cours…";

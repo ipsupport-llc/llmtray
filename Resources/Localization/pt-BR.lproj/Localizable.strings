@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Após %lld minutos de inatividade";
 "After %lld min" = "Após %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Depois da primeira resposta de um novo chat, o modelo gera um título curto para a lista de chats (uma pequena solicitação adicional). Desligado: o início da primeira mensagem. Renomear um chat sempre funciona.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Depois que o Chat lê texto externo (um e-mail, um arquivo, a web), cada chamada ainda é solicitada.";
 "Air quality" = "Qualidade do ar";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: o nome “model” que outras ferramentas enviam à API do LLMTray para obter este modelo. Perfil: qual perfil de ajustes este modelo usa.";
+"All" = "Todos";
 "All chats" = "Todos os chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tudo desligado até você ativar. Modelos são baixados após Finalizar, um por vez.";
 "Allow" = "Permitir";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversa deste projeto recebe estas instruções, após o prompt do sistema do perfil do modelo. Uma alteração passa a valer a partir da próxima mensagem.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Todo chat do projeto recebe o texto completo; pesquisa na web e geração de imagem ou música ficam desativadas nesses chats enquanto um arquivo está fixado.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Cada solicitação que o servidor responde, do chat e de outros apps e agentes pela API, guardada neste Mac. Medianas por modelo e configurações.";
+"Everything" = "Tudo";
 "Everything in that folder is here already." = "Tudo nessa pasta já está aqui.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exatamente o que LLMTray envia para ipsupport.us, campo a campo. Nada mais sai do seu Mac.";
 "Experimental — English only" = "Experimental — somente inglês";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Notas não podem conter links.";
 "Notes in" = "Notas em";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notas aprendidas apenas de um Chat apagado são removidas com ele, a menos que você as tenha editado, fixado ou aprovado.";
+"Nothing" = "Nada";
 "Nothing left to read: every chat was read from its start." = "Não há mais nada para ler: todos os chats foram lidos desde o início.";
 "Nothing logged yet." = "Ainda não há nada no log.";
 "Nothing new to import" = "Nada novo para importar";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Leitura de prompt: até %lld%";
 "Reading chats" = "Leitura de chats";
 "Reading what's installed…" = "Lendo o que está instalado…";
+"Reads Only" = "Somente leitura";
 "Reads chats with" = "Lê Chats com";
 "Ready." = "Pronto.";
 "Ready. This is the Full build: the runtime is included." = "Pronto. Esta é a build Full: o runtime está incluído.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Espaço em cada chat: %lld tokens";
 "Run benchmark" = "Executar benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Execute no Terminal para aumentar o limite de memória da GPU; ele é redefinido quando o Mac reinicia.";
+"Run without asking:" = "Executar sem perguntar:";
 "Running" = "Em execução";
 "Running — %@ on :%lld" = "Em execução — %@ em :%lld";
 "Running…" = "Em execução…";

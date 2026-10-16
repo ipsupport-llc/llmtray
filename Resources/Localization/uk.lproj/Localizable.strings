@@ -140,8 +140,10 @@
 "After %lld idle minutes" = "Після %lld хвилин бездіяльності";
 "After %lld min" = "Через %lld хв";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Після першої відповіді нового чату модель дає йому коротку назву для списку чатів (ще один короткий запит). Вимкнено: початок першого повідомлення. Перейменування чату завжди працює.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "Після того як чат прочитає зовнішній текст (лист, файл, вебсторінку), дозвіл на кожен виклик усе одно запитується.";
 "Air quality" = "Якість повітря";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Аліас — ім'я в полі «model», яке інші програми надсилають до API LLMTray, щоб отримати цю модель. Профіль — який профіль налаштувань використовує модель.";
+"All" = "Усе";
 "All chats" = "Усі чати";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Усе вимкнено, доки ви не увімкнете. Моделі завантажуються після «Готово», по черзі.";
 "Allow" = "Дозволити";
@@ -443,6 +445,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Кожен чат у цьому проєкті отримує ці інструкції після системного підказу в описі моделі. Зміни діють з наступного повідомлення.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Кожен запит, на який відповів сервер, — з чату та від інших застосунків і агентів через API — зберігається на цьому Mac. Медіани за моделлю й налаштуваннями.";
+"Everything" = "Усе";
 "Everything in that folder is here already." = "Усе з цієї папки вже тут.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Точний вміст, який LLMTray надсилає на ipsupport.us — поле за полем. Нічого іншого не покидає ваш Mac.";
 "Experimental — English only" = "Експериментальна — тільки англійська";
@@ -807,6 +810,7 @@
 "Notes can't hold links." = "Нотатки не можуть містити посилання.";
 "Notes in" = "Нотатки мовою";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Нотатки, засвоєні лише з видаленого чату, видаляються разом із ним, якщо ви їх не відредагували, не закріпили або не схвалили.";
+"Nothing" = "Нічого";
 "Nothing left to read: every chat was read from its start." = "Нічого більше читати: кожен чат прочитано від початку.";
 "Nothing logged yet." = "У журналі ще нічого немає.";
 "Nothing new to import" = "Немає нічого нового для імпорту";
@@ -949,6 +953,7 @@
 "Reading a prompt: up to %lld%" = "Читання підказки: до %lld%";
 "Reading chats" = "Читання чатів";
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
+"Reads Only" = "Лише читання";
 "Reads chats with" = "Читає чати за допомогою";
 "Ready." = "Готово.";
 "Ready. This is the Full build: the runtime is included." = "Готово. Це збірка Full: runtime включено.";
@@ -1013,6 +1018,7 @@
 "Room in each chat: %lld tokens" = "Місце в кожному чаті: %lld токенів";
 "Run benchmark" = "Запустити бенчмарк";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Запустіть у Terminal, щоб підняти ліміт пам’яті GPU; при перезавантаженні Mac ліміт скинеться.";
+"Run without asking:" = "Запускати без запиту:";
 "Running" = "Запущена";
 "Running — %@ on :%lld" = "Працює — %@ на :%lld";
 "Running…" = "Виконується…";
