@@ -18,6 +18,10 @@ Authorization spec describes -- the 2025-11-25 revision (and what
 2025-06-18 servers need) -- as a native app (RFC 8252), a public client,
 with nothing of ours in between.
 
+**Canonical URL** (used for every comparison and for `resource`): scheme and
+host lowercased, default port dropped, fragment and query dropped, a lone
+trailing slash on the root ignored.
+
 **1. Discovery** (credential-free requests; https only, the loopback
 redirect excepted; no redirects followed across origins; private and
 link-local addresses refused unless the server itself is local).
@@ -26,8 +30,9 @@ link-local addresses refused unless the server itself is local).
   `/.well-known/oauth-protected-resource/<path of the server URL>`, else
   the same at the root. Its `resource` must equal the server's canonical
   URL exactly for a header or path-inserted lookup, the root URL for the
-  root lookup -- no prefix matching. `scopes_supported` for the request
-  come from here.
+  root lookup -- no prefix matching.
+- Scope to ask for: the challenge's `scope` if the `401` has one, else this
+  metadata's `scopes_supported`, else none (no `scope` parameter).
 - Authorization server metadata, for the first listed authorization server
   (RFC 9728 §7.6: the user sees its host in the browser and in Settings):
   for an issuer with a path, `/.well-known/oauth-authorization-server/<path>`,
@@ -56,8 +61,17 @@ opens in the user's browser; the redirect comes to a loopback listener on
 a random port, opened for that one flow and closed after it or 5 minutes.
 The pending flow is bound to its issuer, endpoints, client id, resource,
 port and verifier: a callback is taken only on that port with that
-`state`, and its `iss` (when the server sends one, RFC 9207) must equal the
-issuer -- the defence against mix-up between authorization servers.
+`state`.
+
+Mix-up between authorization servers (a hostile one pairing an honest
+authorization endpoint with its own token endpoint) is stopped by one of:
+- the response's `iss` (RFC 9207) equal to the issuer -- required, and a
+  missing one fails, when the metadata says
+  `authorization_response_iss_parameter_supported`;
+- else a callback path that names the issuer (`/callback/<hash of the
+  issuer>`), matched exactly, where we registered by DCR (per issuer);
+- else (a client metadata document and no `iss`): the authorization and
+  token endpoints must share the issuer's origin. Otherwise sign-in stops.
 
 **4. Tokens.** Kept in the Keychain per (server, issuer, resource) with the
 client id they belong to; never in files, logs, URLs or query strings.
@@ -65,14 +79,19 @@ client id they belong to; never in files, logs, URLs or query strings.
   endpoint of the issuer the tokens came from, with `resource`; a token is
   sent only to the server it's for, and an authenticated MCP request isn't
   re-sent by a redirect to another origin.
-- Refresh before expiry and after a `401 invalid_token`, one at a time per
-  server (a lock: with rotation, two refreshes with one token can revoke the
-  grant); a new refresh token replaces the old at once.
-- `403 insufficient_scope` with a `scope`: a new sign-in for the larger
-  scope, at most once per call, the user seeing the browser page.
-- A refresh refused by the server (`invalid_grant`) means "Sign in again";
-  a network or 5xx failure keeps the tokens and the call fails as such. A
-  call that was sent and got `401` is reported as failed, not "not sent".
+- Refresh before expiry, and after any `401` to a request that carried a
+  token (with or without `invalid_token`): refresh once, retry the call
+  once. One refresh at a time per server (a lock: with rotation, two
+  refreshes with one token can revoke the grant); a new refresh token
+  replaces the old at once.
+- `403 insufficient_scope` with a `scope`: a new sign-in asking for the
+  scopes granted so far plus the challenged ones (some servers replace
+  rather than add), at most once per call, the user seeing the browser page.
+- A refresh refused with `invalid_grant` means "Sign in again";
+  `invalid_client` (a dynamic registration the server dropped) drops our
+  registration, registers again and signs in again; a network or 5xx
+  failure keeps the tokens and the call fails as such. A call that was sent
+  and got `401` after the retry is reported as failed, not "not sent".
 
 What a token is good for is the server's to enforce (audience); LLMTray
 asks for the right resource and keeps each token to its server.
