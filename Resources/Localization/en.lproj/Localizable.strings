@@ -138,8 +138,10 @@
 "After %lld idle minutes" = "After %lld idle minutes";
 "After %lld min" = "After %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.";
+"After the chat reads outside text (a mail, a file, the web), every call is asked anyway." = "After the chat reads outside text (a mail, a file, the web), every call is asked anyway.";
 "Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
+"All" = "All";
 "All chats" = "All chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "All off unless you enable them. Models are downloaded after Finish, one at a time.";
 "Allow" = "Allow";
@@ -441,6 +443,7 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
+"Everything" = "Everything";
 "Everything in that folder is here already." = "Everything in that folder is here already.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
@@ -805,6 +808,7 @@
 "Notes can't hold links." = "Notes can't hold links.";
 "Notes in" = "Notes in";
 "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them." = "Notes learned only from a deleted chat go with it, unless you edited, pinned or approved them.";
+"Nothing" = "Nothing";
 "Nothing left to read: every chat was read from its start." = "Nothing left to read: every chat was read from its start.";
 "Nothing logged yet." = "Nothing logged yet.";
 "Nothing new to import" = "Nothing new to import";
@@ -947,6 +951,7 @@
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading chats" = "Reading chats";
 "Reading what's installed…" = "Reading what's installed…";
+"Reads Only" = "Reads Only";
 "Reads chats with" = "Reads chats with";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
@@ -1011,6 +1016,7 @@
 "Room in each chat: %lld tokens" = "Room in each chat: %lld tokens";
 "Run benchmark" = "Run benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts.";
+"Run without asking:" = "Run without asking:";
 "Running" = "Running";
 "Running — %@ on :%lld" = "Running — %@ on :%lld";
 "Running…" = "Running…";

@@ -777,6 +777,23 @@ private struct ConfigureSheet: View {
                         if starting {
                             HStack { ProgressView().controlSize(.small); Text("Connecting…").foregroundStyle(.secondary) }
                         }
+                        if server.enabled, !server.visibleTools.isEmpty {
+                            HStack(spacing: 8) {
+                                Text("Run without asking:").font(.callout)
+                                Button("Everything") { hub.setRunWithoutAsking(serverID, tools: server.visibleTools, true) }
+                                if server.visibleTools.contains(where: { $0.readOnlyHint == true }) {
+                                    Button("Reads Only") {
+                                        hub.setRunWithoutAsking(serverID, tools: server.visibleTools, false)
+                                        hub.setRunWithoutAsking(serverID, tools: server.visibleTools.filter { $0.readOnlyHint == true }, true)
+                                    }
+                                }
+                                Button("Nothing") { hub.setRunWithoutAsking(serverID, tools: server.visibleTools, false) }
+                                Spacer()
+                            }
+                            .controlSize(.small)
+                            Text("After the chat reads outside text (a mail, a file, the web), every call is asked anyway.")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
                         ForEach(server.tools, id: \.name) { tool in
                             ToolReviewRow(server: server, tool: tool, details: details)
                         }
@@ -873,7 +890,11 @@ private struct ToolReviewRow: View {
             }
             if reviewed && server.enabled {
                 DisclosureGroup("Run without asking", isExpanded: $allowOpen) {
+                  VStack(alignment: .leading, spacing: 4) {
                     if let field = tool.actionField {
+                        Toggle("All", isOn: Binding(get: { field.values.allSatisfy { binding($0).wrappedValue } },
+                                                    set: { hub.setRunWithoutAsking(server.id, tools: [tool], $0) }))
+                            .toggleStyle(.checkbox).font(.caption.weight(.semibold))
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), alignment: .leading)], alignment: .leading, spacing: 2) {
                             ForEach(field.values, id: \.self) { action in
                                 Toggle(action.replacingOccurrences(of: "_", with: " "), isOn: binding(action))
@@ -883,6 +904,8 @@ private struct ToolReviewRow: View {
                     } else {
                         Toggle("This tool", isOn: binding(nil)).toggleStyle(.checkbox).font(.caption)
                     }
+                  }
+                  .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .font(.caption)
             }
