@@ -71,7 +71,8 @@ final class MemoryReflectionTests: XCTestCase {
                      "Я буду рад помочь с вашими запросами.", "What would you like to change?"] {
             XCTAssertTrue(MemoryText.readsAsReply(text), text)
         }
-        for text in ["Stay calm and go straight to the fix", "Сохранять спокойствие и сразу переходить к решению", "Be brief when they swear"] {
+        for text in ["Stay calm and go straight to the fix", "Сохранять спокойствие и сразу переходить к решению", "Be brief when they swear",
+                     "When unclear, ask: What outcome do you want?", "Ignore small talk", "Surely be concise"] {
             XCTAssertFalse(MemoryText.readsAsReply(text), text)
         }
         let op = MemoryReflection.parseOperations(#"{"op":"add","kind":"observation","topic":"tone","observed":"Polite","text":"I'd be happy to help.","quote":"q"}"#)!.first!
