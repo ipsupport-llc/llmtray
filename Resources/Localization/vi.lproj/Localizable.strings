@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (của LM Studio, chia sẻ với nó)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ đã tồn tại và không thuộc LLMTray. Xóa trước để cài LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ đã tồn tại và trỏ tới %@. Xóa trước để cài LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ không thể đọc các cuộc trò chuyện để dùng cho bộ nhớ: một mô hình khác đang đọc các cuộc trò chuyện của mô hình này.";
 "%@ didn't download: %@" = "%@ không tải về: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ là một liên kết đến một thư mục không khả dụng: kết nối đĩa của thư mục đó hoặc xóa liên kết.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ bị hạn chế: chấp nhận giấy phép trên huggingface.co/%@, sau đó thêm token Hugging Face trong Cài đặt → Models.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d Trò chuyện đang trả lời; phần đọc của chúng sẽ được xếp hàng sau khi chúng hoàn tất.";
 "%d chats queued; reading starts now if the model is free." = "%d Trò chuyện đã được xếp hàng; việc đọc sẽ bắt đầu ngay nếu mô hình đang rảnh.";
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
+"%d parts of chats wait to be read." = "Có %d phần trong Trò chuyện đang chờ được đọc.";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "Vẫn có thể hoàn tác %lld từ Cài đặt > Tệp.";
 "%lld downloads" = "%lld lượt tải xuống";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld tệp không thể được lập chỉ mục";
 "%lld interrupted: look at them in Finder" = "%lld bị gián đoạn: xem chúng trong Finder";
 "%lld items put back under their names." = "%lld mục được đặt lại theo tên của chúng.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld ghi chú đã học mà bạn chưa phê duyệt sẽ bị xóa. Ghi chú bạn đã viết, sửa, ghim hoặc phê duyệt sẽ được giữ lại.";
 "%lld more" = "còn %lld";
 "%lld more…" = "%lld nữa…";
 "%lld need a look: see the list." = "%lld cần xem: xem danh sách.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld mới kể từ khi bạn mở danh sách: chưa chọn cho tới khi bạn đánh dấu.";
 "%lld of 5 stars" = "%lld trên 5 sao";
 "%lld pages" = "%lld trang";
-"%lld parts of chats wait to be read." = "%lld phần của Trò chuyện đang chờ được đọc.";
 "%lld pictures" = "%lld ảnh";
 "%lld pictures added: kept for documents, not searched." = "%lld ảnh đã thêm: giữ cho tài liệu, không được tìm kiếm.";
 "%lld requests" = "%lld yêu cầu";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "Trò chuyện của Dự án %@";
 "Chats outside projects" = "Trò chuyện ngoài Dự án";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Trò chuyện bắt đầu bằng các ghi chú ngắn về bạn và công việc của bạn: cách bạn muốn được trả lời, bạn đang làm gì, những gì bạn đã sửa trước đây. Chỉ các ghi chú nằm trong giới hạn mới được gửi, và chỉ trong Trò chuyện của riêng LLMTray -- không bao giờ gửi đến ứng dụng dùng API, không bao giờ trong Trò chuyện tạm. Mọi thứ vẫn ở trên máy tính này.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Trò chuyện sẽ không còn nhận các mục này nữa. Không thể hoàn tác. Về bạn vẫn được giữ lại (xóa các trường của mục này để xóa). Khi đọc lại, các trò chuyện của bạn được học lại từ đầu; chỉ những gì đã quên, đã đọc trước đó thì không được đọc lại.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Cuộc trò chuyện, dự án, hồ sơ và các mô hình hình ảnh, nhạc, giọng nói và nhúng từ phiên bản trên ipsupport.us đã có ở đây. Những thư mục bạn đã cấp quyền cho nó, và thư mục mô hình chat của bạn, cần sự đồng ý của bạn một lần nữa.";
 "Check Again" = "Kiểm tra lại";
 "Check Now" = "Kiểm tra ngay";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ văn bản; tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi một tệp được ghim.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Mọi yêu cầu máy chủ trả lời, từ cuộc trò chuyện và từ ứng dụng, agent khác qua API, được lưu trên máy Mac này. Trung vị theo mô hình và cài đặt.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Mọi Trò chuyện đã lưu sẽ được đọc từ đầu để ghi chú, dùng những gì bạn đã viết trong đó. Tác vụ chạy trong nền và có thể mất một lúc.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Mỗi trò chuyện đã lưu sẽ được đọc lại từ đầu thêm một lần nữa. Các ghi chú đã có sẽ được xác nhận, không bị nhân đôi.";
 "Everything in that folder is here already." = "Mọi thứ trong thư mục đó đã có ở đây rồi.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Đây là chính xác những gì LLMTray gửi tới ipsupport.us, trường từng trường. Không gì khác rời khỏi máy Mac của bạn.";
 "Experimental — English only" = "Thử nghiệm — chỉ tiếng Anh";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "Để trả lời nhanh hơn (giải mã suy đoán)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Đối với các mô hình có drafter công bố (Gemma 4 26B) hoặc đầu MTP riêng (các mô hình Qwen 3.5 của chúng tôi, tải về cùng chúng): nó dự đoán token trước và mô hình chính kiểm tra trong một lần duyệt. Kết quả như nhau, nhanh hơn. Một yêu cầu khi chạy độc lập sẽ dùng tính năng này; khi có nhiều yêu cầu cùng lúc thì chúng chia sẻ batch mà không dùng tính năng này.";
 "Forget" = "Quên";
-"Forget Everything…" = "Quên tất cả…";
-"Forget What Was Learned…" = "Quên nội dung đã học…";
-"Forget and Read All Chats Again" = "Quên và đọc lại Tất cả Trò chuyện";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Quên mọi ghi chú đã học mà bạn chưa viết, sửa, ghim hoặc phê duyệt, cùng những nội dung đang chờ đọc. Sau đó, các Trò chuyện của bạn có thể được đọc lại theo quy tắc hiện tại -- không gồm các Trò chuyện được đánh dấu “Không nhớ”, và khi Bộ nhớ đang tắt, không đọc trước khi bạn trả lời có đọc những gì đã nói trong thời gian đó hay không.";
+"Forget Everything" = "Quên mọi thứ";
+"Forget Everything and Read Chats Again" = "Quên mọi thứ và đọc lại Trò chuyện";
+"Forget What Was Learned" = "Quên nội dung đã học";
+"Forget What Was Learned and Read Chats Again" = "Quên nội dung đã học và đọc lại Trò chuyện";
+"Forget…" = "Quên…";
 "Found after an interruption" = "Tìm thấy sau khi gián đoạn";
 "Founding Supporters" = "Những người ủng hộ sáng lập";
 "Free disk space" = "Dung lượng đĩa trống";
@@ -613,7 +611,6 @@
 "Later" = "Để sau";
 "Launch at login" = "Mở khi đăng nhập";
 "Launch at login: %@" = "Mở khi đăng nhập: %@";
-"Learn from Past Chats Now" = "Học từ Trò chuyện cũ ngay";
 "Learned from chats" = "Đã học từ Trò chuyện";
 "Learning" = "Học";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Học từ Trò chuyện cần %@ (%@), một Mô hình embedding cho biết Ghi chú nào nói cùng một ý bằng cách diễn đạt khác hoặc bằng ngôn ngữ khác. Mô hình này được tải về máy tính này một lần và dùng chung với Tệp dự án.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bộ nhớ sẽ không học thêm gì từ Trò chuyện này. Các Ghi chú đã học từ đó cũng có thể bị xóa, trừ những ghi chú bạn đã sửa, ghim hoặc phê duyệt.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "Bộ nhớ sẽ tự tải nó khi LLMTray không hoạt động trong %d phút.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bộ nhớ chỉ đọc một Trò chuyện từ tin nhắn đầu tiên sau khi gặp Trò chuyện đó. Mục này cũng đọc mọi Trò chuyện đã lưu từ đầu — những gì bạn đã viết trước khi bật Bộ nhớ — trong nền, khi mô hình đang rảnh. Các Trò chuyện được đánh dấu “Đừng ghi nhớ” sẽ bị bỏ qua.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bộ nhớ chỉ ở trên máy Mac này: ghi chú được giữ trong một tệp tại đây và không bao giờ được tải lên hoặc chia sẻ. Chúng chỉ được đưa vào lời nhắc của Trò chuyện LLMTray -- không gửi đến các ứng dụng dùng API, không đưa vào Trò chuyện tạm.";
 "Memory was off. Read what was said meanwhile?" = "Bộ nhớ đã tắt. Đọc những gì đã nói trong lúc đó?";
 "Memory: %d" = "Bộ nhớ: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Tắt: chỉ Mac này. Bật: bất kỳ ai trên mạng của bạn, chỉ bật trên mạng bạn tin tưởng.";
 "Older" = "Cũ hơn";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Một lần: Cà phê $5, Pro Supporter $25, Founding Supporter $150.";
-"Only Forget" = "Chỉ quên";
 "Only From Now On" = "Chỉ từ bây giờ";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Chỉ khi bạn muốn: Trò chuyện nhận thông tin này trước, thông tin này không bao giờ hết hạn và việc học không bao giờ thay đổi thông tin này. Thông tin này vẫn ở trên máy tính này.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "PDF · %lld pages" = "PDF · %lld trang";
 "Past %lld messages" = "%lld tin nhắn trước đó";
-"Past chats" = "Trò chuyện cũ";
 "Pause" = "Tạm dừng";
 "Pause Indexing" = "Tạm dừng lập chỉ mục";
 "Pause download" = "Tạm dừng tải xuống.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "Lập chỉ mục lại %@";
 "Re-index this file" = "Lập chỉ mục lại tệp này";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Tìm trong %1$lld thư mục con (%2$@): các tệp bên trong được đưa ra ngoài.";
-"Read All Chats Again" = "Đọc lại tất cả Trò chuyện";
-"Read All Chats Again…" = "Đọc lại tất cả Trò chuyện…";
+"Read Everything Again" = "Đọc lại mọi thứ";
 "Read It Too" = "Cũng đọc nội dung đó";
-"Read Them" = "Đọc";
+"Read Past Chats…" = "Đọc Trò chuyện trước đây…";
+"Read What Wasn't Read" = "Đọc nội dung chưa được đọc";
 "Read a chat after %lld quiet minutes" = "Đọc Trò chuyện sau %lld phút không hoạt động";
 "Reading a chat…" = "Đang đọc Trò chuyện…";
 "Reading a prompt: up to %lld%" = "Đọc prompt: tối đa %lld%";
+"Reading chats" = "Đọc Trò chuyện";
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Reads chats with" = "Đọc trò chuyện bằng";
 "Ready." = "Sẵn sàng.";
@@ -983,6 +978,7 @@
 "Save" = "Lưu";
 "Save As…" = "Lưu dưới tên…";
 "Save memory" = "Tiết kiệm bộ nhớ";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Các Trò chuyện đã lưu được đọc trong nền để tạo ghi chú từ những gì bạn đã viết ở đó. Khi đọc lại, các ghi chú đã có sẽ được xác nhận, không bị nhân đôi. Các Trò chuyện được đánh dấu “Đừng ghi nhớ” sẽ bị bỏ qua.";
 "Saved chats will show up here." = "Các trò chuyện đã lưu sẽ hiển thị ở đây.";
 "Saved in your Keychain" = "Đã lưu trong Keychain";
 "Save…" = "Lưu…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Tự động mở LLMTray khi bạn đăng nhập vào máy Mac này.";
 "Start Server" = "Khởi động máy chủ";
 "Start a new saved chat (⌘N) to add files to a project." = "Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm tệp vào dự án.";
-"Start over" = "Bắt đầu lại";
 "Start server" = "Khởi động máy chủ.";
 "Start talking" = "Bắt đầu nói";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
@@ -1297,6 +1292,7 @@
 "Total time" = "Tổng thời gian";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
 "Try Again" = "Thử lại";
+"Try It Again" = "Thử lại";
 "Turn On" = "Bật";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "Chào mừng đến với LLMTray";
 "What can you do?" = "Bạn có thể làm gì?";
 "What chats get" = "Nội dung Trò chuyện nhận";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "Nội dung Trò chuyện nhận, cách đọc Trò chuyện, thời hạn của ghi chú. Cài đặt mặc định phù hợp với hầu hết mọi người.";
 "What decides which models run well here." = "Điều gì quyết định mô hình nào chạy tốt ở đây.";
 "What else" = "Còn gì nữa";
 "What happened?" = "Chuyện gì đã xảy ra?";
 "What the model says appears here." = "Những gì mô hình nói sẽ hiển thị ở đây.";
 "What this chat knows about you from earlier chats" = "Những gì Trò chuyện này biết về bạn từ các Trò chuyện trước";
 "What was copied before stays; importing again goes on from there. %@" = "Những gì đã được sao chép trước đó vẫn giữ nguyên; import lại sẽ tiếp tục từ đó. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Nội dung đã học: nội dung mà bộ nhớ ghi chú đã học nhưng bạn chưa viết, sửa, ghim hoặc phê duyệt. Mọi thứ: mọi ghi chú trừ Về bạn. Cả hai đều không thể hoàn tác.";
 "What you corrected before, so it isn't repeated." = "Những gì bạn đã sửa trước đây để không bị lặp lại.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Những gì bạn đã làm, được tách riêng khỏi ý nghĩa có thể có của việc đó. Được gửi như một phỏng đoán.";
 "What you do" = "Bạn làm gì";

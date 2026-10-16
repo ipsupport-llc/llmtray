@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio와 공유됨)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@이(가) 이미 존재하며 LLMTray 소유가 아닙니다. LLMTray 것을 설치하려면 먼저 제거하세요.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@이(가 이미 존재하며 %@를 가리킵니다. LLMTray 것을 설치하려면 먼저 제거하세요.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@이(가) 메모리용으로 채팅을 읽을 수 없습니다. 다른 모델이 해당 채팅을 읽고 있습니다.";
 "%@ didn't download: %@" = "%@를 다운로드하지 못함: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@는 사용할 수 없는 폴더로 가는 링크입니다: 해당 디스크를 연결하거나 링크를 제거하세요.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@은(는) 접근 제한됨: huggingface.co/%@에서 사용권에 동의한 뒤 설정 → Models에 Hugging Face 토큰을 추가하세요.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d개의 채팅이 응답 중입니다. 해당 채팅은 응답이 끝나면 대기열에 추가됩니다.";
 "%d chats queued; reading starts now if the model is free." = "%d개의 채팅이 대기열에 있습니다. 모델이 사용 중이 아니면 지금 읽기를 시작합니다.";
 "%d overridden, rest from Default · %@" = "%d개 재정의, 나머지는 Default에서 · %@";
+"%d parts of chats wait to be read." = "읽을 대화 내용이 %d개 있습니다.";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld은(는) 설정 > 파일에서 아직 복원할 수 있습니다.";
 "%lld downloads" = "%lld회 다운로드";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld개 파일을 인덱스화할 수 없음";
 "%lld interrupted: look at them in Finder" = "%lld개가 중단됨: Finder에서 확인하세요";
 "%lld items put back under their names." = "%lld개 항목이 원래 이름으로 복원되었습니다.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "승인하지 않은 학습된 메모 %lld개가 삭제됩니다. 직접 작성, 편집, 고정 또는 승인한 메모는 유지됩니다.";
 "%lld more" = "%lld개 더";
 "%lld more…" = "%lld개 더…";
 "%lld need a look: see the list." = "%lld개 항목을 확인하세요: 목록을 보십시오.";
 "%lld new since you opened the list: unticked until you tick them." = "목록을 연 이후 새로 생긴 항목 %lld개: 선택할 때까지 선택 해제된 상태입니다.";
 "%lld of 5 stars" = "5점 만점에 %lld점";
 "%lld pages" = "%lld페이지";
-"%lld parts of chats wait to be read." = "읽기를 기다리는 채팅 부분이 %lld개 있습니다.";
 "%lld pictures" = "%lld장 사진";
 "%lld pictures added: kept for documents, not searched." = "%lld장 사진 추가됨: 문서 용도로 보관되며 검색되지 않습니다.";
 "%lld requests" = "요청 %lld건";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "%@ 프로젝트의 대화";
 "Chats outside projects" = "프로젝트 밖의 대화";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "대화는 사용자와 작업에 대한 짧은 메모로 시작합니다. 선호하는 응답 방식, 작업 중인 내용, 이전에 수정한 내용입니다. 예산에 맞는 메모만 전송되며, LLMTray 자체 대화에만 사용됩니다. API를 사용하는 앱에는 절대 전송되지 않고, 임시 채팅에서도 사용되지 않습니다. 모든 내용은 이 컴퓨터에만 유지됩니다.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "대화는 더 이상 이를 받지 않습니다. 이 작업은 되돌릴 수 없습니다. 사용자 정보는 유지됩니다(제거하려면 해당 필드를 비우세요). 다시 읽으면 대화는 처음부터 새로 학습됩니다. 잊기만 하면, 이전에 읽은 내용은 다시 읽지 않습니다.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us 버전의 채팅, 프로젝트, 프로필 및 이미지·음악·음성·임베딩 모델이 여기에 복사되었습니다. 이전에 접근을 허용한 폴더들과 채팅 모델 폴더는 다시 승인해야 합니다.";
 "Check Again" = "다시 확인";
 "Check Now" = "지금 확인";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "이 프로젝트의 모든 채팅은 모델 프로필의 시스템 프롬프트 뒤에 이 지침을 받습니다. 변경 내용은 다음 메시지부터 적용됩니다.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "프로젝트의 모든 채팅이 전체 텍스트를 받습니다. 파일이 고정되어 있는 동안 해당 채팅에서는 웹 검색과 이미지·음악 생성이 비활성화됩니다.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "서버가 응답한 모든 요청(채팅, API를 통한 다른 앱과 에이전트)을 이 Mac에 기록합니다. 모델과 설정별 중앙값.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "저장된 모든 채팅을 처음부터 읽어, 그곳에 작성한 내용을 메모에 사용합니다. 백그라운드에서 실행되며 시간이 걸릴 수 있습니다.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "저장된 모든 채팅을 처음부터 다시 한 번 읽습니다. 이미 있는 메모는 중복 추가되지 않고 확인만 합니다.";
 "Everything in that folder is here already." = "해당 폴더의 모든 항목이 이미 여기에 있습니다.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray가 ipsupport.us로 보내는 항목을 필드별로 그대로 표시합니다. 다른 데이터는 Mac을 떠나지 않습니다.";
 "Experimental — English only" = "실험적 — 영어 전용";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "더 빠른 응답(추측적 디코딩)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "공개된 drafter(Gemma 4 26B)나 자체 MTP 헤드(예: 함께 다운로드한 Qwen 3.5 모델)가 있는 모델의 경우: 미리 토큰을 예측하고 메인 모델이 한 번에 확인합니다. 출력은 같고 속도는 빠릅니다. 단독 요청일 때 활성화되며, 여러 요청이 동시에 있으면 drafter 없이 배치를 공유합니다.";
 "Forget" = "잊기";
-"Forget Everything…" = "모두 잊기…";
-"Forget What Was Learned…" = "학습한 내용 잊기…";
-"Forget and Read All Chats Again" = "잊고 모든 채팅 다시 읽기";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "직접 작성, 편집, 고정 또는 승인하지 않은 모든 학습된 메모와 읽기 대기 중인 내용을 잊습니다. 그런 다음 현재 규칙으로 채팅을 다시 읽을 수 있습니다. 단, “기억하지 않음”으로 표시된 채팅은 제외되며, 메모리가 꺼져 있던 동안의 대화는 그 사이에 한 말을 읽을지 사용자가 답하기 전까지 제외됩니다.";
+"Forget Everything" = "모두 잊기";
+"Forget Everything and Read Chats Again" = "모두 잊고 대화 다시 읽기";
+"Forget What Was Learned" = "학습한 내용 잊기";
+"Forget What Was Learned and Read Chats Again" = "학습한 내용을 잊고 대화 다시 읽기";
+"Forget…" = "잊기…";
 "Found after an interruption" = "중단 후 발견됨";
 "Founding Supporters" = "창립 후원자";
 "Free disk space" = "여유 디스크 공간";
@@ -613,7 +611,6 @@
 "Later" = "나중에";
 "Launch at login" = "로그인 시 열기";
 "Launch at login: %@" = "로그인 시 실행: %@";
-"Learn from Past Chats Now" = "지금 지난 대화에서 학습";
 "Learned from chats" = "채팅에서 학습한 내용";
 "Learning" = "학습";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "채팅에서 학습하려면 같은 내용을 다른 말이나 다른 언어로 표현한 메모를 구분하는 임베딩 모델인 %@(%@)이 필요합니다. 이 컴퓨터에 한 번 다운로드되며 프로젝트 파일과 공유됩니다.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "이전 대화의 컨텍스트를 재사용하기 위해 유지하는 메모리입니다. 이어서 진행하는 채팅이 전체 기록을 다시 읽지 않도록 합니다. 서버 메모리가 부족해질 때까지 커지지 않도록 제한됩니다.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "메모리가 이 채팅에서 더 이상 배우지 않습니다. 이미 배운 메모도 함께 사라질 수 있지만, 사용자가 편집, 고정 또는 승인한 메모는 제외됩니다.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTray가 %d분 동안 유휴 상태이면 메모리가 자체적으로 불러옵니다.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "메모리는 채팅을 처음 만난 뒤의 첫 메시지부터만 읽습니다. 이 기능은 모델이 사용 중이 아닐 때 백그라운드에서 저장된 모든 채팅도 처음부터, 즉 메모리를 켜기 전에 작성한 내용까지 읽습니다. “기억하지 않음”으로 표시된 채팅은 건너뜁니다.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "메모리는 이 Mac에만 남습니다. 메모는 여기의 파일에 보관되며 업로드되거나 공유되지 않습니다. LLMTray 채팅의 프롬프트에만 들어가며, API를 사용하는 앱이나 임시 채팅에는 들어가지 않습니다.";
 "Memory was off. Read what was said meanwhile?" = "메모리가 꺼져 있었습니다. 그동안 나눈 내용을 읽을까요?";
 "Memory: %d" = "메모리: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "끔: 이 Mac에서만 사용. 켬: 네트워크상의 모든 사용자가 사용 가능하므로 신뢰하는 네트워크에서만 사용하세요.";
 "Older" = "이전";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "일회성: 커피 $5, 프로 후원자 $25, 창립 후원자 $150.";
-"Only Forget" = "잊기만";
 "Only From Now On" = "지금부터만";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "제한된 모델에만 적용(Llama, 일부 Gemma 및 FLUX 저장소): Hugging Face 페이지에서 사용권에 동의한 뒤 여기로 읽기 권한 토큰을 붙여넣으세요. 키체인에 저장되며 huggingface.co로만 전송됩니다.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "원하는 경우에만 입력하세요. 채팅이 이 내용을 먼저 사용하며, 만료되지 않고, 학습으로 변경되지 않습니다. 이 컴퓨터에 남아 있습니다.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray에만 macOS 언어 설정을 덮어씁니다. LLMTray를 다시 시작한 후 적용됩니다. 번역되지 않은 텍스트는 영어로 표시됩니다.";
 "PDF · %lld pages" = "PDF · %lld쪽";
 "Past %lld messages" = "지난 %lld개 메시지";
-"Past chats" = "지난 채팅";
 "Pause" = "일시 정지";
 "Pause Indexing" = "인덱스 일시정지";
 "Pause download" = "다운로드를 일시 정지합니다.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "다시 인덱스 %@";
 "Re-index this file" = "이 파일 다시 인덱스";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld개의 하위 폴더(%2$@)까지 검색: 해당 폴더의 파일을 꺼냄.";
-"Read All Chats Again" = "모든 채팅 다시 읽기";
-"Read All Chats Again…" = "모든 채팅 다시 읽기…";
+"Read Everything Again" = "모두 다시 읽기";
 "Read It Too" = "이것도 읽기";
-"Read Them" = "읽기";
+"Read Past Chats…" = "지난 대화 읽기…";
+"Read What Wasn't Read" = "읽지 않은 내용 읽기";
 "Read a chat after %lld quiet minutes" = "%lld분 동안 조용하면 채팅 읽기";
 "Reading a chat…" = "채팅 읽는 중…";
 "Reading a prompt: up to %lld%" = "프롬프트 읽기: 최대 %lld%";
+"Reading chats" = "대화 읽기";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Reads chats with" = "채팅을 읽을 모델";
 "Ready." = "준비됨.";
@@ -983,6 +978,7 @@
 "Save" = "저장";
 "Save As…" = "다른 이름으로 저장…";
 "Save memory" = "메모리 절약";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "저장된 대화는 그곳에 작성한 내용을 바탕으로 백그라운드에서 메모를 위해 읽습니다. 다시 읽어도 이미 있는 메모는 확인만 하며, 중복 추가되지 않습니다. \"Don't Remember\"로 표시된 대화는 건너뜁니다.";
 "Saved chats will show up here." = "저장한 채팅이 여기 표시됩니다.";
 "Saved in your Keychain" = "키체인에 저장됨";
 "Save…" = "저장…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "이 Mac에 로그인할 때 LLMTray를 자동으로 시작합니다.";
 "Start Server" = "서버 시작";
 "Start a new saved chat (⌘N) to add files to a project." = "프로젝트에 파일을 추가하려면 새 저장된 채팅(⌘N)을 시작하세요.";
-"Start over" = "다시 시작";
 "Start server" = "서버를 시작합니다.";
 "Start talking" = "말하기 시작";
 "Start the server first." = "먼저 서버를 시작하십시오.";
@@ -1297,6 +1292,7 @@
 "Total time" = "총 시간";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "실행 중인 모델에 대해 1, 2, 4, 8개의 동시 요청과 prefill-step-size(256–4096)를 각각 시도하며 시도 간 서버를 재시작합니다. 동시 요청 수: 최고 총합 속도의 90%에 도달하는 최소값(더 높이면 메모리 사용량에 비해 이득이 적음); prefill: 가장 빠른 값.";
 "Try Again" = "다시 시도";
+"Try It Again" = "다시 시도";
 "Turn On" = "켜기";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "파일 텍스트를 이 Mac에서 의미 기반 검색용 벡터로 변환합니다. 제거해도 인덱스는 유지됩니다. 다시 다운로드될 때까지 파일은 단어 단위로 검색됩니다.";
 "Tweak…" = "조정…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "LLMTray에 오신 것을 환영합니다";
 "What can you do?" = "무엇을 할 수 있나요?";
 "What chats get" = "채팅이 받는 내용";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "채팅이 받는 내용, 대화를 읽는 방식, 메모 유지 기간을 설정합니다. 기본값은 대부분의 사용자에게 적합합니다.";
 "What decides which models run well here." = "어떤 모델이 여기서 잘 실행되는지를 결정합니다.";
 "What else" = "그 밖에";
 "What happened?" = "무슨 일이 있었나요?";
 "What the model says appears here." = "모델의 발화가 여기에 표시됩니다.";
 "What this chat knows about you from earlier chats" = "이전 채팅에서 이 채팅이 사용자에 대해 아는 내용";
 "What was copied before stays; importing again goes on from there. %@" = "이전에 복사된 항목은 유지됩니다; 다시 가져오면 그 지점부터 계속됩니다. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "학습한 내용: 사용자가 직접 작성, 편집, 고정 또는 승인하지 않은 메모 메모리가 학습한 내용입니다. 모두: 사용자 정보를 제외한 모든 메모입니다. 둘 다 실행 취소할 수 없습니다.";
 "What you corrected before, so it isn't repeated." = "반복되지 않도록 이전에 수정한 내용.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "사용자가 한 일을 그 의미와 분리해 둡니다. 추정으로 전송됩니다.";
 "What you do" = "하는 일";

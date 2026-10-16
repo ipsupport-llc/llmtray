@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@（LM Studio 的，共享）";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ 已存在且不是 LLMTray 的项目。请先移除它以安装 LLMTray 的版本。";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ 已存在并指向 %@。请先移除它以安装 LLMTray 的版本。";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ 无法读取聊天以用于记忆：另一个模型正在读取其聊天。";
 "%@ didn't download: %@" = "%@ 未下载：%@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ 是一个指向不可用文件夹的链接：请连接其磁盘，或移除该链接。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 受限：请在 huggingface.co/%@ 接受其许可，然后在“设置 → 模型”中添加 Hugging Face 令牌。";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d 个聊天正在回答：它们会在完成后排队读取。";
 "%d chats queued; reading starts now if the model is free." = "%d 个聊天已排队；如果模型空闲，将立即开始读取。";
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
+"%d parts of chats wait to be read." = "有 %d 个对话片段等待读取。";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld 仍可在“设置 > 文件”中撤消。";
 "%lld downloads" = "%lld 次下载";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld 个文件无法建立索引";
 "%lld interrupted: look at them in Finder" = "%lld 项已中断：在 Finder 中查看";
 "%lld items put back under their names." = "%lld 项按原名已恢复。";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld 条你尚未批准的已学习笔记会被移除。你撰写、编辑、置顶或批准的笔记会保留。";
 "%lld more" = "还剩 %lld";
 "%lld more…" = "还有 %lld…";
 "%lld need a look: see the list." = "%lld 项需要查看：请查看列表。";
 "%lld new since you opened the list: unticked until you tick them." = "自打开列表后有 %lld 项新项：未选中，直到你勾选它们。";
 "%lld of 5 stars" = "%lld / 5 星";
 "%lld pages" = "%lld 页";
-"%lld parts of chats wait to be read." = "%lld 个聊天片段等待读取。";
 "%lld pictures" = "%lld 张图片";
 "%lld pictures added: kept for documents, not searched." = "已添加 %lld 张图片：保留供文档使用，不参与搜索。";
 "%lld requests" = "%lld 个请求";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "项目 %@ 的对话";
 "Chats outside projects" = "项目外的对话";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "对话会以关于你和你工作的简短笔记开始：你偏好的回答方式、正在处理的内容、之前纠正过的内容。只会发送符合预算的笔记，并且仅用于 LLMTray 自己的对话——绝不会发送给使用 API 的 App，也绝不会用于临时对话。所有内容都会留在这台电脑上。";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "对话将不再获得这些内容。此操作无法撤销。“关于你”会保留（清空其中的字段即可移除）。再次读取后，将从头重新学习你的对话；只会遗忘内容，之前读过的内容不会再次读取。";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "来自 ipsupport.us 版本的聊天、项目、配置档及图像、音乐、语音和嵌入模型已导入。此前授予该版本的文件夹访问权限，以及你的聊天模型文件夹，需要你重新授权。";
 "Check Again" = "再次检查";
 "Check Now" = "立即检查";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "此项目中的每个对话在模型配置文件的系统提示之后都会应用这些指令。更改自下一条消息起生效。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "当文件被置顶时，项目的每个对话都会获取该文件的全部文本；这些对话中的网页搜索和图像或音乐生成功能被禁用。";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "服务器回答的每个请求（聊天，以及通过 API 的其他应用和智能体）都保存在这台 Mac 上。按模型和设置取中位数。";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "每个已存储的聊天都会从开头读取以生成笔记，使用你在其中写下的内容。它会在后台运行，可能需要一段时间。";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "每个已存储的聊天都会从开头再读取一遍。已有的笔记会被确认，不会重复添加。";
 "Everything in that folder is here already." = "该文件夹中的内容已全部存在于此。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray 向 ipsupport.us 发送的完整内容，逐字段列出。你的 Mac 不会发送其他任何内容。";
 "Experimental — English only" = "试验性功能 — 仅限英语";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "用于更快的回答（猜测解码）";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "对于有公开 drafter（Gemma 4 26B）或自带 MTP head（如我们随模型下载的 Qwen 3.5 系列）的模型：它会提前预测若干 token，主模型在一次处理内校验这些 token。输出相同，但更快。单个请求时会使用它；多个并发时则共享批次，而不使用它。";
 "Forget" = "忘记";
-"Forget Everything…" = "全部忘记…";
-"Forget What Was Learned…" = "忘记已学习的内容…";
-"Forget and Read All Chats Again" = "忘记并重新读取所有聊天";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "忘记所有并非由你撰写、编辑、置顶或批准的已学习笔记，以及等待读取的内容。之后可按当前规则重新读取你的聊天——但不会读取标记为“不要记住”的聊天；内存关闭期间的内容，也要等你回答是否读取这期间所说内容后才会读取。";
+"Forget Everything" = "全部忘记";
+"Forget Everything and Read Chats Again" = "全部忘记并重新读取对话";
+"Forget What Was Learned" = "忘记已学习的内容";
+"Forget What Was Learned and Read Chats Again" = "忘记已学习的内容并重新读取对话";
+"Forget…" = "忘记…";
 "Found after an interruption" = "中断后发现";
 "Founding Supporters" = "创始赞助者";
 "Free disk space" = "可用磁盘空间";
@@ -613,7 +611,6 @@
 "Later" = "稍后";
 "Launch at login" = "登录时打开";
 "Launch at login: %@" = "登录时启动：%@";
-"Learn from Past Chats Now" = "立即从过往对话学习";
 "Learned from chats" = "从聊天中学习到的内容";
 "Learning" = "学习";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "从聊天中学习需要 %@（%@），这是一种嵌入模型，可判断哪些笔记是用不同说法或另一种语言表达同一件事。它只会下载到这台电脑一次，并与项目文件共用。";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "内存不会再从中学习任何内容。它已教过的笔记也可一并移除，但你编辑、置顶或批准过的除外。";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTray 空闲 %d 分钟后，内存会自行加载它。";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "内存只会从遇到某个聊天后的第一条消息开始读取该聊天。此操作也会在后台、模型空闲时，从开头读取每个已存储的聊天——也就是你在内存开启前写下的内容。标记为“不要记住”的聊天会被跳过。";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "内存会保留在这台 Mac 上：笔记保存在本地文件中，绝不会上传或共享。它们只会进入你的 LLMTray 聊天提示词——不会发送给使用 API 的 App，也不会进入临时对话。";
 "Memory was off. Read what was said meanwhile?" = "内存已关闭。要读取期间说过的内容吗？";
 "Memory: %d" = "内存：%d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "关闭：仅限此 Mac。打开：局域网内任何人可用，仅在你信任的网络上开启。";
 "Older" = "更早";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "一次性：咖啡 $5，专业赞助者 $25，创始赞助者 $150。";
-"Only Forget" = "仅忘记";
 "Only From Now On" = "仅从现在开始";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "仅在你需要时填写：聊天会优先获取这些内容，它永不过期，且学习永远不会更改它。它会留在这台电脑上。";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
 "PDF · %lld pages" = "PDF · %lld 页";
 "Past %lld messages" = "过去 %lld 条消息";
-"Past chats" = "过往聊天";
 "Pause" = "暂停";
 "Pause Indexing" = "暂停建立索引";
 "Pause download" = "暂停下载";
@@ -901,13 +895,14 @@
 "Re-index %@" = "重新建立 %@ 索引";
 "Re-index this file" = "为此文件重新建立索引";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "将进入 %1$lld 个子文件夹（%2$@）：其文件将被移出。";
-"Read All Chats Again" = "再次读取所有聊天";
-"Read All Chats Again…" = "再次读取所有聊天…";
+"Read Everything Again" = "重新读取全部内容";
 "Read It Too" = "也读取它";
-"Read Them" = "读取它们";
+"Read Past Chats…" = "读取过往对话…";
+"Read What Wasn't Read" = "读取未读取的内容";
 "Read a chat after %lld quiet minutes" = "聊天静默 %lld 分钟后读取";
 "Reading a chat…" = "正在读取聊天…";
 "Reading a prompt: up to %lld%" = "读取提示：最多 %lld%";
+"Reading chats" = "读取聊天";
 "Reading what's installed…" = "正在读取已安装内容…";
 "Reads chats with" = "使用以下模型读取聊天";
 "Ready." = "已就绪。";
@@ -983,6 +978,7 @@
 "Save" = "保存";
 "Save As…" = "另存为…";
 "Save memory" = "节省内存";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "已保存的聊天会在后台根据你在其中写下的内容被读取，用于生成笔记。再次读取时，已有的笔记会被确认，不会重复添加。标记为“不要记住”的聊天会被跳过。";
 "Saved chats will show up here." = "已保存的对话会显示在此处。";
 "Saved in your Keychain" = "已保存在您的钥匙串中";
 "Save…" = "存储…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "登录这台 Mac 时自动打开 LLMTray。";
 "Start Server" = "启动服务器";
 "Start a new saved chat (⌘N) to add files to a project." = "开始新的已保存聊天（⌘N）以将文件添加到项目。";
-"Start over" = "重新开始";
 "Start server" = "启动服务器。";
 "Start talking" = "开始说话";
 "Start the server first." = "请先启动服务器。";
@@ -1297,6 +1292,7 @@
 "Total time" = "总时长";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "对运行中的模型分别尝试 1、2、4、8 个并发请求和 prefill-step-size（256–4096），每次尝试后重启服务器。并发请求：选择达到最佳总速度 90% 的最小并发数（更高并发对内存开销大但收益小）；prefill：选择最快的值。";
 "Try Again" = "重试";
+"Try It Again" = "重试";
 "Turn On" = "开启";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "欢迎使用 LLMTray";
 "What can you do?" = "你能做什么？";
 "What chats get" = "聊天会获得什么";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "聊天会获得什么、如何读取聊天，以及笔记保留时长。默认设置适合大多数人。";
 "What decides which models run well here." = "决定哪些模型能在此运行良好的因素。";
 "What else" = "更多信息";
 "What happened?" = "发生了什么？";
 "What the model says appears here." = "模型的回复将在此显示。";
 "What this chat knows about you from earlier chats" = "此聊天从之前的聊天中了解的关于你的内容";
 "What was copied before stays; importing again goes on from there. %@" = "已复制的内容会保留；再次导入将从该处继续。 %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "已学习的内容：笔记记忆中由系统学习、且你未编写、编辑、置顶或批准的内容。全部内容：除“关于你”外的所有笔记。这两项操作都无法撤销。";
 "What you corrected before, so it isn't repeated." = "你之前纠正过的内容，避免再次重复。";
 "What you did, kept apart from what it may mean. Sent as a guess." = "你做过的事，会与其可能含义分开保存。会作为猜测发送。";
 "What you do" = "你的职业";

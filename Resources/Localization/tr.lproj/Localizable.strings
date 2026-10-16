@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio'ya ait, onunla paylaşılıyor)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ zaten var ve LLMTray'e ait değil. LLMTray'i yüklemek için önce onu kaldırın.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ zaten var ve %@ öğesine işaret ediyor. LLMTray'i yüklemek için önce onu kaldırın.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@, bellek için sohbetleri okuyamadı: sohbetlerini başka bir model okuyor.";
 "%@ didn't download: %@" = "%@ indirilmedi: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@, erişilemeyen bir klasöre bağlantı: diskini bağlayın ya da bağlantıyı kaldırın.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ kısıtlı: lisansını huggingface.co/%@ adresinde kabul edin, sonra Ayarlar → Models'te bir Hugging Face tokenı ekleyin.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "%d sohbet yanıt veriyor; onların okuması, işleri bitince kuyruğa alınır.";
 "%d chats queued; reading starts now if the model is free." = "%d sohbet kuyruğa alındı; model boşsa okuma şimdi başlar.";
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
+"%d parts of chats wait to be read." = "Sohbetlerin %d bölümü okunmayı bekliyor.";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld, Ayarlar > Dosyalar’dan hâlâ geri alınabilir.";
 "%lld downloads" = "%lld indirme";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "%lld dosya dizine eklenemedi";
 "%lld interrupted: look at them in Finder" = "%lld işlem kesildi: bunlara Finder'da bakın";
 "%lld items put back under their names." = "%lld öğe adlarıyla birlikte geri kondu.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "Onaylamadığınız %lld öğrenilen not silinir. Yazdığınız, düzenlediğiniz, sabitlediğiniz veya onayladığınız notlar kalır.";
 "%lld more" = "%lld daha";
 "%lld more…" = "%lld daha…";
 "%lld need a look: see the list." = "%lld öğe incelenmeli: listeye bakın.";
 "%lld new since you opened the list: unticked until you tick them." = "Listeyi açtığınızdan beri %lld yeni öğe: işaretlenene kadar seçilmedi.";
 "%lld of 5 stars" = "5 üzerinden %lld yıldız";
 "%lld pages" = "%lld sayfa";
-"%lld parts of chats wait to be read." = "Sohbetlerin %lld bölümü okunmayı bekliyor.";
 "%lld pictures" = "%lld resim";
 "%lld pictures added: kept for documents, not searched." = "%lld resim eklendi: belgeler için saklandı, aranmaz.";
 "%lld requests" = "%lld istek";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "%@ projesinin sohbetleri";
 "Chats outside projects" = "Projeler dışındaki sohbetler";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Sohbetler, sizin ve işiniz hakkında kısa notlarla başlar: cevapları nasıl istediğiniz, ne üzerinde çalıştığınız, daha önce neleri düzelttiğiniz. Yalnızca bütçeye sığan notlar gider ve yalnızca LLMTray’in kendi sohbetlerinde; API kullanan uygulamalara hiçbir zaman, geçici sohbetlerde hiçbir zaman gönderilmez. Her şey bu bilgisayarda kalır.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "Sohbetler artık bunları almayacak. Bu işlem geri alınamaz. Sizin hakkınızda kalır (kaldırmak için alanlarını temizleyin). Yeniden okunursa sohbetleriniz baştan yeniden öğrenilir; yalnızca unutulur, daha önce okunanlar yeniden okunmaz.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us sürümünün sohbetleri, projeleri, profilleri ve görsel, müzik, ses ve embedding modelleri şimdi burada. Ona izin verdiğiniz klasörler ve sohbet modelleri klasörünüz için tekrar onayınız gerekiyor.";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Sunucunun yanıtladığı her istek — sohbetten ve API üzerinden diğer uygulama ve ajanlardan — bu Mac'te tutulur. Model ve ayar başına medyanlar.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Kaydedilen her sohbet, notlar için başından itibaren okunur; orada yazdıklarınız kullanılır. Bu işlem arka planda çalışır ve biraz sürebilir.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Kaydedilmiş her sohbet baştan bir kez daha okunur. Zaten var olan Notlar onaylanır, yinelenmez.";
 "Everything in that folder is here already." = "O klasördeki her şey zaten burada.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray'nin ipsupport.us'a alan alan gönderdiği tam bilgiler. Başka hiçbir şey Mac'inizden ayrılmaz.";
 "Experimental — English only" = "Deneysel — yalnızca İngilizce";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "Daha hızlı yanıtlar için (spekülatif çözümleme)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Yayımlanmış bir drafter'ı olan modeller (Gemma 4 26B) veya kendi MTP başlığına sahip modellerde (Qwen 3.5 modellerimiz, bunlarla birlikte indirilir): önden token tahmini yapar ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. Bir istek yalnızken bunu kullanır; birden çok istek aynı anda olursa paketleri paylaşırlar ve kullanmazlar.";
 "Forget" = "Unut";
-"Forget Everything…" = "Her Şeyi Unut…";
-"Forget What Was Learned…" = "Öğrenilenleri Unut…";
-"Forget and Read All Chats Again" = "Unut ve Tüm Sohbetleri Yeniden Oku";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Yazmadığınız, düzenlemediğiniz, sabitlemediğiniz veya onaylamadığınız tüm öğrenilen notları ve okunmayı bekleyenleri unutur. Ardından sohbetleriniz geçerli kurallarla yeniden okunabilir — “Hatırlama” olarak işaretlenenler değil; bellek kapalıyken söylenenler de, bu arada söylenenlerin okunup okunmayacağını yanıtlamadan önce okunmaz.";
+"Forget Everything" = "Her Şeyi Unut";
+"Forget Everything and Read Chats Again" = "Her Şeyi Unut ve Sohbetleri Yeniden Oku";
+"Forget What Was Learned" = "Öğrenilenleri Unut";
+"Forget What Was Learned and Read Chats Again" = "Öğrenilenleri Unut ve Sohbetleri Yeniden Oku";
+"Forget…" = "Unut…";
 "Found after an interruption" = "Kesintiden sonra bulunanlar";
 "Founding Supporters" = "Kurucu Destekçiler";
 "Free disk space" = "Boş disk alanı";
@@ -613,7 +611,6 @@
 "Later" = "Daha Sonra";
 "Launch at login" = "Girişte aç";
 "Launch at login: %@" = "Girişte aç: %@";
-"Learn from Past Chats Now" = "Geçmiş Sohbetlerden Şimdi Öğren";
 "Learned from chats" = "Sohbetlerden öğrenilenler";
 "Learning" = "Öğrenme";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "Sohbetlerden öğrenme, hangi notların aynı şeyi başka sözcüklerle veya başka bir dilde söylediğini belirten bir gömü modeli olan %@ (%@) gerektirir. Bu bilgisayara bir kez indirilir ve proje dosyalarıyla paylaşılır.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Bellek bundan artık hiçbir şey öğrenmez. Daha önce öğrettiği Notlar da gidebilir; düzenlediğiniz, sabitlediğiniz veya onayladıklarınız hariç.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "LLMTray %d dakika boşta kaldığında Bellek bunu kendisi yükler.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Bellek, bir sohbeti yalnızca o sohbetle karşılaştıktan sonraki ilk iletiden itibaren okur. Bu, kaydedilen her sohbeti başından itibaren de okur — Bellek açık değilken yazdıklarınızı — model boştayken arka planda işler. “Hatırlama” olarak işaretlenen Sohbetler atlanır.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "Bellek bu Mac’te kalır: notlar burada bir dosyada tutulur ve asla yüklenmez veya paylaşılmaz. Yalnızca LLMTray sohbetlerinizin istemine gider — API kullanan uygulamalara gitmez, geçici sohbetlere eklenmez.";
 "Memory was off. Read what was said meanwhile?" = "Bellek kapalıydı. Bu arada söylenenler okunsun mu?";
 "Memory: %d" = "Bellek: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Kapalı: yalnızca bu Mac. Açık: ağınızdaki herkes — yalnızca güvendiğiniz ağlarda kullanın.";
 "Older" = "Daha eski";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Tek seferlik: Kahve $5, Pro Destekçi $25, Kurucu Destekçi $150.";
-"Only Forget" = "Yalnızca Unut";
 "Only From Now On" = "Yalnızca Bundan Sonra";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Sadece kısıtlı modeller için (Llama, bazı Gemma ve FLUX depoları): Hugging Face sayfasında modelin lisansını kabul edin, sonra buraya bir read token yapıştırın. Keychain'inizde saklanır, yalnızca huggingface.co'ya gönderilir.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Yalnızca isterseniz: Sohbetler bunu önce alır, süresi hiç dolmaz ve öğrenme bunu hiç değiştirmez. Bu bilgisayarda kalır.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "PDF · %lld pages" = "PDF · %lld sayfa";
 "Past %lld messages" = "Son %lld mesaj";
-"Past chats" = "Geçmiş sohbetler";
 "Pause" = "Duraklat";
 "Pause Indexing" = "Dizine Almayı Duraklat";
 "Pause download" = "İndirmeyi duraklatır.";
@@ -901,13 +895,14 @@
 "Re-index %@" = "%@ öğesini yeniden dizine al";
 "Re-index this file" = "Bu dosyayı yeniden dizine al";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld alt klasöre (%2$@) giriliyor: dosyaları bu klasörlerden çıkarılır.";
-"Read All Chats Again" = "Tüm sohbetleri yeniden oku";
-"Read All Chats Again…" = "Tüm sohbetleri yeniden oku…";
+"Read Everything Again" = "Her Şeyi Yeniden Oku";
 "Read It Too" = "Bunu da Oku";
-"Read Them" = "Bunları Oku";
+"Read Past Chats…" = "Geçmiş Sohbetleri Oku…";
+"Read What Wasn't Read" = "Okunmayanları Oku";
 "Read a chat after %lld quiet minutes" = "Bir sohbeti %lld sessiz dakikadan sonra oku";
 "Reading a chat…" = "Sohbet okunuyor…";
 "Reading a prompt: up to %lld%" = "İsteme okuma: en fazla %lld%";
+"Reading chats" = "Sohbetleri okuma";
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Reads chats with" = "Sohbetleri şununla okur";
 "Ready." = "Hazır.";
@@ -983,6 +978,7 @@
 "Save" = "Kaydet";
 "Save As…" = "Farklı Kaydet…";
 "Save memory" = "Bellek tasarrufu";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Kaydedilmiş sohbetler, oraya yazdıklarınıza göre arka planda notlar için okunur. Yeniden okunduğunda, zaten var olan notlar iki katına çıkarılmaz, doğrulanır. “Hatırlama” olarak işaretlenen sohbetler atlanır.";
 "Saved chats will show up here." = "Kaydedilmiş sohbetler burada görünür.";
 "Saved in your Keychain" = "Keychain'inize kaydedildi";
 "Save…" = "Kaydet…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Bu Mac’e giriş yaptığınızda LLMTray’i otomatik olarak başlatır.";
 "Start Server" = "Sunucuyu başlat";
 "Start a new saved chat (⌘N) to add files to a project." = "Dosyaları bir projeye eklemek için yeni bir kaydedilmiş sohbet başlatın (⌘N).";
-"Start over" = "Baştan başla";
 "Start server" = "Sunucuyu başlat.";
 "Start talking" = "Konuşmaya başla";
 "Start the server first." = "Önce sunucuyu başlatın.";
@@ -1297,6 +1292,7 @@
 "Total time" = "Toplam süre";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Çalışan modele karşı 1, 2, 4 ve 8 isteği aynı anda ve prefill-step-size'ı (256–4096) dener, her deneme arasında sunucuyu yeniden başlatır. Eşzamanlı istekler: en iyi toplam hızın %90'ına ulaşan en az sayı (daha fazlası az fayda için daha fazla bellek tüketir); prefill: en hızlı olan.";
 "Try Again" = "Tekrar Dene";
+"Try It Again" = "Tekrar Dene";
 "Turn On" = "Aç";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "LLMTray'e hoş geldiniz";
 "What can you do?" = "Ne yapabilirsin?";
 "What chats get" = "Sohbetlere gidenler";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "Sohbetlere gidenler, sohbetlerin nasıl okunduğu, Notların ne kadar süre kaldığı. Varsayılanlar çoğu kişiye uygundur.";
 "What decides which models run well here." = "Hangi modellerin burada iyi çalışacağını belirleyenler.";
 "What else" = "Başka ne var";
 "What happened?" = "Ne oldu?";
 "What the model says appears here." = "Modelin söyledikleri burada görünür.";
 "What this chat knows about you from earlier chats" = "Bu sohbetin önceki sohbetlerden sizin hakkınızda bildikleri";
 "What was copied before stays; importing again goes on from there. %@" = "Önceden kopyalananlar kalır; yeniden içe aktarma oradan devam eder. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Öğrenilenler: not belleğinin, sizin yazmadığınız, düzenlemediğiniz, sabitlemediğiniz veya onaylamadığınız öğrendikleri. Her şey: Sizin hakkınızda dışındaki tüm notlar. Hiçbiri geri alınamaz.";
 "What you corrected before, so it isn't repeated." = "Tekrarlanmaması için daha önce düzelttiğiniz şeyler.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "Ne yaptığınız; ne anlama gelebileceğinden ayrı tutulur. Tahmin olarak gönderilir.";
 "What you do" = "Ne iş yaptığınız";

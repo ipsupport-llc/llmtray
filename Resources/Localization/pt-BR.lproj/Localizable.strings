@@ -21,6 +21,7 @@
 "%@ (LM Studio's, shared with it)" = "%@ (do LM Studio, compartilhado com ele)";
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ já existe e não pertence ao LLMTray. Remova-o primeiro para instalar o do LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ já existe e aponta para %@. Remova-o primeiro para instalar o do LLMTray.";
+"%@ couldn't read chats for memory: another model reads its chats." = "%@ não pôde ler os chats para memória: outro modelo lê os chats dele.";
 "%@ didn't download: %@" = "%@ não foi baixado: %@";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ é um alias para uma pasta que não está disponível: conecte o disco ou remova o alias.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ está restrito: aceite a licença em huggingface.co/%@ e depois adicione um token Hugging Face em Ajustes → Modelos.";
@@ -45,6 +46,7 @@
 "%d chats are answering: theirs is queued once they're done." = "Há %d chats respondendo; a leitura deles fica na fila até que terminem.";
 "%d chats queued; reading starts now if the model is free." = "%d chats na fila; a leitura começa agora se o modelo estiver livre.";
 "%d overridden, rest from Default · %@" = "Substituídos: %d, restante de Default · %@";
+"%d parts of chats wait to be read." = "%d partes de conversas aguardam leitura.";
 "%lld MB" = "%lld MB";
 "%lld can still be undone from Settings > Files." = "%lld ainda pode ser desfeito em Ajustes > Arquivos.";
 "%lld downloads" = "%lld downloads";
@@ -53,14 +55,12 @@
 "%lld files couldn't be indexed" = "Não foi possível indexar %lld arquivos";
 "%lld interrupted: look at them in Finder" = "%lld interrompidos: veja-os no Finder";
 "%lld items put back under their names." = "%lld itens restaurados aos seus nomes.";
-"%lld learned notes you haven't approved go. Notes you wrote, edited, pinned or approved stay." = "%lld notas aprendidas que você não aprovou serão apagadas. Notas que você escreveu, editou, fixou ou aprovou permanecem.";
 "%lld more" = "%lld a mais";
 "%lld more…" = "%lld a mais…";
 "%lld need a look: see the list." = "%lld requerem verificação: veja a lista.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld novos desde que você abriu a lista: desmarcados até você marcá‑los.";
 "%lld of 5 stars" = "%lld de 5 estrelas";
 "%lld pages" = "%lld páginas";
-"%lld parts of chats wait to be read." = "%lld partes de chats aguardam leitura.";
 "%lld pictures" = "%lld imagens";
 "%lld pictures added: kept for documents, not searched." = "%lld imagens adicionadas: mantidas para documentos, não pesquisadas.";
 "%lld requests" = "%lld solicitações";
@@ -249,7 +249,6 @@
 "Chats of project %@" = "Conversas do projeto %@";
 "Chats outside projects" = "Conversas fora de projetos";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "As conversas começam com notas curtas sobre você e seu trabalho: como você prefere as respostas, no que está trabalhando e o que já corrigiu antes. Só vão as notas que cabem no limite, e só nas conversas do próprio LLMTray — nunca em apps que usam a API, nunca em chats temporários. Tudo fica neste computador.";
-"Chats won't get them any more. This can't be undone. About you stays (clear its fields to remove it). Read again, your chats are learned from anew; only forgotten, what was read before isn't read again." = "As Conversas não vão mais receber isso. Não é possível desfazer. Sobre você permanece (apague os campos para removê-lo). Ao ler novamente, seus chats são aprendidos desde o início; só o que foi esquecido, o que foi lido antes não é lido de novo.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projetos, perfis e os modelos de imagem, música, voz e embedding da versão de ipsupport.us já estão aqui. As pastas às quais você deu acesso, e sua pasta de modelos de chat, precisam da sua permissão novamente.";
 "Check Again" = "Verificar novamente";
 "Check Now" = "Verificar agora";
@@ -419,8 +418,6 @@
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversa deste projeto recebe estas instruções, após o prompt do sistema do perfil do modelo. Uma alteração passa a valer a partir da próxima mensagem.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Todo chat do projeto recebe o texto completo; pesquisa na web e geração de imagem ou música ficam desativadas nesses chats enquanto um arquivo está fixado.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Cada solicitação que o servidor responde, do chat e de outros apps e agentes pela API, guardada neste Mac. Medianas por modelo e configurações.";
-"Every saved chat is read from its start for notes, using what you wrote there. It runs in the background and can take a while." = "Cada chat salvo é lido desde o início para gerar notas, usando o que você escreveu nele. Isso é executado em segundo plano e pode levar algum tempo.";
-"Every saved chat is read from its start once more. Notes already there are confirmed, not doubled." = "Cada chat salvo é lido novamente desde o início. As Notas que já estão lá são confirmadas, não duplicadas.";
 "Everything in that folder is here already." = "Tudo nessa pasta já está aqui.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exatamente o que LLMTray envia para ipsupport.us, campo a campo. Nada mais sai do seu Mac.";
 "Experimental — English only" = "Experimental — somente inglês";
@@ -464,10 +461,11 @@
 "For faster answers (speculative decoding)" = "Para respostas mais rápidas (decodificação especulativa)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Para modelos com um drafter publicado (Gemma 4 26B) ou com sua própria cabeça MTP (nossos modelos Qwen 3.5, baixados com eles): ele prevê tokens adiantados e o modelo principal os valida em uma única passagem. Mesmo resultado, mais rápido. Uma solicitação recebe isso quando está sozinha; com várias ao mesmo tempo elas compartilham o lote sem ele.";
 "Forget" = "Esquecer";
-"Forget Everything…" = "Esquecer Tudo…";
-"Forget What Was Learned…" = "Esquecer o que foi aprendido…";
-"Forget and Read All Chats Again" = "Esquecer e ler todos os chats novamente";
-"Forgets every learned note you haven't written, edited, pinned or approved, and what's waiting to be read. Then your chats can be read again with the current rules -- not ones marked \"Don't Remember\", nor, while memory was off, before you answer whether to read what was said meanwhile." = "Esquece todas as notas aprendidas que você não escreveu, editou, fixou ou aprovou, e o que está esperando para ser lido. Depois, seus chats podem ser lidos novamente com as regras atuais — exceto os marcados como “Não lembrar” e, enquanto a memória estava desativada, antes de você responder se quer ler o que foi dito nesse meio-tempo.";
+"Forget Everything" = "Esquecer tudo";
+"Forget Everything and Read Chats Again" = "Esquecer tudo e ler as Conversas novamente";
+"Forget What Was Learned" = "Esquecer o que foi aprendido";
+"Forget What Was Learned and Read Chats Again" = "Esquecer o que foi aprendido e ler as Conversas novamente";
+"Forget…" = "Esquecer…";
 "Found after an interruption" = "Encontrados após interrupção";
 "Founding Supporters" = "Patrocinadores Fundadores";
 "Free disk space" = "Espaço livre em disco";
@@ -613,7 +611,6 @@
 "Later" = "Mais tarde";
 "Launch at login" = "Abrir ao iniciar sessão";
 "Launch at login: %@" = "Abrir ao entrar: %@";
-"Learn from Past Chats Now" = "Aprender com conversas anteriores agora";
 "Learned from chats" = "Aprendido com chats";
 "Learning" = "Aprendizado";
 "Learning from chats needs %@ (%@), an embedding model that tells which notes say the same thing in other words or another language. It's downloaded to this computer once, shared with project files." = "O Aprendizado com chats requer %@ (%@), um modelo de embedding que informa quais notas dizem a mesma coisa com outras palavras ou em outro idioma. Ele é baixado uma vez para este computador e compartilhado com os arquivos do projeto.";
@@ -667,7 +664,6 @@
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memória mantida para reutilizar o contexto de conversas anteriores, para que um chat continuado não releia todo o histórico. Limitada para não crescer até o servidor ficar sem memória.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "A Memória não aprende mais nada com ele. As Notas que ele já ensinou também podem ser removidas, exceto as que você editou, fixou ou aprovou.";
 "Memory loads it itself once LLMTray has been idle %d minutes." = "A Memória o carrega por conta própria depois que o LLMTray fica inativo por %d minutos.";
-"Memory reads a chat only from the first message after it met it. This reads every saved chat from its start too -- what you wrote before memory was on -- in the background, while the model is free. Chats marked \"Don't Remember\" are skipped." = "Memória lê um chat apenas a partir da primeira mensagem depois de encontrá-lo. Isto também lê cada chat salvo desde o início — o que você escreveu antes de Memória ser ativada — em segundo plano, enquanto o modelo estiver livre. Chats marcados como “Não lembrar” são ignorados.";
 "Memory stays on this Mac: notes are kept in a file here and never uploaded or shared. They go only into the prompt of your LLMTray chats -- not to apps using the API, not into temporary chats." = "A Memória fica neste Mac: as notas são mantidas em um arquivo aqui e nunca são enviadas nem compartilhadas. Elas vão apenas para o prompt dos seus chats do LLMTray — não para apps que usam a API, nem para chats temporários.";
 "Memory was off. Read what was said meanwhile?" = "A Memória estava desativada. Ler o que foi dito nesse meio-tempo?";
 "Memory: %d" = "Memória: %d";
@@ -792,7 +788,6 @@
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Desligado: apenas este Mac. Ligado: qualquer pessoa na sua rede — só em redes de confiança.";
 "Older" = "Mais antigas";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Pagamento único: Café $5, Patrocinador Pro $25, Patrocinador Fundador $150.";
-"Only Forget" = "Apenas esquecer";
 "Only From Now On" = "Só de agora em diante";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Apenas para modelos restritos (Llama, alguns repositórios Gemma e FLUX): aceite a licença do modelo na página do Hugging Face e cole um token de leitura aqui. Armazenado no seu Keychain, enviado apenas para huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Só se você quiser: os chats recebem isso primeiro, nunca expira, e o aprendizado nunca muda isso. Fica neste computador.";
@@ -821,7 +816,6 @@
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Substitui o idioma do macOS apenas para o LLMTray. Entra em vigor após reiniciar o LLMTray. Textos não traduzidos aparecem em inglês.";
 "PDF · %lld pages" = "PDF · %lld páginas";
 "Past %lld messages" = "Últimas %lld mensagens";
-"Past chats" = "Conversas anteriores";
 "Pause" = "Pausar";
 "Pause Indexing" = "Pausar indexação";
 "Pause download" = "Pausar download";
@@ -901,13 +895,14 @@
 "Re-index %@" = "Reindexar %@";
 "Re-index this file" = "Reindexar este arquivo";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Acessa %1$lld subpastas (%2$@): os arquivos são removidos delas.";
-"Read All Chats Again" = "Ler Todos os chats novamente";
-"Read All Chats Again…" = "Ler Todos os chats novamente…";
+"Read Everything Again" = "Ler tudo novamente";
 "Read It Too" = "Ler isso também";
-"Read Them" = "Ler";
+"Read Past Chats…" = "Ler Conversas anteriores…";
+"Read What Wasn't Read" = "Ler o que não foi lido";
 "Read a chat after %lld quiet minutes" = "Ler um Chat após %lld minutos sem atividade";
 "Reading a chat…" = "Lendo um chat…";
 "Reading a prompt: up to %lld%" = "Leitura de prompt: até %lld%";
+"Reading chats" = "Leitura de chats";
 "Reading what's installed…" = "Lendo o que está instalado…";
 "Reads chats with" = "Lê Chats com";
 "Ready." = "Pronto.";
@@ -983,6 +978,7 @@
 "Save" = "Salvar";
 "Save As…" = "Salvar como…";
 "Save memory" = "Economizar memória";
+"Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Conversas salvas são lidas em segundo plano para as notas, com base no que você escreveu nelas. Quando são lidas novamente, as notas que já estão lá são confirmadas, não duplicadas. Conversas marcadas como “Não lembrar” são ignoradas.";
 "Saved chats will show up here." = "As conversas salvas aparecerão aqui.";
 "Saved in your Keychain" = "Salvo no seu Keychain";
 "Save…" = "Salvar…";
@@ -1069,7 +1065,6 @@
 "Start LLMTray automatically when you log in to this Mac." = "Iniciar o LLMTray automaticamente ao iniciar sessão neste Mac.";
 "Start Server" = "Iniciar servidor";
 "Start a new saved chat (⌘N) to add files to a project." = "Inicie um novo bate‑papo salvo (⌘N) para adicionar arquivos a um projeto.";
-"Start over" = "Começar de novo";
 "Start server" = "Inicia o servidor.";
 "Start talking" = "Comece a falar";
 "Start the server first." = "Inicie o servidor primeiro.";
@@ -1297,6 +1292,7 @@
 "Total time" = "Tempo total";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Testa 1, 2, 4 e 8 solicitações ao mesmo tempo e prefill-step-size (256–4096) contra o modelo em execução, reiniciando o servidor entre cada teste. Solicitações simultâneas: o menor número que alcança 90% da melhor velocidade total (mais custa memória por pouco ganho); prefill: o mais rápido.";
 "Try Again" = "Tentar novamente";
+"Try It Again" = "Tentar novamente";
 "Turn On" = "Ativar";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte o texto dos arquivos em vetores para pesquisa por significado, neste Mac. Remover mantém os índices: os arquivos serão pesquisados pelas palavras até que seja baixado novamente.";
 "Tweak…" = "Ajustar…";
@@ -1383,12 +1379,14 @@
 "Welcome to LLMTray" = "Bem-vindo ao LLMTray";
 "What can you do?" = "O que você pode fazer?";
 "What chats get" = "O que os chats recebem";
+"What chats get, how chats are read, how long notes last. The defaults suit most people." = "O que os chats recebem, como os chats são lidos, Duração das notas. Os padrões servem para a maioria das pessoas.";
 "What decides which models run well here." = "O que determina quais modelos rodam bem aqui.";
 "What else" = "O que mais";
 "What happened?" = "O que aconteceu?";
 "What the model says appears here." = "O que o modelo diz aparece aqui.";
 "What this chat knows about you from earlier chats" = "O que este chat sabe sobre você a partir de chats anteriores";
 "What was copied before stays; importing again goes on from there. %@" = "O que já foi copiado permanece; importar novamente continua a partir daí. %@";
+"What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "O que foi aprendido: o que a memória de notas aprendeu e que você não escreveu, editou, fixou nem aprovou. Tudo: todas as notas, exceto Sobre você. Nenhum dos dois pode ser desfeito.";
 "What you corrected before, so it isn't repeated." = "O que você corrigiu antes, para que não se repita.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "O que você fez, mantido separado do que isso pode significar. Enviado como suposição.";
 "What you do" = "O que você faz";
