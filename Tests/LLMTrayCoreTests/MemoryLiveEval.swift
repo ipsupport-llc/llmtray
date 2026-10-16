@@ -148,7 +148,14 @@ final class MemoryLiveEval: XCTestCase {
         var vectors = (try? JSONDecoder().decode(MemoryVectors.self, from: Data(contentsOf: URL(fileURLWithPath: vectorsPath))))
             ?? MemoryVectors(model: entryModel)
 
-        for chat in Self.sets[set] ?? [] {
+        // MEMORY_EVAL_REAL=<notes.json>: its queued batches (a copy of the
+        // user's), read as the app reads them -- to see why they fail.
+        if let real = env["MEMORY_EVAL_REAL"],
+           let copy = try? JSONDecoder.iso.decode(MemoryFile.self, from: Data(contentsOf: URL(fileURLWithPath: real))) {
+            file.queue = Array(copy.queue.prefix(Int(env["MEMORY_EVAL_LIMIT"] ?? "3") ?? 3))
+            file.notes = copy.notes
+        }
+        for chat in env["MEMORY_EVAL_REAL"] == nil ? (Self.sets[set] ?? []) : [] {
             let id = UUID()
             file.meet(id, from: 0)
             let messages = chat.messages.enumerated().map {
@@ -225,7 +232,7 @@ final class MemoryLiveEval: XCTestCase {
             moodSince: Date().addingTimeInterval(-Double(settings.moodHours) * 3600),
             ask: { messages, maxTokens, shape in
                 let reply = try await self.ask(messages, maxTokens, shape)
-                if debug { print("  [\((messages[0]["content"] as? String ?? "").prefix(40))…] → \(reply.prefix(400))") }
+                if debug { print("  [\((messages[0]["content"] as? String ?? "").prefix(40))…] → \(reply.prefix(500).replacingOccurrences(of: "\n", with: "⏎"))") }
                 return reply
             }) else {
             print("!! unreadable reply")
@@ -394,5 +401,13 @@ final class MemoryLiveEval: XCTestCase {
             out += (0..<r.count).map(r.floats)
         }
         return out
+    }
+}
+
+extension JSONDecoder {
+    static var iso: JSONDecoder {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return d
     }
 }

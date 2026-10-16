@@ -20,6 +20,8 @@ struct MemoryPane: View {
     @AppStorage(Pref.memoryMoodHours.name) private var moodHours = Pref.memoryMoodHours.defaultValue
     @AppStorage(Pref.memoryModel.name) private var learningModel = Pref.memoryModel.defaultValue
     @AppStorage(Pref.memorySorter.name) private var sorter = Pref.memorySorter.defaultValue
+    @AppStorage(Pref.memoryUnfitReaders.name) private var unfitRaw = Pref.memoryUnfitReaders.defaultValue
+    private var unfitReaders: [String] { unfitRaw.split(separator: "\n").map(String.init) }
     @AppStorage(Pref.memorySwitchIdleMinutes.name) private var switchIdleMinutes = Pref.memorySwitchIdleMinutes.defaultValue
     @ObservedObject private var catalog = ModelCatalog.shared
     @AppStorage(Pref.memoryIdleMinutes.name) private var idleMinutes = Pref.memoryIdleMinutes.defaultValue
@@ -160,6 +162,19 @@ struct MemoryPane: View {
                         }
                         if sorter == AppleSystemModel.id, case .unavailable(let why) = AppleSystemModel.availability {
                             Text(why).font(.caption).foregroundStyle(.orange)
+                        }
+                    }
+                    ForEach(unfitReaders, id: \.self) { path in
+                        HStack {
+                            Text(String(format: NSLocalizedString("%@ couldn't read chats for memory: another model reads its chats.", comment: "memory: a model unfit to read"),
+                                        MemoryReflector.displayName(path)))
+                                .font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Try It Again") {
+                                MemoryReflector.setUnfit(path, false)
+                                unfitRaw = UserDefaults.standard[Pref.memoryUnfitReaders]
+                                reflector.poke(after: 1)
+                            }
                         }
                     }
                     if let warning = languageWarning {

@@ -133,7 +133,7 @@ final class MemoryReflector: ObservableObject {
                 }
                 status = .reading
                 let outcome = await reflect(head, embedder: embedder, modelPath: AppleSystemModel.id)
-                guard handle(outcome, of: head) else { return }
+                guard handle(outcome, of: head, model: AppleSystemModel.id) else { return }
                 continue
             }
             // Apple's model as the sorter: every batch is sorted on the
@@ -146,19 +146,26 @@ final class MemoryReflector: ObservableObject {
             // Apple's model answering the chat isn't memory's reader
             // (adr/0025): chats wait for a model that is.
             let loaded: String? = {
-                guard let server, case .running = server.state, server.loadedModelPath != AppleSystemModel.id else { return nil }
-                return server.loadedModelPath
+                guard let server, case .running = server.state, let path = server.loadedModelPath,
+                      path != AppleSystemModel.id, !Self.unfitReaders.contains(path) else { return nil }
+                return path
             }()
             guard let model = loaded,
                   let batch = ready.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
                 // Batches of any model (chats from before models were
                 // recorded) wait for the one the server last had, unloaded
                 // after its idle minutes -- not for one never named.
-                let fallback: String? = {
-                    guard let server, server.isIdleUnloaded, let last = server.loadedModelPath,
-                          last != AppleSystemModel.id, ModelCatalog.shared.model(id: last) != nil else { return nil }
-                    return last
-                }()
+                // The server's last model (unloaded after its idle minutes),
+                // else the one picked for the chat -- not one memory found
+                // can't read.
+                let unfit = Self.unfitReaders
+                let candidates: [String?] = [
+                    server.flatMap { $0.isIdleUnloaded ? $0.loadedModelPath : nil },
+                    UserDefaults.standard[Pref.selectedModelID],
+                ]
+                let fallback = candidates.compactMap { $0 }.first { path in
+                    path != AppleSystemModel.id && !unfit.contains(path) && ModelCatalog.shared.model(id: path) != nil
+                }
                 // The model memory would load: the first waiting batch whose
                 // model is installed (a deleted model's batch doesn't hold the
                 // others), else the server's last one.
@@ -200,7 +207,7 @@ final class MemoryReflector: ObservableObject {
             }
             status = .reading
             let outcome = await reflect(batch, embedder: embedder, modelPath: model)
-            guard handle(outcome, of: batch) else { return }
+            guard handle(outcome, of: batch, model: model) else { return }
         }
         status = .idle
     }
@@ -247,7 +254,7 @@ final class MemoryReflector: ObservableObject {
 
     /// A pass's outcome on the queue: true to go on with the next batch,
     /// false when the loop stops for now (it's poked again as needed).
-    private func handle(_ outcome: Outcome, of batch: MemoryBatch) -> Bool {
+    private func handle(_ outcome: Outcome, of batch: MemoryBatch, model: String) -> Bool {
         let memory = MemoryManager.shared
         // Every queue write checked: one that doesn't reach the disk
         // stops the loop (else the same batch would be read again now).
@@ -255,6 +262,7 @@ final class MemoryReflector: ObservableObject {
         switch outcome {
         case .done:
             notBefore[batch.id] = nil
+            noteReader(model, outcome: outcome, batch: batch.id)
             return true
         case .later(let reason):
             status = .waiting(reason)
@@ -270,6 +278,12 @@ final class MemoryReflector: ObservableObject {
             NSLog("LLMTray memory: batch %d not read: %@", batch.id, reason)
             var failures = 0
             guard memory.change({ failures = $0.failBatch(batch.id) }) else { waitForStorage(saving); return false }
+            // Its reader set aside: every batch, this one too, tries again
+            // with another model, at once.
+            if noteReader(model, outcome: outcome, batch: batch.id) {
+                notBefore = [:]
+                return true
+            }
             // In the server log, where it can be seen (not the chat's words).
             server?.appendLog("--- memory: a part of a chat couldn't be read (\(reason)); "
                 + (failures >= Self.maxAttempts ? "given up after \(failures) tries ---\n" : "tried again later ---\n"))
@@ -294,10 +308,56 @@ final class MemoryReflector: ObservableObject {
         // Apple's model, set for memory: it reads everything, and when it
         // isn't available memory waits for it, not for another model.
         if fixed == AppleSystemModel.id { return fixed }
-        if !fixed.isEmpty, installed.contains(fixed) { return fixed }
+        let unfit = unfitReaders
+        if !fixed.isEmpty, installed.contains(fixed), !unfit.contains(fixed) { return fixed }
         // A chat with Apple's model is read by any model: it misses too
         // much as a reader (adr/0025).
-        return batch.model.flatMap { $0 != AppleSystemModel.id && installed.contains($0) ? $0 : nil }
+        return batch.model.flatMap { $0 != AppleSystemModel.id && installed.contains($0) && !unfit.contains($0) ? $0 : nil }
+    }
+
+    /// Models memory found can't read chats (Pref.memoryUnfitReaders).
+    static var unfitReaders: Set<String> {
+        Set(UserDefaults.standard[Pref.memoryUnfitReaders].split(separator: "\n").map(String.init))
+    }
+
+    static func setUnfit(_ path: String, _ unfit: Bool) {
+        var set = unfitReaders
+        if unfit { set.insert(path) } else { set.remove(path) }
+        UserDefaults.standard[Pref.memoryUnfitReaders] = set.sorted().joined(separator: "\n")
+    }
+
+    /// Batches whose replies couldn't be read, in a row (no batch read
+    /// since), by model: different batches, so one batch's cut-off reply
+    /// can't set a model aside.
+    private var unreadable: [String: Set<Int>] = [:]
+    static let unfitAfter = 3
+
+    /// A model whose replies can't be read again and again (a small one
+    /// that copies the prompt's example or chats back) reads no more chats:
+    /// theirs go to another model, and the batches it failed get their
+    /// tries back. Not the user's fixed choice silently: it's said in the
+    /// server log and Settings, where it can be undone.
+    /// True when the model was set aside now.
+    @discardableResult
+    private func noteReader(_ model: String, outcome: Outcome, batch: Int) -> Bool {
+        guard model != AppleSystemModel.id else { return false }
+        switch outcome {
+        case .failed(let reason) where reason.hasPrefix("unreadable"):
+            unreadable[model, default: []].insert(batch)
+            guard unreadable[model]!.count >= Self.unfitAfter else { return false }
+            unreadable[model] = nil
+            Self.setUnfit(model, true)
+            MemoryManager.shared.change { $0.resetFailures() }
+            server?.appendLog("--- memory: \(Self.displayName(model)) can't read chats for memory (its replies couldn't be read); "
+                + "another model reads them (Settings › Memory) ---\n")
+            return true
+        case .done, .failed:
+            // A batch read, or one that failed otherwise: not in a row.
+            unreadable[model] = nil
+            return false
+        default:
+            return false
+        }
     }
 
     static func displayName(_ path: String) -> String {

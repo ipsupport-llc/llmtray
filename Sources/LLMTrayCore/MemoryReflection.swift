@@ -511,6 +511,12 @@ extension MemoryFile {
         return queue[i].failures!
     }
 
+    /// Every queued batch gets its tries back (the model that failed them
+    /// won't read them again).
+    public mutating func resetFailures() {
+        for i in queue.indices { queue[i].failures = nil }
+    }
+
     public mutating func dropBatch(_ id: Int) {
         queue.removeAll { $0.id == id }
     }
