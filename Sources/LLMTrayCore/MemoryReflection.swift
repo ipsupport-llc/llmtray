@@ -60,6 +60,35 @@ public enum MemoryReflection {
         return nil
     }
 
+    /// The JSON objects in a text, each whole, wherever its lines break: a
+    /// small model writes an op pretty-printed over several lines (LFM2.5
+    /// 2.6B, in a ```json fence), which the one-per-line reading misses.
+    static func spreadObjects(_ text: String) -> [[String: Any]] {
+        var objects: [[String: Any]] = []
+        var depth = 0, inString = false, escaped = false
+        var start: String.Index?
+        for i in text.indices {
+            let c = text[i]
+            if inString {
+                if escaped { escaped = false } else if c == "\\" { escaped = true } else if c == "\"" { inString = false }
+                continue
+            }
+            switch c {
+            case "\"": inString = true
+            case "{":
+                if depth == 0 { start = i }
+                depth += 1
+            case "}" where depth > 0:
+                depth -= 1
+                if depth == 0, let s = start, let object = lineObject(String(text[s...i])) {
+                    objects.append(object)
+                }
+            default: break
+            }
+        }
+        return objects
+    }
+
     /// The operations in a reflect reply; nil when it can't be read. Ones
     /// missing what they need are left out.
     public static func parseOperations(_ reply: String) -> [Operation]? {
@@ -79,6 +108,13 @@ public enum MemoryReflection {
                 let l = line.trimmingCharacters(in: .whitespaces).trimmingCharacters(in: CharacterSet(charactersIn: ","))
                 guard l.hasPrefix("{"), let object = Self.lineObject(l) else { continue }
                 // A wrapper on one line among others: its ops count too.
+                if let wrapped = object["ops"] as? [Any] { ops += wrapped } else { ops.append(object) }
+                read = true
+            }
+        }
+        // Not one per line: objects spread over lines.
+        if !read {
+            for object in spreadObjects(trimmed) {
                 if let wrapped = object["ops"] as? [Any] { ops += wrapped } else { ops.append(object) }
                 read = true
             }
