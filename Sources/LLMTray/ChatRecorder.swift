@@ -3,9 +3,10 @@ import Foundation
 import LLMTrayCore
 
 /// The composer's microphone (adr/0023): a spoken message for a model that
-/// hears. Voice Lab's capture (16 kHz mono, in memory), collected until
-/// Stop and handed back as a WAV -- nothing written to disk, a temporary
-/// chat included. At most `maxSeconds`; it stops itself there.
+/// hears. Voice Lab's capture (16 kHz mono, in memory, through voice
+/// processing where it starts), collected until Stop and handed back as a
+/// WAV -- nothing written to disk, a temporary chat included. At most
+/// `maxSeconds`; it stops itself there.
 @MainActor
 final class ChatRecorder: ObservableObject {
     static let sampleRate = 16_000
@@ -39,7 +40,7 @@ final class ChatRecorder: ObservableObject {
     @Published var problem: String?
 
     private var audio: VoiceAudioEngine?
-    private var capture: MicrophoneCapture?
+    private var capture: VoiceMicrophone?
     private let buffer = Buffer()
     /// Called with the WAV when it stops by itself at the limit.
     var onLimit: ((Data) -> Void)?
@@ -66,21 +67,34 @@ final class ChatRecorder: ObservableObject {
             problem = NSLocalizedString("LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.", comment: "")
             return
         }
-        let audio = VoiceAudioEngine()
-        let capture = MicrophoneCapture(audio: audio, sampleRate: Self.sampleRate)
         _ = buffer.take()
-        do {
-            let buffer = self.buffer
-            try capture.start { [weak self] frame, rms in
-                buffer.append(frame)
-                let seconds = Double(buffer.count) / Double(2 * Self.sampleRate)
-                Task { @MainActor [weak self] in self?.tick(seconds: seconds, level: rms) }
+        let buffer = self.buffer
+        let onFrame: (Data, Float) -> Void = { [weak self] frame, rms in
+            buffer.append(frame)
+            let seconds = Double(buffer.count) / Double(2 * Self.sampleRate)
+            Task { @MainActor [weak self] in self?.tick(seconds: seconds, level: rms) }
+        }
+        // Apple's voice processing first: it takes background sound (music
+        // from the speakers, a fan) out of the clip, and lets the user pick
+        // Voice Isolation in Control Center. The plain microphone if it
+        // can't start on this Mac.
+        var audio: VoiceAudioEngine?
+        let capture: VoiceMicrophone
+        if let io = try? VoiceProcessingIO(inputSampleRate: Self.sampleRate), (try? io.start(onFrame: onFrame)) != nil {
+            capture = io
+        } else {
+            let engine = VoiceAudioEngine()
+            let plain = MicrophoneCapture(audio: engine, sampleRate: Self.sampleRate)
+            do {
+                try plain.start(onFrame: onFrame)
+                try engine.start()
+            } catch {
+                plain.stop()
+                problem = error.localizedDescription
+                return
             }
-            try audio.start()
-        } catch {
-            capture.stop()
-            problem = error.localizedDescription
-            return
+            audio = engine
+            capture = plain
         }
         self.audio = audio
         self.capture = capture
