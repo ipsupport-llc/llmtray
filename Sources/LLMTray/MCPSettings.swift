@@ -81,6 +81,12 @@ struct ToolsPane: View {
             }
         }
         .task { await installer.checkUpdates() }
+        .onChange(of: installer.openConfigure) { _, id in
+            guard let id else { return }
+            installer.openConfigure = nil
+            tab = .installed
+            sheet = .configure(id)
+        }
         .onDrop(of: [.fileURL], isTargeted: $dropTargeted) { providers in
             guard let provider = providers.first else { return false }
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
@@ -312,6 +318,9 @@ private struct ServerRow: View {
 
     private var problem: String? {
         if signIn.signingIn.contains(server.id) { return NSLocalizedString("Signing in: finish in your browser.", comment: "MCP server") }
+        if signIn.needsOwnApp.contains(server.id) && server.oauthClientID == nil {
+            return NSLocalizedString("Needs your own app: Configure.", comment: "MCP server")
+        }
         if server.oauth?.needsSignIn == true { return NSLocalizedString("Needs sign-in.", comment: "MCP server") }
         if !MCPHub.runsHere(server) { return NSLocalizedString("Doesn't run in this version of LLMTray.", comment: "") }
         switch state?.status {
@@ -999,6 +1008,7 @@ private struct SignInSection: View {
     @State private var clientID = ""
     @State private var clientSecret = ""
     @State private var redirect: String?
+    @State private var ownAppOpen = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -1022,7 +1032,7 @@ private struct SignInSection: View {
                 }
             }
             .font(.callout)
-            DisclosureGroup("Your own app (only for servers that need one, like Slack)") {
+            DisclosureGroup("Your own app (only for servers that need one, like Slack)", isExpanded: $ownAppOpen) {
                 VStack(alignment: .leading, spacing: 6) {
                     TextField("Client ID", text: $clientID)
                     SecureField(MCPSecrets.get(server: server.id, name: MCPSignIn.clientSecretName) == nil ? "Client secret" : "Client secret (saved)",
@@ -1063,6 +1073,9 @@ private struct SignInSection: View {
                 redirect = MCPOAuth.manualRedirectURI(issuer: d.server.issuer)
             }
         }
-        .onAppear { clientID = server.oauthClientID ?? "" }
+        .onAppear {
+            clientID = server.oauthClientID ?? ""
+            ownAppOpen = signIn.needsOwnApp.contains(server.id)
+        }
     }
 }

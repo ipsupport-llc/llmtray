@@ -13,6 +13,8 @@ final class MCPInstaller: ObservableObject {
     /// Server id → the newer version there is.
     @Published private(set) var updates: [UUID: String] = [:]
     @Published var message: String?
+    /// A server whose Configure should open now (set by an install).
+    @Published var openConfigure: UUID?
     private var lastCheck: Date?
 
     private var hub: MCPHub { MCPHub.shared }
@@ -116,6 +118,14 @@ final class MCPInstaller: ObservableObject {
         config.enabled = true
         hub.update(config)
         if let error = await startOrSignIn(config.id) {
+            // It needs the user's own app (Slack): kept, off, and Configure
+            // opens where its client id and secret go.
+            if MCPSignIn.shared.needsOwnApp.contains(config.id) {
+                hub.setEnabled(config.id, false)
+                message = String(format: NSLocalizedString("%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In.", comment: "MCP install"), found.name)
+                openConfigure = config.id
+                return
+            }
             // Nothing left behind that doesn't work: taken out again, with why.
             hub.remove(config.id)
             message = String(format: NSLocalizedString("%1$@ wasn't installed: %2$@.", comment: "MCP install"), found.name,
@@ -204,7 +214,14 @@ final class MCPInstaller: ObservableObject {
         } catch {
             return error is CancellationError ? NSLocalizedString("the sign-in was cancelled", comment: "MCP") : error.localizedDescription
         }
-        return await hub.startForReview(id)
+        if let error = await hub.startForReview(id) { return error }
+        // Never started before (installed waiting for the user's own app):
+        // this is its install -- its tools as listed now, and on.
+        if hub.server(id)?.reviewed.isEmpty == true {
+            hub.markReviewed(id)
+            hub.setEnabled(id, true)
+        }
+        return nil
     }
 
     // MARK: Updates
