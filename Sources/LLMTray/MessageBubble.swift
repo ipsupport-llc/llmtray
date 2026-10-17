@@ -115,7 +115,10 @@ struct MessageBubble: View {
                     .help(Text("The model is reasoning before it answers (Settings shows the reasoning itself)"))
             }
 
-            if !message.content.isEmpty || message.reasoning.isEmpty {
+            // A spoken message with nothing typed: the recording is the
+            // message, no empty "…" bubble beside it.
+            let voiceOnly = isUser && message.content.isEmpty && !message.audios.isEmpty
+            if !voiceOnly && (!message.content.isEmpty || message.reasoning.isEmpty) {
                 // Assistant output is markdown (see ChatMarkdown); the
                 // user's own text is shown exactly as typed.
                 Group {
@@ -178,7 +181,12 @@ struct MessageBubble: View {
                               // A spoken message is the user's: nothing to make again.
                               action: isUser ? nil : regenerateMedia.map { act in { act(.music, i, $0) } },
                               isMade: !isUser)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    // The user's recording sits with their message, on their
+                    // side; a made song in the middle, as before.
+                    .padding(isUser ? 10 : 0)
+                    .frame(maxWidth: isUser ? 380 : .infinity, alignment: isUser ? .trailing : .center)
+                    .background(isUser ? RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.15)) : nil)
+                    .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .center)
                     .padding(.vertical, 4)
                 tweakDraft(.music, i)
             }
