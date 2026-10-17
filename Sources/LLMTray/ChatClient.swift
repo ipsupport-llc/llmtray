@@ -234,7 +234,9 @@ final class ChatClient: ObservableObject {
     /// arguments: the same call again (a small model looping on a result it
     /// didn't follow) gets that answer back, not a second run.
     private var turnCallResults: [String: String] = [:]
-    private let maxToolRoundsPerTurn = 4
+    /// The turn's limit on tool rounds: the profile's (Settings › Profiles),
+    /// read as the turn starts.
+    private var maxToolRoundsPerTurn = 10
 
     init(mflux: MfluxManager? = nil, music: MusicManager? = nil) {
         toolbox = ChatToolbox(mflux: mflux, music: music)
@@ -1348,6 +1350,8 @@ final class ChatClient: ObservableObject {
 
     /// `offerTools: false` for the answer after the last allowed tool round.
     private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager, offerTools: Bool = true) {
+        // The turn's first request: its limit on tool rounds, from the profile.
+        if toolRoundsThisTurn == 0 { maxToolRoundsPerTurn = max(1, settings.toolRounds) }
         // The groups as loaded now: one loaded from the + menu while the
         // turn's start awaited the project's files counts in (adr/0020).
         var settings = settings

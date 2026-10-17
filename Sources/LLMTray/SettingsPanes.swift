@@ -939,6 +939,11 @@ struct ProfilesPane: View {
                         }
                     }
                 }
+                row(\.tools.toolRounds, "Tool rounds per message", "How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice.") {
+                    Stepper(value: b(\.tools.toolRounds), in: 1...30) {
+                        Text(verbatim: "\(profiles.value(\.tools.toolRounds, profileID: selectedID))")
+                    }
+                }
                 row(\.tools.toolUsePolicy, "Tool-use rule", "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.") {
                     TextEditor(text: b(\.tools.toolUsePolicy)).frame(minHeight: 50)
                 }

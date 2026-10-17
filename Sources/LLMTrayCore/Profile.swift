@@ -92,6 +92,8 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         /// Per tool group (ToolGroups): declared always, or loaded on demand
         /// (adr/0020). Merged per group across layers.
         public var toolLoading: ToolLoadingMap?
+        /// Rounds of tool calls one message may take before the answer.
+        public var toolRounds: Int?
         public init() {}
     }
 
@@ -218,6 +220,7 @@ extension Profile {
         p.tools.imageQuality = "balanced"
         p.tools.unloadModelDuringImageGen = true
         p.tools.toolUsePolicy = defaultToolUsePolicy
+        p.tools.toolRounds = 10
         p.tools.toolLoading = ToolLoadingMap(ToolGroups.builtIn)
         p.launch.kvBits = KVSettings.defaultBits
         p.launch.kvGroupSize = KVSettings.defaultGroupSize
@@ -285,6 +288,7 @@ public enum ProfileResolver {
             imageQuality: v(\.tools.imageQuality),
             unloadModelDuringImageGen: v(\.tools.unloadModelDuringImageGen),
             toolUsePolicy: v(\.tools.toolUsePolicy),
+            toolRounds: min(max(v(\.tools.toolRounds), 1), 30),
             kvBits: KVSettings.validBits(v(\.launch.kvBits)),
             kvGroupSize: KVSettings.validGroupSize(v(\.launch.kvGroupSize)),
             quantizedKVStart: max(0, v(\.launch.quantizedKVStart)),
@@ -325,6 +329,7 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var imageQuality: String
     public var unloadModelDuringImageGen: Bool
     public var toolUsePolicy: String
+    public var toolRounds: Int
     public var kvBits: Int
     public var kvGroupSize: Int
     public var quantizedKVStart: Int
@@ -380,6 +385,7 @@ extension Profile {
         ProfileField("unloadModelDuringImageGen", \.tools.unloadModelDuringImageGen),
         ProfileField("toolUsePolicy", \.tools.toolUsePolicy),
         ProfileField("toolLoading", \.tools.toolLoading),
+        ProfileField("toolRounds", \.tools.toolRounds),
         ProfileField("kvBits", \.launch.kvBits),
         ProfileField("kvGroupSize", \.launch.kvGroupSize),
         ProfileField("quantizedKVStart", \.launch.quantizedKVStart),

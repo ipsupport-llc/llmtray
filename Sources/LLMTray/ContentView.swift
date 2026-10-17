@@ -756,8 +756,9 @@ struct ContentView: View {
 
     // Only once a reply has finished -- mid-stream there's nothing to redo.
     private var canRegenerate: Bool {
-        // After an error the last message is the user's: retry it.
-        canChat && !chat.isBusy && (chat.messages.last?.role == "assistant" || chat.messages.last?.role == "user")
+        // After an error the last message is the user's: retry it. A turn
+        // that ended at the tool-round limit ends on a tool's answer.
+        canChat && !chat.isBusy && ["assistant", "user", "tool"].contains(chat.messages.last?.role ?? "")
     }
 
     // Only with a meaningful middle to replace -- compactSession's own guard.
