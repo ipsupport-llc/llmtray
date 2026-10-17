@@ -41,7 +41,8 @@ final class ChatRecorder: ObservableObject {
 
     private var audio: VoiceAudioEngine?
     private var capture: VoiceMicrophone?
-    private let buffer = Buffer()
+    /// This recording's: a late frame from the last one lands in its own.
+    private var buffer = Buffer()
     /// Called with the WAV when it stops by itself at the limit.
     var onLimit: ((Data) -> Void)?
 
@@ -67,12 +68,12 @@ final class ChatRecorder: ObservableObject {
             problem = NSLocalizedString("LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.", comment: "")
             return
         }
-        _ = buffer.take()
-        let buffer = self.buffer
+        let buffer = Buffer()
+        self.buffer = buffer
         let onFrame: (Data, Float) -> Void = { [weak self] frame, rms in
             buffer.append(frame)
             let seconds = Double(buffer.count) / Double(2 * Self.sampleRate)
-            Task { @MainActor [weak self] in self?.tick(seconds: seconds, level: rms) }
+            Task { @MainActor [weak self] in self?.tick(seconds: seconds, level: rms, token: token) }
         }
         // Apple's voice processing first: it takes background sound (music
         // from the speakers, a fan) out of the clip, and lets the user pick
@@ -126,8 +127,8 @@ final class ChatRecorder: ObservableObject {
         heldClip = nil
     }
 
-    private func tick(seconds: Double, level: Float) {
-        guard isRecording else { return }
+    private func tick(seconds: Double, level: Float, token: Int) {
+        guard isRecording, token == startToken else { return }
         self.seconds = seconds
         self.level = level
         levels.append(level)
