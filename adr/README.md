@@ -33,5 +33,6 @@ here; this is where the history lives.
 | [0025](0025-apple-system-model.md) | Apple's on-device model (FoundationModels): memory's reader in-process, then a chat model served by the proxy itself; app only, no cloud, nothing to download |
 | [0027](0027-mcp-client.md) | MCP servers the user adds (command, URL, .mcpb, pasted config, the official registry) as on-demand tool groups; every call asked unless allowed per tool, all asked after outside text; own small client |
 | [0028](0028-mcp-oauth.md) | Web MCP servers signed in with OAuth (MCP Authorization spec): metadata discovery, client metadata document or DCR, PKCE + loopback redirect, tokens in the Keychain with refresh |
+| [0029](0029-responses-api.md) | The OpenAI Responses API at /v1/responses (Codex CLI): converted to a chat request in the runtime, stateless, function + custom tools |
 
 New ADR: next number, one topic, the decision first, then why.
