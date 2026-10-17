@@ -145,6 +145,7 @@
 "All" = "All";
 "All chats" = "All chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "All off unless you enable them. Models are downloaded after Finish, one at a time.";
+"All servers are up to date." = "All servers are up to date.";
 "Allow" = "Allow";
 "Allow Folder to Change…" = "Allow Folder to Change…";
 "Allow Folder to Look In…" = "Allow Folder to Look In…";
@@ -807,6 +808,7 @@
 "No usage statistics" = "No usage statistics";
 "Non-commercial license: read it on the model card before using the model." = "Non-commercial license: read it on the model card before using the model.";
 "None" = "None";
+"None of these servers can be updated from here (added by hand or from a file)." = "None of these servers can be updated from here (added by hand or from a file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "None yet. Grants for one chat or one request aren't listed here: they end with it.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Not enough disk space: the voice model needs %1$@, %2$@ is free.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";

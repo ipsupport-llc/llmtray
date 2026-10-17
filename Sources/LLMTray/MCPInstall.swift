@@ -274,6 +274,31 @@ final class MCPInstaller: ObservableObject {
     }
 
     /// At most once an hour, when the Tools pane shows.
+    /// A passing word for the pane (not a problem): it goes by itself.
+    @Published var notice: String?
+
+    /// An update check under way (the pane's button spins).
+    @Published private(set) var checkingUpdates = false
+
+    /// Check for Updates, asked for: every server now, and a word when
+    /// nothing is newer.
+    func checkNow() async {
+        guard !checkingUpdates else { return }
+        checkingUpdates = true
+        await checkUpdates(force: true)
+        checkingUpdates = false
+        let checkable = hub.servers.filter { $0.source != nil }
+        guard updates.isEmpty else { notice = nil; return }
+        notice = checkable.isEmpty
+            ? NSLocalizedString("None of these servers can be updated from here (added by hand or from a file).", comment: "MCP updates")
+            : NSLocalizedString("All servers are up to date.", comment: "MCP updates")
+        let shown = notice
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            if notice == shown { notice = nil }
+        }
+    }
+
     func checkUpdates(force: Bool = false) async {
         if !force, let lastCheck, Date().timeIntervalSince(lastCheck) < 3600 { return }
         lastCheck = Date()

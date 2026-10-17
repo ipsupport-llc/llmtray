@@ -63,8 +63,28 @@ struct ToolsPane: View {
                 }
                 .menuStyle(.borderlessButton)
                 .fixedSize()
+                Button {
+                    Task { await installer.checkNow() }
+                } label: {
+                    if installer.checkingUpdates {
+                        ProgressView().controlSize(.small).frame(width: 16, height: 16)
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+                .buttonStyle(.borderless)
+                .help(Text("Check for Updates"))
+                .disabled(installer.checkingUpdates)
             }
             .padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 10)
+            if let notice = installer.notice {
+                HStack {
+                    Image(systemName: "checkmark.circle").foregroundStyle(.green)
+                    Text(notice).font(.callout)
+                    Spacer()
+                }
+                .padding(.horizontal, 20).padding(.bottom, 8)
+            }
             if let message = installer.message {
                 HStack {
                     Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
