@@ -331,6 +331,7 @@
 "Correction" = "Correction";
 "Corrections" = "Corrections";
 "Couldn't be added: %@" = "Couldn't be added: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Couldn't check %lld of the servers (no connection?). Try again later.";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Couldn't move “%@” to the Trash: %@" = "Couldn't move “%@” to the Trash: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
@@ -799,6 +800,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
+"No servers installed." = "No servers installed.";
 "No sign-in" = "No sign-in";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
