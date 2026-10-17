@@ -183,9 +183,6 @@ struct MessageBubble: View {
                               isMade: !isUser)
                     // The user's recording sits with their message, on their
                     // side; a made song in the middle, as before.
-                    .padding(isUser ? 10 : 0)
-                    .frame(maxWidth: isUser ? 380 : .infinity, alignment: isUser ? .trailing : .center)
-                    .background(isUser ? RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.15)) : nil)
                     .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .center)
                     .padding(.vertical, 4)
                 tweakDraft(.music, i)
