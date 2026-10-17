@@ -145,6 +145,7 @@
 "All" = "All";
 "All chats" = "All chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "All off unless you enable them. Models are downloaded after Finish, one at a time.";
+"All servers are up to date." = "All servers are up to date.";
 "Allow" = "Allow";
 "Allow Folder to Change…" = "Allow Folder to Change…";
 "Allow Folder to Look In…" = "Allow Folder to Look In…";
@@ -330,6 +331,7 @@
 "Correction" = "Correction";
 "Corrections" = "Corrections";
 "Couldn't be added: %@" = "Couldn't be added: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Couldn't check %lld of the servers (no connection?). Try again later.";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Couldn't move “%@” to the Trash: %@" = "Couldn't move “%@” to the Trash: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
@@ -798,6 +800,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
+"No servers installed." = "No servers installed.";
 "No sign-in" = "No sign-in";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
@@ -807,6 +810,7 @@
 "No usage statistics" = "No usage statistics";
 "Non-commercial license: read it on the model card before using the model." = "Non-commercial license: read it on the model card before using the model.";
 "None" = "None";
+"None of these servers can be updated from here (added by hand or from a file)." = "None of these servers can be updated from here (added by hand or from a file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "None yet. Grants for one chat or one request aren't listed here: they end with it.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Not enough disk space: the voice model needs %1$@, %2$@ is free.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";

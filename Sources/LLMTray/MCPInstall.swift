@@ -274,13 +274,59 @@ final class MCPInstaller: ObservableObject {
     }
 
     /// At most once an hour, when the Tools pane shows.
-    func checkUpdates(force: Bool = false) async {
-        if !force, let lastCheck, Date().timeIntervalSince(lastCheck) < 3600 { return }
-        lastCheck = Date()
-        for config in hub.servers {
-            guard let source = config.source, let latest = await latestVersion(source) else { continue }
-            if MCPSource.isNewer(latest, than: config.version) { updates[config.id] = latest } else { updates.removeValue(forKey: config.id) }
+    /// A passing word for the pane (not a problem): it goes by itself.
+    @Published var notice: String?
+
+    /// An update check under way (the pane's button spins).
+    @Published private(set) var checkingUpdates = false
+
+    /// Check for Updates, asked for: every server now, and a word when
+    /// nothing is newer -- or when the check couldn't be made.
+    func checkNow() async {
+        guard !checkingUpdates else { return }
+        checkingUpdates = true
+        let failed = await checkUpdates(force: true)
+        checkingUpdates = false
+        let checkable = hub.servers.filter { $0.source != nil }
+        guard updates.isEmpty else { notice = nil; return }
+        if hub.servers.isEmpty {
+            notice = NSLocalizedString("No servers installed.", comment: "MCP updates")
+        } else if checkable.isEmpty {
+            notice = NSLocalizedString("None of these servers can be updated from here (added by hand or from a file).", comment: "MCP updates")
+        } else if failed > 0 {
+            message = String(format: NSLocalizedString("Couldn't check %lld of the servers (no connection?). Try again later.", comment: "MCP updates"), failed)
+            return
+        } else {
+            notice = NSLocalizedString("All servers are up to date.", comment: "MCP updates")
         }
+        let shown = notice
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            if notice == shown { notice = nil }
+        }
+    }
+
+    /// One check at a time (the pane, the daily one, the button share it).
+    private var running: Task<Int, Never>?
+
+    /// The number of servers whose source couldn't be read.
+    @discardableResult
+    func checkUpdates(force: Bool = false) async -> Int {
+        if let running { return await running.value }
+        if !force, let lastCheck, Date().timeIntervalSince(lastCheck) < 3600 { return 0 }
+        lastCheck = Date()
+        let task = Task { @MainActor () -> Int in
+            var failed = 0
+            for config in hub.servers {
+                guard let source = config.source else { continue }
+                guard let latest = await latestVersion(source) else { failed += 1; continue }
+                if MCPSource.isNewer(latest, than: config.version) { updates[config.id] = latest } else { updates.removeValue(forKey: config.id) }
+            }
+            return failed
+        }
+        running = task
+        defer { running = nil }
+        return await task.value
     }
 
     private func latestVersion(_ source: MCPSource) async -> String? {
