@@ -147,6 +147,7 @@
 "All" = "الكل";
 "All chats" = "كل الدردشات";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "كلها مغلقة ما لم تقم بتشغيلها. يتم تنزيل النماذج بعد Finish، واحدًا تلو الآخر.";
+"All servers are up to date." = "جميع الخوادم محدّثة.";
 "Allow" = "السماح";
 "Allow Folder to Change…" = "السماح للمجلد بالتغيير…";
 "Allow Folder to Look In…" = "السماح للمجلد بالنظر داخل…";
@@ -332,6 +333,7 @@
 "Correction" = "تصحيح";
 "Corrections" = "التصحيحات";
 "Couldn't be added: %@" = "تعذّر الإضافة: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "تعذّر التحقق من %lld من الخوادم (لا يوجد اتصال؟). حاول مرة أخرى لاحقًا.";
 "Couldn't create the report: %@" = "تعذّر إنشاء التقرير: %@";
 "Couldn't move “%@” to the Trash: %@" = "تعذر نقل «%@» إلى سلة المحذوفات: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "تعذّر الوصول إلى ipsupport.us. تم الاحتفاظ بمراجعتك؛ حاول لاحقًا.";
@@ -559,6 +561,7 @@
 "How long notes last" = "مدة بقاء الملاحظات";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "كم عدد الطلبات التي يجيبها الخادم في وقت واحد — على سبيل المثال محادثتك ووكيل برمجي. الطلب الواحد يعمل بأقصى سرعة (مع مُولده أو رأس MTP الخاص به)؛ مع زيادة العدد يشاركون كل خطوة على GPU: كل واحد أبطأ قليلًا، لكنهم أسرع معًا. كل طلب جارٍ يحتفظ بسياقه في الذاكرة، لذا جهاز Mac ذو ذاكرة قليلة يجيب على عدد أقل في الوقت نفسه. 1: واحد تلو الآخر.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "عدد جولات استدعاءات الأدوات التي يمكن أن يجريها النموذج لرسالة واحدة قبل أن يضطر إلى الرد (غالبًا ما تحتاج أدوات الخادم إلى عدة جولات: العثور، ثم القراءة، ثم التنفيذ). ولا يُنفَّذ الاستدعاء نفسه مرتين ضمن الرسالة نفسها.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "عدد المرات التي استخدمت فيها كل من: المحادثة، استدعاءات الأدوات، خادم API (تطبيقات أخرى)، توليد الصور، تحرير الصور، الموسيقى، تنزيل النماذج.";
 "How many tokens it generates per trial." = "عدد الرموز التي يُنشئها في كل تجربة.";
 "How much memory the GPU may use. A model's files must fit under it." = "مقدار الذاكرة التي قد يستخدمها الـ GPU. يجب أن تتسع ملفات النموذج ضمن هذا الحد.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "لا توجد ملاحظات بعد. أضف ما ينبغي أن تعرفه كل دردشة: «الإجابة بالروسية باختصار»، «أصنع مكبر صوت ESP32».";
 "No requests yet." = "لا طلبات بعد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
+"No servers installed." = "لا توجد خوادم مثبتة.";
 "No sign-in" = "لا يتطلب تسجيل الدخول";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "لا اشتراكات. لا قفل للميزات. ادعم التطوير إذا كان LLMTray مفيداً لك.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "لا اقتراحات لذاكرة هذا الـ Mac. تصفح Hugging Face لعرض نموذج.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "لا إحصاءات استخدام";
 "Non-commercial license: read it on the model card before using the model." = "ترخيص غير تجاري: اقرأه في بطاقة النموذج قبل استخدامه.";
 "None" = "بلا";
+"None of these servers can be updated from here (added by hand or from a file)." = "لا يمكن تحديث أي من هذه الخوادم من هنا (أُضيفت يدويًا أو من ملف).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "لا شيء حتى الآن. الأذونات لدردشة واحدة أو طلب واحد غير مدرجة هنا: تنتهي معه.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "مساحة القرص غير كافية: نموذج الصوت يحتاج %1$@، والمتاح %2$@.";
 "Not enough free disk space for this model." = "لا توجد مساحة قرص كافية لهذا النموذج.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "إعدادات الأدوات…";
 "Tool call statistics" = "إحصاءات استدعاءات الأدوات";
 "Tool calls" = "استدعاءات الأدوات";
+"Tool rounds per message" = "جولات الأداة لكل رسالة";
 "Tool server update" = "تحديث خادم الأداة";
 "Tool-use rule" = "قاعدة استخدام الأدوات";
 "Tools" = "الأدوات";

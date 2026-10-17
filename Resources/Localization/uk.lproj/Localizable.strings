@@ -147,6 +147,7 @@
 "All" = "Усе";
 "All chats" = "Усі чати";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Усе вимкнено, доки ви не увімкнете. Моделі завантажуються після «Готово», по черзі.";
+"All servers are up to date." = "Усі сервери актуальні.";
 "Allow" = "Дозволити";
 "Allow Folder to Change…" = "Дозволити папці змінювати…";
 "Allow Folder to Look In…" = "Дозволити папці переглядати…";
@@ -332,6 +333,7 @@
 "Correction" = "Виправлення";
 "Corrections" = "Виправлення";
 "Couldn't be added: %@" = "Не вдалося додати: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Не вдалося перевірити %lld серверів (немає з’єднання?). Спробуйте ще раз пізніше.";
 "Couldn't create the report: %@" = "Не вдалося створити звіт: %@";
 "Couldn't move “%@” to the Trash: %@" = "Не вдалось перемістити «%@» у Кошик: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Не вдалося зв’язатися з ipsupport.us. Ваш відгук збережено — спробуйте пізніше.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Термін дії нотаток";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Скільки запитів сервер обробляє одночасно — наприклад, ваш чат і агент для кодування. Один запит працює на повній швидкості (з drafter або MTP-головою); при більшій кількості вони ділять кожен крок GPU: кожен трохи повільніший, але разом швидше. Кожен активний запит зберігає свій контекст у пам’яті, тому Mac із малою доступною пам’яттю обробляє менше одночасно. 1: по черзі.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Скільки раундів викликів інструментів модель може зробити для одного повідомлення, перш ніж мусить відповісти (інструментам сервера часто потрібно кілька: знайти, прочитати, а потім виконати дію). Той самий виклик двічі в одному повідомленні ніколи не запускається двічі.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Скільки разів ви використали кожну з функцій: чат, виклики інструментів, API‑сервер (інші додатки), генерація зображень, редагування зображень, музика, завантаження моделей.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
 "How much memory the GPU may use. A model's files must fit under it." = "Скільки пам’яті може використовувати GPU. Файли моделі мають вміститися в цей ліміт.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Нотаток ще немає. Додайте те, що має знати кожен чат: «Відповідь російською, коротко», «Я збираю динамік на ESP32».";
 "No requests yet." = "Запитів поки немає.";
 "No runs yet." = "Прогонів ще не було.";
+"No servers installed." = "Сервери не встановлено.";
 "No sign-in" = "Без входу";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Без підписок. Без блокування функцій. Підтримайте розвиток, якщо LLMTray вам корисний.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Немає рекомендацій для пам’яті цього Mac. Пошукайте модель на Hugging Face.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Без статистики використання";
 "Non-commercial license: read it on the model card before using the model." = "Некомерційна ліцензія: ознайомтеся з нею на картці моделі перед використанням.";
 "None" = "Немає";
+"None of these servers can be updated from here (added by hand or from a file)." = "Жоден із цих серверів не можна оновити звідси (їх додано вручну або з файлу).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Ще немає. Дозволи для одного чату або одного запиту тут не списуються: вони закінчуються разом із ним.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Недостатньо місця на диску: голосова модель потребує %1$@, вільно %2$@.";
 "Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Параметри інструментів…";
 "Tool call statistics" = "Статистика викликів інструментів";
 "Tool calls" = "Виклики інструментів";
+"Tool rounds per message" = "Раунди викликів інструментів на повідомлення";
 "Tool server update" = "Оновлення сервера інструментів";
 "Tool-use rule" = "Правило інструментів";
 "Tools" = "Інструменти";

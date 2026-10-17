@@ -147,6 +147,7 @@
 "All" = "सभी";
 "All chats" = "सभी चैट";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "जब तक आप चालू न करें, सब बंद हैं। मॉडल Finish के बाद एक‑एक करके डाउनलोड होंगे।";
+"All servers are up to date." = "सभी सर्वर अप टू डेट हैं।";
 "Allow" = "अनुमत करें";
 "Allow Folder to Change…" = "फ़ोल्डर को बदलने की अनुमति दें…";
 "Allow Folder to Look In…" = "फ़ोल्डर को देखने की अनुमति दें…";
@@ -332,6 +333,7 @@
 "Correction" = "सुधार";
 "Corrections" = "सुधार";
 "Couldn't be added: %@" = "जोड़ नहीं पाए: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "%lld सर्वरों की जाँच नहीं की जा सकी (कनेक्शन नहीं है?). बाद में पुन: प्रयास करें।";
 "Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
 "Couldn't move “%@” to the Trash: %@" = "“%@” को ट्रैश में नहीं भेजा जा सका: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us से संपर्क नहीं हो सका। आपकी समीक्षा सुरक्षित रखी गई है: बाद में फिर कोशिश करें।";
@@ -559,6 +561,7 @@
 "How long notes last" = "नोट कितने समय तक रहते हैं";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "सर्वर एक साथ कितने अनुरोधों का उत्तर देता है — उदाहरण के लिए आपकी चैट और एक कोडिंग एजेंट। एक अनुरोध अकेला पूरा गति से चलता है (अपने drafter या MTP head के साथ); अधिक होने पर वे प्रत्येक GPU स्टेप साझा करते हैं: हर एक थोड़ा धीमा, पर सभी मिलकर तेज़। हर चल रहा अनुरोध अपनी संदर्भ (context) मेमोरी में रखता है, इसलिए कम मेमोरी वाले Mac एक बार में कम उत्तर देते हैं। 1: एक के बाद एक।";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "मॉडल एक संदेश के लिए उत्तर देने से पहले टूल कॉल के कितने दौर कर सकता है (किसी सर्वर के टूल में अक्सर कई चरण लगते हैं: ढूँढना, पढ़ना, फिर कार्रवाई करना)। एक ही संदेश में वही कॉल दो बार कभी दो बार नहीं चलती।";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "आपने कितनी बार उपयोग किया: चैट, टूल कॉल, API server (अन्य ऐप्स), इमेज जनरेशन, इमेज एडिटिंग, म्यूज़िक, मॉडल डाउनलोड।";
 "How many tokens it generates per trial." = "हर ट्रायल में कितने टोकन जनरेट किए जाएँ।";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU कितनी मेमोरी उपयोग कर सकता है। एक मॉडल की फ़ाइलें इस सीमा के भीतर होनी चाहिए।";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "अभी कोई नोट नहीं है। वह जोड़ें जो हर चैट को पता होना चाहिए: “रूसी में संक्षिप्त उत्तर दें”, “मैं ESP32 स्पीकर बनाता हूँ”。";
 "No requests yet." = "अभी कोई अनुरोध नहीं।";
 "No runs yet." = "अभी तक कोई रन नहीं।";
+"No servers installed." = "कोई सर्वर इंस्टॉल नहीं है।";
 "No sign-in" = "साइन इन नहीं किया गया";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "कोई सब्सक्रिप्शन नहीं। कोई फीचर लॉक नहीं। अगर LLMTray आपके लिए उपयोगी है तो विकास का समर्थन करें।";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "इस Mac की मेमोरी के लिए कोई सुझाव नहीं। मॉडल के लिए Hugging Face ब्राउज़ करें।";
@@ -809,6 +813,7 @@
 "No usage statistics" = "कोई उपयोग आँकड़े नहीं";
 "Non-commercial license: read it on the model card before using the model." = "गैर‑व्यावसायिक लाइसेंस: मॉडल का उपयोग करने से पहले मॉडल कार्ड पर पढ़ें।";
 "None" = "कोई नहीं";
+"None of these servers can be updated from here (added by hand or from a file)." = "इनमें से कोई भी सर्वर यहाँ से अपडेट नहीं किया जा सकता (हाथ से या किसी फ़ाइल से जोड़ा गया है)।";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "अभी तक कुछ नहीं। एक चैट या एक अनुरोध के लिए दिए गए अनुमति यहाँ सूचीबद्ध नहीं होते: वे उसी के साथ समाप्त हो जाती हैं।";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "डिस्क स्पेस पर्याप्त नहीं: वॉइस मॉडल को %1$@ चाहिए, %2$@ खाली है।";
 "Not enough free disk space for this model." = "इस मॉडल के लिए डिस्क पर पर्याप्त खाली जगह नहीं है।";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "टूल सेटिंग्स…";
 "Tool call statistics" = "टूल कॉल आँकड़े";
 "Tool calls" = "टूल कॉल";
+"Tool rounds per message" = "प्रति संदेश टूल दौर";
 "Tool server update" = "टूल सर्वर अपडेट";
 "Tool-use rule" = "टूल उपयोग नियम";
 "Tools" = "टूल";

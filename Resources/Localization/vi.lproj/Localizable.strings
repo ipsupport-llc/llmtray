@@ -147,6 +147,7 @@
 "All" = "Tất cả";
 "All chats" = "Tất cả Trò chuyện";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tất cả tắt cho đến khi bạn bật. Các mô hình được tải về sau khi nhấn Finish, từng cái một.";
+"All servers are up to date." = "Tất cả máy chủ đều đã được cập nhật.";
 "Allow" = "Cho phép";
 "Allow Folder to Change…" = "Cho phép Thư mục Thay đổi…";
 "Allow Folder to Look In…" = "Cho phép Thư mục Xem…";
@@ -332,6 +333,7 @@
 "Correction" = "Sửa lỗi";
 "Corrections" = "Các sửa lỗi";
 "Couldn't be added: %@" = "Không thể thêm: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Không thể kiểm tra %lld máy chủ (không có kết nối?). Hãy thử lại sau.";
 "Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
 "Couldn't move “%@” to the Trash: %@" = "Không thể chuyển “%@” vào Thùng Rác: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Không liên lạc được với ipsupport.us. Đánh giá của bạn được lưu: thử lại sau.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Thời hạn của ghi chú";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Số yêu cầu mà máy chủ trả lời cùng lúc — ví dụ chat và tác nhân lập trình. Một yêu cầu chạy đơn lẻ đạt tốc độ tối đa (với drafter hoặc đầu MTP); khi có nhiều yêu cầu, chúng chia sẻ mỗi bước GPU: mỗi yêu cầu hơi chậm hơn, nhưng tổng nhanh hơn. Mỗi yêu cầu đang chạy giữ ngữ cảnh riêng trong bộ nhớ, nên Mac ít bộ nhớ sẽ trả lời ít yêu cầu cùng lúc hơn. 1: lần lượt từng yêu cầu.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Số vòng gọi công cụ mà mô hình có thể thực hiện cho một tin nhắn trước khi phải trả lời (công cụ của máy chủ thường cần vài vòng: tìm, đọc rồi hành động). Cùng một lệnh gọi trong cùng một tin nhắn sẽ không bao giờ chạy hai lần.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Số lần bạn đã dùng từng mục: chat, gọi công cụ, máy chủ API (ứng dụng khác), tạo ảnh, chỉnh sửa ảnh, âm nhạc, tải xuống mô hình.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
 "How much memory the GPU may use. A model's files must fit under it." = "Bao nhiêu bộ nhớ GPU được phép dùng. Tệp của mô hình phải vừa dưới giới hạn này.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Chưa có ghi chú. Thêm điều mọi Trò chuyện nên biết: “Trả lời bằng tiếng Nga, ngắn gọn”, “Tôi chế tạo loa ESP32”.";
 "No requests yet." = "Chưa có yêu cầu nào.";
 "No runs yet." = "Chưa có lần chạy nào.";
+"No servers installed." = "Chưa cài đặt máy chủ nào.";
 "No sign-in" = "Không cần đăng nhập";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Không đăng ký. Không khoá tính năng. Ủng hộ phát triển nếu LLMTray hữu ích với bạn.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Không có gợi ý cho bộ nhớ Mac này. Duyệt Hugging Face để tìm mô hình.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Không gửi thống kê sử dụng";
 "Non-commercial license: read it on the model card before using the model." = "Giấy phép phi thương mại: đọc trên model card trước khi sử dụng.";
 "None" = "Không có";
+"None of these servers can be updated from here (added by hand or from a file)." = "Không thể cập nhật máy chủ nào trong số này từ đây (được thêm thủ công hoặc từ một tệp).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Chưa có. Các quyền cấp cho một cuộc trò chuyện hoặc một yêu cầu không được liệt kê ở đây: chúng kết thúc cùng với nó.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Không đủ dung lượng đĩa: mô hình giọng nói cần %1$@, chỉ còn %2$@.";
 "Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Cài đặt Công cụ…";
 "Tool call statistics" = "Thống kê lượt gọi công cụ";
 "Tool calls" = "Lượt gọi công cụ";
+"Tool rounds per message" = "Số vòng Công cụ mỗi tin nhắn";
 "Tool server update" = "Cập nhật máy chủ công cụ";
 "Tool-use rule" = "Quy tắc sử dụng công cụ";
 "Tools" = "Công cụ";

@@ -147,6 +147,7 @@
 "All" = "すべて";
 "All chats" = "すべてのチャット";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "有効にしない限りすべてオフです。モデルは Finish 後に一度にひとつずつダウンロードされます。";
+"All servers are up to date." = "すべてのサーバは最新です。";
 "Allow" = "許可";
 "Allow Folder to Change…" = "フォルダの変更を許可…";
 "Allow Folder to Look In…" = "フォルダの参照を許可…";
@@ -332,6 +333,7 @@
 "Correction" = "修正";
 "Corrections" = "修正";
 "Couldn't be added: %@" = "追加できませんでした: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "サーバのうち %lld 個を確認できませんでした（接続がありませんか？）。後でもう一度お試しください。";
 "Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
 "Couldn't move “%@” to the Trash: %@" = "「%@」をゴミ箱に移動できませんでした：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.usに接続できませんでした。レビューは保存されています。後で再試行してください。";
@@ -559,6 +561,7 @@
 "How long notes last" = "ノートの有効期間";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "サーバーが同時に処理するリクエスト数 — たとえばチャットとコーディングエージェント。単一リクエストは（drafter や MTP ヘッドを使って）最大速度で動作します。複数では GPU のステップを共有するため、個々はやや遅くなりますが合計は高速化します。各実行中リクエストは独自のコンテキストをメモリに保持するため、空きメモリの少ない Mac は同時処理数が少なくなります。1：順次処理。 ";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "1つのメッセージに対して、モデルが回答する前に行えるツール呼び出しのラウンド数です（サーバのツールでは、検索、読み取り、実行のように複数回必要になることがあります）。1つのメッセージ内で同じ呼び出しが2回あっても、実行されるのは1回だけです。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "使用回数を集計します：チャット、ツール呼び出し、APIサーバー（他のアプリ）、画像生成、画像編集、音楽、モデルのダウンロード。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU が使用できるメモリ量です。モデルのファイルはこの範囲に収まる必要があります。";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "ノートはまだありません。すべてのチャットに知らせたいことを追加します：「ロシア語で簡潔に回答」「ESP32スピーカーを作っています」。";
 "No requests yet." = "まだリクエストはありません。";
 "No runs yet." = "実行履歴はまだありません。";
+"No servers installed." = "インストールされているサーバはありません。";
 "No sign-in" = "サインインなし";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "購読なし。機能ロックなし。LLMTrayが役立つと思ったら開発を支援してください。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "この Mac のメモリに対する提案はありません。Hugging Face でモデルを探してください。";
@@ -809,6 +813,7 @@
 "No usage statistics" = "使用状況の統計を送信しない";
 "Non-commercial license: read it on the model card before using the model." = "非商用ライセンス: モデルを使用する前にモデルカードで確認してください。";
 "None" = "なし";
+"None of these servers can be updated from here (added by hand or from a file)." = "これらのサーバはどれもここからはアップデートできません（手動またはファイルから追加されたものです）。";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "まだありません。単一のチャットやリクエストに対する許可はここに表示されません：そのチャット／リクエストの終了で消えます。";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "ディスク容量が不足しています：音声モデルに %1$@ が必要ですが、空きは %2$@ です。";
 "Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "ツール設定…";
 "Tool call statistics" = "ツール呼び出しの統計";
 "Tool calls" = "ツール呼び出し";
+"Tool rounds per message" = "メッセージごとのツールラウンド数";
 "Tool server update" = "ツールサーバのアップデート";
 "Tool-use rule" = "ツール使用ルール";
 "Tools" = "ツール";

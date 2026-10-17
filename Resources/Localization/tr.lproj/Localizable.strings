@@ -147,6 +147,7 @@
 "All" = "Tümü";
 "All chats" = "Tüm sohbetler";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Açmadığınız sürece hepsi kapalıdır. Modeller Finish sonrası, teker teker indirilir.";
+"All servers are up to date." = "Tüm sunucular güncel.";
 "Allow" = "İzin ver";
 "Allow Folder to Change…" = "Klasörün değişiklik yapmasına izin ver…";
 "Allow Folder to Look In…" = "Klasörün içinde bakmasına izin ver…";
@@ -332,6 +333,7 @@
 "Correction" = "Düzeltme";
 "Corrections" = "Düzeltmeler";
 "Couldn't be added: %@" = "Eklenemedi: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Sunucuların %lld kadarı denetlenemedi (bağlantı yok mu?). Daha sonra tekrar deneyin.";
 "Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
 "Couldn't move “%@” to the Trash: %@" = "“%@” Çöp Kutusu'na taşınamadı: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us adresine ulaşılamadı. Değerlendirmeniz saklandı: daha sonra tekrar deneyin.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Notların ne kadar süre kaldığı";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Sunucunun aynı anda kaç isteğe yanıt verdiği — örneğin sohbetiniz ve bir kodlama aracı. Tek bir istek yalnız çalışırken tam hızda çalışır (drafter veya MTP başlığı ile); daha fazla istekte her GPU adımını paylaşırlar: her biri biraz daha yavaş, birlikte daha hızlı. Her çalışan istek kendi bağlamını bellekte tutar, bu yüzden az belleği olan bir Mac aynı anda daha az istek yanıtlar. 1: ardışık olarak.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Modelin, yanıt vermesi gerekmeden önce tek bir ileti için kaç tur araç çağrısı yapabileceği (bir sunucunun araçları çoğu zaman birkaç adım gerektirir: bul, oku, sonra işlem yap). Aynı çağrı, bir iletide asla iki kez çalıştırılmaz.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Aşağıdakileri kaç kez kullandığınız: sohbet, araç çağrıları, API sunucusu (diğer uygulamalar), görüntü oluşturma, görüntü düzenleme, müzik, model indirmeleri.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU'nun kullanabileceği bellek miktarı. Bir modelin dosyaları bunun altına sığmalıdır.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Henüz not yok. Her sohbetin bilmesi gerekenleri ekleyin: “Kısaca Rusça cevap ver”, “ESP32 hoparlör yapıyorum”.";
 "No requests yet." = "Henüz istek yok.";
 "No runs yet." = "Henüz çalıştırma yok.";
+"No servers installed." = "Yüklü sunucu yok.";
 "No sign-in" = "Oturum açma yok";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Abonelik yok. Özellik kilidi yok. LLMTray size faydalı olduysa geliştirmeyi destekleyin.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Bu Mac'in belleği için öneri yok. Bir model aramak için Hugging Face'e göz atın.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Kullanım istatistiği yok";
 "Non-commercial license: read it on the model card before using the model." = "Ticari olmayan lisans: modeli kullanmadan önce model kartında okuyun.";
 "None" = "Yok";
+"None of these servers can be updated from here (added by hand or from a file)." = "Bu sunucuların hiçbiri buradan güncellenemez (elle veya bir dosyadan eklendi).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Henüz yok. Tek bir sohbet veya tek bir istek için verilen izinler burada listelenmez: onlar işlemle sona erer.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Yetersiz disk alanı: ses modeli %1$@ gerektiriyor, %2$@ boş.";
 "Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Araç Ayarları…";
 "Tool call statistics" = "Araç çağrısı istatistikleri";
 "Tool calls" = "Araç çağrıları";
+"Tool rounds per message" = "İleti başına araç çağrısı turu";
 "Tool server update" = "Araç sunucusu güncellemesi";
 "Tool-use rule" = "Araç kullanma kuralı";
 "Tools" = "Araçlar";

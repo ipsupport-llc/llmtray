@@ -147,6 +147,7 @@
 "All" = "Wszystkie";
 "All chats" = "Wszystkie czaty";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Wszystko wyłączone, dopóki nie włączysz. Modele pobierane po Zakończ, pojedynczo.";
+"All servers are up to date." = "Wszystkie serwery są aktualne.";
 "Allow" = "Zezwól";
 "Allow Folder to Change…" = "Zezwól folderowi na zmiany…";
 "Allow Folder to Look In…" = "Zezwól folderowi na przeglądanie…";
@@ -332,6 +333,7 @@
 "Correction" = "Poprawka";
 "Corrections" = "Poprawki";
 "Couldn't be added: %@" = "Nie można dodać: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Nie udało się sprawdzić %lld serwerów (brak połączenia?). Spróbuj ponownie później.";
 "Couldn't create the report: %@" = "Nie można utworzyć raportu: %@";
 "Couldn't move “%@” to the Trash: %@" = "Nie można przenieść „%@” do kosza: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Nie można połączyć się z ipsupport.us. Twoja recenzja została zachowana — spróbuj ponownie później.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Jak długo trwają notatki";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Ile tokenów promptu jest przetwarzanych w jednym kroku. Większa wartość przyspiesza długie prompty, ale zużywa więcej pamięci. Autostrojenie w teście wydajności może ją dobrać.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Ile żądań serwer obsługuje naraz — np. twój czat i agent programistyczny. Jedno żądanie solo działa pełną prędkością (ze szkicem lub głowicą MTP); przy większej liczbie dzielą każdy krok GPU: każde trochę wolniej, ale łącznie szybciej. Każde uruchomione żądanie trzyma swój kontekst w pamięci, więc Mac z małą ilością pamięci obsłuży mniej jednoczesnych żądań. 1: jedno po drugim.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Określa, ile rund wywołań narzędzi model może wykonać dla jednej wiadomości, zanim będzie musiał odpowiedzieć (narzędzia serwera często wymagają kilku: znajdź, odczytaj, a potem działaj). To samo wywołanie w jednej wiadomości nigdy nie zostanie uruchomione dwa razy.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Jak często korzystałeś z: czatu, wywołań narzędzi, serwera API (inne aplikacje), generowania obrazów, edycji obrazów, muzyki, pobierania modeli.";
 "How many tokens it generates per trial." = "Ile tokenów generuje w każdej próbie.";
 "How much memory the GPU may use. A model's files must fit under it." = "Ile pamięci może użyć GPU. Pliki modelu muszą się w tym zmieścić.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Nie ma jeszcze notatek. Dodaj to, co każdy czat powinien wiedzieć: „Odpowiadaj po rosyjsku, krótko”, „Buduję głośnik ESP32”.";
 "No requests yet." = "Brak żądań.";
 "No runs yet." = "Nie ma jeszcze uruchomień.";
+"No servers installed." = "Brak zainstalowanych serwerów.";
 "No sign-in" = "Bez logowania";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Brak subskrypcji. Brak blokad funkcji. Wspieraj rozwój, jeśli LLMTray ci się przydaje.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Brak sugestii dla pamięci tego Maca. Przeglądaj Hugging Face w poszukiwaniu modelu.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Brak statystyk użycia";
 "Non-commercial license: read it on the model card before using the model." = "Licencja niekomercyjna: przeczytaj ją na karcie modelu przed użyciem.";
 "None" = "Brak";
+"None of these servers can be updated from here (added by hand or from a file)." = "Żadnego z tych serwerów nie można stąd uaktualnić (dodane ręcznie lub z pliku).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Jeszcze brak. Uprawnienia dla jednego czatu lub żądania nie są tu wymienione: kończą się wraz z nimi.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Za mało miejsca na dysku: model głosowy wymaga %1$@, dostępne %2$@.";
 "Not enough free disk space for this model." = "Brak wystarczającej ilości wolnego miejsca na dysku dla tego modelu.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Ustawienia narzędzi…";
 "Tool call statistics" = "Statystyki wywołań narzędzi";
 "Tool calls" = "Wywołania narzędzi";
+"Tool rounds per message" = "Liczba rund narzędzi na wiadomość";
 "Tool server update" = "Uaktualnienie serwera narzędzi";
 "Tool-use rule" = "Reguła używania narzędzi";
 "Tools" = "Narzędzia";
