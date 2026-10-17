@@ -120,8 +120,10 @@ final class MCPInstaller: ObservableObject {
         if let error = await startOrSignIn(config.id) {
             // It needs the user's own app (Slack): kept, off, and Configure
             // opens where its client id and secret go.
-            if MCPSignIn.shared.needsOwnApp.contains(config.id) {
-                hub.setEnabled(config.id, false)
+            if MCPSignIn.shared.needsOwnApp.contains(config.id), var kept = hub.server(config.id) {
+                kept.enabled = false
+                kept.pendingOwnApp = true
+                hub.update(kept)
                 message = String(format: NSLocalizedString("%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In.", comment: "MCP install"), found.name)
                 openConfigure = config.id
                 return
@@ -215,9 +217,12 @@ final class MCPInstaller: ObservableObject {
             return error is CancellationError ? NSLocalizedString("the sign-in was cancelled", comment: "MCP") : error.localizedDescription
         }
         if let error = await hub.startForReview(id) { return error }
-        // Never started before (installed waiting for the user's own app):
-        // this is its install -- its tools as listed now, and on.
-        if hub.server(id)?.reviewed.isEmpty == true {
+        // The install that waited for the user's own app finishes here (the
+        // user chose to install it): its tools as listed now, and on. Any
+        // other server's sign-in approves or enables nothing.
+        if var config = hub.server(id), config.pendingOwnApp {
+            config.pendingOwnApp = false
+            hub.update(config)
             hub.markReviewed(id)
             hub.setEnabled(id, true)
         }

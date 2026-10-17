@@ -80,7 +80,15 @@ struct ToolsPane: View {
             case .discover: DiscoverView(query: query, askFor: { found, origin, source in sheet = .asks(found, origin: origin, source: source) })
             }
         }
-        .task { await installer.checkUpdates() }
+        .task {
+            // An install that finished while the pane was closed.
+            if let id = installer.openConfigure {
+                installer.openConfigure = nil
+                tab = .installed
+                sheet = .configure(id)
+            }
+            await installer.checkUpdates()
+        }
         .onChange(of: installer.openConfigure) { _, id in
             guard let id else { return }
             installer.openConfigure = nil
@@ -318,7 +326,7 @@ private struct ServerRow: View {
 
     private var problem: String? {
         if signIn.signingIn.contains(server.id) { return NSLocalizedString("Signing in: finish in your browser.", comment: "MCP server") }
-        if signIn.needsOwnApp.contains(server.id) && server.oauthClientID == nil {
+        if server.pendingOwnApp && server.oauthClientID == nil {
             return NSLocalizedString("Needs your own app: Configure.", comment: "MCP server")
         }
         if server.oauth?.needsSignIn == true { return NSLocalizedString("Needs sign-in.", comment: "MCP server") }
@@ -1075,7 +1083,7 @@ private struct SignInSection: View {
         }
         .onAppear {
             clientID = server.oauthClientID ?? ""
-            ownAppOpen = signIn.needsOwnApp.contains(server.id)
+            ownAppOpen = server.pendingOwnApp || signIn.needsOwnApp.contains(server.id)
         }
     }
 }
