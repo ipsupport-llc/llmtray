@@ -12,6 +12,9 @@ final class MCPSignIn: ObservableObject {
 
     /// Servers being signed in to now.
     @Published private(set) var signingIn: Set<UUID> = []
+    /// Servers that need the user's own app (no client registration, like
+    /// Slack): kept, off, until its client id is given in Configure.
+    @Published var needsOwnApp: Set<UUID> = []
     private var refreshes: [UUID: Task<String?, Never>] = [:]
     /// Bumped by every sign-in and sign-out: a refresh that started before
     /// one commits nothing.
@@ -94,7 +97,14 @@ final class MCPSignIn: ObservableObject {
             MCPOAuth.canonical($0.metadata.issuer) == MCPOAuth.canonical(discovery.server.issuer)
                 && (config.oauthClientID == nil || $0.clientID == config.oauthClientID) ? ($0.clientID, $0.registration) : nil
         }
-        let client = try await MCPOAuth.client(for: discovery.server, kept: kept, pasted: config.oauthClientID, server: server, fetch: fetch)
+        let client: (id: String, registration: MCPOAuth.Registration)
+        do {
+            client = try await MCPOAuth.client(for: discovery.server, kept: kept, pasted: config.oauthClientID, server: server, fetch: fetch)
+            needsOwnApp.remove(id)
+        } catch MCPOAuth.Failure.noRegistration {
+            needsOwnApp.insert(id)
+            throw MCPOAuth.Failure.noRegistration
+        }
         guard MCPOAuth.mixUpSafe(discovery.server, registration: client.registration) else { throw MCPOAuth.Failure.mixUpRisk }
         var scope = discovery.scope
         if let stepUp { scope = MCPOAuth.scope(challenge: MCPOAuth.Challenge(scope: stepUp), metadata: discovery.resource, granted: tokens(id)?.scope ?? config.oauth?.scope) }

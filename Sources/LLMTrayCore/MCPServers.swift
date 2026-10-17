@@ -39,6 +39,9 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
     public var oauth: MCPOAuthState?
     /// A client id the user pasted, for a server that pre-registers clients.
     public var oauthClientID: String?
+    /// Installed, waiting for the user's own app (no client registration,
+    /// like Slack): its first sign-in finishes the install.
+    public var pendingOwnApp = false
     /// Tool name → the definition hash the user reviewed. A tool missing
     /// here, or with another hash now, is hidden until reviewed again.
     public var reviewed: [String: String] = [:]
@@ -71,7 +74,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, key, kind, command, arguments, environment, workingDirectory, url, headers, secretNames, enabled,
-             origin, description, version, source, answers, icon, oauth, oauthClientID, reviewed, reviewedReadOnly, runWithoutAsking, tools, modelNames, added
+             origin, description, version, source, answers, icon, oauth, oauthClientID, pendingOwnApp, reviewed, reviewedReadOnly, runWithoutAsking, tools, modelNames, added
     }
 
     /// Fields added later read as their defaults: an older file still loads.
@@ -97,6 +100,7 @@ public struct MCPServerConfig: Codable, Identifiable, Equatable, Sendable {
         icon = try c.decodeIfPresent(String.self, forKey: .icon)
         oauth = try c.decodeIfPresent(MCPOAuthState.self, forKey: .oauth)
         oauthClientID = try c.decodeIfPresent(String.self, forKey: .oauthClientID)
+        pendingOwnApp = try c.decodeIfPresent(Bool.self, forKey: .pendingOwnApp) ?? false
         reviewed = try c.decodeIfPresent([String: String].self, forKey: .reviewed) ?? [:]
         reviewedReadOnly = try c.decodeIfPresent([String: Bool].self, forKey: .reviewedReadOnly) ?? [:]
         runWithoutAsking = try c.decodeIfPresent([String: String].self, forKey: .runWithoutAsking) ?? [:]
