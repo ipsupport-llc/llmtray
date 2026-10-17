@@ -142,7 +142,7 @@ struct AudioClipView: View {
                 }
             }
             if !prompt.isEmpty {
-                Label(prompt, systemImage: "music.note")
+                Label(prompt, systemImage: isMade ? "music.note" : "mic.fill")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
