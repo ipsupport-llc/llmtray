@@ -147,6 +147,7 @@
 "All" = "Semua";
 "All chats" = "Semua obrolan";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Semua mati kecuali Anda mengaktifkannya. Model diunduh setelah Selesai, satu per satu.";
+"All servers are up to date." = "Semua server sudah terkini.";
 "Allow" = "Izinkan";
 "Allow Folder to Change…" = "Izinkan Folder Mengubah…";
 "Allow Folder to Look In…" = "Izinkan Folder Melihat…";
@@ -332,6 +333,7 @@
 "Correction" = "Koreksi";
 "Corrections" = "Koreksi";
 "Couldn't be added: %@" = "Tidak dapat ditambahkan: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Tidak dapat memeriksa %lld server (tidak ada koneksi?). Coba lagi nanti.";
 "Couldn't create the report: %@" = "Gagal membuat laporan: %@";
 "Couldn't move “%@” to the Trash: %@" = "Tidak dapat memindahkan “%@” ke Sampah: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Tidak dapat menghubungi ipsupport.us. Ulasan Anda disimpan: coba lagi nanti.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Berapa lama catatan bertahan";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Berapa banyak permintaan yang dijawab server sekaligus — mis. chat Anda dan agen pengkodean. Satu permintaan berjalan sendiri pada kecepatan penuh (dengan drafter atau kepala MTP); dengan lebih banyak permintaan mereka berbagi tiap langkah GPU: masing‑masing sedikit lebih lambat, namun secara keseluruhan lebih cepat. Setiap permintaan yang berjalan menyimpan konteksnya sendiri di memori, jadi Mac dengan memori sedikit akan menjawab lebih sedikit sekaligus. 1: satu per satu.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Berapa putaran panggilan alat yang boleh dibuat model untuk satu pesan sebelum harus menjawab (alat server sering memerlukan beberapa langkah: mencari, membaca, lalu bertindak). Panggilan yang sama dua kali dalam satu pesan tidak akan pernah dijalankan dua kali.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Berapa kali Anda menggunakan masing‑masing: obrolan, pemanggilan alat, server API (aplikasi lain), pembuatan gambar, pengeditan gambar, musik, unduhan model.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
 "How much memory the GPU may use. A model's files must fit under it." = "Berapa banyak memori yang dapat digunakan GPU. File model harus muat di bawah batas ini.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Belum ada catatan. Tambah hal yang perlu diketahui setiap obrolan: “Jawab dalam bahasa Rusia, singkat”, “Saya membuat speaker ESP32”.";
 "No requests yet." = "Belum ada permintaan.";
 "No runs yet." = "Belum ada yang dijalankan.";
+"No servers installed." = "Tidak ada server yang terpasang.";
 "No sign-in" = "Tidak perlu masuk";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Tanpa langganan. Tanpa fitur terkunci. Dukung pengembangan jika LLMTray berguna bagi Anda.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Tidak ada saran untuk memori Mac ini. Jelajahi Hugging Face untuk model.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Tanpa statistik penggunaan";
 "Non-commercial license: read it on the model card before using the model." = "Lisensi non-komersial: baca di model card sebelum menggunakan model.";
 "None" = "Tidak Ada";
+"None of these servers can be updated from here (added by hand or from a file)." = "Tidak ada server ini yang dapat diperbarui dari sini (ditambahkan secara manual atau dari file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Belum ada. Izin untuk satu chat atau satu permintaan tidak tercantum di sini: izin berakhir bersamanya.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Ruang disk tidak cukup: model suara membutuhkan %1$@, hanya tersisa %2$@.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Pengaturan Alat…";
 "Tool call statistics" = "Statistik panggilan alat";
 "Tool calls" = "Panggilan alat";
+"Tool rounds per message" = "Putaran alat per pesan";
 "Tool server update" = "Pembaruan server alat";
 "Tool-use rule" = "Aturan penggunaan alat";
 "Tools" = "Alat";

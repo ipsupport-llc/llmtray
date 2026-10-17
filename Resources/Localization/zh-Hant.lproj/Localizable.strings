@@ -147,6 +147,7 @@
 "All" = "全部";
 "All chats" = "所有聊天";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "預設皆關閉，需你開啟。模型在按「完成」後逐一下載。";
+"All servers are up to date." = "所有伺服器都已是最新。";
 "Allow" = "允許";
 "Allow Folder to Change…" = "允許資料夾變更⋯";
 "Allow Folder to Look In…" = "允許資料夾檢視⋯";
@@ -332,6 +333,7 @@
 "Correction" = "更正";
 "Corrections" = "更正";
 "Couldn't be added: %@" = "無法加入：%@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "無法檢查其中 %lld 個伺服器（沒有連線？）。請稍後再試。";
 "Couldn't create the report: %@" = "無法建立報告：%@";
 "Couldn't move “%@” to the Trash: %@" = "無法將「%@」移到資源回收筒：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "無法連到 ipsupport.us。已保留您的評論，請稍後再試。";
@@ -559,6 +561,7 @@
 "How long notes last" = "附註保留多久";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "伺服器同時回應多少個請求 — 例如你的聊天與程式碼助理。單一請求可以全速執行（若有 drafter 或 MTP head）；多個請求則在每個 GPU 步驟共享運算：單個稍慢，但整體更快。每個執行中的請求會在記憶體保留其上下文，因此記憶體較少的 Mac 同時回應的數量會較少。1：依序執行。";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "該模型在一則訊息中、必須回答前可進行多少輪工具呼叫（伺服器的工具通常需要好幾輪：先找出內容、再讀取，然後執行動作）。同一則訊息中的相同呼叫不會執行兩次。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "您使用下列功能的次數：聊天、工具呼叫、API 伺服器（其他應用程式）、圖像產生、圖像編輯、音樂、模型下載。";
 "How many tokens it generates per trial." = "每次試驗產生的 token 數量。";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU 可使用的記憶體量。模型檔案總和必須低於此限額。";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "尚無附註。新增每個聊天都應該知道的內容：「以俄文簡短回應」、「我在製作 ESP32 喇叭」。";
 "No requests yet." = "還沒有請求。";
 "No runs yet." = "尚未執行。";
+"No servers installed." = "未安裝任何伺服器。";
 "No sign-in" = "無需登入";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "無訂閱。無功能鎖定。如果 LLMTray 對你有幫助，歡迎支持開發。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "針對此 Mac 的記憶體沒有建議。請至 Hugging Face 瀏覽模型。";
@@ -809,6 +813,7 @@
 "No usage statistics" = "不傳送使用統計";
 "Non-commercial license: read it on the model card before using the model." = "非商業授權：使用前請先在模型說明卡閱讀授權內容。";
 "None" = "無";
+"None of these servers can be updated from here (added by hand or from a file)." = "這些伺服器都無法在此處更新（手動加入或從檔案加入）。";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "尚無。單一聊天室或單次請求的授權不會列在此處：會隨該請求結束。";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "磁碟空間不足：語音模型需要 %1$@，目前可用 %2$@。";
 "Not enough free disk space for this model." = "此模型所需的磁碟空間不足。";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "工具設定…";
 "Tool call statistics" = "工具呼叫統計";
 "Tool calls" = "工具呼叫";
+"Tool rounds per message" = "每則訊息的工具輪數";
 "Tool server update" = "工具伺服器更新";
 "Tool-use rule" = "工具使用規則";
 "Tools" = "工具";

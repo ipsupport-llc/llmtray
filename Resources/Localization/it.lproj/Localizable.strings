@@ -147,6 +147,7 @@
 "All" = "Tutto";
 "All chats" = "Tutte le chat";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tutto disattivato finché non lo attivi. I modelli vengono scaricati dopo Fine, uno alla volta.";
+"All servers are up to date." = "Tutti i server sono aggiornati.";
 "Allow" = "Consenti";
 "Allow Folder to Change…" = "Consenti alla cartella di modificare…";
 "Allow Folder to Look In…" = "Consenti alla cartella di esplorare…";
@@ -332,6 +333,7 @@
 "Correction" = "Correzione";
 "Corrections" = "Correzioni";
 "Couldn't be added: %@" = "Impossibile aggiungere: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "Impossibile controllare %lld server (nessuna connessione?). Riprova più tardi.";
 "Couldn't create the report: %@" = "Impossibile creare il rapporto: %@";
 "Couldn't move “%@” to the Trash: %@" = "Impossibile spostare “%@” nel Cestino: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Impossibile contattare ipsupport.us. La tua recensione è salvata: riprova più tardi.";
@@ -559,6 +561,7 @@
 "How long notes last" = "Durata delle note";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Numero di token del prompt elaborati per passaggio. Un valore più alto è più veloce con prompt lunghi, ma usa più memoria. L’auto-regolazione del benchmark può sceglierlo automaticamente.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Quante richieste il server gestisce contemporaneamente — per esempio la chat e un agente di coding. Una richiesta sola gira a piena velocità (con il suo drafter o MTP head); con più richieste condividono ogni passo GPU: ciascuna un po’ più lenta, ma insieme più veloci. Ogni richiesta mantiene il proprio contesto in memoria, quindi un Mac con poca RAM libera risponde a meno richieste contemporaneamente. 1: una dopo l’altra.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "Quanti round di Chiamate agli strumenti il modello può effettuare per un messaggio prima di dover rispondere (gli strumenti di un server spesso richiedono più passaggi: trovare, leggere e poi agire). La stessa chiamata, se ripetuta due volte nello stesso messaggio, non viene mai eseguita due volte.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Quante volte hai usato ciascuno dei seguenti: chat, chiamate a tool, server API (altre app), generazione immagine, modifica immagine, musica, download dei modelli.";
 "How many tokens it generates per trial." = "Numero di token generati per ogni prova.";
 "How much memory the GPU may use. A model's files must fit under it." = "Quanta memoria può usare la GPU. I file del modello devono rientrarvi.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Ancora nessuna nota. Aggiungi cosa deve sapere ogni chat: “Risposta in russo, breve”, “Costruisco un altoparlante ESP32”.";
 "No requests yet." = "Ancora nessuna richiesta.";
 "No runs yet." = "Ancora nessuna esecuzione.";
+"No servers installed." = "Nessun server installato.";
 "No sign-in" = "Nessun accesso";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Niente abbonamenti. Nessuna funzione bloccata. Sostieni lo sviluppo se LLMTray ti è utile.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Nessun suggerimento per la memoria di questo Mac. Cerca un modello su Hugging Face.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "Nessuna statistica di utilizzo";
 "Non-commercial license: read it on the model card before using the model." = "Licenza non commerciale: leggila sulla model card prima di usare il modello.";
 "None" = "Nessuno";
+"None of these servers can be updated from here (added by hand or from a file)." = "Nessuno di questi server può essere aggiornato da qui (aggiunto manualmente o da un file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Ancora nulla. Le autorizzazioni per una singola chat o richiesta non sono elencate qui: terminano con essa.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Spazio su disco insufficiente: il modello vocale richiede %1$@, disponibili %2$@.";
 "Not enough free disk space for this model." = "Spazio su disco insufficiente per questo modello.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "Impostazioni strumenti…";
 "Tool call statistics" = "Statistiche delle chiamate agli strumenti";
 "Tool calls" = "Chiamate agli strumenti";
+"Tool rounds per message" = "Round di Chiamate agli strumenti per messaggio";
 "Tool server update" = "Aggiornamento del server dello Strumento";
 "Tool-use rule" = "Regola per l’uso degli strumenti";
 "Tools" = "Strumenti";

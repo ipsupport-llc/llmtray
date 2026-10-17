@@ -147,6 +147,7 @@
 "All" = "모두";
 "All chats" = "모든 채팅";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "켜지지 않은 항목은 사용자가 켤 때까지 꺼짐. 모델은 Finish 후 한 번에 하나씩 다운로드됩니다.";
+"All servers are up to date." = "모든 서버가 최신 상태입니다.";
 "Allow" = "허용";
 "Allow Folder to Change…" = "폴더 변경 허용…";
 "Allow Folder to Look In…" = "폴더 열람 허용…";
@@ -332,6 +333,7 @@
 "Correction" = "수정";
 "Corrections" = "수정";
 "Couldn't be added: %@" = "추가할 수 없음: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "서버 %lld개의 상태를 확인할 수 없습니다(연결이 없나요?). 나중에 다시 시도하세요.";
 "Couldn't create the report: %@" = "보고서를 생성할 수 없습니다: %@";
 "Couldn't move “%@” to the Trash: %@" = "“%@”을(를) 휴지통으로 옮길 수 없음: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us에 연결할 수 없습니다. 작성하신 리뷰는 보관됩니다: 나중에 다시 시도하세요.";
@@ -559,6 +561,7 @@
 "How long notes last" = "메모 유지 기간";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "서버가 동시에 처리하는 요청 수 — 예: 채팅과 코딩 에이전트. 단독 요청은 최대 속도로 실행됩니다(해당 시 drafter 또는 MTP 헤드 사용). 요청이 많아지면 GPU 단계별로 자원을 나누어 사용하므로 개별 속도는 약간 느려지지만 전체 처리량은 증가합니다. 각 실행 요청은 자체 컨텍스트를 메모리에 유지하므로 여유 메모리가 적은 Mac은 동시에 더 적게 처리합니다. 1: 순차 처리.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "모델이 한 메시지에서 답변해야 하기 전에 수행할 수 있는 도구 호출 라운드 수입니다(서버의 도구는 찾기, 읽기, 실행처럼 여러 단계가 필요한 경우가 많음). 같은 메시지에서 같은 호출은 두 번 실행되지 않습니다.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "다음 항목을 각각 몇 번 사용했는지: 채팅, 도구 호출, API 서버(다른 앱), 이미지 생성, 이미지 편집, 음악, 모델 다운로드.";
 "How many tokens it generates per trial." = "시도당 생성 토큰 수";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU가 사용할 수 있는 메모리 양입니다. 모델 파일이 이 제한보다 작아야 합니다.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "아직 메모가 없습니다. 모든 채팅이 알아야 할 내용을 추가하세요. “러시아어로 간단히 응답”, “ESP32 스피커를 만듭니다”.";
 "No requests yet." = "아직 요청이 없습니다.";
 "No runs yet." = "아직 실행이 없습니다.";
+"No servers installed." = "설치된 서버가 없습니다.";
 "No sign-in" = "로그인 안 함";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "구독 없음. 기능 잠금 없음. LLMTray가 도움이 됐다면 개발을 지원해 주세요.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "이 Mac의 메모리에 대한 권장 항목이 없습니다. Hugging Face에서 모델을 찾아보세요.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "사용 통계 없음";
 "Non-commercial license: read it on the model card before using the model." = "비상업적 사용 허가: 모델을 사용하기 전에 모델 카드에서 확인하세요.";
 "None" = "없음";
+"None of these servers can be updated from here (added by hand or from a file)." = "이 서버들은 여기에서 업데이트할 수 없습니다(수동으로 추가했거나 파일에서 추가됨).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "아직 없음. 개별 채팅 또는 요청에 대한 권한은 여기 나열되지 않습니다: 권한은 해당 채팅/요청과 함께 종료됩니다.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "디스크 공간 부족: 음성 모델에 %1$@ 필요, %2$@만 사용 가능함.";
 "Not enough free disk space for this model." = "이 모델을 위해 디스크 여유 공간이 충분하지 않습니다.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "도구 설정…";
 "Tool call statistics" = "도구 호출 통계";
 "Tool calls" = "도구 호출";
+"Tool rounds per message" = "메시지당 도구 라운드 수";
 "Tool server update" = "도구 서버 업데이트";
 "Tool-use rule" = "도구 사용 규칙";
 "Tools" = "도구";

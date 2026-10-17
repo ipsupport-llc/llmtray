@@ -147,6 +147,7 @@
 "All" = "הכול";
 "All chats" = "כל הצ׳אטים";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "הכול כבוי עד שתדליקו. המודלים יורדו אחרי Finish, אחד‑אחד.";
+"All servers are up to date." = "כל השרתים מעודכנים.";
 "Allow" = "אפשר";
 "Allow Folder to Change…" = "אפשר לתיקייה לשנות…";
 "Allow Folder to Look In…" = "אפשר לתיקייה להסתכל ב…";
@@ -332,6 +333,7 @@
 "Correction" = "תיקון";
 "Corrections" = "תיקונים";
 "Couldn't be added: %@" = "לא נוכל להוסיף: %@";
+"Couldn't check %lld of the servers (no connection?). Try again later." = "לא ניתן היה לבדוק %lld מהשרתים (אין חיבור?). נסה שוב מאוחר יותר.";
 "Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
 "Couldn't move “%@” to the Trash: %@" = "לא ניתן להעביר את “%@” לפח: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "לא ניתן היה להגיע ל-ipsupport.us. הביקורת נשמרה: נסה שוב מאוחר יותר.";
@@ -559,6 +561,7 @@
 "How long notes last" = "כמה זמן הערות נשמרות";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "כמה בקשות השרת עונה בבת אחת — למשל צ׳אט שלך וסוכן קידוד. בקשה אחת לבד רצה במהירות המלאה (עם drafter או MTP head); כשיש יותר הם חולקים כל צעד GPU: כל אחת מעט איטית יותר, אבל כולן יחד מהירות יותר. כל בקשה שרצה מחזיקה בהקשר שלה בזיכרון, לכן מק עם מעט זיכרון עונה על פחות בקשות בבת אחת. 1: אחת אחרי השנייה.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "כמה סבבים של קריאות לכלים המודל יכול לבצע עבור הודעה אחת לפני שעליו להשיב (כלים של שרת נדרשים לעיתים לכמה קריאות: למצוא, לקרוא ואז לפעול). אותה קריאה פעמיים באותה הודעה לעולם לא תרוץ פעמיים.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "כמה פעמים השתמשת בכל אחד מהבאים: צ'אט, קריאות כלים, שרת ה-API (יישומים אחרים), יצירת תמונות, עריכת תמונות, מוזיקה, הורדות מודלים.";
 "How many tokens it generates per trial." = "כמה טוקנים נוצרים בכל ניסיון.";
 "How much memory the GPU may use. A model's files must fit under it." = "כמה זיכרון GPU מותר להשתמש. קבצי המודל חייבים להתאים למגבלה זו.";
@@ -800,6 +803,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "אין עדיין הערות. הוסף מה שכל צ׳אט צריך לדעת: „תשובה ברוסית, בקצרה”, „אני בונה רמקול ESP32”.";
 "No requests yet." = "אין עדיין בקשות.";
 "No runs yet." = "עדיין אין הרצות.";
+"No servers installed." = "אין שרתים מותקנים.";
 "No sign-in" = "ללא התחברות";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "ללא מנויים. ללא חסימות תכונות. תמכו בפיתוח אם LLMTray שימושי לכם.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "אין הצעות לזיכרון של Mac זה. דפדפו ב‑Hugging Face אחרי מודל.";
@@ -809,6 +813,7 @@
 "No usage statistics" = "ללא סטטיסטיקות שימוש";
 "Non-commercial license: read it on the model card before using the model." = "רישיון לא‑מסחרי: קרא אותו בכרטיס המודל לפני השימוש.";
 "None" = "ללא";
+"None of these servers can be updated from here (added by hand or from a file)." = "אי אפשר לעדכן מכאן אף אחד מהשרתים האלה (נוספו ידנית או מקובץ).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "עדיין אין. הרשאות לשיחה אחת או בקשה אחת אינן מופיעות כאן: הן מסתיימות איתה.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "אין מספיק מקום בדיסק: מודל הקול צריך %1$@, פנוי %2$@.";
 "Not enough free disk space for this model." = "אין מספיק מקום פנוי בדיסק עבור המודל הזה.";
@@ -1376,6 +1381,7 @@
 "Tool Settings…" = "הגדרות כלי…";
 "Tool call statistics" = "סטטיסטיקת קריאות לכלים";
 "Tool calls" = "קריאות לכלים";
+"Tool rounds per message" = "סבבי קריאות לכלים לכל הודעה";
 "Tool server update" = "עדכון לשרת הכלים";
 "Tool-use rule" = "כלל לשימוש בכלים";
 "Tools" = "כלים";
