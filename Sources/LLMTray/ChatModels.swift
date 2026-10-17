@@ -258,6 +258,8 @@ struct ChatSettings {
     var thinkingEffort: ThinkingEffort = .high
     /// Appended to the system prompt whenever tools are offered.
     var toolUsePolicy: String = Profile.defaultToolUsePolicy
+    /// Rounds of tool calls per message (the profile's).
+    var toolRounds = 10
     /// The chat's project, set when the turn starts (ChatClient) and kept
     /// through its tool rounds like modelPath; nil for a chat in none and
     /// for a temporary chat.
@@ -304,6 +306,7 @@ struct ChatSettings {
         unloadModelDuringImageGen = p.unloadModelDuringImageGen
         imageQuality = ImageQuality(rawValue: p.imageQuality) ?? .balanced
         toolUsePolicy = p.toolUsePolicy
+        toolRounds = p.toolRounds
         toolLoading = p.toolLoading
     }
 

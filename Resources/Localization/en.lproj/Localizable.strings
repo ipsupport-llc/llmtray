@@ -557,6 +557,7 @@
 "How long notes last" = "How long notes last";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.";
+"How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice." = "How many rounds of tool calls the model may make for one message before it has to answer (a server's tools often take several: find, read, then act). The same call twice in one message never runs twice.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
 "How much memory the GPU may use. A model's files must fit under it." = "How much memory the GPU may use. A model's files must fit under it.";
@@ -1374,6 +1375,7 @@
 "Tool Settings…" = "Tool Settings…";
 "Tool call statistics" = "Tool call statistics";
 "Tool calls" = "Tool calls";
+"Tool rounds per message" = "Tool rounds per message";
 "Tool server update" = "Tool server update";
 "Tool-use rule" = "Tool-use rule";
 "Tools" = "Tools";
