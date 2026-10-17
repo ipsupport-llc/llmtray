@@ -35,6 +35,7 @@
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ không phải là liên kết của LLMTray, nên để nguyên.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ chưa được tải xuống — bật lại tạo ảnh trong Cài đặt.";
 "%@ isn't installed yet" = "%@ chưa được cài đặt";
+"%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ cần ứng dụng riêng của bạn: thêm ID ứng dụng khách và mã bí mật của ứng dụng đó trong Cấu hình, thêm URL chuyển hướng hiển thị ở đó vào ứng dụng của bạn, rồi Đăng nhập.";
 "%@ wasn't found on Hugging Face." = "Không tìm thấy %@ trên Hugging Face.";
 "%@ · %@ left" = "%@ · còn %@";
 "%@ · %@ of %@" = "%@ · %@ trong %@";
@@ -754,6 +755,7 @@
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Cần khoảng %1$@ GB; máy Mac này có %2$@ GB.";
 "Needs sign-in" = "Cần đăng nhập";
 "Needs sign-in." = "Cần đăng nhập.";
+"Needs your own app: Configure." = "Cần ứng dụng riêng của bạn: Cấu hình.";
 "Network" = "Mạng";
 "Never" = "Không bao giờ";
 "New Chat" = "Trò chuyện mới";
