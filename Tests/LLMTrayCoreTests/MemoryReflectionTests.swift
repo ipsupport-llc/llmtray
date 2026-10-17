@@ -11,6 +11,8 @@ final class MemoryReflectionTests: XCTestCase {
         // Two of them, a brace inside a string not counted.
         let two = "{\n \"op\": \"add\", \"text\": \"a {b}\", \"quote\": \"x\"\n}\n{\n \"op\": \"add\", \"text\": \"c\", \"quote\": \"y\"\n}"
         XCTAssertEqual(MemoryReflection.parseOperations(two)?.map(\.text), ["a {b}", "c"])
+        // A brace in a single-quoted string is text too: nothing taken from it.
+        XCTAssertNil(MemoryReflection.parseOperations("{\n  'error': '} {\"ops\":[]} {'\n}"))
     }
 
     let t0 = Date(timeIntervalSince1970: 1_800_000_000)

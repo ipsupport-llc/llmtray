@@ -65,16 +65,18 @@ public enum MemoryReflection {
     /// 2.6B, in a ```json fence), which the one-per-line reading misses.
     static func spreadObjects(_ text: String) -> [[String: Any]] {
         var objects: [[String: Any]] = []
-        var depth = 0, inString = false, escaped = false
+        var depth = 0, escaped = false
+        // The quote a string is open with (LenientJSON takes ' too).
+        var quote: Character?
         var start: String.Index?
         for i in text.indices {
             let c = text[i]
-            if inString {
-                if escaped { escaped = false } else if c == "\\" { escaped = true } else if c == "\"" { inString = false }
+            if let q = quote {
+                if escaped { escaped = false } else if c == "\\" { escaped = true } else if c == q { quote = nil }
                 continue
             }
             switch c {
-            case "\"": inString = true
+            case "\"", "'": quote = c
             case "{":
                 if depth == 0 { start = i }
                 depth += 1
@@ -114,8 +116,15 @@ public enum MemoryReflection {
         }
         // Not one per line: objects spread over lines.
         if !read {
+            // Only what looks like an op (or a wrapper of them) counts as read.
             for object in spreadObjects(trimmed) {
-                if let wrapped = object["ops"] as? [Any] { ops += wrapped } else { ops.append(object) }
+                if let wrapped = object["ops"] as? [Any] {
+                    ops += wrapped
+                } else if object["op"] != nil {
+                    ops.append(object)
+                } else {
+                    continue
+                }
                 read = true
             }
         }
