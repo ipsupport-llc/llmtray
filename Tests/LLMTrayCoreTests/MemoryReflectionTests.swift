@@ -2,6 +2,19 @@ import XCTest
 @testable import LLMTrayCore
 
 final class MemoryReflectionTests: XCTestCase {
+    func testOpsPrettyPrintedOverLines() {
+        // LFM2.5 2.6B's reply: one op over several lines, in a fence.
+        let reply = "\n\n```json\n{\n  \"op\": \"add\",\n  \"topic\": \"work\",\n  \"text\": \"Бэкенд-разработчик на Go\",\n  \"quote\": \"я вообще-то бэкенд разработчик на Go\"\n}\n```"
+        let ops = MemoryReflection.parseOperations(reply)
+        XCTAssertEqual(ops?.count, 1)
+        XCTAssertEqual(ops?.first?.text, "Бэкенд-разработчик на Go")
+        // Two of them, a brace inside a string not counted.
+        let two = "{\n \"op\": \"add\", \"text\": \"a {b}\", \"quote\": \"x\"\n}\n{\n \"op\": \"add\", \"text\": \"c\", \"quote\": \"y\"\n}"
+        XCTAssertEqual(MemoryReflection.parseOperations(two)?.map(\.text), ["a {b}", "c"])
+        // A brace in a single-quoted string is text too: nothing taken from it.
+        XCTAssertNil(MemoryReflection.parseOperations("{\n  'error': '} {\"ops\":[]} {'\n}"))
+    }
+
     let t0 = Date(timeIntervalSince1970: 1_800_000_000)
     let chat = UUID()
     /// Learning shared: these tests are about the write itself; keeping it

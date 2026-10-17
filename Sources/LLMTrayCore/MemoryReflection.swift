@@ -60,6 +60,37 @@ public enum MemoryReflection {
         return nil
     }
 
+    /// The JSON objects in a text, each whole, wherever its lines break: a
+    /// small model writes an op pretty-printed over several lines (LFM2.5
+    /// 2.6B, in a ```json fence), which the one-per-line reading misses.
+    static func spreadObjects(_ text: String) -> [[String: Any]] {
+        var objects: [[String: Any]] = []
+        var depth = 0, escaped = false
+        // The quote a string is open with (LenientJSON takes ' too).
+        var quote: Character?
+        var start: String.Index?
+        for i in text.indices {
+            let c = text[i]
+            if let q = quote {
+                if escaped { escaped = false } else if c == "\\" { escaped = true } else if c == q { quote = nil }
+                continue
+            }
+            switch c {
+            case "\"", "'": quote = c
+            case "{":
+                if depth == 0 { start = i }
+                depth += 1
+            case "}" where depth > 0:
+                depth -= 1
+                if depth == 0, let s = start, let object = lineObject(String(text[s...i])) {
+                    objects.append(object)
+                }
+            default: break
+            }
+        }
+        return objects
+    }
+
     /// The operations in a reflect reply; nil when it can't be read. Ones
     /// missing what they need are left out.
     public static func parseOperations(_ reply: String) -> [Operation]? {
@@ -80,6 +111,20 @@ public enum MemoryReflection {
                 guard l.hasPrefix("{"), let object = Self.lineObject(l) else { continue }
                 // A wrapper on one line among others: its ops count too.
                 if let wrapped = object["ops"] as? [Any] { ops += wrapped } else { ops.append(object) }
+                read = true
+            }
+        }
+        // Not one per line: objects spread over lines.
+        if !read {
+            // Only what looks like an op (or a wrapper of them) counts as read.
+            for object in spreadObjects(trimmed) {
+                if let wrapped = object["ops"] as? [Any] {
+                    ops += wrapped
+                } else if object["op"] != nil {
+                    ops.append(object)
+                } else {
+                    continue
+                }
                 read = true
             }
         }
