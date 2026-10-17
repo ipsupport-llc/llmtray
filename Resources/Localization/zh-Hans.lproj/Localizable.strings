@@ -35,6 +35,7 @@
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ 不是 LLMTray 的链接，因此保持原样未更改。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ 尚未下载 —— 请在“设置”中重新启用图像生成。";
 "%@ isn't installed yet" = "尚未安装 %@";
+"%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ 需要你自己的应用：在“配置”中添加其客户端 ID 和密钥，将那里显示的重定向 URL 添加到你的应用，然后登录。";
 "%@ wasn't found on Hugging Face." = "在 Hugging Face 上未找到 %@。";
 "%@ · %@ left" = "%@ · 还剩 %@";
 "%@ · %@ of %@" = "%@ · %@ / %@";
@@ -754,6 +755,7 @@
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "大约需要 %1$@ GB；此 Mac 可用 %2$@ GB。";
 "Needs sign-in" = "需要登录";
 "Needs sign-in." = "需要登录。";
+"Needs your own app: Configure." = "需要你自己的应用：配置。";
 "Network" = "网络";
 "Never" = "永不";
 "New Chat" = "新建对话";

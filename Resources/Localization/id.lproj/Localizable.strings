@@ -35,6 +35,7 @@
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ bukan tautan milik LLMTray, jadi tidak diubah.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
 "%@ isn't installed yet" = "%@ belum terpasang";
+"%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ memerlukan app Anda sendiri: tambahkan ID Klien dan rahasianya di Konfigurasikan, tambahkan URL pengalihan yang ditampilkan di sana ke app Anda, lalu Masuk.";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
 "%@ · %@ left" = "%@ · %@ tersisa";
 "%@ · %@ of %@" = "%@ · %@ dari %@";
@@ -754,6 +755,7 @@
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Membutuhkan sekitar %1$@ GB; Mac ini memiliki %2$@ GB.";
 "Needs sign-in" = "Perlu masuk";
 "Needs sign-in." = "Perlu masuk.";
+"Needs your own app: Configure." = "Memerlukan app Anda sendiri: Konfigurasikan.";
 "Network" = "Jaringan";
 "Never" = "Tidak Pernah";
 "New Chat" = "Obrolan Baru";

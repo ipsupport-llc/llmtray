@@ -35,6 +35,7 @@
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ LLMTray का लिंक नहीं है, इसलिए इसे जैसा है वैसा ही छोड़ा गया।";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ अभी डाउनलोड नहीं हुआ है — Settings में जाकर generate_image फिर से सक्षम करें।";
 "%@ isn't installed yet" = "%@ अभी इंस्टॉल नहीं है";
+"%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ के लिए आपका अपना ऐप चाहिए: “कॉन्फ़िगर करें” में उसका क्लाइंट ID और secret जोड़ें, वहाँ दिखाया गया Redirect URL अपने ऐप में जोड़ें, फिर “साइन इन” करें.";
 "%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
 "%@ · %@ left" = "%@ · %@ बचे";
 "%@ · %@ of %@" = "%@ · %@ में से %@";
@@ -754,6 +755,7 @@
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "लगभग %1$@ GB की आवश्यकता है; इस Mac में %2$@ GB है।";
 "Needs sign-in" = "साइन इन आवश्यक है";
 "Needs sign-in." = "साइन इन आवश्यक है।";
+"Needs your own app: Configure." = "आपका अपना ऐप चाहिए: “कॉन्फ़िगर करें”.";
 "Network" = "नेटवर्क";
 "Never" = "कभी नहीं";
 "New Chat" = "नया चैट";

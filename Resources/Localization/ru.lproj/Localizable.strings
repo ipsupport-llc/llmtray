@@ -35,6 +35,7 @@
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ не является ссылкой LLMTray, поэтому оставлен без изменений.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ещё не загружен — снова включите генерацию изображений в Настройках.";
 "%@ isn't installed yet" = "%@ ещё не установлен";
+"%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "Для %@ нужно собственное приложение: добавьте его Идентификатор клиента и секрет в разделе «Настроить», добавьте в своё приложение показанный там Redirect URL, затем нажмите «Войти».";
 "%@ wasn't found on Hugging Face." = "%@ не найден на Hugging Face.";
 "%@ · %@ left" = "%@ · осталось %@";
 "%@ · %@ of %@" = "%@ · %@ из %@";
@@ -754,6 +755,7 @@
 "Needs about %1$@ GB; this Mac has %2$@ GB." = "Требуется около %1$@ ГБ; в этом Mac — %2$@ ГБ.";
 "Needs sign-in" = "Требуется вход";
 "Needs sign-in." = "Требуется вход.";
+"Needs your own app: Configure." = "Требуется собственное приложение: «Настроить».";
 "Network" = "Сеть";
 "Never" = "Никогда";
 "New Chat" = "Новый чат";
