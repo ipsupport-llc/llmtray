@@ -195,6 +195,10 @@ final class MCPTests: XCTestCase {
         XCTAssertEqual(found.asks.map(\.key), ["limit"])
         XCTAssertEqual(found.asks.first?.defaultValue, "20")
         XCTAssertEqual(found.asks.first?.kind, .number)
+        XCTAssertEqual(found.asks.first?.onCommandLine, true)
+        // In the environment only: not on the command line.
+        let envOnly = try MCPImport.parseManifest(Data(manifest.replacingOccurrences(of: ", \"${user_config.limit}\"]}}", with: "], \"env\": {\"LIMIT\": \"${user_config.limit}\"}}}").utf8), folder: "/b")
+        XCTAssertEqual(envOnly.asks.first?.onCommandLine, false)
         XCTAssertEqual(MCPImport.fill("${user_config.dir}", folder: "/b", home: "/h", answers: ["dir": "${HOME}/Downloads"]), "/h/Downloads")
         XCTAssertEqual(MCPImport.text(true), "true")
         XCTAssertEqual(MCPImport.text(false), "false")

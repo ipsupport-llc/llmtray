@@ -714,6 +714,11 @@ private struct AskField: View {
             if let help = ask.help, !help.isEmpty {
                 Text(help).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
+            if ask.onCommandLine && (ask.sensitive || secret) {
+                Label(NSLocalizedString("This server takes it on its command line: other users of this Mac can see it while the server runs.", comment: "MCP setting: a secret passed as a command argument"),
+                      systemImage: "exclamationmark.triangle")
+                    .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

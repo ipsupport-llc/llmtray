@@ -238,6 +238,9 @@ public enum MCPImport {
         public var defaultValue: String?
         public var kind: Kind = .string
         public var help: String?
+        /// Put on the server's command line by the bundle: other users of
+        /// this Mac can see it (ps), unlike the environment.
+        public var onCommandLine = false
 
         public init(key: String, title: String, sensitive: Bool, required: Bool, defaultValue: String?,
                     kind: Kind = .string, help: String? = nil) {
@@ -323,6 +326,10 @@ public enum MCPImport {
             f.asks.append(Ask(key: key, title: (v["title"] as? String) ?? key, sensitive: v["sensitive"] as? Bool ?? false,
                               required: v["required"] as? Bool ?? false, defaultValue: text(v["default"]),
                               kind: Ask.Kind(rawValue: v["type"] as? String ?? "") ?? .string, help: v["description"] as? String))
+        }
+        for i in f.asks.indices {
+            let placeholder = "${user_config.\(f.asks[i].key)}"
+            f.asks[i].onCommandLine = ([f.command] + f.arguments).contains { $0.contains(placeholder) }
         }
         // Every placeholder must be one we fill.
         for text in [f.command] + f.arguments + Array(f.environment.values) {
