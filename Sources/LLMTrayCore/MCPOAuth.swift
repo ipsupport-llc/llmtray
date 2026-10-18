@@ -475,18 +475,93 @@ extension MCPOAuth {
     }
 
     /// Whether `url` may be fetched while signing in to `server`: no private,
-    /// loopback or link-local hosts unless the server itself is one.
-    public static func fetchable(_ url: URL, for server: URL) -> Bool {
-        func local(_ host: String) -> Bool {
-            let h = host.lowercased()
-            if h == "localhost" || h.hasSuffix(".local") || h == "::1" { return true }
-            let p = h.split(separator: ".").compactMap { Int($0) }
-            guard p.count == 4 else { return h.hasPrefix("fe80:") || h.hasPrefix("fc") || h.hasPrefix("fd") }
-            return p[0] == 10 || p[0] == 127 || (p[0] == 172 && (16...31).contains(p[1])) || (p[0] == 192 && p[1] == 168)
-                || (p[0] == 169 && p[1] == 254) || p[0] == 0
-        }
+    /// loopback or link-local hosts unless the server itself is one. IP
+    /// literals in any form inet_aton / inet_pton take (127.1, 0x7f000001,
+    /// 0177.0.0.1, [::ffff:127.0.0.1]) and names that resolve to such an
+    /// address count. A name that resolves differently by the time it's
+    /// fetched (DNS rebinding) isn't caught here.
+    public static func fetchable(_ url: URL, for server: URL,
+                                 resolve: (String) -> [IPAddress] = IPAddress.resolve) -> Bool {
         guard let host = url.host else { return false }
-        return !local(host) || local(server.host ?? "")
+        return !isLocal(host, resolve: resolve) || isLocal(server.host ?? "", resolve: resolve)
+    }
+
+    /// Whether a host is this Mac, a private network or link-local.
+    static func isLocal(_ host: String, resolve: (String) -> [IPAddress]) -> Bool {
+        var h = host.lowercased()
+        if h.hasPrefix("["), h.hasSuffix("]") { h = String(h.dropFirst().dropLast()) }
+        while h.hasSuffix(".") { h.removeLast() }
+        if h.isEmpty { return true }
+        if let ip = IPAddress(literal: h) { return ip.isLocal }
+        if h == "localhost" || h.hasSuffix(".localhost") || h.hasSuffix(".local") { return true }
+        return resolve(h).contains { $0.isLocal }
+    }
+
+    /// An IPv4 or IPv6 address.
+    public enum IPAddress: Equatable {
+        case v4(UInt32)
+        case v6([UInt8])
+
+        /// An address written as an IP literal (inet_aton's IPv4 forms, or IPv6).
+        init?(literal: String) {
+            var a4 = in_addr()
+            if literal.allSatisfy({ $0.isHexDigit || $0 == "." || $0 == "x" }), inet_aton(literal, &a4) != 0 {
+                self = .v4(UInt32(bigEndian: a4.s_addr))
+                return
+            }
+            var a6 = in6_addr()
+            if inet_pton(AF_INET6, literal, &a6) == 1 {
+                self = .v6(withUnsafeBytes(of: &a6) { Array($0) })
+                return
+            }
+            return nil
+        }
+
+        var isLocal: Bool {
+            switch self {
+            case .v4(let a):
+                let b0 = a >> 24, b1 = (a >> 16) & 0xff
+                return b0 == 0 || b0 == 10 || b0 == 127 || (b0 == 169 && b1 == 254)
+                    || (b0 == 172 && (16...31).contains(b1)) || (b0 == 192 && b1 == 168)
+                    || (b0 == 100 && (64...127).contains(b1))
+            case .v6(let b):
+                if b.allSatisfy({ $0 == 0 }) { return true }  // ::
+                if b[0..<15].allSatisfy({ $0 == 0 }) && b[15] == 1 { return true }  // ::1
+                if b[0] == 0xfe && b[1] & 0xc0 == 0x80 { return true }  // fe80::/10
+                if b[0] & 0xfe == 0xfc { return true }  // fc00::/7
+                // IPv4-mapped (::ffff:a.b.c.d) and IPv4-compatible (::a.b.c.d).
+                if b[0..<10].allSatisfy({ $0 == 0 }) && ((b[10] == 0xff && b[11] == 0xff) || (b[10] == 0 && b[11] == 0)) {
+                    let v4 = UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15])
+                    return IPAddress.v4(v4).isLocal
+                }
+                return false
+            }
+        }
+
+        /// The addresses a name resolves to (none when it doesn't).
+        public static func resolve(_ name: String) -> [IPAddress] {
+            var hints = addrinfo()
+            hints.ai_family = AF_UNSPEC
+            hints.ai_socktype = SOCK_STREAM
+            var list: UnsafeMutablePointer<addrinfo>?
+            guard getaddrinfo(name, nil, &hints, &list) == 0, let first = list else { return [] }
+            defer { freeaddrinfo(list) }
+            var out: [IPAddress] = []
+            var node: UnsafeMutablePointer<addrinfo>? = first
+            while let n = node {
+                if let sa = n.pointee.ai_addr {
+                    if n.pointee.ai_family == AF_INET {
+                        let a = sa.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr.s_addr }
+                        out.append(.v4(UInt32(bigEndian: a)))
+                    } else if n.pointee.ai_family == AF_INET6 {
+                        var a = sa.withMemoryRebound(to: sockaddr_in6.self, capacity: 1) { $0.pointee.sin6_addr }
+                        out.append(.v6(withUnsafeBytes(of: &a) { Array($0) }))
+                    }
+                }
+                node = n.pointee.ai_next
+            }
+            return out
+        }
     }
 
     /// The server's resource and authorization server metadata, checked.

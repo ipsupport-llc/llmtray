@@ -131,7 +131,9 @@ final class MCPSignIn: ObservableObject {
     /// Tokens gone (revoked where the server can), "Sign in" again.
     func signOut(_ id: UUID) async {
         if let state = hub.server(id)?.oauth, let endpoint = state.metadata.revocationEndpoint, let t = tokens(id),
-           let resource = URL(string: state.resource), MCPOAuth.fetchable(endpoint, for: resource) {
+           let resource = URL(string: state.resource),
+           // Off the main actor: the check may resolve the host name.
+           await Task.detached(operation: { MCPOAuth.fetchable(endpoint, for: resource) }).value {
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")

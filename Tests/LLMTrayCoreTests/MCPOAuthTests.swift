@@ -206,6 +206,20 @@ final class MCPOAuthTests: XCTestCase {
         XCTAssertTrue(MCPOAuth.fetchable(URL(string: "http://localhost:9000/x")!, for: URL(string: "http://localhost:8000/mcp")!))
     }
 
+    func testLoopbackInOtherSpellingsIsLocal() {
+        let none: (String) -> [MCPOAuth.IPAddress] = { _ in [] }
+        for host in ["https://[::ffff:127.0.0.1]/x", "https://127.1/x", "https://0x7f000001/x", "https://2130706433/x",
+                     "https://0177.0.0.1/x", "https://localhost./x", "https://[::1]/x", "https://[fd00::1]/x",
+                     "https://[fe80::1]/x", "https://100.64.0.1/x", "https://a.localhost/x", "https://[::]/x"] {
+            XCTAssertFalse(MCPOAuth.fetchable(URL(string: host)!, for: server, resolve: none), host)
+        }
+        // A public name that resolves to this Mac.
+        let toLoopback: (String) -> [MCPOAuth.IPAddress] = { $0 == "local.attacker.example" ? [.v4(0x7f00_0001)] : [] }
+        XCTAssertFalse(MCPOAuth.fetchable(URL(string: "https://local.attacker.example/x")!, for: server, resolve: toLoopback))
+        XCTAssertTrue(MCPOAuth.fetchable(URL(string: "https://8.8.8.8/x")!, for: server, resolve: none))
+        XCTAssertTrue(MCPOAuth.fetchable(URL(string: "https://beef.example/x")!, for: server, resolve: none))
+    }
+
     func testRegistrationRefusesASecret() throws {
         XCTAssertEqual(try MCPOAuth.registeredClientID(JSONSerialization.data(withJSONObject: ["client_id": "c1", "token_endpoint_auth_method": "none"])), "c1")
         XCTAssertThrowsError(try MCPOAuth.registeredClientID(JSONSerialization.data(withJSONObject: ["client_id": "c1", "client_secret": "s"]))) {
