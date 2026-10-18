@@ -27,6 +27,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ couldn't read chats for memory: another model reads its chats.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
+"%@ errors" = "%@ errors";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ is on in this chat: you'll be asked before each call.";
@@ -34,6 +35,8 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";
 "%@ isn't installed yet" = "%@ isn't installed yet";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In.";
+"%@ of %@ lines" = "%@ of %@ lines";
+"%@ warnings" = "%@ warnings";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ · %@ of %@" = "%@ · %@ of %@";
@@ -80,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(estimate; exact after the first answer)";
 "(measured for this model)" = "(measured for this model)";
 "(no result yet)" = "(no result yet)";
-"(no server output yet)" = "(no server output yet)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
 "30 s reached · release to send, Esc to drop" = "30 s reached · release to send, Esc to drop";
@@ -295,6 +297,7 @@
 "Choose…" = "Choose…";
 "Clear" = "Clear";
 "Clear search" = "Clear search";
+"Clear the log" = "Clear the log";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Clear the queue: what's indexed stays searchable, the rest is marked not indexed";
 "Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Click to record a clip; hold to talk and release to send (the model hears it)";
@@ -324,7 +327,9 @@
 "Copied" = "Copied";
 "Copies %1$@ · index %2$@ on disk" = "Copies %1$@ · index %2$@ on disk";
 "Copy" = "Copy";
+"Copy Line" = "Copy Line";
 "Copy the details as text" = "Copy the details as text";
+"Copy the lines shown" = "Copy the lines shown";
 "Copy the song as an audio file" = "Copy the song as an audio file";
 "Copy the text" = "Copy the text";
 "Copying the included runtime…" = "Copying the included runtime…";
@@ -492,6 +497,7 @@
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "Folders can't be added yet: %@. Add the files in them instead.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat.";
+"Follow" = "Follow";
 "Follow the description" = "Follow the description";
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
@@ -635,6 +641,7 @@
 "Keep first messages: %lld" = "Keep first messages: %lld";
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keep the loaded model" = "Keep the loaded model";
+"Keep the newest line in view" = "Keep the newest line in view";
 "Keeps crashing -- see its log." = "Keeps crashing -- see its log.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
@@ -642,6 +649,7 @@
 "Kind" = "Kind";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
+"LLMTray events" = "LLMTray events";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray fetches it with the model it speeds up: download that model.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";
@@ -793,6 +801,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.";
 "No files yet" = "No files yet";
 "No folder changes yet." = "No folder changes yet.";
+"No lines match the filters" = "No lines match the filters";
 "No messages yet" = "No messages yet";
 "No microphone is available." = "No microphone is available.";
 "No model uses it." = "No model uses it.";
@@ -801,6 +810,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
+"No server output yet" = "No server output yet";
 "No servers installed." = "No servers installed.";
 "No sign-in" = "No sign-in";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
@@ -873,6 +883,7 @@
 "Opens at login" = "Opens at login";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Other apps reach your models through an OpenAI-compatible API on this Mac.";
 "Other devices on your network can use the server" = "Other devices on your network can use the server";
+"Other output" = "Other output";
 "Outside projects" = "Outside projects";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
@@ -913,6 +924,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory.";
 "Preference" = "Preference";
 "Preferences" = "Preferences";
+"Prefill progress" = "Prefill progress";
 "Prefill step" = "Prefill step";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Press Start and talk. Speakers work with echo cancellation; headphones are still best.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Press Start and talk. Use headphones: the model hears its own voice from the speakers.";
@@ -1012,6 +1024,8 @@
 "Repaired" = "Repaired";
 "Report a Bug" = "Report a Bug";
 "Report a Bug…" = "Report a Bug…";
+"Request stats" = "Request stats";
+"Requests" = "Requests";
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
@@ -1051,6 +1065,7 @@
 "Save" = "Save";
 "Save As…" = "Save As…";
 "Save memory" = "Save memory";
+"Save the whole log to a file…" = "Save the whole log to a file…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped.";
 "Saved chats will show up here." = "Saved chats will show up here.";
 "Saved in your Keychain" = "Saved in your Keychain";
@@ -1061,6 +1076,7 @@
 "Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
+"Search the log" = "Search the log";
 "Searching the registry…" = "Searching the registry…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
 "Seen in" = "Seen in";
@@ -1095,6 +1111,7 @@
 "Share anonymous usage statistics" = "Share anonymous usage statistics";
 "Shared by all chats" = "Shared by all chats";
 "Share…" = "Share…";
+"Show" = "Show";
 "Show All %lld Lines" = "Show All %lld Lines";
 "Show All Files…" = "Show All Files…";
 "Show Chat Window" = "Show Chat Window";
@@ -1105,6 +1122,7 @@
 "Show Previous Tab" = "Show Previous Tab";
 "Show Reports…" = "Show Reports…";
 "Show What Chats Get…" = "Show What Chats Get…";
+"Show all" = "Show all";
 "Show in Finder" = "Show in Finder";
 "Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
@@ -1471,6 +1489,7 @@
 "Waits for the model to be free." = "Waits for the model to be free.";
 "Waits for the model to be loaded." = "Waits for the model to be loaded.";
 "Walkie-talkie" = "Walkie-talkie";
+"Warnings" = "Warnings";
 "Weather" = "Weather";
 "Web" = "Web";
 "Web search" = "Web search";
@@ -1518,6 +1537,7 @@
 "Words only" = "Words only";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";
+"Wrap long lines" = "Wrap long lines";
 "Write here" = "Write here";
 "Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
