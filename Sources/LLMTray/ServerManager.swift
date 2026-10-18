@@ -1115,17 +1115,27 @@ final class ServerManager: ObservableObject {
     // same log (see ProxyForwardDelegate) so a stalled/reset request shows
     // up right alongside the server's own output instead of vanishing
     // silently.
+    /// The number of the log's first line: lines dropped from the front
+    /// (the cap, Clear) are counted, so a line keeps its number.
+    private(set) var logFirstLine = 0
+
     /// The log window's Clear: what's shown so far, not what comes next.
     func clearLog() {
+        logFirstLine += log.reduce(0) { $1 == "\n" ? $0 + 1 : $0 } + (log.isEmpty || log.hasSuffix("\n") ? 0 : 1)
         log = ""
     }
 
     func appendLog(_ text: String) {
-        log += text
-        // Cap the retained log so a long-running server doesn't grow this unbounded.
-        if log.count > 200_000 {
-            log = String(log.suffix(150_000))
+        // Cap the retained log so a long-running server doesn't grow this
+        // unbounded: whole lines dropped from the front.
+        var next = log + text
+        if next.count > 200_000 {
+            var kept = Substring(next.suffix(150_000))
+            if let newline = kept.firstIndex(of: "\n") { kept = kept[kept.index(after: newline)...] }
+            logFirstLine += next.dropLast(kept.count).reduce(0) { $1 == "\n" ? $0 + 1 : $0 }
+            next = String(kept)
         }
+        log = next
     }
 
     private func checkForReadySignal(_ chunk: String, modelPath: String) {

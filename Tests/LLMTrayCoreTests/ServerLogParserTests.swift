@@ -37,6 +37,26 @@ final class ServerLogParserTests: XCTestCase {
         XCTAssertEqual(lines.map(\.id), Array(0..<lines.count))
     }
 
+    func testReviewCases() {
+        let log = """
+        WARNING:root:Prompt cache: checkpoint skipped
+        INFO:root:Request stats: prompt=3
+        127.0.0.1 - - [17/Oct/2026 06:22:15] "POST /v1/chat/completions HTTP/1.1" 500 -
+        --- mlx_lm.server exited unexpectedly (code 9) ---
+        DEBUG body: {"error": "the warning was quoted"}
+        --- a rule --- in model text
+        Traceback (most recent call last):
+          File "x.py", line 1
+        2026-10-17 06:22:16,000 - INFO - Starting httpd
+        """
+        let lines = ServerLogParser.parse(log, firstID: 100)
+        XCTAssertEqual(lines.map(\.kind), [.warning, .stats, .request, .warning, .info, .info, .error, .error, .info])
+        XCTAssertTrue(lines[2].isError)
+        XCTAssertEqual(lines.first?.id, 100)
+        XCTAssertEqual(lines[3].message, "mlx_lm.server exited unexpectedly (code 9)")
+        XCTAssertTrue(ServerLogParser.matches("Café ready", "cafe"))
+    }
+
     func testEmptyAndPartialLines() {
         XCTAssertTrue(ServerLogParser.parse("").isEmpty)
         XCTAssertEqual(ServerLogParser.parse("half a line").first?.kind, .info)

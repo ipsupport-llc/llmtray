@@ -8,23 +8,39 @@ extension Notification.Name {
     static let showServerLog = Notification.Name("LLMTray.showServerLog")
 }
 
-/// The server log, parsed (ServerLogParser) a few times a second at most:
-/// prefill progress can append many lines a second.
+/// The server log, parsed (ServerLogParser) off the main thread, a few
+/// times a second at most (prefill progress can append many lines a
+/// second), and only while the window is open.
 @MainActor
 final class ServerLogModel: ObservableObject {
     @Published private(set) var lines: [ServerLogLine] = []
+    private let server: ServerManager
     private var bag: AnyCancellable?
+    private static let queue = DispatchQueue(label: "LLMTray server log parsing", qos: .userInitiated)
 
     init(server: ServerManager) {
-        lines = ServerLogParser.parse(server.log)
+        self.server = server
+    }
+
+    /// The window is shown (true) or closed.
+    func setActive(_ active: Bool) {
+        guard active else {
+            bag = nil
+            return
+        }
+        guard bag == nil else { return }
         bag = server.$log
-            .throttle(for: .milliseconds(250), scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] log in self?.lines = ServerLogParser.parse(log) }
+            .map { [server] log in (log, server.logFirstLine) }
+            .throttle(for: .milliseconds(250), scheduler: Self.queue, latest: true)
+            .map { ServerLogParser.parse($0.0, firstID: $0.1) }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] lines in self?.lines = lines }
     }
 }
 
 struct ServerLogView: View {
-    @ObservedObject var server: ServerManager
+    /// Not observed: the view follows the model's throttled lines.
+    let server: ServerManager
     @StateObject private var model: ServerLogModel
 
     enum Level: String, CaseIterable, Identifiable {
@@ -59,7 +75,7 @@ struct ServerLogView: View {
         let query = search.trimmingCharacters(in: .whitespaces)
         return model.lines.filter { line in
             switch level {
-            case .errors where line.kind != .error: return false
+            case .errors where !line.isError: return false
             case .problems where !line.isProblem: return false
             default: break
             }
@@ -74,7 +90,7 @@ struct ServerLogView: View {
                 default: break
                 }
             }
-            return query.isEmpty || line.text.localizedCaseInsensitiveContains(query)
+            return ServerLogParser.matches(line.text, query)
         }
     }
 
@@ -112,7 +128,7 @@ struct ServerLogView: View {
                         if follow, let last = lines.last?.id { proxy.scrollTo(last, anchor: .bottom) }
                     }
                     .onAppear {
-                        if let last = lines.last?.id { proxy.scrollTo(last, anchor: .bottom) }
+                        if follow, let last = lines.last?.id { proxy.scrollTo(last, anchor: .bottom) }
                     }
                 }
             }
@@ -121,6 +137,8 @@ struct ServerLogView: View {
         }
         .frame(minWidth: 720, minHeight: 420)
         .background(Color(nsColor: .windowBackgroundColor))
+        .onAppear { model.setActive(true) }
+        .onDisappear { model.setActive(false) }
     }
 
     // MARK: Toolbar
@@ -183,20 +201,20 @@ struct ServerLogView: View {
     }
 
     private func statusBar(shown: Int) -> some View {
-        let errors = model.lines.filter { $0.kind == .error }.count
-        let warnings = model.lines.filter { $0.kind == .warning }.count
+        let errors = model.lines.filter(\.isError).count
+        let warnings = model.lines.filter { $0.isProblem && !$0.isError }.count
         return HStack(spacing: 14) {
             Text(String(format: NSLocalizedString("%@ of %@ lines", comment: "Server log: lines shown of all"),
                         shown.formatted(), model.lines.count.formatted()))
                 .foregroundStyle(.secondary)
             Button { level = .errors } label: {
-                Label(String(format: NSLocalizedString("%@ errors", comment: "Server log: error count"), errors.formatted()),
+                Label(String(format: NSLocalizedString("Errors: %@", comment: "Server log: error count"), errors.formatted()),
                       systemImage: "xmark.octagon.fill")
                     .foregroundStyle(errors > 0 ? .red : .secondary)
             }
             .buttonStyle(.plain).disabled(errors == 0)
             Button { level = .problems } label: {
-                Label(String(format: NSLocalizedString("%@ warnings", comment: "Server log: warning count"), warnings.formatted()),
+                Label(String(format: NSLocalizedString("Warnings: %@", comment: "Server log: warning count"), warnings.formatted()),
                       systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(warnings > 0 ? .orange : .secondary)
             }
@@ -229,7 +247,13 @@ struct ServerLogView: View {
         panel.allowedContentTypes = [UTType(filenameExtension: "log") ?? .plainText]
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        try? server.log.write(to: url, atomically: true, encoding: .utf8)
+        do {
+            try server.log.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            let alert = NSAlert(error: error)
+            alert.messageText = NSLocalizedString("The log couldn't be saved", comment: "Server log: save failed")
+            alert.runModal()
+        }
     }
 }
 
@@ -253,9 +277,10 @@ private struct LogRow: View {
                     .padding(.horizontal, 5).padding(.vertical, 1)
                     .background(Capsule().fill(statusColor(status).opacity(0.18)))
                     .foregroundStyle(statusColor(status))
-                Text("\(line.method ?? "") \(line.path ?? "")")
+                highlighted("\(line.method ?? "") \(line.path ?? "")")
                     .foregroundStyle(.primary)
                     .lineLimit(wrap ? nil : 1)
+                    .fixedSize(horizontal: !wrap, vertical: false)
             } else {
                 highlighted(line.message)
                     .foregroundStyle(textColor)
@@ -270,7 +295,7 @@ private struct LogRow: View {
         .padding(.vertical, 2)
         .padding(.leading, 10)
         .padding(.trailing, 10)
-        .background(line.kind == .error ? Color.red.opacity(0.07) : line.kind == .warning ? Color.orange.opacity(0.06) : .clear)
+        .background(line.isError ? Color.red.opacity(0.07) : line.isProblem ? Color.orange.opacity(0.06) : .clear)
         .overlay(alignment: .leading) {
             Rectangle().fill(tint.opacity(line.kind == .info || line.kind == .debug ? 0 : 0.9)).frame(width: 3)
         }
@@ -319,7 +344,7 @@ private struct LogRow: View {
         guard !q.isEmpty else { return Text(text) }
         var attributed = AttributedString(text)
         var start = text.startIndex
-        while let r = text.range(of: q, options: .caseInsensitive, range: start..<text.endIndex) {
+        while let r = text.range(of: q, options: [.caseInsensitive, .diacriticInsensitive], range: start..<text.endIndex) {
             if let lower = AttributedString.Index(r.lowerBound, within: attributed),
                let upper = AttributedString.Index(r.upperBound, within: attributed) {
                 attributed[lower..<upper].backgroundColor = .yellow.opacity(0.45)

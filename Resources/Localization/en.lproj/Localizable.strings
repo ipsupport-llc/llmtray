@@ -27,7 +27,6 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ couldn't read chats for memory: another model reads its chats.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
-"%@ errors" = "%@ errors";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ is on in this chat: you'll be asked before each call.";
@@ -36,7 +35,6 @@
 "%@ isn't installed yet" = "%@ isn't installed yet";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In.";
 "%@ of %@ lines" = "%@ of %@ lines";
-"%@ warnings" = "%@ warnings";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ · %@ of %@" = "%@ · %@ of %@";
@@ -454,6 +452,7 @@
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)";
 "Errors" = "Errors";
+"Errors: %@" = "Errors: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
@@ -1274,6 +1273,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
 "The last change couldn't be saved." = "The last change couldn't be saved.";
+"The log couldn't be saved" = "The log couldn't be saved";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The macOS version." = "The macOS version.";
 "The microphone couldn't start: %@" = "The microphone couldn't start: %@";
@@ -1490,6 +1490,7 @@
 "Waits for the model to be loaded." = "Waits for the model to be loaded.";
 "Walkie-talkie" = "Walkie-talkie";
 "Warnings" = "Warnings";
+"Warnings: %@" = "Warnings: %@";
 "Weather" = "Weather";
 "Web" = "Web";
 "Web search" = "Web search";
