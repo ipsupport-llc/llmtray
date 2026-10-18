@@ -36,6 +36,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
 "%@ isn't installed yet" = "%@ belum terpasang";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ memerlukan app Anda sendiri: tambahkan ID Klien dan rahasianya di Konfigurasikan, tambahkan URL pengalihan yang ditampilkan di sana ke app Anda, lalu Masuk.";
+"%@ of %@ lines" = "%@ dari %@ baris";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
 "%@ · %@ left" = "%@ · %@ tersisa";
 "%@ · %@ of %@" = "%@ · %@ dari %@";
@@ -82,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(perkiraan; tepat setelah jawaban pertama)";
 "(measured for this model)" = "(diukur untuk model ini)";
 "(no result yet)" = "(belum ada hasil)";
-"(no server output yet)" = "(belum ada output server)";
 "+ MTP drafter %@" = "+ Perancang MTP %@";
 "1 hour" = "1 jam";
 "30 s reached · release to send, Esc to drop" = "30 dtk tercapai · lepas untuk mengirim, Esc untuk membuang";
@@ -297,6 +297,7 @@
 "Choose…" = "Pilih…";
 "Clear" = "Bersihkan";
 "Clear search" = "Bersihkan pencarian";
+"Clear the log" = "Bersihkan log";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Bersihkan antrean: yang sudah diindeks tetap dapat dicari, sisanya ditandai tidak terindeks";
 "Click to enable Project files: add files to the project and let its chats search them." = "Klik untuk mengaktifkan Berkas Proyek: tambahkan berkas ke proyek dan biarkan obrolannya mencarinya.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Klik untuk merekam klip; tahan untuk berbicara dan lepas untuk mengirim (model akan mendengarnya).";
@@ -326,7 +327,9 @@
 "Copied" = "Disalin";
 "Copies %1$@ · index %2$@ on disk" = "Salinan %1$@ · indeks %2$@ di disk";
 "Copy" = "Salin";
+"Copy Line" = "Salin Baris";
 "Copy the details as text" = "Salin detail sebagai teks";
+"Copy the lines shown" = "Salin baris yang ditampilkan";
 "Copy the song as an audio file" = "Salin lagu sebagai berkas audio";
 "Copy the text" = "Salin teks";
 "Copying the included runtime…" = "Menyalin runtime yang disertakan…";
@@ -451,6 +454,7 @@
 "Enjoying LLMTray?" = "Menikmati LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Environment, NAME=value per baris (kunci, token, dan kata sandi masuk ke Keychain)";
 "Errors" = "Kesalahan";
+"Errors: %@" = "Kesalahan: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Setiap permintaan yang dijawab server, dari chat dan dari aplikasi serta agen lain lewat API, disimpan di Mac ini. Median per model dan pengaturan.";
@@ -494,6 +498,7 @@
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "Folder belum bisa ditambahkan: %@. Tambahkan berkas di dalamnya sebagai gantinya.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Folder yang bisa digunakan obrolan tanpa meminta izin. Saat obrolan membutuhkan folder lain, ia akan meminta di obrolan.";
+"Follow" = "Ikuti";
 "Follow the description" = "Ikuti deskripsi";
 "For This Chat" = "Untuk Chat Ini";
 "For an Hour" = "Untuk Satu Jam";
@@ -637,6 +642,7 @@
 "Keep first messages: %lld" = "Pertahankan pesan pertama: %lld";
 "Keep last messages: %lld" = "Pertahankan pesan terakhir: %lld";
 "Keep the loaded model" = "Pertahankan model yang dimuat";
+"Keep the newest line in view" = "Pertahankan baris terbaru tetap terlihat";
 "Keeps crashing -- see its log." = "Terus mogok -- lihat log-nya.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Menyimpan port ini. Jika aplikasi lain benar‑benar menggunakannya, server tidak akan mulai sampai Anda mengubah port di Pengaturan.";
@@ -644,6 +650,7 @@
 "Kind" = "Jenis";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Panduan LLMTray";
+"LLMTray events" = "Peristiwa LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray mengambilnya bersama model yang dipercepatnya: unduh model tersebut.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray tidak diizinkan menggunakan mikrofon.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray tidak diizinkan menggunakan mikrofon. Izinkan di Pengaturan Sistem › Privasi & Keamanan › Mikrofon.";
@@ -795,6 +802,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Tidak ada model embedding: file dicari berdasarkan kata-katanya. Unduh di Pengaturan > Files untuk pencarian berdasarkan makna.";
 "No files yet" = "Belum ada berkas";
 "No folder changes yet." = "Belum ada perubahan folder.";
+"No lines match the filters" = "Tidak ada baris yang cocok dengan filter";
 "No messages yet" = "Belum ada pesan";
 "No microphone is available." = "Tidak ada mikrofon tersedia.";
 "No model uses it." = "Tidak ada model yang menggunakannya.";
@@ -803,6 +811,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Belum ada catatan. Tambah hal yang perlu diketahui setiap obrolan: “Jawab dalam bahasa Rusia, singkat”, “Saya membuat speaker ESP32”.";
 "No requests yet." = "Belum ada permintaan.";
 "No runs yet." = "Belum ada yang dijalankan.";
+"No server output yet" = "Belum ada output server";
 "No servers installed." = "Tidak ada server yang terpasang.";
 "No sign-in" = "Tidak perlu masuk";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Tanpa langganan. Tanpa fitur terkunci. Dukung pengembangan jika LLMTray berguna bagi Anda.";
@@ -875,6 +884,7 @@
 "Opens at login" = "Membuka saat masuk";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Aplikasi lain mengakses model Anda melalui API kompatibel OpenAI di Mac ini.";
 "Other devices on your network can use the server" = "Perangkat lain di jaringan Anda dapat menggunakan server";
+"Other output" = "Output lain";
 "Outside projects" = "Di luar proyek";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Jika melebihi ini, catatan terlemah (paling lama, paling tidak pasti) kedaluwarsa. Catatan Tersemat dipertahankan.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
@@ -915,6 +925,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Presisi cache atensi. 8-bit: hampir tanpa kehilangan, memori separuh. 4-bit: seperempat, jauh lebih buruk pada konteks panjang. Penuh: terbaik, memori terbanyak.";
 "Preference" = "Preferensi";
 "Preferences" = "Preferensi";
+"Prefill progress" = "Progres prefill";
 "Prefill step" = "Langkah prefill";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Tekan Mulai dan bicara. Speaker berfungsi dengan pembatalan gema; tetap disarankan menggunakan headphone.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Tekan Mulai dan bicara. Gunakan headphone: model akan mendengar suaranya dari speaker.";
@@ -1014,6 +1025,8 @@
 "Repaired" = "Diperbaiki";
 "Report a Bug" = "Laporkan Bug";
 "Report a Bug…" = "Laporkan Bug…";
+"Request stats" = "Statistik permintaan";
+"Requests" = "Permintaan";
 "Rescan" = "Pindai Ulang";
 "Rescan Models" = "Pindai Ulang Model";
 "Rescan or manage models" = "Pindai ulang atau kelola model";
@@ -1053,6 +1066,7 @@
 "Save" = "Simpan";
 "Save As…" = "Simpan Sebagai…";
 "Save memory" = "Hemat memori";
+"Save the whole log to a file…" = "Simpan seluruh log ke file…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Chat yang disimpan dibaca di latar belakang untuk catatan, berdasarkan yang Anda tulis di sana. Jika dibaca lagi, catatan yang sudah ada dikonfirmasi, tidak digandakan. Chat yang ditandai “Jangan Ingat” dilewati.";
 "Saved chats will show up here." = "Chat tersimpan akan tampil di sini.";
 "Saved in your Keychain" = "Tersimpan di Keychain Anda";
@@ -1063,6 +1077,7 @@
 "Search by meaning is off for now: %@" = "Pencarian berdasarkan makna dimatikan untuk sekarang: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Pencarian berdasarkan makna menggunakan %@ (%@), sekarang diunduh ke Mac ini. Tanpa itu, berkas hanya dicari berdasarkan kata-kata; Anda dapat mengunduhnya di sini nanti.";
 "Search chats" = "Cari chat";
+"Search the log" = "Cari log";
 "Searching the registry…" = "Mencari di registri…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Detik sebelum draf dijalankan sebagaimana adanya. 0: tunggu sampai Anda menekan Jalankan.";
 "Seen in" = "Terlihat di";
@@ -1097,6 +1112,7 @@
 "Share anonymous usage statistics" = "Bagikan statistik penggunaan anonim";
 "Shared by all chats" = "Dibagikan oleh semua obrolan";
 "Share…" = "Bagikan…";
+"Show" = "Tampilkan";
 "Show All %lld Lines" = "Tampilkan Semua %lld Baris";
 "Show All Files…" = "Tampilkan Semua Berkas…";
 "Show Chat Window" = "Tampilkan Jendela Chat";
@@ -1107,6 +1123,7 @@
 "Show Previous Tab" = "Tampilkan Tab Sebelumnya";
 "Show Reports…" = "Tampilkan Laporan…";
 "Show What Chats Get…" = "Tampilkan Yang diterima obrolan…";
+"Show all" = "Tampilkan semua";
 "Show in Finder" = "Tampilkan di Finder";
 "Show model controls in the chat window" = "Tampilkan kontrol model di jendela obrolan";
 "Show more" = "Tampilkan lebih banyak";
@@ -1258,6 +1275,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "Generator gambar sedang sibuk dengan obrolan lain — coba lagi setelah selesai.";
 "The import stopped" = "Proses impor dihentikan";
 "The last change couldn't be saved." = "Perubahan terakhir tidak dapat disimpan.";
+"The log couldn't be saved" = "Log tidak dapat disimpan";
 "The longest answer the model may write. Also capped by the model's own context length." = "Jawaban terpanjang yang boleh ditulis model. Juga dibatasi oleh panjang konteks model itu sendiri.";
 "The macOS version." = "Versi macOS.";
 "The microphone couldn't start: %@" = "Mikrofon gagal dimulai: %@";
@@ -1357,6 +1375,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "Kartu model ini tidak mencantumkan %@: model mungkin kurang baik membaca Obrolan dalam bahasa itu dan menulis catatan yang lebih buruk.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
+"This server takes it on its command line: other users of this Mac can see it while the server runs." = "Server ini menerimanya pada command line: pengguna lain di Mac Ini dapat melihatnya saat server berjalan.";
 "This tool" = "Alat ini";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Versi ini mengindeks file teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods) serta menyimpan gambar untuk dokumen; folder dan file tersembunyi tidak dapat ditambahkan.";
 "This version of LLMTray can't send reviews. Please update the app." = "Versi LLMTray ini tidak dapat mengirim ulasan. Silakan perbarui aplikasi.";
@@ -1473,6 +1492,8 @@
 "Waits for the model to be free." = "Menunggu model tersedia.";
 "Waits for the model to be loaded." = "Menunggu model dimuat.";
 "Walkie-talkie" = "Walkie‑talkie";
+"Warnings" = "Peringatan";
+"Warnings: %@" = "Peringatan: %@";
 "Weather" = "Cuaca";
 "Web" = "Web";
 "Web search" = "Pencarian web";
@@ -1520,6 +1541,7 @@
 "Words only" = "Hanya kata";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memori kerja untuk membaca prompt secara bertahap; lebih sedikit membaca prompt panjang dalam langkah lebih kecil dan lebih lambat. Jika cache prompt dan ini bersama-sama paling banyak 90%: sisanya memuat prompt yang sedang dibaca.";
 "Works offline" = "Bekerja secara offline";
+"Wrap long lines" = "Bungkus baris panjang";
 "Write here" = "Tulis di sini";
 "Writing the song…" = "Menulis lagu…";
 "Yesterday" = "Kemarin";

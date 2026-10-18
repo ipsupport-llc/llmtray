@@ -36,6 +36,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ aún no está descargado: vuelve a activar la generación de imágenes en Ajustes.";
 "%@ isn't installed yet" = "%@ no está instalado todavía";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ necesita tu propia app: añade su ID de cliente y secreto en Configurar, añade la URL de redirección que se muestra allí a tu app y, después, inicia sesión.";
+"%@ of %@ lines" = "%@ de %@ líneas";
 "%@ wasn't found on Hugging Face." = "No se encontró %@ en Hugging Face.";
 "%@ · %@ left" = "%@ · quedan %@";
 "%@ · %@ of %@" = "%@ · %@ de %@";
@@ -82,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(estimación; exacto después de la primera respuesta)";
 "(measured for this model)" = "(medido para este modelo)";
 "(no result yet)" = "(aún no hay resultados)";
-"(no server output yet)" = "(aún no hay salida del servidor)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hora";
 "30 s reached · release to send, Esc to drop" = "30 s alcanzados · suelta para enviar, Esc para descartar";
@@ -297,6 +297,7 @@
 "Choose…" = "Elegir…";
 "Clear" = "Borrar";
 "Clear search" = "Borrar búsqueda";
+"Clear the log" = "Borrar el registro.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Vaciar la cola: lo indexado sigue siendo buscable; el resto se marca como no indexado";
 "Click to enable Project files: add files to the project and let its chats search them." = "Haga clic para activar Archivos del proyecto: agregue archivos al proyecto y permita que sus chats los busquen.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Haz clic para grabar un clip; mantén pulsado para hablar y suelta para enviarlo (el modelo lo oye).";
@@ -326,7 +327,9 @@
 "Copied" = "Copiado";
 "Copies %1$@ · index %2$@ on disk" = "Copia %1$@ · indexa %2$@ en el disco";
 "Copy" = "Copiar";
+"Copy Line" = "Copiar línea";
 "Copy the details as text" = "Copiar los detalles como texto";
+"Copy the lines shown" = "Copiar las líneas mostradas.";
 "Copy the song as an audio file" = "Copiar la canción como archivo de audio";
 "Copy the text" = "Copiar el texto";
 "Copying the included runtime…" = "Copiando el runtime incluido…";
@@ -451,6 +454,7 @@
 "Enjoying LLMTray?" = "¿Te gusta LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Entorno, NAME=value por línea (las claves, los tokens y las contraseñas van al llavero)";
 "Errors" = "Errores";
+"Errors: %@" = "Errores: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversación de este proyecto recibe estas instrucciones después del prompt de sistema del perfil del modelo. Los cambios se aplican a partir del siguiente mensaje.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Todos los chats del proyecto reciben el texto completo; la búsqueda web y la generación de imágenes o música están desactivadas en esos chats mientras un archivo está anclado.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Cada solicitud que responde el servidor, del chat y de otras apps y agentes a través de la API, guardada en este Mac. Medianas por modelo y ajustes.";
@@ -494,6 +498,7 @@
 "Folders" = "Carpetas";
 "Folders can't be added yet: %@. Add the files in them instead." = "Las carpetas no se pueden añadir todavía: %@. Añade los archivos que contienen en su lugar.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Carpetas que los chats pueden usar sin pedir permiso. Cuando un chat necesita otra carpeta, te lo solicita en el chat.";
+"Follow" = "Seguir";
 "Follow the description" = "Seguir la descripción";
 "For This Chat" = "Para este chat";
 "For an Hour" = "Durante una hora";
@@ -637,6 +642,7 @@
 "Keep first messages: %lld" = "Conservar primeros mensajes: %lld";
 "Keep last messages: %lld" = "Conservar últimos mensajes: %lld";
 "Keep the loaded model" = "Mantener el modelo cargado";
+"Keep the newest line in view" = "Mantener la línea más reciente a la vista.";
 "Keeps crashing -- see its log." = "Sigue fallando; consulta su registro.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene los primeros N tokens del contexto en precisión completa antes de cuantizar. Más gana precisión en prompts largos a costa de ahorro de memoria.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Reserva este puerto. Si otra app realmente lo está usando, el servidor no se iniciará hasta que cambies el puerto en Ajustes.";
@@ -644,6 +650,7 @@
 "Kind" = "Tipo";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Guía de LLMTray";
+"LLMTray events" = "Eventos de LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray lo obtiene con el modelo que acelera: descarga ese modelo.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray no tiene permiso para usar el micrófono.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray no tiene permiso para usar el micrófono. Permítelo en Ajustes del Sistema › Privacidad y seguridad › Micrófono.";
@@ -795,6 +802,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Sin modelo de embeddings: los archivos se buscan por sus palabras. Descárgalo en Ajustes > Files para buscar por significado.";
 "No files yet" = "Aún no hay archivos";
 "No folder changes yet." = "Aún no hay cambios en carpetas.";
+"No lines match the filters" = "Ninguna línea coincide con los filtros";
 "No messages yet" = "Aún no hay mensajes";
 "No microphone is available." = "No hay ningún micrófono disponible.";
 "No model uses it." = "Ningún modelo lo usa.";
@@ -803,6 +811,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Aún no hay notas. Añade lo que todo Chat debería saber: «Responde en ruso, brevemente», «Estoy creando un altavoz ESP32».";
 "No requests yet." = "Aún no hay solicitudes.";
 "No runs yet." = "Aún no hay ejecuciones.";
+"No server output yet" = "Todavía no hay salida del servidor";
 "No servers installed." = "No hay servidores instalados.";
 "No sign-in" = "Sin inicio de sesión";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Sin suscripciones. Sin funciones bloqueadas. Apoya el desarrollo si LLMTray te resulta útil.";
@@ -875,6 +884,7 @@
 "Opens at login" = "Se abre al iniciar sesión";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Otras apps acceden a tus modelos mediante una API compatible con OpenAI en este Mac.";
 "Other devices on your network can use the server" = "Otros dispositivos en tu red pueden usar el servidor";
+"Other output" = "Otra salida";
 "Outside projects" = "Fuera de Proyectos";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Por encima de esto, caducan las notas más débiles (las más antiguas y menos seguras). Las notas fijadas se conservan.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Cambia el idioma solo para LLMTray, por encima del de macOS. Surte efecto al reiniciar LLMTray. El texto sin traducir se muestra en inglés.";
@@ -915,6 +925,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precisión de la caché de atención. 8 bits: casi sin pérdida, la mitad de memoria. 4 bits: una cuarta parte, notablemente peor con contexto largo. Completa: la mejor, más memoria.";
 "Preference" = "Preferencia";
 "Preferences" = "Preferencias";
+"Prefill progress" = "Progreso del prellenado";
 "Prefill step" = "Paso de prefill";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Pulsa Iniciar y habla. Los altavoces funcionan con cancelación de eco; los auriculares siguen siendo lo ideal.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Pulsa Iniciar y habla. Usa auriculares: el modelo oirá su propia voz desde los altavoces.";
@@ -1014,6 +1025,8 @@
 "Repaired" = "Reparadas";
 "Report a Bug" = "Informar un fallo";
 "Report a Bug…" = "Informar un fallo…";
+"Request stats" = "Estadísticas de solicitudes";
+"Requests" = "Solicitudes";
 "Rescan" = "Volver a buscar";
 "Rescan Models" = "Volver a buscar modelos";
 "Rescan or manage models" = "Volver a buscar o gestionar modelos";
@@ -1053,6 +1066,7 @@
 "Save" = "Guardar";
 "Save As…" = "Guardar como…";
 "Save memory" = "Ahorrar memoria";
+"Save the whole log to a file…" = "Guardar todo el registro en un archivo…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Los chats guardados se leen en segundo plano para extraer notas de lo que escribiste allí. Al volver a leerlos, las notas que ya están se confirman, no se duplican. Los chats marcados como «No recordar» se omiten.";
 "Saved chats will show up here." = "Los chats guardados aparecerán aquí.";
 "Saved in your Keychain" = "Guardado en tu Keychain";
@@ -1063,6 +1077,7 @@
 "Search by meaning is off for now: %@" = "La búsqueda por significado está desactivada por ahora: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "La búsqueda por significado usa %@ (%@), descargado ahora en este Mac. Sin él, los archivos solo se buscan por sus palabras; puedes descargarlo aquí más tarde.";
 "Search chats" = "Buscar chats";
+"Search the log" = "Buscar en el registro";
 "Searching the registry…" = "Buscando en el registro…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Segundos antes de que el borrador siga tal cual. 0: esperar a que pulses Generar.";
 "Seen in" = "Visible en";
@@ -1097,6 +1112,7 @@
 "Share anonymous usage statistics" = "Compartir estadísticas de uso anónimas";
 "Shared by all chats" = "Compartido por todos los chats";
 "Share…" = "Compartir…";
+"Show" = "Mostrar";
 "Show All %lld Lines" = "Mostrar las %lld líneas";
 "Show All Files…" = "Mostrar todos los archivos…";
 "Show Chat Window" = "Mostrar ventana de chat";
@@ -1107,6 +1123,7 @@
 "Show Previous Tab" = "Mostrar pestaña anterior";
 "Show Reports…" = "Mostrar informes…";
 "Show What Chats Get…" = "Mostrar Qué reciben los Chats…";
+"Show all" = "Mostrar todo";
 "Show in Finder" = "Mostrar en Finder";
 "Show model controls in the chat window" = "Mostrar controles del modelo en la ventana de chat";
 "Show more" = "Mostrar más";
@@ -1258,6 +1275,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "El generador de imágenes está ocupado con otro chat; inténtalo de nuevo cuando termine.";
 "The import stopped" = "La importación se detuvo";
 "The last change couldn't be saved." = "No se ha podido guardar el último cambio.";
+"The log couldn't be saved" = "No se pudo guardar el registro";
 "The longest answer the model may write. Also capped by the model's own context length." = "La respuesta más larga que puede escribir el modelo. También limitada por su longitud de contexto.";
 "The macOS version." = "La versión de macOS.";
 "The microphone couldn't start: %@" = "No se pudo iniciar el micrófono: %@";
@@ -1357,6 +1375,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Este modelo usa %1$@ de los %2$@ GB que puede usar la GPU; en entradas largas puede quedarse sin memoria. Use un modelo más pequeño.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "La ficha de este modelo no incluye %@: puede leer mal los Chat en ese idioma y escribir notas peores.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "El archivo de este perfil no se puede leer, así que no se puede editar aquí. Corrige o elimina el archivo y vuelve a abrir Ajustes.";
+"This server takes it on its command line: other users of this Mac can see it while the server runs." = "Este servidor lo recibe en su línea de comandos: otros usuarios de Este Mac pueden verlo mientras el servidor esté en ejecución.";
 "This tool" = "Esta herramienta";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Esta versión indexa archivos de texto, Markdown, código, PDF, Word (docx, doc), ODT, RTF, HTML y hojas de cálculo (xlsx, ods) y conserva imágenes para documentos; no se pueden añadir carpetas ni archivos ocultos.";
 "This version of LLMTray can't send reviews. Please update the app." = "Esta versión de LLMTray no puede enviar valoraciones. Actualiza la app.";
@@ -1473,6 +1492,8 @@
 "Waits for the model to be free." = "Espera a que el modelo esté libre.";
 "Waits for the model to be loaded." = "Espera a que el modelo se haya cargado.";
 "Walkie-talkie" = "Walkie‑talkie";
+"Warnings" = "Advertencias";
+"Warnings: %@" = "Advertencias: %@";
 "Weather" = "Tiempo";
 "Web" = "Web";
 "Web search" = "Búsqueda web";
@@ -1520,6 +1541,7 @@
 "Words only" = "Solo palabras";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memoria de trabajo para leer un prompt en trozos; menos hace que los prompts largos se lean en pasos más pequeños y lentos. Si la caché de prompts y esto suman como máximo 90%: el resto contiene el prompt que se está leyendo.";
 "Works offline" = "Funciona sin conexión";
+"Wrap long lines" = "Ajustar líneas largas";
 "Write here" = "Escribe aquí";
 "Writing the song…" = "Escribiendo la canción…";
 "Yesterday" = "Ayer";

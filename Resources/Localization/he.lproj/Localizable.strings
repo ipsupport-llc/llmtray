@@ -36,6 +36,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
 "%@ isn't installed yet" = "%@ עדיין לא מותקן";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "‏%@ מחייב יישום משלכם: הוסיפו את מזהה לקוח והסוד שלו ב״הגדר״, הוסיפו ליישום שלכם את URL ההפניה שמוצג שם, ואז בחרו ״התחברות״.";
+"%@ of %@ lines" = "%@ מתוך %@ שורות";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
 "%@ · %@ left" = "%@ · נותרו %@";
 "%@ · %@ of %@" = "%@ · %@ מתוך %@";
@@ -82,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(הערכה; מדויק לאחר התשובה הראשונה)";
 "(measured for this model)" = "(נמדד עבור המודל הזה)";
 "(no result yet)" = "(אין תוצאה עדיין)";
-"(no server output yet)" = "(עדיין אין פלט מהשרת)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "שעה";
 "30 s reached · release to send, Esc to drop" = "הגעת ל־30 שנ׳ · שחרר כדי לשלוח, Esc כדי להשליך";
@@ -297,6 +297,7 @@
 "Choose…" = "בחירה…";
 "Clear" = "נקה";
 "Clear search" = "נקה חיפוש";
+"Clear the log" = "נקה את היומן.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "נקה תור: מה שאונדקס נשאר לחיפוש, השאר מסומן כ'לא מאונדקס'";
 "Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת קבצי פרויקט: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "לחץ כדי להקליט קטע; החזק כדי לדבר ושחרר כדי לשלוח (המודל שומע זאת)";
@@ -326,7 +327,9 @@
 "Copied" = "הועתק";
 "Copies %1$@ · index %2$@ on disk" = "עותקים %1$@ · אינדקס %2$@ בדיסק";
 "Copy" = "העתק";
+"Copy Line" = "העתק שורה";
 "Copy the details as text" = "העתק את הפרטים כטקסט";
+"Copy the lines shown" = "העתק את השורות המוצגות.";
 "Copy the song as an audio file" = "העתק את השיר כקובץ שמע";
 "Copy the text" = "העתק את הטקסט";
 "Copying the included runtime…" = "מעתיק את ה‑runtime הכלול…";
@@ -451,6 +454,7 @@
 "Enjoying LLMTray?" = "נהנים מ‑LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "סביבה, NAME=value בכל שורה (מפתחות, אסימונים וסיסמאות נשמרים ב-Keychain)";
 "Errors" = "שגיאות";
+"Errors: %@" = "שגיאות: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
@@ -494,6 +498,7 @@
 "Folders" = "תיקיות";
 "Folders can't be added yet: %@. Add the files in them instead." = "לא ניתן להוסיף תיקיות עדיין: %@. הוסף במקום זאת את הקבצים שבתוכן.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "תיקיות שהצ'אטים יכולים להשתמש בהן בלי לשאול. כשהצ'אט צריך תיקיה אחרת, הוא יבקש ממך בצ'אט.";
+"Follow" = "עקוב";
 "Follow the description" = "היצמד לתיאור";
 "For This Chat" = "לעבור שיחה זו";
 "For an Hour" = "לשעה";
@@ -637,6 +642,7 @@
 "Keep first messages: %lld" = "השאר הודעות ראשונות: %lld";
 "Keep last messages: %lld" = "השאר הודעות אחרונות: %lld";
 "Keep the loaded model" = "השאר את המודל הטעון";
+"Keep the newest line in view" = "השאר את השורה החדשה ביותר בתצוגה.";
 "Keeps crashing -- see its log." = "ממשיך לקרוס -- עיין ביומן שלו.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "שומר את N הטוקנים הראשונים של ההקשר בדיוק מלא לפני קוונטיזציה. ערך גבוה יותר מחליף חיסכון בזיכרון בדיוק בהנחיות ארוכות.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "משמר את פורט זה. אם אפליקציה אחרת כבר משתמשת בו, השרת לא יתחל עד שתשנה את הפורט ב־Settings.";
@@ -644,6 +650,7 @@
 "Kind" = "סוג";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "מדריך LLMTray";
+"LLMTray events" = "אירועי LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray מוריד אותו עם המודל שהוא מאיץ: הורד את המודל הזה.";
 "LLMTray isn't allowed to use the microphone." = "אין ל‑LLMTray הרשאה להשתמש במיקרופון.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "ל־LLMTray אין הרשאה להשתמש במיקרופון. אפשר זאת בהגדרות המערכת › פרטיות ואבטחה › מיקרופון.";
@@ -795,6 +802,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "אין דגם הטמעה: החיפוש בקבצים נעשה לפי המילים שלהם. יש להוריד אותו ב־הגדרות > קבצים לחיפוש לפי משמעות.";
 "No files yet" = "אין קבצים עדיין";
 "No folder changes yet." = "עדיין אין שינויים בתיקיות.";
+"No lines match the filters" = "אין שורות התואמות למסננים";
 "No messages yet" = "עדיין אין הודעות";
 "No microphone is available." = "אין מיקרופון זמין.";
 "No model uses it." = "אף מודל לא משתמש בו.";
@@ -803,6 +811,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "אין עדיין הערות. הוסף מה שכל צ׳אט צריך לדעת: „תשובה ברוסית, בקצרה”, „אני בונה רמקול ESP32”.";
 "No requests yet." = "אין עדיין בקשות.";
 "No runs yet." = "עדיין אין הרצות.";
+"No server output yet" = "עדיין אין פלט מהשרת";
 "No servers installed." = "אין שרתים מותקנים.";
 "No sign-in" = "ללא התחברות";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "ללא מנויים. ללא חסימות תכונות. תמכו בפיתוח אם LLMTray שימושי לכם.";
@@ -875,6 +884,7 @@
 "Opens at login" = "נפתח בכניסה";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "אפליקציות אחרות ניגשות למודלים שלך דרך API תואם OpenAI על Mac זה.";
 "Other devices on your network can use the server" = "מכשירים אחרים ברשת שלך יכולים להשתמש בשרת";
+"Other output" = "פלט אחר";
 "Outside projects" = "מחוץ לפרויקטים";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "מעבר לזה, ההערות החלשות ביותר (הישנות ביותר, הפחות ודאיות) פגות. הערות נעוצות נשמרות.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "מחליף את שפת macOS עבור LLMTray בלבד. ייכנס לתוקף לאחר הפעלה מחדש של LLMTray. טקסט שלא תורגם יוצג באנגלית.";
@@ -915,6 +925,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
 "Preference" = "העדפה";
 "Preferences" = "העדפות";
+"Prefill progress" = "התקדמות המילוי מראש";
 "Prefill step" = "שלב מילוי מקדים";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "לחץ על Start ודבר. רמקולים פועלים עם הדחקת הד; אוזניות עדיפות עדיין.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "הקש על 'התחל' ותדבר. השתמש באוזניות: המודל שומע את קולו מהרמקולים.";
@@ -1014,6 +1025,8 @@
 "Repaired" = "תוקנו";
 "Report a Bug" = "דווח על תקלה";
 "Report a Bug…" = "דווח על תקלה…";
+"Request stats" = "סטטיסטיקות בקשות";
+"Requests" = "בקשות";
 "Rescan" = "סרוק מחדש";
 "Rescan Models" = "סרוק מודלים מחדש";
 "Rescan or manage models" = "סריקה מחדש או ניהול דגמים.";
@@ -1053,6 +1066,7 @@
 "Save" = "שמור";
 "Save As…" = "שמור בשם…";
 "Save memory" = "חסוך זיכרון";
+"Save the whole log to a file…" = "שמור את כל היומן בקובץ…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "צ'אטים שמורים נקראים ברקע כדי ליצור הערות, לפי מה שכתבת שם. בקריאה חוזרת, הערות שכבר קיימות מאושרות ולא מוכפלות. צ'אטים שמסומנים ״לא לזכור״ מדולגים.";
 "Saved chats will show up here." = "צ'אטים שנשמרו יופיעו כאן.";
 "Saved in your Keychain" = "שמור ב‑Keychain שלך";
@@ -1063,6 +1077,7 @@
 "Search by meaning is off for now: %@" = "חיפוש לפי משמעות כבוי לעת עתה: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "חיפוש לפי משמעות משתמש ב־%@ (%@), שהורד עכשיו למחשב זה. בלעדיו מחפשים קבצים רק לפי מילים; ניתן להורידו כאן מאוחר יותר.";
 "Search chats" = "חפש צ'אטים";
+"Search the log" = "חיפוש ביומן";
 "Searching the registry…" = "מחפש ברישום…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "שניות לפני שהטיוטה ממשיכה כפי שהיא. 0: המתן עד שתלחץ 'צור'.";
 "Seen in" = "מוצג ב";
@@ -1097,6 +1112,7 @@
 "Share anonymous usage statistics" = "שתף סטטיסטיקות שימוש אנונימיות";
 "Shared by all chats" = "משותף לכל הצ׳אטים";
 "Share…" = "שיתוף…";
+"Show" = "הצג";
 "Show All %lld Lines" = "הצג את כל %lld השורות";
 "Show All Files…" = "הצג את כל הקבצים…";
 "Show Chat Window" = "הצג חלון שיחה";
@@ -1107,6 +1123,7 @@
 "Show Previous Tab" = "הצג כרטיסייה הקודמת";
 "Show Reports…" = "הצג דוחות…";
 "Show What Chats Get…" = "הצג את מה צ׳אטים מקבלים…";
+"Show all" = "הצג הכול";
 "Show in Finder" = "הצג ב‑Finder";
 "Show model controls in the chat window" = "הצג בקרות מודל בחלון הצ'אט";
 "Show more" = "הצג עוד";
@@ -1258,6 +1275,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "מחולל התמונות עסוק בשיחה אחרת — נסה שוב כאשר יסיים.";
 "The import stopped" = "הייבוא נעצר";
 "The last change couldn't be saved." = "לא ניתן היה לשמור את השינוי האחרון.";
+"The log couldn't be saved" = "לא ניתן היה לשמור את היומן";
 "The longest answer the model may write. Also capped by the model's own context length." = "התשובה הארוכה ביותר שהמודל רשאי לכתוב. מוגבלת גם לפי אורך ההקשר של המודל עצמו.";
 "The macOS version." = "גרסת ה-macOS.";
 "The microphone couldn't start: %@" = "לא ניתן להפעיל את המיקרופון: %@";
@@ -1357,6 +1375,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "כרטיס המודל הזה לא מציין את %@: ייתכן שהוא יקרא צ׳אטים בשפה זו בצורה גרועה ויכתוב הערות גרועות יותר.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "לא ניתן לקרוא את קובץ הפרופיל הזה, לכן אי אפשר לערוך אותו כאן. יש לתקן או למחוק את הקובץ, ואז לפתוח מחדש את ההגדרות.";
+"This server takes it on its command line: other users of this Mac can see it while the server runs." = "השרת הזה מקבל אותו בשורת הפקודה שלו: משתמשים אחרים של ה-Mac הזה יכולים לראות אותו כל עוד השרת פועל.";
 "This tool" = "הכלי הזה";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "גרסה זו מאנדקסת קבצי טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF, HTML וגיליונות (xlsx, ods) ומשאירה תמונות לשימוש במסמכים; אי‑אפשר להוסיף תיקיות או קבצים מוסתרים.";
 "This version of LLMTray can't send reviews. Please update the app." = "גרסה זו של LLMTray לא יכולה לשלוח חוות דעת. עדכן את האפליקציה.";
@@ -1473,6 +1492,8 @@
 "Waits for the model to be free." = "ממתין עד שהמודל יהיה פנוי.";
 "Waits for the model to be loaded." = "ממתין עד שהמודל ייטען.";
 "Walkie-talkie" = "ווקי‑טוקי";
+"Warnings" = "אזהרות";
+"Warnings: %@" = "אזהרות: %@";
 "Weather" = "מזג אוויר";
 "Web" = "אינטרנט";
 "Web search" = "חיפוש באינטרנט";
@@ -1520,6 +1541,7 @@
 "Words only" = "מילים בלבד";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
 "Works offline" = "עובד ללא חיבור";
+"Wrap long lines" = "גלישת שורות ארוכות";
 "Write here" = "כתוב כאן";
 "Writing the song…" = "כותב את השיר…";
 "Yesterday" = "אתמול";
