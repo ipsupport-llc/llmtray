@@ -36,6 +36,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@이(가) 아직 다운로드되지 않았습니다 — 설정에서 이미지 생성을 다시 활성화하세요.";
 "%@ isn't installed yet" = "%@이(가) 아직 설치되어 있지 않습니다";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@에는 자체 앱이 필요합니다. 구성에서 해당 클라이언트 ID와 시크릿을 추가하고, 거기에 표시된 Redirect URL을 앱에 추가한 다음, 로그인하세요.";
+"%@ of %@ lines" = "%@ / %@줄";
 "%@ wasn't found on Hugging Face." = "Hugging Face에서 %@을(를) 찾을 수 없습니다.";
 "%@ · %@ left" = "%@ · %@ 남음";
 "%@ · %@ of %@" = "%@ · %@ / %@";
@@ -82,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(추정치; 첫 응답 후 정확 값)";
 "(measured for this model)" = "(이 모델에 대해 측정됨)";
 "(no result yet)" = "(아직 결과 없음)";
-"(no server output yet)" = "(아직 서버 출력 없음)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1시간";
 "30 s reached · release to send, Esc to drop" = "30초 도달 · 놓으면 전송, Esc로 버리기";
@@ -297,6 +297,7 @@
 "Choose…" = "선택…";
 "Clear" = "지우기";
 "Clear search" = "검색 지우기";
+"Clear the log" = "로그를 지웁니다";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "대기열 지우기: 인덱스된 항목은 검색 가능 상태로 유지되며, 나머지는 인덱스되지 않음으로 표시됩니다";
 "Click to enable Project files: add files to the project and let its chats search them." = "클릭하여 프로젝트 파일 활성화: 파일을 프로젝트에 추가하고 해당 채팅들이 검색하도록 허용합니다.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "클릭하여 클립을 녹음합니다. 길게 눌러 말한 다음 놓으면 전송됩니다(모델이 듣습니다).";
@@ -326,7 +327,9 @@
 "Copied" = "복사됨";
 "Copies %1$@ · index %2$@ on disk" = "복사 대상 %1$@ · 디스크의 인덱스 %2$@";
 "Copy" = "복사";
+"Copy Line" = "줄 복사";
 "Copy the details as text" = "세부 정보를 텍스트로 복사";
+"Copy the lines shown" = "표시된 줄을 복사합니다";
 "Copy the song as an audio file" = "노래를 오디오 파일로 복사합니다";
 "Copy the text" = "텍스트를 복사합니다";
 "Copying the included runtime…" = "포함된 런타임 복사 중…";
@@ -451,6 +454,7 @@
 "Enjoying LLMTray?" = "LLMTray가 마음에 드시나요?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "환경, 한 줄에 NAME=value 하나씩(키, 토큰 및 암호는 키체인에 저장됨)";
 "Errors" = "오류";
+"Errors: %@" = "오류: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "이 프로젝트의 모든 채팅은 모델 프로필의 시스템 프롬프트 뒤에 이 지침을 받습니다. 변경 내용은 다음 메시지부터 적용됩니다.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "프로젝트의 모든 채팅이 전체 텍스트를 받습니다. 파일이 고정되어 있는 동안 해당 채팅에서는 웹 검색과 이미지·음악 생성이 비활성화됩니다.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "서버가 응답한 모든 요청(채팅, API를 통한 다른 앱과 에이전트)을 이 Mac에 기록합니다. 모델과 설정별 중앙값.";
@@ -494,6 +498,7 @@
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "폴더는 아직 추가할 수 없음: %@. 대신 해당 폴더의 파일을 추가하세요.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "채팅에서 묻지 않고 사용할 수 있는 폴더입니다. 채팅이 다른 폴더가 필요하면 채팅에서 요청합니다.";
+"Follow" = "따라가기";
 "Follow the description" = "설명 따르기";
 "For This Chat" = "이 채팅용";
 "For an Hour" = "1시간 동안";
@@ -637,6 +642,7 @@
 "Keep first messages: %lld" = "처음 메시지 유지: %lld개";
 "Keep last messages: %lld" = "마지막 메시지 유지: %lld개";
 "Keep the loaded model" = "로드된 모델 유지";
+"Keep the newest line in view" = "최신 줄이 계속 보이도록 유지합니다";
 "Keeps crashing -- see its log." = "계속 충돌함 — 로그를 확인하십시오.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "양자화하기 전에 컨텍스트의 처음 N개 토큰을 전체 정밀도로 유지합니다. 값이 높을수록 메모리 절약은 줄지만 긴 프롬프트의 정확도가 높아집니다.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "이 포트를 유지합니다. 다른 앱이 실제로 포트를 사용 중이라면 Settings에서 포트를 변경할 때까지 서버가 시작되지 않습니다.";
@@ -644,6 +650,7 @@
 "Kind" = "종류";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray 안내서";
+"LLMTray events" = "LLMTray 이벤트";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray는 속도를 높이는 모델과 함께 이를 가져옵니다. 해당 모델을 다운로드하세요.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray에 마이크 사용 권한이 없습니다.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray에 마이크 사용이 허용되어 있지 않습니다. 시스템 설정 › 개인정보 보호 및 보안 › 마이크에서 허용하십시오.";
@@ -795,6 +802,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "임베딩 모델 없음: 파일은 단어로만 검색됩니다. 의미로 검색하려면 설정 > 파일에서 다운로드하세요.";
 "No files yet" = "아직 파일 없음";
 "No folder changes yet." = "아직 폴더 변경이 없습니다.";
+"No lines match the filters" = "필터와 일치하는 줄이 없습니다";
 "No messages yet" = "아직 메시지가 없음";
 "No microphone is available." = "사용 가능한 마이크가 없습니다.";
 "No model uses it." = "사용 중인 모델이 없습니다.";
@@ -803,6 +811,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "아직 메모가 없습니다. 모든 채팅이 알아야 할 내용을 추가하세요. “러시아어로 간단히 응답”, “ESP32 스피커를 만듭니다”.";
 "No requests yet." = "아직 요청이 없습니다.";
 "No runs yet." = "아직 실행이 없습니다.";
+"No server output yet" = "아직 서버 출력이 없습니다";
 "No servers installed." = "설치된 서버가 없습니다.";
 "No sign-in" = "로그인 안 함";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "구독 없음. 기능 잠금 없음. LLMTray가 도움이 됐다면 개발을 지원해 주세요.";
@@ -875,6 +884,7 @@
 "Opens at login" = "로그인 시 열림";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "다른 앱은 이 Mac의 OpenAI 호환 API를 통해 모델에 접근합니다.";
 "Other devices on your network can use the server" = "네트워크의 다른 기기가 서버를 사용할 수 있음";
+"Other output" = "기타 출력";
 "Outside projects" = "프로젝트 외부";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "이를 초과하면 가장 약한 메모(가장 오래되고 가장 불확실한 메모)가 만료됩니다. 고정됨 메모는 유지됩니다.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray에만 macOS 언어 설정을 덮어씁니다. LLMTray를 다시 시작한 후 적용됩니다. 번역되지 않은 텍스트는 영어로 표시됩니다.";
@@ -915,6 +925,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "어텐션 캐시의 정밀도입니다. 8비트: 거의 무손실이며 메모리를 절반만 사용합니다. 4비트: 1/4만 사용하지만 긴 컨텍스트에서 품질이 눈에 띄게 떨어집니다. Full: 최상의 품질, 메모리 사용량 최대.";
 "Preference" = "선호 사항";
 "Preferences" = "선호 사항";
+"Prefill progress" = "프리필 진행률";
 "Prefill step" = "프리필 단계";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "시작을 눌러 말하세요. 스피커에서도 에코 제거가 작동하지만 헤드폰이 더 좋습니다.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Start를 누르고 말하세요. 이어폰 사용 권장: 모델이 스피커에서 나오는 자신의 목소리를 듣습니다.";
@@ -1014,6 +1025,8 @@
 "Repaired" = "복구됨";
 "Report a Bug" = "버그 신고";
 "Report a Bug…" = "버그 신고…";
+"Request stats" = "요청 통계";
+"Requests" = "요청";
 "Rescan" = "다시 스캔";
 "Rescan Models" = "모델 다시 스캔";
 "Rescan or manage models" = "모델을 다시 검색하거나 관리합니다.";
@@ -1053,6 +1066,7 @@
 "Save" = "저장";
 "Save As…" = "다른 이름으로 저장…";
 "Save memory" = "메모리 절약";
+"Save the whole log to a file…" = "전체 로그를 파일로 저장합니다…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "저장된 대화는 그곳에 작성한 내용을 바탕으로 백그라운드에서 메모를 위해 읽습니다. 다시 읽어도 이미 있는 메모는 확인만 하며, 중복 추가되지 않습니다. \"Don't Remember\"로 표시된 대화는 건너뜁니다.";
 "Saved chats will show up here." = "저장한 채팅이 여기 표시됩니다.";
 "Saved in your Keychain" = "키체인에 저장됨";
@@ -1063,6 +1077,7 @@
 "Search by meaning is off for now: %@" = "현재 의미 기반 검색이 꺼져 있습니다: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "의미 기반 검색은 %@ (%@)을 사용하며, 현재 이 Mac에 다운로드되어 있습니다. 없으면 파일은 단어 단위로만 검색됩니다. 나중에 여기에서 다운로드할 수 있습니다.";
 "Search chats" = "채팅 검색";
+"Search the log" = "로그 검색";
 "Searching the registry…" = "레지스트리 검색 중…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "초 단위로 초안이 그대로 진행되기 전 대기 시간입니다. 0이면 사용자가 Generate를 누를 때까지 기다립니다.";
 "Seen in" = "표시 위치";
@@ -1097,6 +1112,7 @@
 "Share anonymous usage statistics" = "익명 사용 통계 공유";
 "Shared by all chats" = "모든 채팅에서 공유";
 "Share…" = "공유…";
+"Show" = "보기";
 "Show All %lld Lines" = "전체 %lld줄 보기";
 "Show All Files…" = "모든 파일 보기…";
 "Show Chat Window" = "채팅 창 표시";
@@ -1107,6 +1123,7 @@
 "Show Previous Tab" = "이전 탭 보기";
 "Show Reports…" = "보고서 보기…";
 "Show What Chats Get…" = "채팅이 받는 내용 보기…";
+"Show all" = "모두 보기";
 "Show in Finder" = "Finder에서 보기";
 "Show model controls in the chat window" = "채팅 창에 모델 제어기 표시";
 "Show more" = "더 보기";
@@ -1258,6 +1275,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "이미지 생성기가 다른 대화로 작업 중입니다. 완료된 뒤 다시 시도하세요.";
 "The import stopped" = "가져오기가 중단되었습니다";
 "The last change couldn't be saved." = "마지막 변경 사항을 저장할 수 없습니다.";
+"The log couldn't be saved" = "로그를 저장할 수 없습니다";
 "The longest answer the model may write. Also capped by the model's own context length." = "모델이 작성할 수 있는 가장 긴 답변입니다. 모델 자체의 컨텍스트 길이로도 제한됩니다.";
 "The macOS version." = "macOS 버전.";
 "The microphone couldn't start: %@" = "마이크를 시작할 수 없음: %@";
@@ -1357,6 +1375,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하세요.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "이 모델 카드에는 %@이(가) 표시되어 있지 않습니다. 해당 언어의 채팅을 제대로 읽지 못하고 더 나쁜 메모를 작성할 수 있습니다.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
+"This server takes it on its command line: other users of this Mac can see it while the server runs." = "이 서버는 명령줄에서 이를 받으므로, 서버가 실행되는 동안 이 Mac의 다른 사용자가 볼 수 있습니다.";
 "This tool" = "이 도구";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods) 파일을 인덱싱하고, 사진은 문서용으로 보관합니다. 폴더와 숨김 파일은 추가할 수 없습니다.";
 "This version of LLMTray can't send reviews. Please update the app." = "이 LLMTray 버전에서는 리뷰를 보낼 수 없습니다. 앱을 업데이트해 주세요.";
@@ -1473,6 +1492,8 @@
 "Waits for the model to be free." = "모델을 사용할 수 있을 때까지 기다립니다.";
 "Waits for the model to be loaded." = "모델이 로드될 때까지 기다립니다.";
 "Walkie-talkie" = "무전기";
+"Warnings" = "경고";
+"Warnings: %@" = "경고: %@";
 "Weather" = "날씨";
 "Web" = "웹";
 "Web search" = "웹 검색";
@@ -1520,6 +1541,7 @@
 "Words only" = "텍스트만";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "프롬프트를 청크로 읽을 때 사용할 작업 메모리입니다. 값을 작게 하면 긴 프롬프트를 더 작고 느린 단계로 읽습니다. 프롬프트 캐시와 합쳐 최대 90%일 때 나머지가 현재 읽는 프롬프트를 보관합니다.";
 "Works offline" = "오프라인 작동";
+"Wrap long lines" = "긴 줄 줄바꿈";
 "Write here" = "여기에 입력";
 "Writing the song…" = "곡 작성 중…";
 "Yesterday" = "어제";

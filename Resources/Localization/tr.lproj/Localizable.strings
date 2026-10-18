@@ -36,6 +36,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ henüz indirilmiyor — Görüntü oluşturmayı Ayarlar'dan tekrar etkinleştirin.";
 "%@ isn't installed yet" = "%@ henüz yüklü değil";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "%@ için kendi uygulamanız gerekir: Yapılandır bölümüne İstemci Kimliği ve gizli anahtarını ekleyin, orada gösterilen yönlendirme URL’sini uygulamanıza ekleyin, ardından Oturum Açın.";
+"%@ of %@ lines" = "%@ / %@ satır";
 "%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
 "%@ · %@ left" = "%@ · %@ kaldı";
 "%@ · %@ of %@" = "%@ · %@ içinde %@";
@@ -82,7 +83,6 @@
 "(estimate; exact after the first answer)" = "(tahmini; ilk yanıttan sonra kesinleşir)";
 "(measured for this model)" = "(bu model için ölçüldü)";
 "(no result yet)" = "(henüz sonuç yok)";
-"(no server output yet)" = "(henüz sunucu çıktısı yok)";
 "+ MTP drafter %@" = "+ MTP taslağı %@";
 "1 hour" = "1 saat";
 "30 s reached · release to send, Esc to drop" = "30 sn’ye ulaşıldı · göndermek için bırakın, vazgeçmek için Esc";
@@ -297,6 +297,7 @@
 "Choose…" = "Seç…";
 "Clear" = "Temizle";
 "Clear search" = "Aramayı temizle";
+"Clear the log" = "Günlüğü temizler.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Kuyruğu temizle: dizine eklenen aranabilir kalır, kalanlar dizine eklenmemiş olarak işaretlenir";
 "Click to enable Project files: add files to the project and let its chats search them." = "Proje dosyalarını etkinleştirmek için tıklayın: dosyaları projeye ekleyin ve sohbetlerin bunlarda arama yapmasına izin verin.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Klip kaydetmek için tıklayın; konuşmak için basılı tutun ve göndermek için bırakın (model bunu duyar).";
@@ -326,7 +327,9 @@
 "Copied" = "Kopyalandı";
 "Copies %1$@ · index %2$@ on disk" = "Kopyalar %1$@ · diskte %2$@ dizini";
 "Copy" = "Kopyala";
+"Copy Line" = "Satırı Kopyala";
 "Copy the details as text" = "Ayrıntıları metin olarak kopyala";
+"Copy the lines shown" = "Gösterilen satırları kopyalar.";
 "Copy the song as an audio file" = "Şarkıyı ses dosyası olarak kopyala";
 "Copy the text" = "Metni kopyala";
 "Copying the included runtime…" = "Dahil edilen runtime kopyalanıyor…";
@@ -451,6 +454,7 @@
 "Enjoying LLMTray?" = "LLMTray hoşunuza gidiyor mu?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Ortam, her satıra NAME=value (anahtarlar, token’lar ve parolalar Anahtar Zinciri’ne gider)";
 "Errors" = "Hatalar";
+"Errors: %@" = "Hatalar: %@";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Sunucunun yanıtladığı her istek — sohbetten ve API üzerinden diğer uygulama ve ajanlardan — bu Mac'te tutulur. Model ve ayar başına medyanlar.";
@@ -494,6 +498,7 @@
 "Folders" = "Klasörler";
 "Folders can't be added yet: %@. Add the files in them instead." = "Klasörler henüz eklenemiyor: %@. Bunun yerine içindeki dosyaları ekleyin.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Sohbetlerin sormadan kullanabileceği klasörler. Bir sohbet başka bir klasöre ihtiyaç duyarsa, sohbette sizden izin ister.";
+"Follow" = "İzle";
 "Follow the description" = "Açıklamayı takip et";
 "For This Chat" = "Bu Sohbet İçin";
 "For an Hour" = "Bir Saat İçin";
@@ -637,6 +642,7 @@
 "Keep first messages: %lld" = "İlk iletileri koru: %lld";
 "Keep last messages: %lld" = "Son iletileri koru: %lld";
 "Keep the loaded model" = "Yüklü modeli tut";
+"Keep the newest line in view" = "En yeni satırı görünümde tutar.";
 "Keeps crashing -- see its log." = "Sürekli çöküyor -- günlüğüne bakın.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Bağlamın ilk N token’ını nicelemeden önce tam hassasiyette tutar. Daha yüksek değer, uzun istemlerde doğruluk için bellek tasarrufundan ödün verir.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Bu bağlantı noktasını tutar. Gerçekten başka bir uygulama kullanıyorsa, sunucu Settings bölümünden portu değiştirene kadar başlamaz.";
@@ -644,6 +650,7 @@
 "Kind" = "Tür";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Kılavuzu";
+"LLMTray events" = "LLMTray olayları";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray bunu hızlandırdığı modelle birlikte alır: o modeli indirin.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray'ın mikrofonu kullanmasına izin verilmiyor.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray’in mikrofonu kullanmasına izin verilmiyor. Sistem Ayarları › Gizlilik ve Güvenlik › Mikrofon’da izin verin.";
@@ -795,6 +802,7 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Gömmelenme modeli yok: dosyalar sözcüklerine göre aranır. Anlamına göre arama için Ayarlar > Files bölümünden indirin.";
 "No files yet" = "Henüz dosya yok";
 "No folder changes yet." = "Henüz klasör değişikliği yok.";
+"No lines match the filters" = "Hiçbir satır filtrelerle eşleşmiyor";
 "No messages yet" = "Henüz mesaj yok";
 "No microphone is available." = "Mikrofon bulunmuyor.";
 "No model uses it." = "Hiçbir model bunu kullanmıyor.";
@@ -803,6 +811,7 @@
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Henüz not yok. Her sohbetin bilmesi gerekenleri ekleyin: “Kısaca Rusça cevap ver”, “ESP32 hoparlör yapıyorum”.";
 "No requests yet." = "Henüz istek yok.";
 "No runs yet." = "Henüz çalıştırma yok.";
+"No server output yet" = "Henüz sunucu çıktısı yok";
 "No servers installed." = "Yüklü sunucu yok.";
 "No sign-in" = "Oturum açma yok";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Abonelik yok. Özellik kilidi yok. LLMTray size faydalı olduysa geliştirmeyi destekleyin.";
@@ -875,6 +884,7 @@
 "Opens at login" = "Girişte açılır";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Diğer uygulamalar modellere bu Mac'te OpenAI uyumlu bir API aracılığıyla erişir.";
 "Other devices on your network can use the server" = "Ağınızdaki diğer cihazlar sunucuyu kullanabilir";
+"Other output" = "Diğer çıktı";
 "Outside projects" = "Projelerin dışında";
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Bunun üzerinde, en zayıf notların (en eski, kesinliği en düşük) süresi dolar. Sabitlenen notlar tutulur.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
@@ -915,6 +925,7 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Attention önbelleğinin hassasiyeti. 8 bit: neredeyse kayıpsız, belleğin yarısı. 4 bit: dörtte biri, uzun bağlamda belirgin biçimde daha kötü. Tam: en iyi, en fazla bellek.";
 "Preference" = "Tercih";
 "Preferences" = "Tercihler";
+"Prefill progress" = "Ön doldurma ilerlemesi";
 "Prefill step" = "Ön doldurma adımı";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Başlat’a basıp konuşun. Hoparlörler gecikme giderme ile çalışır; en iyi sonuç için kulaklık önerilir.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Başlat'a basın ve konuşun. Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
@@ -1014,6 +1025,8 @@
 "Repaired" = "Onarılan";
 "Report a Bug" = "Hata Bildir";
 "Report a Bug…" = "Hata Bildir…";
+"Request stats" = "İstek istatistikleri";
+"Requests" = "İstekler";
 "Rescan" = "Yeniden Tara";
 "Rescan Models" = "Modelleri Yeniden Tara";
 "Rescan or manage models" = "Modelleri yeniden tara veya yönet";
@@ -1053,6 +1066,7 @@
 "Save" = "Kaydet";
 "Save As…" = "Farklı Kaydet…";
 "Save memory" = "Bellek tasarrufu";
+"Save the whole log to a file…" = "Günlüğün tamamını bir dosyaya kaydeder…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Kaydedilmiş sohbetler, oraya yazdıklarınıza göre arka planda notlar için okunur. Yeniden okunduğunda, zaten var olan notlar iki katına çıkarılmaz, doğrulanır. “Hatırlama” olarak işaretlenen sohbetler atlanır.";
 "Saved chats will show up here." = "Kaydedilmiş sohbetler burada görünür.";
 "Saved in your Keychain" = "Keychain'inize kaydedildi";
@@ -1063,6 +1077,7 @@
 "Search by meaning is off for now: %@" = "Anlamsal arama şu anda kapalı: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Anlamsal arama %@ (%@) kullanır; şu anda bu Mac’e indirildi. Olmazsa dosyalar yalnızca kelimelerine göre aranır; daha sonra buradan indirebilirsiniz.";
 "Search chats" = "Sohbetlerde ara";
+"Search the log" = "Günlükte ara";
 "Searching the registry…" = "Kayıt aranıyor…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Taslağın olduğu gibi devam etmeden önceki saniye. 0: Oluştur’a basana kadar bekle.";
 "Seen in" = "Görüldüğü yer";
@@ -1097,6 +1112,7 @@
 "Share anonymous usage statistics" = "Anonim kullanım istatistiklerini paylaş";
 "Shared by all chats" = "Tüm sohbetler tarafından paylaşılır";
 "Share…" = "Paylaş…";
+"Show" = "Göster";
 "Show All %lld Lines" = "%lld Satırın Tümünü Göster";
 "Show All Files…" = "Tüm Dosyaları Göster…";
 "Show Chat Window" = "Sohbet Penceresini Göster";
@@ -1107,6 +1123,7 @@
 "Show Previous Tab" = "Önceki Sekmeyi Göster";
 "Show Reports…" = "Raporları Göster…";
 "Show What Chats Get…" = "Sohbetlere Gidenleri Göster…";
+"Show all" = "Tümünü Göster";
 "Show in Finder" = "Finder’da Göster";
 "Show model controls in the chat window" = "Sohbet penceresinde model denetimlerini göster";
 "Show more" = "Daha fazla göster";
@@ -1258,6 +1275,7 @@
 "The image generator is busy with another chat -- try again once it's done." = "Görüntü oluşturucu başka bir sohbetle meşgul — işlem bitince tekrar deneyin.";
 "The import stopped" = "İçe aktarma durdu";
 "The last change couldn't be saved." = "Son değişiklik kaydedilemedi.";
+"The log couldn't be saved" = "Günlük kaydedilemedi";
 "The longest answer the model may write. Also capped by the model's own context length." = "Modelin yazabileceği en uzun yanıt. Modelin kendi bağlam uzunluğuyla da sınırlıdır.";
 "The macOS version." = "macOS sürümü.";
 "The microphone couldn't start: %@" = "Mikrofon başlatılamadı: %@";
@@ -1357,6 +1375,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın.";
 "This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "Bu modelin kartında %@ listelenmiyor: Bu dildeki sohbetleri kötü okuyabilir ve daha kötü notlar yazabilir.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";
+"This server takes it on its command line: other users of this Mac can see it while the server runs." = "Bu sunucu bunu komut satırında alır: sunucu çalışırken Bu Mac’teki diğer kullanıcılar bunu görebilir.";
 "This tool" = "Bu araç";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını dizinler ve resimleri belgeler için saklar; klasörler ve gizli dosyalar eklenemez.";
 "This version of LLMTray can't send reviews. Please update the app." = "Bu LLMTray sürümü değerlendirme gönderemez. Lütfen uygulamayı güncelleyin.";
@@ -1473,6 +1492,8 @@
 "Waits for the model to be free." = "Modelin boşa çıkmasını bekler.";
 "Waits for the model to be loaded." = "Modelin yüklenmesini bekler.";
 "Walkie-talkie" = "Telsiz";
+"Warnings" = "Uyarılar";
+"Warnings: %@" = "Uyarılar: %@";
 "Weather" = "Hava Durumu";
 "Web" = "Web";
 "Web search" = "Web araması";
@@ -1520,6 +1541,7 @@
 "Words only" = "Sadece kelimeler";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "İstemi parça parça okumak için çalışma belleği; daha az bellek uzun istemleri daha küçük, daha yavaş adımlarla okur. İsteme önbelleği toplamda en fazla %90 ise: kalan, okunan istemi tutar.";
 "Works offline" = "Çevrimdışı çalışır";
+"Wrap long lines" = "Uzun satırları kaydır";
 "Write here" = "Buraya yazın";
 "Writing the song…" = "Şarkı yazılıyor…";
 "Yesterday" = "Dün";
