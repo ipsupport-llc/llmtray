@@ -487,7 +487,7 @@ extension MCPOAuth {
     }
 
     /// Whether a host is this Mac, a private network or link-local.
-    static func isLocal(_ host: String, resolve: (String) -> [IPAddress]) -> Bool {
+    public static func isLocal(_ host: String, resolve: (String) -> [IPAddress]) -> Bool {
         var h = host.lowercased()
         if h.hasPrefix("["), h.hasSuffix("]") { h = String(h.dropFirst().dropLast()) }
         while h.hasSuffix(".") { h.removeLast() }
@@ -503,7 +503,7 @@ extension MCPOAuth {
         case v6([UInt8])
 
         /// An address written as an IP literal (inet_aton's IPv4 forms, or IPv6).
-        init?(literal: String) {
+        public init?(literal: String) {
             var a4 = in_addr()
             if literal.allSatisfy({ $0.isHexDigit || $0 == "." || $0 == "x" }), inet_aton(literal, &a4) != 0 {
                 self = .v4(UInt32(bigEndian: a4.s_addr))
@@ -517,11 +517,14 @@ extension MCPOAuth {
             return nil
         }
 
-        var isLocal: Bool {
+        /// This Mac, a private or local network, link-local, multicast or
+        /// broadcast: nothing an outside fetch may reach.
+        public var isLocal: Bool {
             switch self {
             case .v4(let a):
                 let b0 = a >> 24, b1 = (a >> 16) & 0xff
-                return b0 == 0 || b0 == 10 || b0 == 127 || (b0 == 169 && b1 == 254)
+                return b0 == 0 || b0 == 10 || b0 == 127 || (b0 == 169 && b1 == 254) || b0 >= 224
+                    || (b0 == 198 && (b1 == 18 || b1 == 19))
                     || (b0 == 172 && (16...31).contains(b1)) || (b0 == 192 && b1 == 168)
                     || (b0 == 100 && (64...127).contains(b1))
             case .v6(let b):
@@ -529,12 +532,33 @@ extension MCPOAuth {
                 if b[0..<15].allSatisfy({ $0 == 0 }) && b[15] == 1 { return true }  // ::1
                 if b[0] == 0xfe && b[1] & 0xc0 == 0x80 { return true }  // fe80::/10
                 if b[0] & 0xfe == 0xfc { return true }  // fc00::/7
+                if b[0] == 0xff { return true }  // multicast
+                // NAT64 (64:ff9b::/96) and 6to4 (2002::/16) carry an IPv4
+                // address the network translates to: as local as it is.
+                if b[0] == 0x00, b[1] == 0x64, b[2] == 0xff, b[3] == 0x9b, b[4..<12].allSatisfy({ $0 == 0 }) {
+                    return IPAddress.v4(UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15])).isLocal
+                }
+                if b[0] == 0x20, b[1] == 0x02 {
+                    return IPAddress.v4(UInt32(b[2]) << 24 | UInt32(b[3]) << 16 | UInt32(b[4]) << 8 | UInt32(b[5])).isLocal
+                }
                 // IPv4-mapped (::ffff:a.b.c.d) and IPv4-compatible (::a.b.c.d).
                 if b[0..<10].allSatisfy({ $0 == 0 }) && ((b[10] == 0xff && b[11] == 0xff) || (b[10] == 0 && b[11] == 0)) {
                     let v4 = UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15])
                     return IPAddress.v4(v4).isLocal
                 }
                 return false
+            }
+        }
+
+        /// As written for a connection ("93.184.216.34", "2606:2800::1").
+        public var text: String {
+            switch self {
+            case .v4(let a):
+                return "\(a >> 24).\((a >> 16) & 0xff).\((a >> 8) & 0xff).\(a & 0xff)"
+            case .v6(var b):
+                var out = [CChar](repeating: 0, count: Int(INET6_ADDRSTRLEN))
+                _ = b.withUnsafeMutableBytes { inet_ntop(AF_INET6, $0.baseAddress, &out, socklen_t(INET6_ADDRSTRLEN)) }
+                return String(cString: out)
             }
         }
 
