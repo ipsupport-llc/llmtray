@@ -28,6 +28,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ couldn't read chats for memory: another model reads its chats.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
+"%@ from cache" = "%@ from cache";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ is on in this chat: you'll be asked before each call.";
@@ -38,6 +39,7 @@
 "%@ new" = "%@ new";
 "%@ of %@ shown" = "%@ of %@ shown";
 "%@ requests" = "%@ requests";
+"%@ s" = "%@ s";
 "%@ tok/s" = "%@ tok/s";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
@@ -92,6 +94,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
 "30 s reached · release to send, Esc to drop" = "30 s reached · release to send, Esc to drop";
+"7 Days" = "7 Days";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";
@@ -118,6 +121,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
+"API key" = "API key";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes.";
 "About LLMTray" = "About LLMTray";
 "About you" = "About you";
@@ -195,6 +199,7 @@
 "Answer details" = "Answer details";
 "Answer in Russian, briefly" = "Answer in Russian, briefly";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Anyone on your network can use the server: a key keeps it to the clients you give it to.";
 "Anything else chats should know" = "Anything else chats should know";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
@@ -205,6 +210,7 @@
 "Approve Selected" = "Approve Selected";
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too.";
 "Arguments, one per line" = "Arguments, one per line";
 "Ask Later" = "Ask Later";
 "Ask about LLMTray" = "Ask about LLMTray";
@@ -249,6 +255,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Built into macOS · LLMTray's chat only";
+"By" = "By";
 "Cached" = "Cached";
 "Calculator" = "Calculator";
 "Calls" = "Calls";
@@ -257,6 +264,7 @@
 "Can look · %@" = "Can look · %@";
 "Can look · 1 hour" = "Can look · 1 hour";
 "Can look · Always" = "Can look · Always";
+"Can't be read" = "Can't be read";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -307,12 +315,17 @@
 "Choose…" = "Choose…";
 "Clear" = "Clear";
 "Clear Log" = "Clear Log";
+"Clear Statistics…" = "Clear Statistics…";
+"Clear or turn off" = "Clear or turn off";
 "Clear search" = "Clear search";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Clear the queue: what's indexed stays searchable, the rest is marked not indexed";
 "Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Click to record a clip; hold to talk and release to send (the model hears it)";
 "Click ■ to stop · Esc cancels" = "Click ■ to stop · Esc cancels";
+"Client" = "Client";
 "Client ID" = "Client ID";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it.";
+"Clients using the current key get 401 until they're given the new one." = "Clients using the current key get 401 until they're given the new one.";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -357,10 +370,12 @@
 "Couldn't reach the server -- please try again later." = "Couldn't reach the server -- please try again later.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log).";
 "Couldn't start the voice runner: %@" = "Couldn't start the voice runner: %@";
+"Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere.";
 "Countdown" = "Countdown";
 "Countdown: %lld s" = "Countdown: %lld s";
 "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened.";
 "Country facts" = "Country facts";
+"Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac." = "Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac.";
 "Crash reports (%lld)" = "Crash reports (%lld)";
 "Create Email…" = "Create Email…";
 "Creativity" = "Creativity";
@@ -372,6 +387,7 @@
 "Current settings are already fastest" = "Current settings are already fastest";
 "Date" = "Date";
 "Date & time" = "Date & time";
+"Day" = "Day";
 "Debug lines" = "Debug lines";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.";
 "Default can't be renamed: every model falls back to it" = "Default can't be renamed: every model falls back to it";
@@ -472,6 +488,7 @@
 "Errors: go to the next one (⌘E)" = "Errors: go to the next one (⌘E)";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
+"Every day's counts are removed. This can't be undone." = "Every day's counts are removed. This can't be undone.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
 "Everything" = "Everything";
 "Everything in that folder is here already." = "Everything in that folder is here already.";
@@ -657,10 +674,13 @@
 "Keep first messages: %lld" = "Keep first messages: %lld";
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keep the loaded model" = "Keep the loaded model";
+"Keep usage statistics" = "Keep usage statistics";
 "Keeps crashing -- see its log." = "Keeps crashing -- see its log.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
 "Kept free: %lld MB" = "Kept free: %lld MB";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other.";
+"Key" = "Key";
 "Kind" = "Kind";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
@@ -721,6 +741,7 @@
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make a Document…" = "Make a Document…";
+"Make a new key?" = "Make a new key?";
 "Make again" = "Make again";
 "Make images and edit them." = "Make images and edit them.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.";
@@ -787,6 +808,8 @@
 "Never" = "Never";
 "New Chat" = "New Chat";
 "New Chat in Project" = "New Chat in Project";
+"New Key" = "New Key";
+"New Key…" = "New Key…";
 "New Note" = "New Note";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
@@ -826,6 +849,8 @@
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No open tab in %@." = "No open tab in %@.";
+"No requests yet in this period." = "No requests yet in this period.";
+"No requests yet today." = "No requests yet today.";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
 "No server output yet" = "No server output yet";
@@ -882,10 +907,12 @@
 "On" = "On";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Only From Now On";
+"Only for connections from other devices" = "Only for connections from other devices";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
 "Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
 "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@.";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "Only this Mac can connect now (local network access is off), so no client is asked for the key.";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
@@ -913,6 +940,7 @@
 "Past %lld messages" = "Past %lld messages";
 "Paste a Config" = "Paste a Config";
 "Paste a Config…" = "Paste a Config…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain.";
 "Pasted config" = "Pasted config";
 "Pause" = "Pause";
 "Pause Indexing" = "Pause Indexing";
@@ -1050,6 +1078,7 @@
 "Report a Bug" = "Report a Bug";
 "Report a Bug…" = "Report a Bug…";
 "Requests" = "Requests";
+"Require an API key" = "Require an API key";
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
@@ -1118,9 +1147,9 @@
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation.";
 "Server" = "Server";
-"Server Log" = "Server Log";
 "Server log" = "Server log";
 "Server settings changed -- restart to apply them." = "Server settings changed -- restart to apply them.";
+"Server…" = "Server…";
 "Set Up LLMTray" = "Set Up LLMTray";
 "Set Up LLMTray…" = "Set Up LLMTray…";
 "Setting up image generation (first time only)…" = "Setting up image generation (first time only)…";
@@ -1136,6 +1165,7 @@
 "Share anonymous usage statistics" = "Share anonymous usage statistics";
 "Shared by all chats" = "Shared by all chats";
 "Share…" = "Share…";
+"Show" = "Show";
 "Show All" = "Show All";
 "Show All %lld Lines" = "Show All %lld Lines";
 "Show All Files…" = "Show All Files…";
@@ -1304,6 +1334,9 @@
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
+"The key couldn't be saved in the Keychain." = "The key couldn't be saved in the Keychain.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked.";
 "The last change couldn't be saved." = "The last change couldn't be saved.";
 "The log couldn't be saved" = "The log couldn't be saved";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
@@ -1476,7 +1509,9 @@
 "Update failed: %@" = "Update failed: %@";
 "Update to %@" = "Update to %@";
 "Updates" = "Updates";
+"Usage" = "Usage";
 "Usage statistics" = "Usage statistics";
+"Usage statistics are off" = "Usage statistics are off";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then).";
 "Usage statistics: the reports" = "Usage statistics: the reports";
 "Use" = "Use";
@@ -1622,6 +1657,7 @@
 "finishing" = "finishing";
 "first %@ s" = "first %@ s";
 "first token %.1f s" = "first token %.1f s";
+"first token in %@ on average" = "first token in %@ on average";
 "for this chat" = "for this chat";
 "generation %.1f tok/s" = "generation %.1f tok/s";
 "hears audio" = "hears audio";

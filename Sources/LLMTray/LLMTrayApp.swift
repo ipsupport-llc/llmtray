@@ -409,6 +409,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
         SpeedJournalStore.shared.flush()
+        UsageStore.shared.flush()
         MCPHub.shared.killAllNow()
         killServerNow()
     }
@@ -615,7 +616,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             item(NSLocalizedString("Start Server", comment: ""), #selector(quickStart))
         }
-        item(NSLocalizedString("Server Log", comment: ""), #selector(showServerLogWindow))
+        item(NSLocalizedString("Server…", comment: "tray menu: the Server window (usage and log)"), #selector(showServerLogWindow))
 
         menu.addItem(.separator())
 
@@ -931,11 +932,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "LLMTray — Server Log"
+            window.title = "LLMTray — Server"
             // Keep the window instance alive across closes so reopening it
             // is instant and doesn't lose scroll position mid-session.
             window.isReleasedWhenClosed = false
-            window.contentView = NSHostingView(rootView: ServerLogView(server: server))
+            window.contentView = NSHostingView(rootView: ServerWindowView(server: server))
             window.center()
             logWindow = window
         }
@@ -1191,6 +1192,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 ProfileManager.shared.flushPendingWrites()
                 SpeedJournalStore.shared.flush()
+                UsageStore.shared.flush()
                 self?.killServerNow()
                 exit(0)
             }
