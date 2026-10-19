@@ -66,7 +66,9 @@ final class WebSearchTool: SelectableTool {
             // Small models put the address in query too.
             let url = (arguments["url"] as? String) ?? (query.contains(".") && !query.contains(" ") ? query : "")
             guard !url.isEmpty else { return Self.error("url is required for source=page") }
-            let page = (arguments["page"] as? Int) ?? (arguments["page"] as? Double).map { Int($0) } ?? 1
+            // Junk numbers from a small model (1e19, NaN) are page 1.
+            let asked = (arguments["page"] as? Int) ?? (arguments["page"] as? Double).flatMap { $0.isFinite && abs($0) < 1e6 ? Int($0) : nil }
+            let page = min(max(asked ?? 1, 1), 10_000)
             do {
                 let read = try await WebPageReader.read(url)
                 return Self.json(WebPageText.result(url: read.url, title: read.title, pages: read.pages, page: page))

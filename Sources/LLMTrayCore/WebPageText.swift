@@ -26,22 +26,39 @@ public enum WebPageText {
         return .success(url)
     }
 
-    /// The page's main text: its <article> or <main> when one holds most of
-    /// what there is to read (not the site's menus around it), else all.
-    public static func mainText(_ html: String) -> String {
-        let all = HTMLText.text(html)
-        for tag in ["article", "main"] {
-            guard let open = html.range(of: "<\(tag)", options: .caseInsensitive),
-                  let close = html.range(of: "</\(tag)>", options: [.caseInsensitive, .backwards]),
-                  open.lowerBound < close.lowerBound else { continue }
-            let inner = HTMLText.text(String(html[open.lowerBound..<close.upperBound]))
-            if inner.count >= 500 { return inner }
+    /// The HTML without what's never shown: comments, scripts, styles,
+    /// templates, svg -- so text hidden there can't pass for the page's.
+    static func visibleHTML(_ html: String) -> String {
+        var out = html
+        for pattern in [#"<!--[\s\S]*?-->"#, #"<script\b[\s\S]*?</script\s*>"#, #"<style\b[\s\S]*?</style\s*>"#,
+                        #"<template\b[\s\S]*?</template\s*>"#, #"<svg\b[\s\S]*?</svg\s*>"#, #"<noscript\b[\s\S]*?</noscript\s*>"#] {
+            out = out.replacingOccurrences(of: pattern, with: " ", options: [.regularExpression, .caseInsensitive])
         }
-        return all
+        return out
+    }
+
+    /// The page's main text: its largest <article>, or its <main>, when that
+    /// holds enough to read (not the site's menus around it), else all of
+    /// the page's text.
+    public static func mainText(_ html: String) -> String {
+        let visible = visibleHTML(html)
+        for tag in ["article", "main"] {
+            var best = ""
+            var from = visible.startIndex
+            while let open = visible.range(of: "<\(tag)", options: .caseInsensitive, range: from..<visible.endIndex),
+                  let close = visible.range(of: "</\(tag)", options: .caseInsensitive, range: open.upperBound..<visible.endIndex) {
+                let inner = HTMLText.text(String(visible[open.lowerBound..<close.lowerBound]))
+                if inner.count > best.count { best = inner }
+                from = close.upperBound
+            }
+            if best.count >= 500 { return best }
+        }
+        return HTMLText.text(html)
     }
 
     /// The page's <title>, if it has one.
-    public static func title(_ html: String) -> String? {
+    public static func title(_ page: String) -> String? {
+        let html = visibleHTML(page)
         guard let open = html.range(of: "<title", options: .caseInsensitive),
               let close = html.range(of: ">", range: open.upperBound..<html.endIndex),
               let end = html.range(of: "</title>", options: .caseInsensitive, range: close.upperBound..<html.endIndex) else { return nil }
@@ -57,18 +74,19 @@ public enum WebPageText {
         let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { return [] }
         var pages: [String] = []
-        var rest = Substring(clean)
-        while rest.count > size {
-            let limit = rest.index(rest.startIndex, offsetBy: size)
-            let window = rest[rest.index(rest.startIndex, offsetBy: size * 3 / 4)..<limit]
+        var start = clean.startIndex
+        // Index steps of at most `size` each: linear in the text.
+        while let limit = clean.index(start, offsetBy: size, limitedBy: clean.endIndex), limit < clean.endIndex {
+            let quarter = clean.index(start, offsetBy: size * 3 / 4)
+            let window = clean[quarter..<limit]
             let cut = window.range(of: "\n\n", options: .backwards)?.upperBound
                 ?? window.range(of: "\n", options: .backwards)?.upperBound
                 ?? window.range(of: " ", options: .backwards)?.upperBound
                 ?? limit
-            pages.append(rest[..<cut].trimmingCharacters(in: .whitespacesAndNewlines))
-            rest = rest[cut...]
+            pages.append(clean[start..<cut].trimmingCharacters(in: .whitespacesAndNewlines))
+            start = cut
         }
-        let last = rest.trimmingCharacters(in: .whitespacesAndNewlines)
+        let last = clean[start...].trimmingCharacters(in: .whitespacesAndNewlines)
         if !last.isEmpty { pages.append(last) }
         return pages
     }

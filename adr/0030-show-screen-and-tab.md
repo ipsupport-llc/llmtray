@@ -69,10 +69,22 @@ like the others). Both builds.
   text, else all of it; about 4000 characters a page, "page=2" for more.
 - A page that's only scripts is rendered in an offscreen WKWebView
   (non-persistent store, 15 s) and read the same way.
-- Nothing on this Mac or the local network: the address and every
-  redirect are checked (names resolved too), and the WebKit view gets
-  content rules blocking local and private addresses for everything the
-  page asks for -- without the rules, it isn't rendered at all.
+- Nothing on this Mac or the local network, in two layers. Every load of
+  a read -- the page, its redirects, and in WebKit everything the page
+  asks for, WebSockets too -- goes through a CONNECT proxy of its own on
+  loopback (WebPageProxy): it resolves the host itself, refuses one that
+  is or resolves to a local or private address, and connects to the very
+  address it checked, so DNS rebinding can't slip through. Address
+  literals don't go through a proxy in WebKit: content rules block local
+  and private ones (WebKit writes 2130706433 as 127.0.0.1 before the
+  rules see it), "localhost", IPv6 literals and addresses with a user
+  name. Without the rules nothing is rendered. Checked with a probe page:
+  without the two layers it reached a local server 7 times, with them 0.
+- Limits: 5 MB of HTML (counted as it comes), 25 MB and 25 s for all a
+  read loads, 20 s for a render, 400 000 characters of rendered text;
+  one read at a time, the next waits.
+- The page's own encoding (the server's charset, or its meta tag); the
+  largest article, or main, found outside comments and scripts.
 - Read pages are kept ten minutes in memory, so the next page is free.
 
 ## Later (not in this change)
