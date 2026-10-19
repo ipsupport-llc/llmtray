@@ -69,7 +69,7 @@ public struct SharedContext: Codable, Equatable, Sendable, Identifiable {
 
     /// Runs of spaces and of blank lines collapsed, lines trimmed: page text
     /// is mostly layout whitespace.
-    static func clean(_ text: String) -> String {
+    public static func clean(_ text: String) -> String {
         var lines: [String] = []
         var blank = false
         for raw in text.components(separatedBy: .newlines) {

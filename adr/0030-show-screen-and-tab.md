@@ -57,6 +57,24 @@ Tab**: Apple Events to browsers need a temporary-exception entitlement
 App Review is unlikely to accept. Compiled out (`#if !APP_STORE`), not
 shown disabled.
 
+## Reading a web page (2026-10-19)
+
+`web_search` reads a page as one more of its sources (`source=page`, `url`,
+`page`): one tool for small models, its own switch in the profile ("Read
+web pages", a network tool -- off by default, refused after outside text
+like the others). Both builds.
+
+- A fresh load, not the user's tab: an ephemeral session, no cookies,
+  nothing on disk; the page's article or main part when it holds the
+  text, else all of it; about 4000 characters a page, "page=2" for more.
+- A page that's only scripts is rendered in an offscreen WKWebView
+  (non-persistent store, 15 s) and read the same way.
+- Nothing on this Mac or the local network: the address and every
+  redirect are checked (names resolved too), and the WebKit view gets
+  content rules blocking local and private addresses for everything the
+  page asks for -- without the rules, it isn't rendered at all.
+- Read pages are kept ten minutes in memory, so the next page is free.
+
 ## Later (not in this change)
 
 - **Walkthrough**: after a capture, "Done — show again" re-captures the
@@ -65,7 +83,6 @@ shown disabled.
 - **`look_at_screen`**: a tool the model calls during a walkthrough; each
   call is a card in the chat ("Show Safari again? · Capture · Skip").
   Never a capture without the click.
-- **`web_page(url)`**: a page loaded fresh in an offscreen WKWebView with
-  no cookies (not the user's tab), read in pages; both builds.
+
 - The focused window's accessibility text (exact labels, cheap) —
   standalone only.

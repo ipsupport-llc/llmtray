@@ -14,6 +14,7 @@ final class WebSearchTool: SelectableTool {
         ("news", "news", "current events; no query = top headlines"),
         ("get_wikipedia_summary", "wikipedia", "summary of a person, place or topic"),
         ("hackernews", "hackernews", "Hacker News front page"),
+        ("web_page", "page", "read a web page: url; long ones in pages, page=2 for more"),
     ]
 
     init() { super.init(name: "web_search", entries: Self.sources.map(\.entry)) }
@@ -30,6 +31,10 @@ final class WebSearchTool: SelectableTool {
                 "hacker_news": "hackernews", "hacker news": "hackernews", "headlines": "news",
             ]))
         }
+        if offered.contains(where: { $0.value == "page" }) {
+            params.append(.init("url", .string, "For source=page: the address to read.", aliases: ["link", "address", "href", "page_url"]))
+            params.append(.init("page", .integer, "For source=page: which page of a long one (1 first).", aliases: ["part", "chunk"]))
+        }
         if offered.contains(where: { $0.value == "news" || $0.value == "wikipedia" }) {
             params.append(.init("lang", .string, "Language code for news and wikipedia.", aliases: ["language", "locale", "hl"]))
         }
@@ -38,10 +43,12 @@ final class WebSearchTool: SelectableTool {
         return ToolSchema(name, what, params)
     }
 
-    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["source"] != nil }
+    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["source"] != nil || arguments["url"] != nil }
 
     override func entry(for arguments: [String: Any]) -> String {
         if let value = arguments["source"] as? String, let s = Self.sources.first(where: { $0.value == value }) { return s.entry }
+        // An address and no source: reading it.
+        if arguments["url"] != nil { return "web_page" }
         return entries[0]
     }
 
@@ -55,6 +62,17 @@ final class WebSearchTool: SelectableTool {
         switch entry {
         case "news": return await NewsSource.run(query: query, lang: arguments["lang"] as? String)
         case "hackernews": return await HackerNewsSource.run(query: query)
+        case "web_page":
+            // Small models put the address in query too.
+            let url = (arguments["url"] as? String) ?? (query.contains(".") && !query.contains(" ") ? query : "")
+            guard !url.isEmpty else { return Self.error("url is required for source=page") }
+            let page = (arguments["page"] as? Int) ?? (arguments["page"] as? Double).map { Int($0) } ?? 1
+            do {
+                let read = try await WebPageReader.read(url)
+                return Self.json(WebPageText.result(url: read.url, title: read.title, pages: read.pages, page: page))
+            } catch {
+                return Self.error("couldn't read \(url): \(error.localizedDescription)")
+            }
         case "get_wikipedia_summary":
             guard !query.isEmpty else { return Self.error("query is required for source=wikipedia") }
             return await WikipediaSource().run(title: Self.withoutWikipedia(query), lang: arguments["lang"] as? String)
@@ -573,6 +591,7 @@ enum ToolCatalog {
         Entry(name: "web_search", title: NSLocalizedString("Web search", comment: "chat tool"), usesNetwork: true),
         Entry(name: "news", title: NSLocalizedString("News", comment: "chat tool"), usesNetwork: true),
         Entry(name: "hackernews", title: NSLocalizedString("Hacker News", comment: "chat tool"), usesNetwork: true),
+        Entry(name: "web_page", title: NSLocalizedString("Read web pages", comment: "chat tool"), usesNetwork: true),
         Entry(name: "get_wikipedia_summary", title: NSLocalizedString("Wikipedia", comment: "chat tool"), usesNetwork: true),
         Entry(name: "get_country_info", title: NSLocalizedString("Country facts", comment: "chat tool"), usesNetwork: true),
         Entry(name: "get_public_holidays", title: NSLocalizedString("Public holidays", comment: "chat tool"), usesNetwork: true),
