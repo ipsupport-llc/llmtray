@@ -104,6 +104,7 @@
 "A deleted project" = "삭제된 프로젝트";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "하나의 채팅에서 학습한 사실이나 관찰 내용은 다른 채팅에서도 나타나거나 사용자가 승인할 때까지 기다립니다. 질문 하나만으로 사용자를 판단하지 않습니다. 사용자가 요청한 선호 사항이나 수정 사항은 즉시 사용됩니다.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "더 풍성하고 완성도 높은 믹스입니다. 가사가 덜 선명하게 들립니다. 30초 분량의 음악을 만드는 데 약 20초 소요됩니다.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "GPU 메모리에 맞지 않는 mixture-of-experts 모델(Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…)은 전문가 일부만 메모리에 유지하고, 필요할 때 나머지를 SSD에서 읽어 옵니다. 메모리에 맞는 모델보다 몇 배 느리지만 실행할 수 있습니다. 해당 모델을 다음에 시작할 때 적용됩니다.";
 "A model is a tool, not an authority" = "모델은 도구일 뿐, 권위가 아닙니다";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "메모가 이 기간 동안 확인되지 않으면 가중치가 절반으로 줄고, 약 세 배가 지나면 만료됩니다. 고정됨 메모는 만료되지 않습니다.";
 "A package: moved as one item." = "패키지: 하나의 항목으로 이동됩니다.";
@@ -495,6 +496,7 @@
 "Everything" = "모두";
 "Everything in that folder is here already." = "해당 폴더의 모든 항목이 이미 여기에 있습니다.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray가 ipsupport.us로 보내는 항목을 필드별로 그대로 표시합니다. 다른 데이터는 Mac을 떠나지 않습니다.";
+"Experimental" = "실험 기능";
 "Experimental — English only" = "실험적 — 영어 전용";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "실험적 — 영어 전용. Voice Lab 실행 중에는 채팅 모델이 언로드되며, 종료 후 다시 로드됩니다.";
 "Expired" = "만료됨";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "각 답변 직후";
 "Room in each chat: %lld tokens" = "각 채팅의 공간: %lld개 토큰";
 "Run benchmark" = "벤치마크 실행";
+"Run big MoE models with experts on disk" = "전문가를 디스크에 두고 큰 MoE 모델 실행";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "터미널에서 실행하여 GPU 메모리 한도를 높이세요; Mac 재시작 시 초기화됩니다.";
 "Run without asking:" = "묻지 않고 실행:";
 "Running" = "실행 중";

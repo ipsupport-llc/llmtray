@@ -104,6 +104,7 @@
 "A deleted project" = "已删除的项目";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "从一个聊天中学习到的事实或观察会先等待，直到另一个聊天也出现（或你批准）：一个问题并不代表你是谁。你主动提出的内容——偏好、纠正——会立即使用。";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "更饱满、更成品感的混音；歌词听得不那么清晰。制作约需 30 秒音乐的 20 秒。";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "对于无法装入 GPU 内存的混合专家模型（Gemma 4 26B-A4B、Nemotron 30B-A3B、Qwen MoE…），只会将部分专家保留在内存中，并按需从 SSD 读取其他专家。比能装入内存的模型慢数倍，但可以运行。将在下次启动此类模型时生效。";
 "A model is a tool, not an authority" = "模型是工具，不是权威";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "笔记在这么久未被确认后权重减半，并在约三倍时长后过期。已固定的笔记永不过期。";
 "A package: moved as one item." = "一个包：作为单个项目移动。";
@@ -495,6 +496,7 @@
 "Everything" = "所有内容";
 "Everything in that folder is here already." = "该文件夹中的内容已全部存在于此。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray 向 ipsupport.us 发送的完整内容，逐字段列出。你的 Mac 不会发送其他任何内容。";
+"Experimental" = "实验性";
 "Experimental — English only" = "试验性功能 — 仅限英语";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "试验性功能 — 仅限英语。运行 Voice Lab 时会卸载聊天模型，停止后重新加载。";
 "Expired" = "已过期";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "每次回答后立即";
 "Room in each chat: %lld tokens" = "每个聊天中的空间：%lld 个 token";
 "Run benchmark" = "运行基准测试";
+"Run big MoE models with experts on disk" = "运行将专家放在磁盘上的大型 MoE 模型";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在终端中运行以提高 GPU 内存限制；Mac 重启后会重置。";
 "Run without asking:" = "无需询问即可运行：";
 "Running" = "正在运行";

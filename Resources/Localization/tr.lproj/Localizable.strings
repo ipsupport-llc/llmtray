@@ -104,6 +104,7 @@
 "A deleted project" = "Silinmiş bir proje";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Bir sohbetten öğrenilen olgu veya gözlem, başka bir sohbet de bunu gösterene kadar (veya siz onaylayana kadar) bekler: tek bir soru kim olduğunuzu belirlemez. İstedikleriniz — tercihler, düzeltmeler — hemen kullanılır.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "GPU belleğine sığmayan bir mixture-of-experts modeli (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) uzmanlarının yalnızca bir kısmını bellekte tutar, diğerlerini ise gerektikçe SSD’den okur. Sığan bir modele göre birkaç kat daha yavaştır, ancak çalışır. Böyle bir model bir sonraki başlatıldığında etkili olur.";
 "A model is a tool, not an authority" = "Model bir araçtır, otorite değil";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Bir not bu süre boyunca doğrulanmazsa yarı ağırlıkta sayılır ve yaklaşık üç katı süre sonra geçerliliğini yitirir. Sabitlenen notların süresi hiçbir zaman dolmaz.";
 "A package: moved as one item." = "Bir paket: tek öge olarak taşındı.";
@@ -495,6 +496,7 @@
 "Everything" = "Her Şey";
 "Everything in that folder is here already." = "O klasördeki her şey zaten burada.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray'nin ipsupport.us'a alan alan gönderdiği tam bilgiler. Başka hiçbir şey Mac'inizden ayrılmaz.";
+"Experimental" = "Deneysel";
 "Experimental — English only" = "Deneysel — yalnızca İngilizce";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Deneysel — yalnızca İngilizce. Voice Lab çalışırken sohbet modeli boşaltılır; işlem bitince yeniden yüklenir.";
 "Expired" = "Süresi Dolanlar";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "Her yanıttan hemen sonra";
 "Room in each chat: %lld tokens" = "Her sohbetteki yer: %lld token";
 "Run benchmark" = "Benchmark Çalıştır";
+"Run big MoE models with experts on disk" = "Uzmanları diskte tutarak büyük MoE modellerini çalıştır";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU bellek sınırını artırmak için Terminal'de çalıştırın; Mac yeniden başladığında sıfırlanır.";
 "Run without asking:" = "Sormadan çalıştır:";
 "Running" = "Çalışıyor";

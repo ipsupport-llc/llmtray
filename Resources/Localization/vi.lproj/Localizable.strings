@@ -104,6 +104,7 @@
 "A deleted project" = "Một dự án đã xóa";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Một sự kiện hoặc quan sát học được từ một Trò chuyện sẽ chờ đến khi một Trò chuyện khác cũng cho thấy điều đó (hoặc bạn phê duyệt): một câu hỏi không nói lên bạn là ai. Những gì bạn yêu cầu -- tùy chọn, chỉnh sửa -- được dùng ngay.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "Mô hình mixture-of-experts (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) không vừa trong bộ nhớ GPU sẽ chỉ giữ một phần các expert trong bộ nhớ và đọc các expert còn lại từ SSD khi cần. Chậm hơn vài lần so với mô hình vừa trong bộ nhớ, nhưng vẫn chạy được. Có hiệu lực khi lần tới khởi chạy một mô hình như vậy.";
 "A model is a tool, not an authority" = "Mô hình là công cụ, không phải nguồn có thẩm quyền";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Sau khoảng thời gian này nếu chưa được xác nhận, ghi chú chỉ còn được tính một nửa và sẽ hết hạn sau khoảng gấp ba lần thời gian đó. Ghi chú Đã ghim không bao giờ hết hạn.";
 "A package: moved as one item." = "Một gói: di chuyển như một mục duy nhất.";
@@ -495,6 +496,7 @@
 "Everything" = "Mọi thứ";
 "Everything in that folder is here already." = "Mọi thứ trong thư mục đó đã có ở đây rồi.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Đây là chính xác những gì LLMTray gửi tới ipsupport.us, trường từng trường. Không gì khác rời khỏi máy Mac của bạn.";
+"Experimental" = "Thử nghiệm";
 "Experimental — English only" = "Thử nghiệm — chỉ tiếng Anh";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Thử nghiệm — chỉ tiếng Anh. Mô hình chat được giải nạp khi Voice Lab chạy và sẽ nạp lại sau.";
 "Expired" = "Đã hết hạn";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "Ngay sau mỗi câu trả lời";
 "Room in each chat: %lld tokens" = "Dung lượng trong mỗi Trò chuyện: %lld token";
 "Run benchmark" = "Chạy đo hiệu năng";
+"Run big MoE models with experts on disk" = "Chạy các mô hình MoE lớn với expert trên đĩa";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Chạy trong Terminal để tăng giới hạn bộ nhớ GPU; sẽ về lại khi Mac khởi động lại.";
 "Run without asking:" = "Chạy mà không cần hỏi:";
 "Running" = "Đang chạy";
