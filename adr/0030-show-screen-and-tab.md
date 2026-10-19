@@ -80,6 +80,13 @@ like the others). Both builds.
   rules see it), "localhost", IPv6 literals and addresses with a user
   name. Without the rules nothing is rendered. Checked with a probe page:
   without the two layers it reached a local server 7 times, with them 0.
+- The proxy is the read's own: a password per read (407 otherwise), no
+  failover to a direct connection; addresses on a network this Mac is on
+  (its interfaces' networks, embedded IPv4 in mapped, NAT64 and 6to4
+  addresses too) are refused as local. The WebKit view runs in Lockdown
+  Mode: no WebRTC (its sockets go around any proxy) in any frame, no
+  WebAssembly or JIT -- checked: RTCPeerConnection is undefined in the
+  page and a new iframe, scripts and fetch still run.
 - Limits: 5 MB of HTML (counted as it comes), 25 MB and 25 s for all a
   read loads, 20 s for a render, 400 000 characters of rendered text;
   one read at a time, the next waits.

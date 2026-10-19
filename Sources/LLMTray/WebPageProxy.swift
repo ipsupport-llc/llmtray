@@ -22,6 +22,10 @@ final class WebPageProxy: @unchecked Sendable {
     static let ports: Set<UInt16> = [80, 443]
     /// Connections at once.
     static let maxConnections = 48
+    /// Connections not yet past the password at once, and how long one may
+    /// take to get there.
+    static let maxPending = 8
+    static let headTimeout: TimeInterval = 3
 
     /// The read's credentials: only it can use the proxy.
     let user = "llmtray"
@@ -30,6 +34,8 @@ final class WebPageProxy: @unchecked Sendable {
     private let queue = DispatchQueue(label: "LLMTray.webPageProxy")
     private var listener: NWListener?
     private var connections: [ObjectIdentifier: NWConnection] = [:]
+    /// Accepted, still reading their CONNECT head.
+    private var pending: [ObjectIdentifier: NWConnection] = [:]
     private var received = 0
     private var sent = 0
     private var stopped = false
@@ -79,6 +85,8 @@ final class WebPageProxy: @unchecked Sendable {
         listener = nil
         connections.values.forEach { $0.cancel() }
         connections = [:]
+        pending.values.forEach { $0.cancel() }
+        pending = [:]
     }
 
     // MARK: Connections
@@ -95,21 +103,30 @@ final class WebPageProxy: @unchecked Sendable {
     }
 
     private func accept(_ client: NWConnection) {
-        guard track(client) else { return }
+        // Not counted against the read's connections until it gives the
+        // password; a few at a time, briefly.
+        guard !stopped, pending.count < Self.maxPending else { client.cancel(); return }
+        let id = ObjectIdentifier(client)
+        pending[id] = client
         client.start(queue: queue)
+        queue.asyncAfter(deadline: .now() + Self.headTimeout) { [weak self] in
+            if self?.pending.removeValue(forKey: id) != nil { client.cancel() }
+        }
         readHead(client, Data())
     }
 
     /// Reads the CONNECT request (its head, at most 8 KB).
     private func readHead(_ client: NWConnection, _ buffer: Data) {
         client.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] data, _, done, error in
-            guard let self, !self.stopped else { client.cancel(); return }
+            guard let self, !self.stopped, self.pending[ObjectIdentifier(client)] != nil else { client.cancel(); return }
             var buffer = buffer
             if let data { buffer.append(data) }
             if let end = buffer.range(of: Data("\r\n\r\n".utf8)) {
+                self.pending[ObjectIdentifier(client)] = nil
                 self.connect(client, head: buffer[..<end.lowerBound], rest: buffer[end.upperBound...])
             } else if done || error != nil || buffer.count > 8192 {
-                self.drop(client)
+                self.pending[ObjectIdentifier(client)] = nil
+                client.cancel()
             } else {
                 self.readHead(client, buffer)
             }
@@ -131,6 +148,7 @@ final class WebPageProxy: @unchecked Sendable {
         guard auth == expected else {
             return refuse(client, "407 Proxy Authentication Required", extra: "Proxy-Authenticate: Basic realm=\"LLMTray\"\r\n")
         }
+        guard track(client) else { return }
         guard parts.count >= 2, parts[0] == "CONNECT", let target = Self.hostPort(String(parts[1])),
               Self.ports.contains(target.port) else {
             return refuse(client, "405 Method Not Allowed")
@@ -266,11 +284,20 @@ enum LocalNetworks {
 
 extension Array where Element == LocalNetworks.Network {
     func contains(_ ip: MCPOAuth.IPAddress) -> Bool {
-        let bytes: [UInt8]
+        func v4(_ a: UInt32) -> [UInt8] { [UInt8(a >> 24), UInt8((a >> 16) & 0xff), UInt8((a >> 8) & 0xff), UInt8(a & 0xff)] }
         switch ip {
-        case .v4(let a): bytes = [UInt8(a >> 24), UInt8((a >> 16) & 0xff), UInt8((a >> 8) & 0xff), UInt8(a & 0xff)]
-        case .v6(let b): bytes = b
+        case .v4(let a):
+            return contains { $0.contains(v4(a)) }
+        case .v6(let b):
+            if contains(where: { $0.contains(b) }) { return true }
+            // An IPv4 address inside it (mapped ::ffff:, NAT64 64:ff9b::,
+            // 6to4 2002::): checked against this Mac's IPv4 networks.
+            let embedded: [UInt8]?
+            if b[0..<10].allSatisfy({ $0 == 0 }) && b[10] == 0xff && b[11] == 0xff { embedded = [UInt8](b[12..<16]) }
+            else if b[0] == 0x00, b[1] == 0x64, b[2] == 0xff, b[3] == 0x9b { embedded = [UInt8](b[12..<16]) }
+            else if b[0] == 0x20, b[1] == 0x02 { embedded = [UInt8](b[2..<6]) }
+            else { embedded = nil }
+            return embedded.map { e in contains { $0.contains(e) } } ?? false
         }
-        return contains { $0.contains(bytes) }
     }
 }

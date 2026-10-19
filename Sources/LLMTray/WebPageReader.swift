@@ -144,9 +144,11 @@ enum WebPageReader {
         return (text, http.url ?? url)
     }
 
-    /// The body, at most maxBytes, gathered off the main actor.
+    /// The body, at most maxBytes, gathered off the main actor (a
+    /// nonisolated async function runs there) and stopped when the read is
+    /// cancelled.
     nonisolated private static func collect(_ bytes: URLSession.AsyncBytes) async throws -> Data {
-        try await Task.detached {
+        do {
             var data = Data()
             var chunk = [UInt8]()
             chunk.reserveCapacity(65536)
@@ -156,12 +158,14 @@ enum WebPageReader {
                     data.append(contentsOf: chunk)
                     chunk.removeAll(keepingCapacity: true)
                     if data.count > maxBytes { throw ReadError.tooBig }
+                    try Task.checkCancellation()
                 }
             }
             data.append(contentsOf: chunk)
             if data.count > maxBytes { throw ReadError.tooBig }
+            try Task.checkCancellation()
             return data
-        }.value
+        }
     }
 
     /// The bytes in the encoding the server or the page names (a
@@ -213,12 +217,11 @@ enum WebPageReader {
             // rendered.
             guard let rules = await Self.literalBlocker() else { return nil }
             config.userContentController.add(rules)
-            // WebRTC opens its own sockets, around any proxy: gone before a
-            // page's scripts run, in every frame.
-            config.userContentController.addUserScript(WKUserScript(
-                source: "for (const n of ['RTCPeerConnection','webkitRTCPeerConnection','RTCDataChannel','RTCIceCandidate']) {"
-                    + "try { Object.defineProperty(window, n, {value: undefined, writable: false, configurable: false}); } catch (e) {} }",
-                injectionTime: .atDocumentStart, forMainFrameOnly: false))
+            // Lockdown Mode: no WebRTC (its sockets go around any proxy) in
+            // any frame, an empty iframe's too; no WebAssembly, no JIT.
+            // Checked: RTCPeerConnection is undefined in the page and in a
+            // new iframe, fetch and scripts still run.
+            config.defaultWebpagePreferences.isLockdownModeEnabled = true
             config.preferences.javaScriptCanOpenWindowsAutomatically = false
             config.mediaTypesRequiringUserActionForPlayback = .all
             let view = WKWebView(frame: NSRect(x: 0, y: 0, width: 1280, height: 900), configuration: config)
