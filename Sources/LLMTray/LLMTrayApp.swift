@@ -583,8 +583,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         item(NSLocalizedString("Settings…", comment: ""), #selector(showSettingsWindow), key: ",")
         // Set Up, What's New and Voice Lab are in Settings, Rate and
         // Support in About: the menu keeps what's used every day.
+        // Validated by AppKit: Sparkle greys out Check for Updates while
+        // one is running.
         let help = NSMenu()
-        help.autoenablesItems = false
         item(NSLocalizedString("LLMTray Guide", comment: "tray menu: opens the guide on the website"), #selector(showGuide), in: help)
         // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.):
         // the bare `.build/debug/LLMTray` binary has none, and the item
