@@ -37,8 +37,9 @@ struct UsageView: View {
     @State private var confirmsClear = false
     /// Read again every minute: Today moves on at midnight.
     @State private var now = Date()
-    /// Bumped when the window comes to the front: the table is made again.
+    /// Bumped when this window comes to the front: the table is made again.
     @State private var shown = 0
+    @StateObject private var window = HostWindow()
     private let tick = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     private var selectedPeriod: UsageLedger.Period { UsageLedger.Period(rawValue: period) ?? .week }
@@ -47,7 +48,9 @@ struct UsageView: View {
     var body: some View {
         Group { if enabled { statistics } else { off } }
             .onReceive(tick) { now = $0 }
-            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+            .background(ChatScrollViewFinder.WindowReader { window.window = $0 })
+            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { note in
+                guard let key = note.object as? NSWindow, key === window.window else { return }
                 now = Date()
                 shown += 1
             }
@@ -158,11 +161,17 @@ struct UsageView: View {
         // Made again when its rows come or go (a new model, client or day)
         // and when the window comes back: the native table could miss rows
         // added while the window was behind others, until reopened.
-        .id(TableKey(names: lines.map(\.name), shown: shown))
+        .id(TableKey(names: Set(lines.map(\.name)), shown: shown))
+    }
+
+    /// The window the tab is in (weak).
+    final class HostWindow: ObservableObject {
+        weak var window: NSWindow?
     }
 
     private struct TableKey: Hashable {
-        let names: [String]
+        /// The rows there are, not their order (most requests first moves).
+        let names: Set<String>
         let shown: Int
     }
 
