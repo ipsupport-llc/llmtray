@@ -443,24 +443,52 @@ public enum ModelWeights {
         let keys = ["num_experts", "num_local_experts", "n_routed_experts"]
         guard let experts = keys.lazy.compactMap({ (text[$0] ?? config[$0]) as? Int }).first, experts > 1,
               let names = try? FileManager.default.contentsOfDirectory(atPath: path) else { return 0 }
-        return names.filter { $0.hasSuffix(".safetensors") }.reduce(Int64(0)) { sum, name in
+        // A module's tensors can be in different files: gathered first.
+        var modules: [String: ExpertModule] = [:]
+        for name in names where name.hasSuffix(".safetensors") {
             let file = URL(fileURLWithPath: path).appendingPathComponent(name).resolvingSymlinksInPath()
             let (header, dataBytes) = safetensorsHeader(file)
-            return sum + routedExpertBytes(header: header, dataBytes: dataBytes, experts: experts)
+            guard gatherExperts(header: header, dataBytes: dataBytes, experts: experts, into: &modules) else { return 0 }
         }
+        return offloadable(modules)
     }
 
+    struct ExpertModule {
+        var bytes: Int64 = 0
+        var scales = false
+        var bias = false
+    }
+
+    /// Only what the runtime leaves on disk: quantized gate/up/down
+    /// projections of a stacked SwitchGLU (scales present, no linear
+    /// bias). Other experts (Nemotron's fc1/fc2, unquantized, biased) load.
     static func routedExpertBytes(header: [String: Any], dataBytes: Int64, experts: Int) -> Int64 {
-        var sum: Int64 = 0
+        var modules: [String: ExpertModule] = [:]
+        guard gatherExperts(header: header, dataBytes: dataBytes, experts: experts, into: &modules) else { return 0 }
+        return offloadable(modules)
+    }
+
+    static func offloadable(_ modules: [String: ExpertModule]) -> Int64 {
+        modules.values.filter { $0.scales && !$0.bias }.reduce(0) { $0 + $1.bytes }
+    }
+
+    /// False when the header's offsets aren't to be trusted.
+    static func gatherExperts(header: [String: Any], dataBytes: Int64, experts: Int, into modules: inout [String: ExpertModule]) -> Bool {
         for (key, value) in header where key != "__metadata__" {
             guard key.contains(".switch_mlp.") || key.contains(".switch_glu."),
+                  let projection = ["gate_proj", "up_proj", "down_proj"].first(where: { key.contains(".\($0).") }),
                   let info = value as? [String: Any], let shape = info["shape"] as? [NSNumber], shape.first?.intValue == experts,
                   let offsets = info["data_offsets"] as? [NSNumber], offsets.count == 2 else { continue }
             let (start, end) = (offsets[0].int64Value, offsets[1].int64Value)
-            guard start >= 0, end >= start, end <= dataBytes else { return 0 }
-            sum += end - start
+            guard start >= 0, end >= start, end <= dataBytes else { return false }
+            let module = String(key[..<key.range(of: ".\(projection).")!.lowerBound])
+            var m = modules[module] ?? ExpertModule()
+            m.bytes += end - start
+            if key.hasSuffix(".gate_proj.scales") { m.scales = true }
+            if key.hasSuffix(".bias") { m.bias = true }
+            modules[module] = m
         }
-        return sum
+        return true
     }
 
     /// A safetensors file's JSON header and the size of the data after it

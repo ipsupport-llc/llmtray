@@ -106,16 +106,17 @@ public enum ServerLaunch {
 
     /// `--experts-on-disk`: the share of a MoE model's routed experts kept in
     /// memory so the rest of it, the margin and a reserve for its work fit
-    /// the GPU limit; 0.1 at the least. nil when it fits as it is (no
-    /// reason to read from disk) or isn't MoE.
+    /// the GPU limit, in 5% steps, 10-90%. nil when it fits as it is (no
+    /// reason to read from disk), isn't MoE, or doesn't fit even with 10%.
     public static func expertsOnDiskShare(gpuLimitBytes: UInt64?, weightsBytes: Int64, expertBytes: Int64,
                                           shares: MemoryShares = .default) -> Double? {
         guard expertBytes > 0, let limit = gpuLimitBytes,
               let headroom = gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weightsBytes),
               headroom < GPUFit.tightHeadroomBytes else { return nil }
         let room = Int64(clamping: limit) - (weightsBytes - expertBytes) - shares.marginBytes - expertsOnDiskReserveBytes
-        let share = Double(room) / Double(expertBytes)
-        return min(0.9, max(0.1, (share * 20).rounded(.down) / 20))
+        let share = (Double(room) / Double(expertBytes) * 20).rounded(.down) / 20
+        guard share >= 0.1 else { return nil }
+        return min(0.9, share)
     }
 
     public static func gpuHeadroomBytes(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int64? {
