@@ -65,6 +65,7 @@
 "%lld failed" = "%lld failed";
 "%lld files" = "%lld files";
 "%lld files couldn't be indexed" = "%lld files couldn't be indexed";
+"%lld h later" = "%lld h later";
 "%lld interrupted: look at them in Finder" = "%lld interrupted: look at them in Finder";
 "%lld items put back under their names." = "%lld items put back under their names.";
 "%lld min later" = "%lld min later";

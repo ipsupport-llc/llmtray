@@ -14,6 +14,8 @@ extension Notification.Name {
 @MainActor
 final class ServerLogModel: ObservableObject {
     @Published private(set) var entries: [ServerLogEntry] = []
+    /// What the status bar counts, with the entries.
+    private(set) var counts = (requests: 0, errors: 0, warnings: 0)
     private let server: ServerManager
     private var bag: AnyCancellable?
     private static let queue = DispatchQueue(label: "LLMTray server log parsing", qos: .userInitiated)
@@ -34,7 +36,11 @@ final class ServerLogModel: ObservableObject {
             .throttle(for: .milliseconds(250), scheduler: Self.queue, latest: true)
             .map { ServerLogGrouping.entries(ServerLogParser.parse($0.0, firstID: $0.1)) }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] entries in self?.entries = entries }
+            .sink { [weak self] entries in
+                self?.counts = (entries.filter { $0.kind == .request }.count, entries.filter(\.isError).count,
+                                entries.filter { $0.isProblem && !$0.isError }.count)
+                self?.entries = entries
+            }
     }
 }
 
@@ -59,12 +65,20 @@ final class LogScrollState: ObservableObject {
             forName: NSView.boundsDidChangeNotification, object: scroll.contentView, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, self.watch.isScrolling else { return }
+                // The view moved: by the user (wheel, scroller, keys) unless
+                // it's the log's own scroll to the end. New lines don't move
+                // it (the content grows below).
+                guard let self, Date() >= self.ownScrollUntil || self.watch.isScrolling else { return }
                 let end = self.isAtEnd
                 if end != self.atEnd { self.atEnd = end }
             }
         }
     }
+
+    /// The log scrolls itself (to the end, to a problem): its moves until
+    /// then aren't the user's.
+    private var ownScrollUntil = Date.distantPast
+    func scrollingItself() { ownScrollUntil = Date().addingTimeInterval(0.4) }
 
     var isAtEnd: Bool {
         guard let scroll = scrollView, let document = scroll.documentView else { return true }
@@ -97,6 +111,8 @@ struct ServerLogView: View {
     @AppStorage("serverLog.wrap") private var wrap = true
     @AppStorage("serverLog.compact") private var compact = false
     @State private var expanded: Set<Int> = []
+    /// Opened by a search match and closed by hand.
+    @State private var collapsed: Set<Int> = []
     @State private var newSinceLeft = 0
     @State private var lastProblemJump: Int?
     @FocusState private var searchFocused: Bool
@@ -157,7 +173,8 @@ struct ServerLogView: View {
                 }
             }
             Divider()
-            LogStatusBar(server: server, entries: model.entries, shown: entries.count, filtered: scope != .all || !query.isEmpty,
+            LogStatusBar(server: server, counts: model.counts, total: model.entries.count, shown: entries.count,
+                         filtered: scope != .all || !query.isEmpty || !showEvents || !showOther,
                          jumpToProblem: { jumpToProblem(errorsOnly: $0) }, showAll: { scope = .all; search = "" })
         }
         .frame(minWidth: 760, minHeight: 440)
@@ -189,23 +206,34 @@ struct ServerLogView: View {
                 .background(ChatScrollViewFinder { scroll.attach($0) })
             }
             .background(Color(nsColor: .textBackgroundColor))
-            .onChange(of: entries.last.map { "\($0.id)/\($0.children.count)/\($0.repeats)" }) {
-                guard follow else { return }
+            // Anything new in the log -- a new entry, or a line joining an
+            // earlier one (a request's stats after a warning).
+            .onChange(of: model.entries.map(\.lines.count).reduce(0, +) + model.entries.count) { old, new in
+                guard follow, new > old else { return }
                 if scroll.atEnd {
+                    scroll.scrollingItself()
                     proxy.scrollTo(Self.endID, anchor: .bottom)
                 } else {
-                    newSinceLeft += 1
+                    newSinceLeft += new - old
                 }
             }
             .onChange(of: scroll.atEnd) { if scroll.atEnd { newSinceLeft = 0 } }
             .onChange(of: follow) {
-                if follow { scroll.atEnd = true; newSinceLeft = 0; proxy.scrollTo(Self.endID, anchor: .bottom) }
+                if follow { scroll.atEnd = true; newSinceLeft = 0; scroll.scrollingItself(); proxy.scrollTo(Self.endID, anchor: .bottom) }
             }
-            .onChange(of: endRequest) { scroll.atEnd = true; newSinceLeft = 0; proxy.scrollTo(Self.endID, anchor: .bottom) }
+            .onChange(of: endRequest) {
+                scroll.atEnd = true; newSinceLeft = 0; scroll.scrollingItself(); proxy.scrollTo(Self.endID, anchor: .bottom)
+            }
             .onChange(of: problemRequest) {
-                if let id = problemRequest?.id { withAnimation { proxy.scrollTo(id, anchor: .center) } }
+                if let id = problemRequest?.id { scroll.scrollingItself(); withAnimation { proxy.scrollTo(id, anchor: .center) } }
             }
-            .onAppear { if follow { proxy.scrollTo(Self.endID, anchor: .bottom) } }
+            .onAppear {
+                // A list made again (after Clear, or filters that hid all):
+                // at the end, following.
+                scroll.atEnd = true
+                newSinceLeft = 0
+                if follow { scroll.scrollingItself(); proxy.scrollTo(Self.endID, anchor: .bottom) }
+            }
         }
     }
 
@@ -225,20 +253,29 @@ struct ServerLogView: View {
     }
 
     private func isExpanded(_ entry: ServerLogEntry) -> Bool {
-        expanded.contains(entry.id) || (!query.isEmpty && entry.children.contains { ServerLogParser.matches($0.text, query) })
+        expanded.contains(entry.id)
+            || (!query.isEmpty && !collapsed.contains(entry.id) && entry.children.contains { ServerLogParser.matches($0.text, query) })
     }
 
     private func toggle(_ entry: ServerLogEntry) {
-        if expanded.contains(entry.id) { expanded.remove(entry.id) } else { expanded.insert(entry.id) }
+        if isExpanded(entry) {
+            expanded.remove(entry.id)
+            collapsed.insert(entry.id)
+        } else {
+            expanded.insert(entry.id)
+            collapsed.remove(entry.id)
+        }
     }
 
     /// Seconds since the entry before, when it's a pause worth seeing
     /// (10 s to an hour): a server that went quiet, or hung.
     static func gap(before i: Int, in entries: [ServerLogEntry]) -> Int? {
         guard i > 0, let now = seconds(entries[i].head.time) else { return nil }
-        guard let before = entries[..<i].last(where: { $0.head.time != nil }).flatMap({ seconds($0.head.time) }) else { return nil }
+        // From when the one before ended (a request's last line), not began.
+        guard let before = entries[..<i].last(where: { $0.lastTime != nil }).flatMap({ seconds($0.lastTime) }) else { return nil }
         let gap = now - before
-        return gap >= 10 && gap < 3600 ? gap : nil
+        // Negative: past midnight, or out of order -- no marker.
+        return gap >= 10 ? gap : nil
     }
 
     static func seconds(_ time: String?) -> Int? {
@@ -256,7 +293,7 @@ struct ServerLogView: View {
             } else {
                 Image(systemName: "line.3.horizontal.decrease.circle").font(.system(size: 30)).foregroundStyle(.tertiary)
                 Text("Nothing matches").font(.headline)
-                Button("Show Everything") { scope = .all; search = ""; showEvents = true; showOther = true }
+                Button("Show Everything") { scope = .all; search = ""; showEvents = true; showOther = true; showDebug = true }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -338,11 +375,16 @@ struct ServerLogView: View {
     private var shortcuts: some View {
         ZStack {
             Button("") { searchFocused = true }.keyboardShortcut("f")
-            Button("") { server.clearLog(); expanded = [] }.keyboardShortcut("k")
-            Button("") { save() }.keyboardShortcut("s")
-            Button("") { copy(visible) }.keyboardShortcut("c", modifiers: [.command, .shift])
-            Button("") { jumpToProblem(errorsOnly: true) }.keyboardShortcut("e")
-            Button("") { follow = true; jumpToEnd() }.keyboardShortcut(.end, modifiers: [])
+            // Not while typing in the search field: End moves its caret, ⌘K
+            // isn't a reason to lose the log.
+            Group {
+                Button("") { server.clearLog(); expanded = [] }.keyboardShortcut("k")
+                Button("") { save() }.keyboardShortcut("s")
+                Button("") { copy(visible) }.keyboardShortcut("c", modifiers: [.command, .shift])
+                Button("") { jumpToProblem(errorsOnly: true) }.keyboardShortcut("e")
+                Button("") { follow = true; jumpToEnd() }.keyboardShortcut(.end, modifiers: [])
+            }
+            .disabled(searchFocused)
         }
         .opacity(0)
         .allowsHitTesting(false)
@@ -378,16 +420,15 @@ struct ServerLogView: View {
 /// (a click goes to the next), what the filters show.
 private struct LogStatusBar: View {
     @ObservedObject var server: ServerManager
-    let entries: [ServerLogEntry]
+    let counts: (requests: Int, errors: Int, warnings: Int)
+    let total: Int
     let shown: Int
     let filtered: Bool
     let jumpToProblem: (_ errorsOnly: Bool) -> Void
     let showAll: () -> Void
 
     var body: some View {
-        let errors = entries.filter(\.isError).count
-        let warnings = entries.filter { $0.isProblem && !$0.isError }.count
-        let requests = entries.filter { $0.kind == .request }.count
+        let (requests, errors, warnings) = counts
         HStack(spacing: 14) {
             HStack(spacing: 5) {
                 Circle().fill(Color(nsColor: ServerStatusText.color(server))).frame(width: 7, height: 7)
@@ -409,7 +450,7 @@ private struct LogStatusBar: View {
             Spacer()
             if filtered {
                 Text(String(format: NSLocalizedString("%@ of %@ shown", comment: "Server log: entries shown of all"),
-                            shown.formatted(), entries.count.formatted()))
+                            shown.formatted(), total.formatted()))
                     .foregroundStyle(.secondary)
                 Button("Show All", action: showAll).buttonStyle(.link)
             }
@@ -427,7 +468,8 @@ private struct GapMarker: View {
         HStack(spacing: 8) {
             Rectangle().fill(Color.secondary.opacity(0.18)).frame(height: 1)
             Text(seconds < 60 ? String(format: NSLocalizedString("%lld s later", comment: "Server log: a pause between entries"), seconds)
-                              : String(format: NSLocalizedString("%lld min later", comment: "Server log: a pause between entries"), seconds / 60))
+                 : seconds < 3600 ? String(format: NSLocalizedString("%lld min later", comment: "Server log: a pause between entries"), seconds / 60)
+                 : String(format: NSLocalizedString("%lld h later", comment: "Server log: a pause between entries"), seconds / 3600))
                 .font(.caption2).foregroundStyle(.tertiary).fixedSize()
             Rectangle().fill(Color.secondary.opacity(0.18)).frame(height: 1)
         }
@@ -569,8 +611,9 @@ private struct EntryRow: View {
                     .font(.caption).foregroundStyle(.secondary)
                     .padding(.bottom, 2)
             }
-            // A warning shown without its source: the line as written.
-            if entry.kind == .warning, entry.summary != entry.head.message {
+            // The head as written, where the row shows it otherwise (a
+            // request's access line, a warning without its source).
+            if entry.kind == .request || (entry.kind == .warning && entry.summary != entry.head.message) {
                 highlighted(entry.head.text)
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(.secondary)

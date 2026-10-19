@@ -68,9 +68,13 @@ public enum ServerLogParser {
                 // or an access line ends a cut-off one).
                 if line.time != nil || line.status != nil || line.kind == .event {
                     inTraceback = false
-                } else {
-                    if !indented { inTraceback = false }
+                } else if indented {
                     line = line.with(kind: .error)
+                } else {
+                    // The exception ends it; other text after a cut-off
+                    // traceback is just text.
+                    inTraceback = false
+                    if ServerLogGrouping.isException(text) { line = line.with(kind: .error) }
                 }
             } else if indented, line.time == nil, let previous, previous == .warning || previous == .error {
                 // A warning's source line ("  warnings.warn(") goes with it.
@@ -174,7 +178,7 @@ public struct ServerLogEntry: Identifiable, Equatable, Sendable {
     /// it has a traceback, else the head's message.
     public var summary: String {
         if kind == .error, let exception = children.last(where: { !$0.text.hasPrefix(" ") && !$0.text.hasPrefix("\t")
-            && !$0.text.hasPrefix("Traceback") }) {
+            && !$0.text.hasPrefix("Traceback") && !ServerLogGrouping.chainLines.contains(where: $0.text.hasPrefix) }) {
             return exception.text
         }
         // "/path/server.py:3156: UserWarning: …": the warning first; where
@@ -188,8 +192,14 @@ public struct ServerLogEntry: Identifiable, Equatable, Sendable {
     public var isError: Bool { kind == .error || (head.status ?? 0) >= 500 }
     public var isProblem: Bool { isError || kind == .warning || (head.status ?? 0) >= 400 }
     public var lines: [ServerLogLine] { [head] + children }
-    /// Every line's text, for copying and searching.
-    public var text: String { lines.map(\.text).joined(separator: "\n") }
+    /// Every line's text, for copying and searching (a folded repeat says
+    /// how many).
+    public var text: String {
+        lines.map(\.text).joined(separator: "\n") + (repeats > 1 ? "\n(×\(repeats))" : "")
+    }
+
+    /// The time of its last line that has one: when it ended.
+    public var lastTime: String? { lines.last(where: { $0.time != nil })?.time }
 }
 
 extension ServerLogEntry.Kind {
@@ -211,47 +221,80 @@ public enum ServerLogGrouping {
                              "/v1/messages", "/v1/responses"]
 
     static let progressPattern = try! NSRegularExpression(pattern: #"(\d+)\s*/\s*(\d+)"#)
+    /// The line ending a traceback: an exception's name ("RuntimeError: boom",
+    /// "KeyboardInterrupt"), not any text.
+    static let exceptionPattern = try! NSRegularExpression(pattern: #"^[A-Za-z_][\w.]*(?::.*)?$"#)
+    /// Python's lines between chained tracebacks.
+    static let chainLines = ["During handling of the above exception", "The above exception was the direct cause"]
+
+    static func isException(_ text: String) -> Bool {
+        exceptionPattern.firstMatch(in: text, range: NSRange(location: 0, length: (text as NSString).length)) != nil
+    }
+
+    /// LLMTray events after which nothing open goes on: the server started,
+    /// stopped or failed.
+    static func endsRequests(_ line: ServerLogLine) -> Bool {
+        guard line.text.hasPrefix("--- ") else { return false }
+        if line.kind == .warning { return true }
+        let lower = line.message.lowercased()
+        return ["start", "stop", "ready", "restart", "loading", "exited", "unload"].contains { lower.contains($0) }
+    }
 
     public static func entries(_ lines: [ServerLogLine]) -> [ServerLogEntry] {
         var out: [ServerLogEntry] = []
         /// Generating requests not yet ended by their stats line (indices).
         var open: [Int] = []
-        /// The problem entry lines may still join (index), and whether it's
-        /// in a traceback.
+        /// The problem entry lines may still join (index).
         var problem: Int?
         var inTraceback = false
+        /// After a traceback's exception: Python may chain another.
+        var afterException = false
+        /// A repeat of a warning was folded in: its own source lines (already
+        /// there) aren't added again.
+        var repeating = false
 
         for line in lines {
             let indented = line.text.hasPrefix(" ") || line.text.hasPrefix("\t")
             // A warning's or error's own lines: indented source lines, a
-            // traceback and the exception that ends it.
-            if let p = problem, line.time == nil, line.status == nil, line.kind != .event {
+            // traceback and the exception that ends it, chained ones.
+            if let p = problem, line.time == nil, line.status == nil, !line.text.hasPrefix("--- ") {
                 if line.text.hasPrefix("Traceback") {
                     inTraceback = true
+                    afterException = false
                     out[p].children.append(line)
                     if out[p].kind == .warning { out[p].kind = .error }
                     continue
                 }
-                if indented {
+                if afterException, chainLines.contains(where: line.text.hasPrefix) {
                     out[p].children.append(line)
                     continue
                 }
-                if inTraceback {
-                    // The exception line ends it.
+                if indented {
+                    if !(repeating && out[p].children.contains { $0.text == line.text }) { out[p].children.append(line) }
+                    continue
+                }
+                if inTraceback, isException(line.text) {
                     out[p].children.append(line)
                     inTraceback = false
-                    problem = nil
+                    afterException = true
                     continue
                 }
             }
             problem = nil
             inTraceback = false
+            afterException = false
+            repeating = false
 
             // A traceback with no record before it.
             if line.text.hasPrefix("Traceback") {
                 out.append(ServerLogEntry(kind: .error, head: line))
                 problem = out.count - 1
                 inTraceback = true
+                continue
+            }
+            // A frame or source line whose start was cut off: as it is.
+            if indented, line.time == nil, line.kind == .error || line.kind == .warning {
+                out.append(ServerLogEntry(kind: .line, head: line))
                 continue
             }
 
@@ -262,14 +305,17 @@ public enum ServerLogGrouping {
                 if line.method == "POST", generating.contains(path), (line.status ?? 0) < 400 { open.append(out.count - 1) }
             case .cache, .progress, .stats:
                 // Joins the request it belongs to: the only one open. With
-                // several at once there's no telling which: on its own.
+                // several at once there's no telling which: on its own (and
+                // a stats line still ends one of them, the oldest).
                 guard open.count == 1, let r = open.first else {
                     out.append(ServerLogEntry(kind: .line, head: line))
+                    if line.kind == .stats, !open.isEmpty { open.removeFirst() }
                     continue
                 }
                 out[r].children.append(line)
                 if line.kind == .stats {
                     out[r].stats = RequestStats.parse(line.message)
+                    out[r].progress = nil
                     open.removeAll()
                 } else if line.kind == .progress {
                     let ns = line.message as NSString
@@ -280,10 +326,13 @@ public enum ServerLogGrouping {
                 }
             case .warning, .error:
                 let kind = ServerLogEntry.Kind(line)
-                // The same warning again: counted on the last one.
+                // The same warning again: counted on the last one, its source
+                // lines not added twice.
                 if kind == .warning, let last = out.indices.last, out[last].kind == .warning,
-                   out[last].head.message == line.message, out[last].children.isEmpty {
+                   out[last].head.message == line.message {
                     out[last].repeats += 1
+                    problem = last
+                    repeating = true
                     continue
                 }
                 var entry = ServerLogEntry(kind: kind, head: line)
@@ -293,8 +342,7 @@ public enum ServerLogGrouping {
             default:
                 out.append(ServerLogEntry(kind: ServerLogEntry.Kind(line), head: line))
             }
-            // An event (the server restarted, stopped) ends what was open.
-            if line.kind == .event { open.removeAll() }
+            if endsRequests(line) { open.removeAll() }
         }
         return out
     }

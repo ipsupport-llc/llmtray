@@ -88,7 +88,8 @@ final class ServerLogParserTests: XCTestCase {
         let request = entries[2]
         XCTAssertEqual(request.children.count, 3)
         XCTAssertEqual(request.stats?.prompt, 521)
-        XCTAssertEqual(request.progress?.done, 256)
+        // Read: its progress is done with.
+        XCTAssertNil(request.progress)
         XCTAssertEqual(entries[3].repeats, 2)
         XCTAssertEqual(entries[4].summary, "RuntimeError: boom")
         XCTAssertEqual(entries[4].context, "Generation failed; the requests in work get the error: boom")
@@ -106,5 +107,62 @@ final class ServerLogParserTests: XCTestCase {
         let entries = ServerLogGrouping.entries(ServerLogParser.parse(log))
         XCTAssertEqual(entries.map(\.kind), [.request, .request, .line])
         XCTAssertNil(entries[0].stats)
+    }
+
+    func testReviewedGroupingCases() {
+        func kinds(_ log: String) -> [ServerLogEntry] { ServerLogGrouping.entries(ServerLogParser.parse(log)) }
+        // Python's own warning shape repeated: one entry, ×2, one source line.
+        let warn = kinds("""
+        /x/server.py:1: UserWarning: careful
+          warnings.warn(
+        /x/server.py:1: UserWarning: careful
+          warnings.warn(
+        """)
+        XCTAssertEqual(warn.count, 1)
+        XCTAssertEqual(warn[0].repeats, 2)
+        XCTAssertEqual(warn[0].children.count, 1)
+
+        // Chained tracebacks: one error, the final cause as its summary.
+        let chained = kinds("""
+        2026-10-17 06:22:14,000 - ERROR - Generation failed: boom
+        Traceback (most recent call last):
+          File "a.py", line 1
+        ValueError: first
+
+        During handling of the above exception, another exception occurred:
+
+        Traceback (most recent call last):
+          File "b.py", line 2
+        RuntimeError: second
+        """)
+        XCTAssertEqual(chained.map(\.kind), [.error])
+        XCTAssertEqual(chained[0].summary, "RuntimeError: second")
+
+        // A traceback cut off: the next ordinary line isn't its exception.
+        let cut = kinds("""
+        Traceback (most recent call last):
+          File "a.py", line 1
+        some unrelated output
+        """)
+        XCTAssertEqual(cut.map(\.kind), [.error, .line])
+
+        // Overlapping requests don't stop later ones from getting their stats.
+        let overlap = kinds("""
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/messages HTTP/1.1" 200 -
+        2026-10-17 06:22:12,000 - INFO - Request stats: prompt=5 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        2026-10-17 06:22:12,500 - INFO - Request stats: prompt=6 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        127.0.0.1 - - [17/Oct/2026 06:22:20] "POST /v1/chat/completions HTTP/1.1" 200 -
+        2026-10-17 06:22:21,000 - INFO - Request stats: prompt=7 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        """)
+        XCTAssertEqual(overlap.last?.stats?.prompt, 7)
+
+        // The server dying ends the request it was serving.
+        let died = kinds("""
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -
+        --- mlx_lm.server exited unexpectedly (code 9) ---
+        2026-10-17 06:22:30,000 - INFO - Request stats: prompt=5 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        """)
+        XCTAssertNil(died[0].stats)
     }
 }
