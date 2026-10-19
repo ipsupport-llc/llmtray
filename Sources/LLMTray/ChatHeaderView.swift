@@ -406,21 +406,26 @@ struct ServerStatusLabel: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            Circle().fill(statusColor).frame(width: 8, height: 8)
-            Text(statusText).font(.callout.weight(.medium)).lineLimit(1).truncationMode(.middle)
+            Circle().fill(Color(nsColor: ServerStatusText.color(server))).frame(width: 8, height: 8)
+            Text(ServerStatusText.text(server)).font(.callout.weight(.medium)).lineLimit(1).truncationMode(.middle)
         }
     }
+}
 
-    private var statusColor: Color {
+/// The server's state in a word and a color: the popover's status line and
+/// the tray menu's first line.
+@MainActor
+enum ServerStatusText {
+    static func color(_ server: ServerManager) -> NSColor {
         switch server.state {
-        case .stopped: return server.suspendedForImageGeneration ? .blue : .gray
-        case .starting: return .yellow
-        case .running: return .green
-        case .failed: return .red
+        case .stopped: return server.suspendedForImageGeneration ? .systemBlue : .systemGray
+        case .starting: return .systemYellow
+        case .running: return .systemGreen
+        case .failed: return .systemRed
         }
     }
 
-    private var statusText: String {
+    static func text(_ server: ServerManager) -> String {
         switch server.state {
         case .stopped:
             // Unloaded for an image or a song (ChatClient): not idle, and

@@ -274,6 +274,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(detachChatSoon), name: .detachChat, object: nil
         )
         NotificationCenter.default.addObserver(
+            self, selector: #selector(sharingWillPick), name: .sharingWillPick, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(sharingDidPick), name: .sharingDidPick, object: nil
+        )
+        // Which browser "Attach Tab" means: the last one in front (adr/0030).
+        ScreenShare.shared.startWatchingApps()
+        NotificationCenter.default.addObserver(
             self, selector: #selector(showAboutPanel), name: .showAbout, object: nil
         )
         NotificationCenter.default.addObserver(
@@ -489,6 +497,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    /// Where the chat was while a window or the screen is picked
+    /// (adr/0030): it steps aside, so the picker shows what's under it,
+    /// and comes back after.
+    private enum ChatBeforePick { case none, popover, window }
+    private var chatBeforePick = ChatBeforePick.none
+
+    @objc private func sharingWillPick() {
+        if chatPresentation.isDetached, chatWindow.window?.isVisible == true {
+            chatBeforePick = .window
+            chatWindow.window?.orderOut(nil)
+        } else if popover.isShown {
+            chatBeforePick = .popover
+            popover.performClose(nil)
+        } else {
+            chatBeforePick = .none
+        }
+    }
+
+    @objc private func sharingDidPick() {
+        switch chatBeforePick {
+        case .window: showChatWindow()
+        case .popover:
+            if let button = statusItem.button, !popover.isShown {
+                popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        case .none: break
+        }
+        chatBeforePick = .none
+    }
+
     /// The chat window was closed: the chat goes back into the popover.
     private func attachChat() {
         guard chatPresentation.isDetached else { return }
@@ -552,85 +591,83 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// from ever opening via the button's own action.
     private func showQuickMenu() {
         let menu = NSMenu()
+        menu.autoenablesItems = false
+        func item(_ title: String, _ action: Selector?, key: String = "", in m: NSMenu? = nil, target: AnyObject? = nil) {
+            let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
+            item.target = target ?? self
+            (m ?? menu).addItem(item)
+        }
+
+        // What the server is doing, first: a failure opens the log.
+        menu.addItem(statusMenuItem())
+        menu.addItem(.separator())
 
         // The chat and its model, without opening the popover first.
         let openItem = NSMenuItem(title: NSLocalizedString("Open Chat", comment: "tray menu"), action: #selector(quickOpenChat), keyEquivalent: "o")
         openItem.keyEquivalentModifierMask = [.command, .shift]
         openItem.target = self
         menu.addItem(openItem)
-        let newItem = NSMenuItem(title: NSLocalizedString("New Chat", comment: "tray menu"), action: #selector(quickNewChat), keyEquivalent: "n")
-        newItem.target = self
-        menu.addItem(newItem)
         menu.addItem(modelMenuItem())
-        menu.addItem(profileMenuItem())
 
         menu.addItem(.separator())
 
-        let toggleItem: NSMenuItem
         if isServerRunning {
-            toggleItem = NSMenuItem(title: NSLocalizedString("Stop Server", comment: ""), action: #selector(quickStop), keyEquivalent: "")
+            item(NSLocalizedString("Stop Server", comment: ""), #selector(quickStop))
         } else {
-            toggleItem = NSMenuItem(title: NSLocalizedString("Start Server", comment: ""), action: #selector(quickStart), keyEquivalent: "")
+            item(NSLocalizedString("Start Server", comment: ""), #selector(quickStart))
         }
-        toggleItem.target = self
-        menu.addItem(toggleItem)
+        item(NSLocalizedString("Server…", comment: "tray menu: the Server window (usage and log)"), #selector(showServerLogWindow))
 
         menu.addItem(.separator())
 
-        let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
-        settingsItem.target = self
-        menu.addItem(settingsItem)
-        // Only once it's turned on and its model is here (Settings > Voice).
-        if VoiceModelStore.shared.isEnabled, VoiceModelStore.shared.isDownloaded(VoiceModelStore.shared.selected) {
-            let voiceItem = NSMenuItem(title: NSLocalizedString("Voice Lab…", comment: ""), action: #selector(showVoiceLab), keyEquivalent: "")
-            voiceItem.target = self
-            menu.addItem(voiceItem)
-        }
-        let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
-        logItem.target = self
-        menu.addItem(logItem)
-
-        menu.addItem(.separator())
-
-        // What's used now and then goes one level down.
+        item(NSLocalizedString("Settings…", comment: ""), #selector(showSettingsWindow), key: ",")
+        // Set Up, What's New and Voice Lab are in Settings, Rate and
+        // Support in About: the menu keeps what's used every day.
+        // Validated by AppKit: Sparkle greys out Check for Updates while
+        // one is running.
         let help = NSMenu()
-        func add(_ title: String, _ action: Selector, target: AnyObject? = nil) {
-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
-            item.target = target ?? self
-            help.addItem(item)
-        }
-        add(NSLocalizedString("Set Up LLMTray…", comment: ""), #selector(showSetupWizard))
-        add(NSLocalizedString("What's New…", comment: ""), #selector(showWhatsNew))
-        add(NSLocalizedString("LLMTray Guide", comment: "tray menu: opens the guide on the website"), #selector(showGuide))
+        item(NSLocalizedString("LLMTray Guide", comment: "tray menu: opens the guide on the website"), #selector(showGuide), in: help)
         // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.):
         // the bare `.build/debug/LLMTray` binary has none, and the item
         // would only fail with "updater failed to start".
         #if !APP_STORE
         if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
-            add(NSLocalizedString("Check for Updates…", comment: ""), #selector(SPUStandardUpdaterController.checkForUpdates(_:)), target: updaterController)
+            item(NSLocalizedString("Check for Updates…", comment: ""), #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                 in: help, target: updaterController)
         }
         #endif
-        help.addItem(.separator())
-        add(NSLocalizedString("Report a Bug…", comment: ""), #selector(showBugReport))
-        add(NSLocalizedString("Rate LLMTray…", comment: ""), #selector(showReview))
-        add(NSLocalizedString("Support LLMTray…", comment: ""), #selector(showSupport))
+        item(NSLocalizedString("Report a Bug…", comment: ""), #selector(showBugReport), in: help)
         let helpItem = NSMenuItem(title: NSLocalizedString("Help", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
         helpItem.submenu = help
         menu.addItem(helpItem)
-
-        let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
-        aboutItem.target = self
-        menu.addItem(aboutItem)
+        item(NSLocalizedString("About LLMTray", comment: ""), #selector(showAboutPanel))
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: NSLocalizedString("Quit LLMTray", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
-        quitItem.target = self
-        menu.addItem(quitItem)
+        item(NSLocalizedString("Quit LLMTray", comment: ""), #selector(quitApp), key: "q")
 
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
         statusItem.menu = nil
+    }
+
+    /// "● Running — model on :port": the popover's status line. Only a
+    /// failure is clickable -- it opens the log, where the reason is.
+    private func statusMenuItem() -> NSMenuItem {
+        let title = NSMutableAttributedString(string: "● ", attributes: [
+            .foregroundColor: ServerStatusText.color(server), .font: NSFont.menuFont(ofSize: 0),
+        ])
+        title.append(NSAttributedString(string: ServerStatusText.text(server), attributes: [
+            .foregroundColor: NSColor.secondaryLabelColor, .font: NSFont.menuFont(ofSize: 0),
+        ]))
+        let failed: Bool
+        if case .failed = server.state { failed = true } else { failed = false }
+        let item = NSMenuItem(title: "", action: failed ? #selector(showServerLogWindow) : nil, keyEquivalent: "")
+        item.attributedTitle = title
+        item.target = self
+        item.isEnabled = failed
+        if failed { item.toolTip = NSLocalizedString("Open the server log", comment: "tray menu: the failed status line") }
+        return item
     }
 
     /// Select Model ▸ -- what the popover's picker lists, the selected one
@@ -658,37 +695,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
-    /// Profiles ▸ -- the selected model's, checked; picking one assigns it
-    /// as the popover's profile picker does.
-    private func profileMenuItem() -> NSMenuItem {
-        let profiles = ProfileManager.shared
-        let modelID = UserDefaults.standard[Pref.selectedModelID]
-        let current = profiles.profileID(for: modelID)
-        let canAssign = ModelSelection.canAssignProfile(to: modelID, server: server, benchmark: benchmark)
-        let submenu = NSMenu()
-        submenu.autoenablesItems = false
-        for profile in profiles.profiles {
-            let item = NSMenuItem(title: profile.name, action: #selector(quickAssignProfile(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = profile.id
-            item.state = profile.id == current ? .on : .off
-            item.isEnabled = canAssign
-            submenu.addItem(item)
-        }
-        let item = NSMenuItem(title: NSLocalizedString("Profiles", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
-        item.submenu = submenu
-        return item
-    }
-
     /// The full chat window -- the menu's way of saying LLMTray is more than
     /// its popover (a left click already opens that). Raised if it's open.
     @objc private func quickOpenChat() {
-        detachChatSoon()
-    }
-
-    /// A new chat, in the chat window.
-    @objc private func quickNewChat() {
-        tabs.newChat()
         detachChatSoon()
     }
 
@@ -700,11 +709,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let model = ModelSelection.modelToLoad(afterPicking: id, server: server, benchmark: benchmark) else { return }
         let server = self.server
         Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
-    }
-
-    @objc private func quickAssignProfile(_ sender: NSMenuItem) {
-        guard let id = sender.representedObject as? String else { return }
-        ModelSelection.assignProfile(id, to: UserDefaults.standard[Pref.selectedModelID], server: server, benchmark: benchmark)
     }
 
     @objc private func quickStart() {
