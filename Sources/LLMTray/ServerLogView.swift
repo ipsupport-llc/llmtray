@@ -119,6 +119,8 @@ struct ServerLogView: View {
     /// Asks the list to go to the end / to a problem (it holds the proxy).
     @State private var endRequest = 0
     @State private var problemRequest: ProblemJump?
+    /// A jump asked for while no list was shown: done when it appears.
+    @State private var problemJumpPending = false
     private struct ProblemJump: Equatable { let id: Int; let serial: Int }
 
     init(server: ServerManager) {
@@ -208,7 +210,9 @@ struct ServerLogView: View {
             .background(Color(nsColor: .textBackgroundColor))
             // Anything new in the log -- a new entry, or a line joining an
             // earlier one (a request's stats after a warning).
-            .onChange(of: model.entries.map(\.lines.count).reduce(0, +) + model.entries.count) { old, new in
+            // The newest line's number: it grows with every line, also when
+            // old ones are dropped from the front at the log's cap.
+            .onChange(of: model.entries.compactMap { $0.lines.last?.id }.max() ?? 0) { old, new in
                 guard follow, new > old else { return }
                 if scroll.atEnd {
                     scroll.scrollingItself()
@@ -225,14 +229,25 @@ struct ServerLogView: View {
                 scroll.atEnd = true; newSinceLeft = 0; scroll.scrollingItself(); proxy.scrollTo(Self.endID, anchor: .bottom)
             }
             .onChange(of: problemRequest) {
-                if let id = problemRequest?.id { scroll.scrollingItself(); withAnimation { proxy.scrollTo(id, anchor: .center) } }
+                if let id = problemRequest?.id {
+                    problemJumpPending = false
+                    scroll.scrollingItself()
+                    withAnimation { proxy.scrollTo(id, anchor: .center) }
+                }
             }
             .onAppear {
                 // A list made again (after Clear, or filters that hid all):
                 // at the end, following.
                 scroll.atEnd = true
                 newSinceLeft = 0
-                if follow { scroll.scrollingItself(); proxy.scrollTo(Self.endID, anchor: .bottom) }
+                if problemJumpPending, let id = problemRequest?.id {
+                    problemJumpPending = false
+                    scroll.scrollingItself()
+                    proxy.scrollTo(id, anchor: .center)
+                } else if follow {
+                    scroll.scrollingItself()
+                    proxy.scrollTo(Self.endID, anchor: .bottom)
+                }
             }
         }
     }
@@ -249,6 +264,9 @@ struct ServerLogView: View {
         if !visible.contains(where: { $0.id == next.id }) { scope = .all; search = "" }
         if !next.children.isEmpty { expanded.insert(next.id) }
         follow = false
+        // No list shown now (all filtered out): it scrolls there when it
+        // appears.
+        if visible.isEmpty { problemJumpPending = true }
         problemRequest = ProblemJump(id: next.id, serial: (problemRequest?.serial ?? 0) + 1)
     }
 
@@ -358,7 +376,7 @@ struct ServerLogView: View {
                 Button("Copy Shown") { copy(visible) }
                 Button("Save Log…") { save() }
                 Divider()
-                Button("Clear Log", role: .destructive) { server.clearLog(); expanded = [] }
+                Button("Clear Log", role: .destructive) { clear() }
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -377,11 +395,11 @@ struct ServerLogView: View {
             Button("") { searchFocused = true }.keyboardShortcut("f")
             // Not while typing in the search field: End moves its caret, ⌘K
             // isn't a reason to lose the log.
+            Button("") { save() }.keyboardShortcut("s")
+            Button("") { copy(visible) }.keyboardShortcut("c", modifiers: [.command, .shift])
+            Button("") { jumpToProblem(errorsOnly: true) }.keyboardShortcut("e")
             Group {
-                Button("") { server.clearLog(); expanded = [] }.keyboardShortcut("k")
-                Button("") { save() }.keyboardShortcut("s")
-                Button("") { copy(visible) }.keyboardShortcut("c", modifiers: [.command, .shift])
-                Button("") { jumpToProblem(errorsOnly: true) }.keyboardShortcut("e")
+                Button("") { clear() }.keyboardShortcut("k")
                 Button("") { follow = true; jumpToEnd() }.keyboardShortcut(.end, modifiers: [])
             }
             .disabled(searchFocused)
@@ -392,6 +410,13 @@ struct ServerLogView: View {
     }
 
     // MARK: Actions
+
+    private func clear() {
+        server.clearLog()
+        expanded = []
+        collapsed = []
+        lastProblemJump = nil
+    }
 
     private func copy(_ entries: [ServerLogEntry]) {
         NSPasteboard.general.clearContents()

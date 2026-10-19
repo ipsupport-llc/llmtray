@@ -157,6 +157,15 @@ final class ServerLogParserTests: XCTestCase {
         """)
         XCTAssertEqual(overlap.last?.stats?.prompt, 7)
 
+        // A failed request doesn't stay open: the next one gets its stats.
+        let failed = kinds("""
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -
+        2026-10-17 06:22:12,000 - ERROR - Request failed during generation: boom
+        127.0.0.1 - - [17/Oct/2026 06:22:20] "POST /v1/chat/completions HTTP/1.1" 200 -
+        2026-10-17 06:22:21,000 - INFO - Request stats: prompt=7 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        """)
+        XCTAssertEqual(failed.last?.stats?.prompt, 7)
+
         // The server dying ends the request it was serving.
         let died = kinds("""
         127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -

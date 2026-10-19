@@ -336,7 +336,12 @@ public enum ServerLogGrouping {
                     continue
                 }
                 var entry = ServerLogEntry(kind: kind, head: line)
-                if kind == .error { entry.context = line.message }
+                if kind == .error {
+                    entry.context = line.message
+                    // A failure ends the requests being served: no stats
+                    // line comes for them.
+                    open.removeAll()
+                }
                 out.append(entry)
                 problem = out.count - 1
             default:
