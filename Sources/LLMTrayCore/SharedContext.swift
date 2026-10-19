@@ -27,11 +27,15 @@ public struct SharedContext: Codable, Equatable, Sendable, Identifiable {
     /// For a tab: the browser ran no script, so only its title and address
     /// came (Chromium's "Allow JavaScript from Apple Events" is off).
     public var titleOnly = false
+    /// A capture whose picture goes with the message: its recognized text
+    /// is for a model that doesn't see (noteForModel).
+    public var hasPicture = false
 
     /// The most text one shared item adds to a message, in characters.
     public static let maxText = 6000
 
-    public init(kind: Kind, title: String, source: String, text: String? = nil, titleOnly: Bool = false) {
+    public init(kind: Kind, title: String, source: String, text: String? = nil, titleOnly: Bool = false, hasPicture: Bool = false) {
+        self.hasPicture = hasPicture
         self.kind = kind
         self.title = title
         self.source = source
@@ -80,10 +84,12 @@ public struct SharedContext: Codable, Equatable, Sendable, Identifiable {
     }
 
     /// The block the model gets before the message's text: marked as what
-    /// the user showed, so a page's words don't read as the user's own.
-    public var noteForModel: String {
+    /// the user showed, so a page's words don't read as the user's own. A
+    /// capture's text goes only to a model that doesn't see its picture
+    /// (`seesPicture` false).
+    public func noteForModel(seesPicture: Bool) -> String {
         var lines = ["[The user is showing you this. \(heading)]"]
-        if let text {
+        if let text, !(hasPicture && seesPicture) {
             switch kind {
             case .window, .screen:
                 lines.append("Text recognized in it (icons, colors and states of controls aren't in it):")

@@ -182,7 +182,8 @@ enum ChatRequestBuilder {
         // Files added to the project since the last message: said first.
         // Then what the user showed (adr/0030).
         let notes = message.role == "user"
-            ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 } + message.shared.map(\.noteForModel) : []
+            ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 }
+                + message.shared.map { $0.noteForModel(seesPicture: !message.images.isEmpty) } : []
         let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
         if message.role == "user", !message.images.isEmpty || !message.audios.isEmpty {
             // Attachments are always normalized to PNG before landing in

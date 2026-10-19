@@ -54,9 +54,22 @@ final class ComposerModel: ObservableObject {
     }
     @Published var acceptsImages = false {
         didSet {
-            // A capture shown as an image goes too (a text model would get
-            // nothing of it).
-            if !acceptsImages { attachments.removeAll(); shared.removeAll { $0.image != nil } } else { notice = nil }
+            if !acceptsImages {
+                attachments.removeAll()
+                // A capture goes on as its recognized text; one with none
+                // can't go at all.
+                let before = shared.count
+                shared = shared.compactMap { item in
+                    guard item.image != nil else { return item }
+                    guard item.context.text != nil else { return nil }
+                    var context = item.context
+                    context.hasPicture = false
+                    return SharedItem(context: context)
+                }
+                if shared.count < before {
+                    showNotice(NSLocalizedString("A window with no readable text was removed: this model can't see pictures.", comment: "chat: model switched to one without vision"))
+                }
+            } else { notice = nil }
         }
     }
 
@@ -142,15 +155,18 @@ final class ComposerModel: ObservableObject {
                 showNotice(NSLocalizedString("Nothing was captured: the window may have closed. Try again.", comment: "chat: a picked window gave no picture"))
                 return
             }
+            // Its text is read either way: for a model that doesn't see, and
+            // for later turns if the chat moves to one.
+            let base = capture.context
+            let text = await ScreenShare.recognizeText(capture.image)
             // Whether the model sees is read now, not at the click: the
             // model may have changed while the picker was up.
             if acceptsImages, let png = ImageAttachment.pngData(capture.image) {
-                shared.append(SharedItem(context: capture.context, image: png))
+                shared.append(SharedItem(context: SharedContext(kind: base.kind, title: base.title, source: base.source,
+                                                                text: text, hasPicture: true), image: png))
                 return
             }
-            let base = capture.context
-            let context = SharedContext(kind: base.kind, title: base.title, source: base.source,
-                                        text: await ScreenShare.recognizeText(capture.image))
+            let context = SharedContext(kind: base.kind, title: base.title, source: base.source, text: text)
             guard context.text != nil else {
                 showNotice(NSLocalizedString("No text was found in it, and this model can't see images: pick a vision model to show it as a picture.",
                                              comment: "chat: a window shown to a text-only model had no readable text"))
@@ -392,12 +408,14 @@ struct ChatComposer: View {
                 } else {
                     Button(action: send) {
                         Image(systemName: "arrow.up.circle.fill").font(.system(size: 28))
-                            .foregroundStyle(!canChat || composer.isEmpty ? Color.secondary : Color.accentColor)
+                            .foregroundStyle(!canChat || composer.isEmpty || composer.isSharing ? Color.secondary : Color.accentColor)
                     }
                     .buttonStyle(.plain)
                     .help("Send")
                     .accessibilityLabel("Send")
-                    .disabled(!canChat || composer.isEmpty)
+                    // A window or tab still being read goes with this message,
+                    // not the next.
+                    .disabled(!canChat || composer.isEmpty || composer.isSharing)
                 }
             }
         }

@@ -9,13 +9,13 @@ final class SharedContextTests: XCTestCase {
         let long = SharedContext(kind: .window, title: "", source: "", text: String(repeating: "x", count: SharedContext.maxText + 10))
         XCTAssertEqual(long.text?.count, SharedContext.maxText)
         XCTAssertTrue(long.truncated)
-        XCTAssertTrue(long.noteForModel.contains("(cut here"))
+        XCTAssertTrue(long.noteForModel(seesPicture: false).contains("(cut here"))
         XCTAssertNil(SharedContext(kind: .window, title: "", source: "", text: " \n ").text)
     }
 
     func testNoteMarksItAsShown() {
         let tab = SharedContext(kind: .browserTab, title: "Account", source: "https://x.org/a", text: "Two-factor: off")
-        XCTAssertEqual(tab.noteForModel, """
+        XCTAssertEqual(tab.noteForModel(seesPicture: true), """
         [The user is showing you this. Browser tab: Account (https://x.org/a)]
         The page's text:
         Two-factor: off
@@ -23,9 +23,13 @@ final class SharedContextTests: XCTestCase {
         """)
         let window = SharedContext(kind: .window, title: "Account settings", source: "Safari")
         XCTAssertEqual(window.heading, "Window: Safari — Account settings")
-        XCTAssertEqual(window.noteForModel, "[The user is showing you this. Window: Safari — Account settings]\n[End of what the user is showing]")
+        XCTAssertEqual(window.noteForModel(seesPicture: true), "[The user is showing you this. Window: Safari — Account settings]\n[End of what the user is showing]")
         let bare = SharedContext(kind: .browserTab, title: "", source: "https://x.org", titleOnly: true)
-        XCTAssertTrue(bare.noteForModel.contains("Only the title and address"))
+        XCTAssertTrue(bare.noteForModel(seesPicture: true).contains("Only the title and address"))
+        // A capture's text: for a model that doesn't see its picture only.
+        let shot = SharedContext(kind: .window, title: "A", source: "B", text: "Wi-Fi", hasPicture: true)
+        XCTAssertFalse(shot.noteForModel(seesPicture: true).contains("Wi-Fi"))
+        XCTAssertTrue(shot.noteForModel(seesPicture: false).contains("Wi-Fi"))
     }
 
     func testReadingOrder() {

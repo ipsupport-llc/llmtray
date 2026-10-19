@@ -781,7 +781,7 @@ struct ContentView: View {
         // The field stays enabled (and focused) while streaming; this is
         // what stops Return from sending a second message mid-stream.
         // Return in an empty field mustn't start loading a model.
-        guard canChat, !chat.isBusy, !composer.isEmpty else { return }
+        guard canChat, !chat.isBusy, !composer.isEmpty, !composer.isSharing else { return }
         // Taken first: a recording too short to keep leaves nothing to send,
         // and nothing must start the model then.
         let (text, images, audios, shared) = composer.take()

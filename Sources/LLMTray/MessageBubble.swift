@@ -171,7 +171,7 @@ struct MessageBubble: View {
             if isUser {
                 // What the user showed the model with it (adr/0030).
                 ForEach(message.shared) { c in
-                    Label(SharedChip.title(c) + " · " + SharedChip.detail(c, image: c.text == nil && c.kind != .browserTab),
+                    Label(SharedChip.title(c) + " · " + SharedChip.detail(c, image: c.hasPicture),
                           systemImage: SharedChip.symbol(c.kind))
                         .font(.caption)
                         .foregroundStyle(.secondary)

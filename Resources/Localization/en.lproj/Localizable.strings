@@ -104,6 +104,7 @@
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "A symbolic link: the link itself, not what it points to.";
 "A temporary chat can't hold files" = "A temporary chat can't hold files";
+"A window with no readable text was removed: this model can't see pictures." = "A window with no readable text was removed: this model can't see pictures.";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — clear vocals, 8-bit (recommended)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";

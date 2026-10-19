@@ -94,10 +94,11 @@ final class ScreenShare: NSObject {
         if let id = Bundle.main.bundleIdentifier { config.excludedBundleIDs = [id] }
         picker.defaultConfiguration = config
         picker.add(self)
-        picker.isActive = true
-        // One pick at a time (isBusy): nothing pending here.
+        // One pick at a time (isBusy): nothing pending here. Pending before
+        // the picker starts, so a failure to start finds it.
         let filter = await withCheckedContinuation { continuation in
             pending = continuation
+            picker.isActive = true
             picker.present(using: screen ? .display : .window)
         }
         picker.remove(self)
