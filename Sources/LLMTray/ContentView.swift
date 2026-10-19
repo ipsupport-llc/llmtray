@@ -925,6 +925,34 @@ struct ChatScrollViewFinder: NSViewRepresentable {
     }
 }
 
+extension ChatScrollViewFinder {
+    /// Reports the window the view it's the background of is in.
+    struct WindowReader: NSViewRepresentable {
+        let found: (NSWindow) -> Void
+
+        init(_ found: @escaping (NSWindow) -> Void) { self.found = found }
+
+        func makeNSView(context: Context) -> ReaderView {
+            let v = ReaderView()
+            v.found = found
+            return v
+        }
+
+        func updateNSView(_ view: ReaderView, context: Context) { view.found = found }
+
+        final class ReaderView: NSView {
+            var found: ((NSWindow) -> Void)?
+
+            override func viewDidMoveToWindow() {
+                super.viewDidMoveToWindow()
+                if let window { found?(window) }
+            }
+
+            override func hitTest(_ point: NSPoint) -> NSView? { nil }
+        }
+    }
+}
+
 private struct ChatBottomKey: PreferenceKey {
     static var defaultValue = ChatGeometry(bottom: 0, height: 0)
     static func reduce(value: inout ChatGeometry, nextValue: () -> ChatGeometry) { value = nextValue() }
