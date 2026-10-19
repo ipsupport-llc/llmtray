@@ -18,6 +18,11 @@ public enum Pref {
     // Server
     public static let port = PrefKey("llmtray.port", default: 8765)
     public static let allowLAN = PrefKey("llmtray.allowLAN", default: false)
+    /// Clients must send the API key (APIKeyCheck): off until turned on.
+    public static let apiKeyRequired = PrefKey("llmtray.apiKey.required", default: false)
+    /// ...but only those connecting from another device: this Mac's apps
+    /// go without it.
+    public static let apiKeyNetworkOnly = PrefKey("llmtray.apiKey.networkOnly", default: true)
     /// Usage statistics (UsageLedger) are kept: off until turned on.
     public static let usageStatsEnabled = PrefKey("llmtray.usageStats.enabled", default: false)
     /// `ModelSwitchPolicy` raw value: an outside client asking for another model.

@@ -114,6 +114,7 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
+"API key" = "API key";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes.";
 "About LLMTray" = "About LLMTray";
 "About you" = "About you";
@@ -191,6 +192,7 @@
 "Answer details" = "Answer details";
 "Answer in Russian, briefly" = "Answer in Russian, briefly";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Anyone on your network can use the server: a key keeps it to the clients you give it to.";
 "Anything else chats should know" = "Anything else chats should know";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
@@ -201,6 +203,7 @@
 "Approve Selected" = "Approve Selected";
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too.";
 "Arguments, one per line" = "Arguments, one per line";
 "Ask Later" = "Ask Later";
 "Ask about LLMTray" = "Ask about LLMTray";
@@ -253,6 +256,7 @@
 "Can look · %@" = "Can look · %@";
 "Can look · 1 hour" = "Can look · 1 hour";
 "Can look · Always" = "Can look · Always";
+"Can't be read" = "Can't be read";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -312,6 +316,8 @@
 "Click ■ to stop · Esc cancels" = "Click ■ to stop · Esc cancels";
 "Client" = "Client";
 "Client ID" = "Client ID";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it.";
+"Clients using the current key get 401 until they're given the new one." = "Clients using the current key get 401 until they're given the new one.";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -662,6 +668,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
 "Kept free: %lld MB" = "Kept free: %lld MB";
 "Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other.";
+"Key" = "Key";
 "Kind" = "Kind";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
@@ -722,6 +729,7 @@
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make a Document…" = "Make a Document…";
+"Make a new key?" = "Make a new key?";
 "Make again" = "Make again";
 "Make images and edit them." = "Make images and edit them.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.";
@@ -788,6 +796,8 @@
 "Never" = "Never";
 "New Chat" = "New Chat";
 "New Chat in Project" = "New Chat in Project";
+"New Key" = "New Key";
+"New Key…" = "New Key…";
 "New Note" = "New Note";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
@@ -885,10 +895,12 @@
 "On" = "On";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Only From Now On";
+"Only for connections from other devices" = "Only for connections from other devices";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
 "Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
 "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@.";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "Only this Mac can connect now (local network access is off), so no client is asked for the key.";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
@@ -916,6 +928,7 @@
 "Past %lld messages" = "Past %lld messages";
 "Paste a Config" = "Paste a Config";
 "Paste a Config…" = "Paste a Config…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain.";
 "Pasted config" = "Pasted config";
 "Pause" = "Pause";
 "Pause Indexing" = "Pause Indexing";
@@ -1052,6 +1065,7 @@
 "Report a Bug…" = "Report a Bug…";
 "Request stats" = "Request stats";
 "Requests" = "Requests";
+"Require an API key" = "Require an API key";
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
@@ -1305,6 +1319,9 @@
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
+"The key couldn't be saved in the Keychain." = "The key couldn't be saved in the Keychain.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked.";
 "The last change couldn't be saved." = "The last change couldn't be saved.";
 "The log couldn't be saved" = "The log couldn't be saved";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";

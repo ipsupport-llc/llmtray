@@ -1325,6 +1325,11 @@ struct ServerPane: View {
     @EnvironmentObject var benchmark: BenchmarkRunner
     @AppStorage(Pref.port) private var port
     @AppStorage(Pref.allowLAN) private var allowLAN
+    @AppStorage(Pref.apiKeyRequired) private var apiKeyRequired
+    @AppStorage(Pref.apiKeyNetworkOnly) private var apiKeyNetworkOnly
+    @State private var apiKey: String?
+    @State private var showsKey = false
+    @State private var keyError: String?
     @AppStorage(Pref.modelSwitchPolicy) private var modelSwitchPolicy
     @AppStorage(Pref.stallThresholdSeconds) private var stallThresholdSeconds
     @AppStorage(Pref.memoryMarginMB) private var memoryMarginMB
@@ -1353,6 +1358,7 @@ struct ServerPane: View {
                     }
                     .disabled(!isStopped)
                 }
+                apiKeySection
                 Section("Model switching") {
                     Picker(selection: $modelSwitchPolicy) {
                         Text("Switch at once").tag(ModelSwitchPolicy.auto.rawValue)
@@ -1406,6 +1412,86 @@ struct ServerPane: View {
             }
             .formStyle(.grouped)
             RestartBanner().padding(8)
+        }
+    }
+}
+
+extension ServerPane {
+    /// An optional key clients must send (APIKeyCheck); the app's own chat
+    /// never needs it.
+    var apiKeySection: some View {
+        Section("API key") {
+            Toggle(isOn: Binding(get: { apiKeyRequired }, set: { on in
+                if on {
+                    guard let key = APIKey.ensure() else {
+                        keyError = APIKey.unreadable
+                            ? NSLocalizedString("The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key.", comment: "settings: API key")
+                            : NSLocalizedString("The key couldn't be saved in the Keychain.", comment: "settings: API key")
+                        return
+                    }
+                    apiKey = key
+                }
+                keyError = nil
+                apiKeyRequired = on
+            })) {
+                SettingLabel(title: "Require an API key", help: "Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it.")
+            }
+            if apiKeyRequired {
+                LabeledContent {
+                    HStack(spacing: 6) {
+                        Text(verbatim: apiKey == nil ? NSLocalizedString("Can't be read", comment: "settings: the API key isn't readable") : showsKey ? (apiKey ?? "") : String(repeating: "•", count: 16))
+                            .font(.system(.callout, design: .monospaced))
+                            .textSelection(.enabled)
+                            .lineLimit(1)
+                        Button { showsKey.toggle() } label: { Image(systemName: showsKey ? "eye.slash" : "eye") }
+                            .buttonStyle(.borderless)
+                            .help(showsKey ? "Hide" : "Show")
+                        Button("Copy") {
+                            guard let apiKey else { return }
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(apiKey, forType: .string)
+                        }
+                        .disabled(apiKey == nil)
+                        Button("New Key…") { regenerateKey() }
+                    }
+                } label: {
+                    SettingLabel(title: "Key", help: "Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain.")
+                }
+                Toggle(isOn: $apiKeyNetworkOnly) {
+                    SettingLabel(title: "Only for connections from other devices", help: "Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too.")
+                }
+                if apiKeyNetworkOnly && !allowLAN {
+                    Text("Only this Mac can connect now (local network access is off), so no client is asked for the key.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            } else if allowLAN {
+                Text("Anyone on your network can use the server: a key keeps it to the clients you give it to.")
+                    .font(.caption).foregroundStyle(.orange)
+            }
+            if let keyError { Text(keyError).font(.caption).foregroundStyle(.red) }
+        }
+        .onAppear {
+            guard apiKeyRequired else { return }
+            APIKey.refresh()
+            apiKey = APIKey.value
+            keyError = apiKey == nil
+                ? NSLocalizedString("The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked.", comment: "settings: API key")
+                : nil
+        }
+    }
+
+    private func regenerateKey() {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Make a new key?", comment: "settings: API key")
+        alert.informativeText = NSLocalizedString("Clients using the current key get 401 until they're given the new one.", comment: "settings: API key")
+        alert.addButton(withTitle: NSLocalizedString("New Key", comment: "settings: API key"))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        if let key = APIKey.regenerate() {
+            apiKey = key
+            keyError = nil
+        } else {
+            keyError = NSLocalizedString("The key couldn't be saved in the Keychain.", comment: "settings: API key")
         }
     }
 }

@@ -252,6 +252,10 @@ public enum ServerLaunch {
             args += ["--buffer-cache-mb", String(mb)]
         }
         args += p.extraServerArgs.split(separator: " ").map(String.init)
+        // The model process listens on this Mac only, whatever the extra
+        // arguments say (the last --host wins): other devices come through
+        // the proxy -- its model list, switching and API key.
+        args += ["--host", "127.0.0.1"]
         return args
     }
 

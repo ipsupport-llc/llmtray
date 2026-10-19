@@ -63,16 +63,21 @@ public enum CommandLineOutput {
     /// `llmtray api`: the endpoint and how a client uses it.
     public static func api(_ s: ControlStatus, exampleModel: String?) -> String {
         let model = exampleModel ?? "<name from llmtray models>"
+        // A key asked of this Mac's clients too (Settings › Server).
+        let keyed = s.apiKeyForLocal == true
+        let keyLine = keyed ? "export OPENAI_API_KEY=<key>      # the key in LLMTray's Settings › Server › API key"
+                            : "export OPENAI_API_KEY=local      # any value: LLMTray doesn't check it here"
+        let auth = keyed ? " -H 'Authorization: Bearer <key>'" : ""
         var text = """
             OpenAI-compatible API: \(s.baseURL)
 
             Point an OpenAI client at it:
               export OPENAI_BASE_URL=\(s.baseURL)
-              export OPENAI_API_KEY=local      # any value: LLMTray doesn't check it
+              \(keyLine)
 
             A request names the model by its name in `llmtray models` (without
             one, the loaded model answers):
-              curl \(s.baseURL)/chat/completions -H 'Content-Type: application/json' \\
+              curl \(s.baseURL)/chat/completions -H 'Content-Type: application/json'\(auth) \\
                 -d '{"model": "\(model)", "messages": [{"role": "user", "content": "Hello"}]}'
             """
         if !s.canAnswer {
