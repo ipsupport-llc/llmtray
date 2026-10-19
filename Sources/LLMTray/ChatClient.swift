@@ -939,9 +939,10 @@ final class ChatClient: ObservableObject {
     /// -- read first, off the main thread, while the turn already shows as
     /// busy. A Stop or another chat meanwhile drops it.
     private func startTurn(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
-        // A window's or a page's text in the message the turn answers
-        // (adr/0030): outside text from the start.
-        if let last = messages.last(where: { $0.role == "user" && !$0.isToolContext }), last.shared.contains(where: { $0.text != nil }) {
+        // A window, the screen or a page shown in this chat (adr/0030) --
+        // its text, or a page's title and address -- goes with every
+        // request after: outside text from each turn's start.
+        if messages.contains(where: { $0.role == "user" && !$0.shared.isEmpty }) {
             toolbox.noteSharedText()
         }
         let base = withProject(settings)

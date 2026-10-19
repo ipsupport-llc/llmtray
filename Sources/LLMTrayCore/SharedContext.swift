@@ -177,25 +177,37 @@ public enum BrowserTab {
     public static func script(for browser: Browser, titleOnly: Bool = false) -> String {
         let app = "application id \"\(browser.bundleID)\""
         let sep = "(ASCII character 30)"
+        // Long enough for macOS's Automation prompt to be answered.
+        let timeout = 120
         switch browser.family {
         case .safari:
             let text = titleOnly ? "\"\"" : "(text of t)"
             return """
-            tell \(app)
-                set t to current tab of front window
-                return (name of t) & \(sep) & (URL of t) & \(sep) & \(text)
-            end tell
+            with timeout of \(timeout) seconds
+                tell \(app)
+                    set t to current tab of front window
+                    return (name of t) & \(sep) & (URL of t) & \(sep) & \(text)
+                end tell
+            end timeout
             """
         case .chromium:
             let js = pageTextJS.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
             let text = titleOnly ? "\"\"" : "(execute t javascript \"\(js)\")"
             return """
-            tell \(app)
-                set t to active tab of front window
-                return (title of t) & \(sep) & (URL of t) & \(sep) & \(text)
-            end tell
+            with timeout of \(timeout) seconds
+                tell \(app)
+                    set t to active tab of front window
+                    return (title of t) & \(sep) & (URL of t) & \(sep) & \(text)
+                end tell
+            end timeout
             """
         }
+    }
+
+    /// The error number osascript ends its message with ("… (-1743)").
+    public static func errorNumber(_ message: String) -> Int? {
+        guard let open = message.lastIndex(of: "("), let close = message.lastIndex(of: ")"), open < close else { return nil }
+        return Int(message[message.index(after: open)..<close])
     }
 
     /// A script's answer as a shared tab: nil when it isn't one.

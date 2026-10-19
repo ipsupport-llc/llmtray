@@ -24,6 +24,9 @@ final class ScreenShare: NSObject {
     }
 
     private var pending: CheckedContinuation<SCContentFilter?, Never>?
+    /// A pick or a capture is under way: one at a time, app-wide (the
+    /// picker and the chat stepping aside are one each).
+    private(set) var isBusy = false
     /// The apps in front before LLMTray, latest last (bundle ids): the
     /// browser whose tab "Attach Current Tab" means. Identity only.
     private var recentApps: [String] = []
@@ -51,12 +54,24 @@ final class ScreenShare: NSObject {
 
     // MARK: Windows and the screen
 
+    enum CaptureError: Error {
+        /// Another pick is under way.
+        case busy
+        /// Cancelled in the picker.
+        case cancelled
+        /// Picked, but no picture came (the window closed meanwhile…).
+        case failed
+    }
+
     /// The system picker for one window (or one display), then one still
-    /// of it. nil: cancelled, or it couldn't be captured.
-    func capture(screen: Bool) async -> Capture? {
+    /// of it.
+    func capture(screen: Bool) async -> Result<Capture, CaptureError> {
+        guard !isBusy else { return .failure(.busy) }
+        isBusy = true
+        defer { isBusy = false }
         NotificationCenter.default.post(name: .sharingWillPick, object: nil)
         defer { NotificationCenter.default.post(name: .sharingDidPick, object: nil) }
-        guard let filter = await pick(screen: screen) else { return nil }
+        guard let filter = await pick(screen: screen) else { return .failure(.cancelled) }
         let config = SCStreamConfiguration()
         let rect = filter.contentRect
         let scale = CGFloat(filter.pointPixelScale)
@@ -66,9 +81,9 @@ final class ScreenShare: NSObject {
         config.capturesAudio = false
         let box = FilterBox(filter)
         guard let image = try? await SCScreenshotManager.captureImage(contentFilter: box.filter, configuration: config) else {
-            return nil
+            return .failure(.failed)
         }
-        return Capture(image: image, context: describe(filter, screen: screen))
+        return .success(Capture(image: image, context: describe(filter, screen: screen)))
     }
 
     private func pick(screen: Bool) async -> SCContentFilter? {
@@ -80,8 +95,8 @@ final class ScreenShare: NSObject {
         picker.defaultConfiguration = config
         picker.add(self)
         picker.isActive = true
+        // One pick at a time (isBusy): nothing pending here.
         let filter = await withCheckedContinuation { continuation in
-            pending?.resume(returning: nil)
             pending = continuation
             picker.present(using: screen ? .display : .window)
         }
@@ -149,41 +164,69 @@ final class ScreenShare: NSObject {
     /// address only when a Chromium browser runs no scripts from Apple
     /// Events (`titleOnly` set then).
     func readTab(_ browser: BrowserTab.Browser) async -> Result<SharedContext, TabError> {
-        let first = await Self.run(BrowserTab.script(for: browser))
-        switch first {
-        case .success(let answer):
-            if let tab = BrowserTab.parse(answer, titleOnly: false) { return .success(tab) }
+        // Quit since the menu was drawn: asking it would launch it again.
+        guard NSWorkspace.shared.runningApplications.contains(where: { $0.bundleIdentifier == browser.bundleID }) else {
             return .failure(.noTab)
-        case .failure(let error) where error.code == -1743 || error.code == -1744:
-            return .failure(.notAllowed)
-        case .failure:
-            guard browser.family == .chromium,
-                  case .success(let answer) = await Self.run(BrowserTab.script(for: browser, titleOnly: true)),
-                  let tab = BrowserTab.parse(answer, titleOnly: true) else { return .failure(.noTab) }
-            return .success(tab)
         }
-    }
-
-    /// Runs `source` off the main thread (the browser may take a while,
-    /// and macOS's Automation prompt waits for the user). The error number
-    /// when it fails.
-    private nonisolated static func run(_ source: String) async -> Result<String, ScriptError> {
-        await withCheckedContinuation { continuation in
-            scriptQueue.async {
-                var error: NSDictionary?
-                let result = NSAppleScript(source: source)?.executeAndReturnError(&error)
-                if let result, error == nil {
-                    continuation.resume(returning: .success(result.stringValue ?? ""))
-                } else {
-                    continuation.resume(returning: .failure(ScriptError(code: (error?[NSAppleScript.errorNumber] as? Int) ?? -1)))
-                }
+        switch await Self.run(BrowserTab.script(for: browser)) {
+        case .success(let answer):
+            return BrowserTab.parse(answer, titleOnly: false).map { .success($0) } ?? .failure(.noTab)
+        case .failure(let error):
+            // A Chromium browser refuses the page script alone when its
+            // JavaScript from Apple Events is off -- with the same error
+            // as Automation turned down, in some: its title and address
+            // are asked for anyway, and only their refusal is Automation's.
+            guard browser.family == .chromium else { return .failure(Self.isDenial(error.code) ? .notAllowed : .noTab) }
+            switch await Self.run(BrowserTab.script(for: browser, titleOnly: true)) {
+            case .success(let answer):
+                return BrowserTab.parse(answer, titleOnly: true).map { .success($0) } ?? .failure(.noTab)
+            case .failure(let error):
+                return .failure(Self.isDenial(error.code) ? .notAllowed : .noTab)
             }
         }
     }
 
     struct ScriptError: Error { let code: Int }
 
-    private nonisolated static let scriptQueue = DispatchQueue(label: "LLMTray.browserTab")
+    /// Automation turned down (errAEEventNotPermitted, or the user
+    /// declined the prompt).
+    private static func isDenial(_ code: Int) -> Bool { code == -1743 || code == -1744 }
+
+    /// Runs `source` in osascript, a process of its own: NSAppleScript is
+    /// for the main thread, and there it would hold the app while the
+    /// browser answers or macOS's Automation prompt waits. macOS asks for
+    /// LLMTray (the responsible app). The error number when it fails.
+    private nonisolated static func run(_ source: String) async -> Result<String, ScriptError> {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+                process.arguments = ["-"]
+                let input = Pipe(), output = Pipe(), errors = Pipe()
+                process.standardInput = input
+                process.standardOutput = output
+                process.standardError = errors
+                do { try process.run() } catch {
+                    continuation.resume(returning: .failure(ScriptError(code: -1)))
+                    return
+                }
+                input.fileHandleForWriting.write(Data(source.utf8))
+                try? input.fileHandleForWriting.close()
+                // Read before waiting: a long page fills the pipe.
+                let out = output.fileHandleForReading.readDataToEndOfFile()
+                let err = errors.fileHandleForReading.readDataToEndOfFile()
+                process.waitUntilExit()
+                if process.terminationStatus == 0 {
+                    // osascript ends what it prints with a newline.
+                    var text = String(decoding: out, as: UTF8.self)
+                    if text.hasSuffix("\n") { text.removeLast() }
+                    continuation.resume(returning: .success(text))
+                } else {
+                    continuation.resume(returning: .failure(ScriptError(code: BrowserTab.errorNumber(String(decoding: err, as: UTF8.self)) ?? -1)))
+                }
+            }
+        }
+    }
     #endif
 }
 

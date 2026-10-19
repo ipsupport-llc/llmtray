@@ -57,6 +57,9 @@ final class SharedContextTests: XCTestCase {
         let bare = BrowserTab.parse("Docs\u{1E}https://x.org\u{1E}", titleOnly: true)
         XCTAssertEqual(bare?.titleOnly, true)
         XCTAssertNil(bare?.text)
+        XCTAssertEqual(BrowserTab.errorNumber("execution error: Not authorized to send Apple events to Safari. (-1743)"), -1743)
+        XCTAssertNil(BrowserTab.errorNumber("no number"))
+        XCTAssertTrue(BrowserTab.script(for: chrome).hasPrefix("with timeout of"))
     }
 
     func testSharedTextIsOutsideText() {

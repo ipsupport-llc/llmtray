@@ -129,24 +129,34 @@ final class ComposerModel: ObservableObject {
     func shareWindow(screen: Bool) {
         guard !isSharing else { return }
         isSharing = true
-        let vision = acceptsImages
         Task {
             defer { isSharing = false }
-            guard let capture = await ScreenShare.shared.capture(screen: screen) else { return }
-            var context = capture.context
-            var image: Data?
-            if vision {
-                image = ImageAttachment.pngData(capture.image)
-            } else {
-                let text = await ScreenShare.recognizeText(capture.image)
-                context = SharedContext(kind: context.kind, title: context.title, source: context.source, text: text)
-                if context.text == nil {
-                    showNotice(NSLocalizedString("No text was found in it, and this model can't see images: pick a vision model to show it as a picture.",
-                                                 comment: "chat: a window shown to a text-only model had no readable text"))
-                    return
-                }
+            let capture: ScreenShare.Capture
+            switch await ScreenShare.shared.capture(screen: screen) {
+            case .success(let c): capture = c
+            case .failure(.cancelled): return
+            case .failure(.busy):
+                showNotice(NSLocalizedString("Another chat is picking a window: finish that first.", comment: "chat: a second window pick while one is open"))
+                return
+            case .failure(.failed):
+                showNotice(NSLocalizedString("Nothing was captured: the window may have closed. Try again.", comment: "chat: a picked window gave no picture"))
+                return
             }
-            shared.append(SharedItem(context: context, image: image))
+            // Whether the model sees is read now, not at the click: the
+            // model may have changed while the picker was up.
+            if acceptsImages, let png = ImageAttachment.pngData(capture.image) {
+                shared.append(SharedItem(context: capture.context, image: png))
+                return
+            }
+            let base = capture.context
+            let context = SharedContext(kind: base.kind, title: base.title, source: base.source,
+                                        text: await ScreenShare.recognizeText(capture.image))
+            guard context.text != nil else {
+                showNotice(NSLocalizedString("No text was found in it, and this model can't see images: pick a vision model to show it as a picture.",
+                                             comment: "chat: a window shown to a text-only model had no readable text"))
+                return
+            }
+            shared.append(SharedItem(context: context))
         }
     }
 

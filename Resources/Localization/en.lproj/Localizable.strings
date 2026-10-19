@@ -177,6 +177,7 @@
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.";
 "Another LLMTray is running" = "Another LLMTray is running";
+"Another chat is picking a window: finish that first." = "Another chat is picking a window: finish that first.";
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Another version next to this one (a new seed, the same request)" = "Another version next to this one (a new seed, the same request)";
@@ -850,6 +851,7 @@
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
 "Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
+"Nothing was captured: the window may have closed. Try again." = "Nothing was captured: the window may have closed. Try again.";
 "Nothing: no note is sent to these chats now." = "Nothing: no note is sent to these chats now.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here.";
 "Now: %@ → %@ (until %@)" = "Now: %@ → %@ (until %@)";

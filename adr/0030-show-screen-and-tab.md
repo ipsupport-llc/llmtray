@@ -43,9 +43,11 @@ the sent message; it's saved with the chat like an attachment (a
 temporary chat saves nothing). The text goes with that message only, as
 a block marked as the user's shared window or page.
 
-**Outside text.** A page or a window can carry instructions. A turn whose
-message carries shared text is treated like one with pinned files
-(`ToolTrust.TurnState.sharedText`): no network tools or generators in it.
+**Outside text.** A page or a window can carry instructions, in its text
+or in a title. What's shown stays in the conversation, so a chat that has
+shown anything is treated like one with pinned files from then on
+(`ToolTrust.TurnState.sharedText`, set at every turn's start): no network
+tools or generators in it. A new chat has them again.
 
 ## App Store
 
