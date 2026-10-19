@@ -894,8 +894,9 @@ final class UserScrollWatch: ObservableObject {
     }
 }
 
-/// Reports the NSScrollView around the view it's the background of.
-private struct ChatScrollViewFinder: NSViewRepresentable {
+/// Reports the NSScrollView around the view it's the background of (the
+/// chat, the server log).
+struct ChatScrollViewFinder: NSViewRepresentable {
     let found: (NSScrollView) -> Void
 
     init(_ found: @escaping (NSScrollView) -> Void) { self.found = found }

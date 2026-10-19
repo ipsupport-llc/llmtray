@@ -140,3 +140,162 @@ extension ServerLogLine {
         ServerLogLine(id: id, text: text, kind: kind, time: time, message: message, method: method, path: path, status: status)
     }
 }
+
+/// What the log window shows: lines grouped into what happened. A request
+/// with the cache, progress and stats lines that followed it; a warning or
+/// an error with its source lines or traceback; an LLMTray event; any
+/// other line on its own.
+public struct ServerLogEntry: Identifiable, Equatable, Sendable {
+    public enum Kind: Equatable, Sendable { case request, warning, error, event, line }
+
+    /// The first line's id: stable while lines are added after it.
+    public var id: Int { head.id }
+    public var kind: Kind
+    public var head: ServerLogLine
+    /// The lines after the head that belong to it (shown when expanded).
+    public var children: [ServerLogLine] = []
+    /// A request's stats line, parsed.
+    public var stats: RequestStats?
+    /// A request's latest prefill progress, while its prompt is read.
+    public var progress: (done: Int, total: Int)?
+    /// The same warning again right after: shown once, "×N".
+    public var repeats = 1
+    /// For an error: what failed ("Generation failed…") when the exception
+    /// line is the summary.
+    public var context: String?
+
+    public static func == (a: Self, b: Self) -> Bool {
+        a.kind == b.kind && a.head == b.head && a.children == b.children && a.stats == b.stats
+            && a.progress?.done == b.progress?.done && a.progress?.total == b.progress?.total
+            && a.repeats == b.repeats && a.context == b.context
+    }
+
+    /// The summary line: an error's exception ("RuntimeError: boom") when
+    /// it has a traceback, else the head's message.
+    public var summary: String {
+        if kind == .error, let exception = children.last(where: { !$0.text.hasPrefix(" ") && !$0.text.hasPrefix("\t")
+            && !$0.text.hasPrefix("Traceback") }) {
+            return exception.text
+        }
+        // "/path/server.py:3156: UserWarning: …": the warning first; where
+        // it came from is in the head line, shown when expanded.
+        if kind == .warning, let range = head.message.range(of: #"^\S+:\d+: (?=\w*Warning: )"#, options: .regularExpression) {
+            return String(head.message[range.upperBound...])
+        }
+        return head.message
+    }
+
+    public var isError: Bool { kind == .error || (head.status ?? 0) >= 500 }
+    public var isProblem: Bool { isError || kind == .warning || (head.status ?? 0) >= 400 }
+    public var lines: [ServerLogLine] { [head] + children }
+    /// Every line's text, for copying and searching.
+    public var text: String { lines.map(\.text).joined(separator: "\n") }
+}
+
+extension ServerLogEntry.Kind {
+    init(_ line: ServerLogLine) {
+        switch line.kind {
+        case .request: self = .request
+        case .warning: self = .warning
+        case .error: self = .error
+        case .event: self = .event
+        default: self = .line
+        }
+    }
+}
+
+public enum ServerLogGrouping {
+    /// The routes whose requests generate: their cache, progress and stats
+    /// lines follow them.
+    static let generating = ["/v1/chat/completions", "/chat/completions", "/v1/completions", "/completions",
+                             "/v1/messages", "/v1/responses"]
+
+    static let progressPattern = try! NSRegularExpression(pattern: #"(\d+)\s*/\s*(\d+)"#)
+
+    public static func entries(_ lines: [ServerLogLine]) -> [ServerLogEntry] {
+        var out: [ServerLogEntry] = []
+        /// Generating requests not yet ended by their stats line (indices).
+        var open: [Int] = []
+        /// The problem entry lines may still join (index), and whether it's
+        /// in a traceback.
+        var problem: Int?
+        var inTraceback = false
+
+        for line in lines {
+            let indented = line.text.hasPrefix(" ") || line.text.hasPrefix("\t")
+            // A warning's or error's own lines: indented source lines, a
+            // traceback and the exception that ends it.
+            if let p = problem, line.time == nil, line.status == nil, line.kind != .event {
+                if line.text.hasPrefix("Traceback") {
+                    inTraceback = true
+                    out[p].children.append(line)
+                    if out[p].kind == .warning { out[p].kind = .error }
+                    continue
+                }
+                if indented {
+                    out[p].children.append(line)
+                    continue
+                }
+                if inTraceback {
+                    // The exception line ends it.
+                    out[p].children.append(line)
+                    inTraceback = false
+                    problem = nil
+                    continue
+                }
+            }
+            problem = nil
+            inTraceback = false
+
+            // A traceback with no record before it.
+            if line.text.hasPrefix("Traceback") {
+                out.append(ServerLogEntry(kind: .error, head: line))
+                problem = out.count - 1
+                inTraceback = true
+                continue
+            }
+
+            switch line.kind {
+            case .request:
+                out.append(ServerLogEntry(kind: .request, head: line))
+                let path = (line.path ?? "").split(separator: "?").first.map(String.init) ?? ""
+                if line.method == "POST", generating.contains(path), (line.status ?? 0) < 400 { open.append(out.count - 1) }
+            case .cache, .progress, .stats:
+                // Joins the request it belongs to: the only one open. With
+                // several at once there's no telling which: on its own.
+                guard open.count == 1, let r = open.first else {
+                    out.append(ServerLogEntry(kind: .line, head: line))
+                    continue
+                }
+                out[r].children.append(line)
+                if line.kind == .stats {
+                    out[r].stats = RequestStats.parse(line.message)
+                    open.removeAll()
+                } else if line.kind == .progress {
+                    let ns = line.message as NSString
+                    if let m = progressPattern.firstMatch(in: line.message, range: NSRange(location: 0, length: ns.length)),
+                       let done = Int(ns.substring(with: m.range(at: 1))), let total = Int(ns.substring(with: m.range(at: 2))) {
+                        out[r].progress = (done, total)
+                    }
+                }
+            case .warning, .error:
+                let kind = ServerLogEntry.Kind(line)
+                // The same warning again: counted on the last one.
+                if kind == .warning, let last = out.indices.last, out[last].kind == .warning,
+                   out[last].head.message == line.message, out[last].children.isEmpty {
+                    out[last].repeats += 1
+                    continue
+                }
+                var entry = ServerLogEntry(kind: kind, head: line)
+                if kind == .error { entry.context = line.message }
+                out.append(entry)
+                problem = out.count - 1
+            default:
+                out.append(ServerLogEntry(kind: ServerLogEntry.Kind(line), head: line))
+            }
+            // An event (the server restarted, stopped) ends what was open.
+            if line.kind == .event { open.removeAll() }
+        }
+        return out
+    }
+}

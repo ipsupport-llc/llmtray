@@ -61,4 +61,50 @@ final class ServerLogParserTests: XCTestCase {
         XCTAssertTrue(ServerLogParser.parse("").isEmpty)
         XCTAssertEqual(ServerLogParser.parse("half a line").first?.kind, .info)
     }
+
+    func testEntriesGroupWhatHappened() {
+        let log = """
+        --- runtime ready ---
+        /Users/x/site-packages/mlx_lm/server.py:3156: UserWarning: mlx_lm.server is not recommended for production
+          warnings.warn(
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -
+        2026-10-17 06:22:11,984 - INFO - Prompt Cache: 0 sequences, 0.00 GB
+        2026-10-17 06:22:11,986 - INFO - Prompt processing progress: 256/521
+        2026-10-17 06:22:12,795 - INFO - Request stats: prompt=521 cached=0 first_token_s=0.658 tokens=19 decode_s=0.153 drafted=0
+        2026-10-17 06:22:13,000 - WARNING - Prompt cache: checkpoint skipped: no memory room
+        2026-10-17 06:22:13,100 - WARNING - Prompt cache: checkpoint skipped: no memory room
+        2026-10-17 06:22:14,000 - ERROR - Generation failed; the requests in work get the error: boom
+        Traceback (most recent call last):
+          File "/x/server.py", line 1, in <module>
+            main()
+        RuntimeError: boom
+        127.0.0.1 - - [17/Oct/2026 06:22:15] "GET /v1/models HTTP/1.1" 200 -
+        2026-10-17 06:22:16,000 - INFO - Starting httpd
+        """
+        let entries = ServerLogGrouping.entries(ServerLogParser.parse(log))
+        XCTAssertEqual(entries.map(\.kind), [.event, .warning, .request, .warning, .error, .request, .line])
+        XCTAssertEqual(entries[1].children.map(\.text), ["  warnings.warn("])
+        XCTAssertEqual(entries[1].summary, "UserWarning: mlx_lm.server is not recommended for production")
+        let request = entries[2]
+        XCTAssertEqual(request.children.count, 3)
+        XCTAssertEqual(request.stats?.prompt, 521)
+        XCTAssertEqual(request.progress?.done, 256)
+        XCTAssertEqual(entries[3].repeats, 2)
+        XCTAssertEqual(entries[4].summary, "RuntimeError: boom")
+        XCTAssertEqual(entries[4].context, "Generation failed; the requests in work get the error: boom")
+        XCTAssertEqual(entries[4].children.count, 4)
+        XCTAssertTrue(entries[5].children.isEmpty)
+        XCTAssertEqual(entries.map(\.id), entries.map(\.head.id))
+    }
+
+    func testStatsWithSeveralOpenRequestsStayApart() {
+        let log = """
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/chat/completions HTTP/1.1" 200 -
+        127.0.0.1 - - [17/Oct/2026 06:22:11] "POST /v1/messages HTTP/1.1" 200 -
+        2026-10-17 06:22:12,795 - INFO - Request stats: prompt=5 cached=0 first_token_s=0.1 tokens=2 decode_s=0.1 drafted=0
+        """
+        let entries = ServerLogGrouping.entries(ServerLogParser.parse(log))
+        XCTAssertEqual(entries.map(\.kind), [.request, .request, .line])
+        XCTAssertNil(entries[0].stats)
+    }
 }
