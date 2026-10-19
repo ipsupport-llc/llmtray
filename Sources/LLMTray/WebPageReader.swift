@@ -22,7 +22,7 @@ enum WebPageReader {
     private static var cache: [String: Page] = [:]
     private static let keepFor: TimeInterval = 600
     /// The most a page's HTML may be.
-    static let maxBytes = 5 << 20
+    nonisolated static let maxBytes = 5 << 20
     /// The most rendered text kept (a page can make any amount).
     static let maxRenderedCharacters = 400_000
 
@@ -72,6 +72,8 @@ enum WebPageReader {
 
         await takeTurn()
         defer { endTurn() }
+        // Given up on while it waited: no network for it.
+        try Task.checkCancellation()
         if let hit = cache[key] { return hit }
 
         let proxy = WebPageProxy()
@@ -132,19 +134,7 @@ enum WebPageReader {
             throw ReadError.notText(type.split(separator: ";").first.map(String.init) ?? type)
         }
         if http.expectedContentLength > maxBytes { throw ReadError.tooBig }
-        var data = Data()
-        var chunk = [UInt8]()
-        chunk.reserveCapacity(65536)
-        for try await byte in bytes {
-            chunk.append(byte)
-            if chunk.count == 65536 {
-                data.append(contentsOf: chunk)
-                chunk.removeAll(keepingCapacity: true)
-                if data.count > maxBytes { throw ReadError.tooBig }
-            }
-        }
-        data.append(contentsOf: chunk)
-        if data.count > maxBytes { throw ReadError.tooBig }
+        let data = try await collect(bytes)
         let text = await Task.detached { decode(data, encodingName: http.textEncodingName) }.value
         // Plain text isn't HTML: kept as it is.
         if type.hasPrefix("text/plain") || type.contains("json") {
@@ -152,6 +142,26 @@ enum WebPageReader {
             return ("<pre>" + escaped + "</pre>", http.url ?? url)
         }
         return (text, http.url ?? url)
+    }
+
+    /// The body, at most maxBytes, gathered off the main actor.
+    nonisolated private static func collect(_ bytes: URLSession.AsyncBytes) async throws -> Data {
+        try await Task.detached {
+            var data = Data()
+            var chunk = [UInt8]()
+            chunk.reserveCapacity(65536)
+            for try await byte in bytes {
+                chunk.append(byte)
+                if chunk.count == 65536 {
+                    data.append(contentsOf: chunk)
+                    chunk.removeAll(keepingCapacity: true)
+                    if data.count > maxBytes { throw ReadError.tooBig }
+                }
+            }
+            data.append(contentsOf: chunk)
+            if data.count > maxBytes { throw ReadError.tooBig }
+            return data
+        }.value
     }
 
     /// The bytes in the encoding the server or the page names (a

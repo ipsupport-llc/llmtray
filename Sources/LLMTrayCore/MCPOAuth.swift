@@ -524,6 +524,7 @@ extension MCPOAuth {
             case .v4(let a):
                 let b0 = a >> 24, b1 = (a >> 16) & 0xff
                 return b0 == 0 || b0 == 10 || b0 == 127 || (b0 == 169 && b1 == 254) || b0 >= 224
+                    || (b0 == 198 && (b1 == 18 || b1 == 19))
                     || (b0 == 172 && (16...31).contains(b1)) || (b0 == 192 && b1 == 168)
                     || (b0 == 100 && (64...127).contains(b1))
             case .v6(let b):
@@ -532,6 +533,14 @@ extension MCPOAuth {
                 if b[0] == 0xfe && b[1] & 0xc0 == 0x80 { return true }  // fe80::/10
                 if b[0] & 0xfe == 0xfc { return true }  // fc00::/7
                 if b[0] == 0xff { return true }  // multicast
+                // NAT64 (64:ff9b::/96) and 6to4 (2002::/16) carry an IPv4
+                // address the network translates to: as local as it is.
+                if b[0] == 0x00, b[1] == 0x64, b[2] == 0xff, b[3] == 0x9b, b[4..<12].allSatisfy({ $0 == 0 }) {
+                    return IPAddress.v4(UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15])).isLocal
+                }
+                if b[0] == 0x20, b[1] == 0x02 {
+                    return IPAddress.v4(UInt32(b[2]) << 24 | UInt32(b[3]) << 16 | UInt32(b[4]) << 8 | UInt32(b[5])).isLocal
+                }
                 // IPv4-mapped (::ffff:a.b.c.d) and IPv4-compatible (::a.b.c.d).
                 if b[0..<10].allSatisfy({ $0 == 0 }) && ((b[10] == 0xff && b[11] == 0xff) || (b[10] == 0 && b[11] == 0)) {
                     let v4 = UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15])

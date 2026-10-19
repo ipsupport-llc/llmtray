@@ -15,6 +15,10 @@ final class WebPageTextTests: XCTestCase {
         XCTAssertEqual(WebPageText.address("http://router.local", resolve: publicResolve), .failure(.local))
         XCTAssertEqual(WebPageText.address("http://[::1]/", resolve: publicResolve), .failure(.local))
         XCTAssertEqual(WebPageText.address("http://rebind.example", resolve: lanResolve), .failure(.local))
+        // Translated ranges carrying a private IPv4: as local as it.
+        XCTAssertEqual(WebPageText.address("http://[64:ff9b::c0a8:101]/", resolve: publicResolve), .failure(.local))
+        XCTAssertEqual(WebPageText.address("http://[2002:c0a8:101::1]/", resolve: publicResolve), .failure(.local))
+        XCTAssertEqual(WebPageText.address("http://198.18.0.1/", resolve: publicResolve), .failure(.local))
     }
 
     func testTitle() {
