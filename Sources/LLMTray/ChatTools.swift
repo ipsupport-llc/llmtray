@@ -379,6 +379,12 @@ final class ChatToolbox {
         turnTrust.pinnedText = true
     }
 
+    /// The turn's message shows a window's or a page's text (adr/0030): the
+    /// barrier is down from its start, as with pinned files.
+    func noteSharedText() {
+        turnTrust.sharedText = true
+    }
+
     /// The names of the tools that return project or folder text: their
     /// calls and results are left out of later turns' requests.
     var projectToolNames: Set<String> {

@@ -62,6 +62,7 @@ enum ChatRequestBuilder {
             if !dropImages { copy.images = message.images }
             if !dropAudio { copy.audios = message.audios }
             copy.projectFilesAdded = message.projectFilesAdded
+            copy.shared = message.shared
             return serialize(message: copy, note: note)
         }
         // The project's instructions between the profile's prompt and the
@@ -179,7 +180,9 @@ enum ChatRequestBuilder {
             return dict
         }
         // Files added to the project since the last message: said first.
-        let notes = message.role == "user" ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 } : []
+        // Then what the user showed (adr/0030).
+        let notes = message.role == "user"
+            ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 } + message.shared.map(\.noteForModel) : []
         let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
         if message.role == "user", !message.images.isEmpty || !message.audios.isEmpty {
             // Attachments are always normalized to PNG before landing in

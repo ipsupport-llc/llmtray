@@ -25,7 +25,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>A tool server you added in LLMTray (Settings › Tools) works with this app, for example to read or organize your mail. LLMTray asks you before each call.</string>
+	<string>LLMTray reads this browser's front tab (its title, address and text) when you choose Attach Tab in a chat, or a tool server you added in Settings › Tools works with this app, for example to read your mail. Nothing is read without your click or your OK.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>LLMTray listens only while Voice Lab is on, to talk with the local voice model. Nothing is recorded to disk.</string>
 	<key>NSHighResolutionCapable</key>

@@ -208,6 +208,7 @@
 "At most %d characters: a note is one short statement." = "At most %d characters: a note is one short statement.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
 "Attach Images…" = "Attach Images…";
+"Attach Tab from %@" = "Attach Tab from %@";
 "Attach images" = "Attach images";
 "Attach images or allow folders" = "Attach images or allow folders";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
@@ -650,6 +651,7 @@
 "LLMTray Guide" = "LLMTray Guide";
 "LLMTray events" = "LLMTray events";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray fetches it with the model it speeds up: download that model.";
+"LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
@@ -669,6 +671,8 @@
 "Leave a Review" = "Leave a Review";
 "Length" = "Length";
 "Let chats make documents" = "Let chats make documents";
+"Let chats see a window or the screen" = "Let chats see a window or the screen";
+"Let chats see a window, the screen or a browser tab" = "Let chats see a window, the screen or a browser tab";
 "Let chats work in folders" = "Let chats work in folders";
 "Let coding agents and scripts use your models." = "Let coding agents and scripts use your models.";
 "Let the chat look in %@?" = "Let the chat look in %@?";
@@ -807,6 +811,7 @@
 "No models found in this folder." = "No models found in this folder.";
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
+"No open tab in %@." = "No open tab in %@.";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
 "No server output yet" = "No server output yet";
@@ -814,6 +819,7 @@
 "No sign-in" = "No sign-in";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
+"No text was found in it, and this model can't see images: pick a vision model to show it as a picture." = "No text was found in it, and this model can't see images: pick a vision model to show it as a picture.";
 "No thanks" = "No thanks";
 "No tool calls yet in this version." = "No tool calls yet in this version.";
 "No update check at launch" = "No update check at launch";
@@ -863,6 +869,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
 "Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
+"Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@.";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
@@ -903,6 +910,7 @@
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
 "Picks a model that fits your Mac and enables only what you choose." = "Picks a model that fits your Mac and enables only what you choose.";
+"Picture" = "Picture";
 "Pictures over 50 MB can't be added: %@." = "Pictures over 50 MB can't be added: %@.";
 "Pictures · %lld — for documents, not searched" = "Pictures · %lld — for documents, not searched";
 "Pin" = "Pin";
@@ -1070,6 +1078,7 @@
 "Saved in your Keychain" = "Saved in your Keychain";
 "Save…" = "Save…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is.";
+"Screen" = "Screen";
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
 "Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
@@ -1121,12 +1130,14 @@
 "Show Previous Tab" = "Show Previous Tab";
 "Show Reports…" = "Show Reports…";
 "Show What Chats Get…" = "Show What Chats Get…";
+"Show a Window…" = "Show a Window…";
 "Show all" = "Show all";
 "Show in Finder" = "Show in Finder";
 "Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
 "Show only overrides" = "Show only overrides";
 "Show reasoning" = "Show reasoning";
+"Show the Screen…" = "Show the Screen…";
 "Show the profile files in Finder" = "Show the profile files in Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac";
 "Show the project's files" = "Show the project's files";
@@ -1217,6 +1228,7 @@
 "Temporary chat" = "Temporary chat";
 "Temporary chats can only look in folders, for that chat only." = "Temporary chats can only look in folders, for that chat only.";
 "Temporary — not saved" = "Temporary — not saved";
+"Text · %@" = "Text · %@";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents.";
 "Thank you!" = "Thank you!";
 "Thank you! List your name in Supporters?" = "Thank you! List your name in Supporters?";
@@ -1227,6 +1239,8 @@
 "That isn't LLMTray's folder" = "That isn't LLMTray's folder";
 "That isn't an http(s) URL." = "That isn't an http(s) URL.";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "The %lld moves to the Trash are unticked: tick the ones you want.";
+"The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac." = "The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac.";
+"The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac." = "The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac.";
 "The App Store couldn't confirm the purchase." = "The App Store couldn't confirm the purchase.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";
 "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs.";
@@ -1483,6 +1497,7 @@
 "Waiting for an image or song to finish…" = "Waiting for an image or song to finish…";
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";
+"Waiting for your pick…" = "Waiting for your pick…";
 "Waiting to be sent: %@" = "Waiting to be sent: %@";
 "Waits for %@ to be loaded." = "Waits for %@ to be loaded.";
 "Waits for a model: start one to read your chats." = "Waits for a model: start one to read your chats.";
@@ -1535,6 +1550,8 @@
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
 "Wikipedia" = "Wikipedia";
+"Window" = "Window";
+"Windows and pages" = "Windows and pages";
 "With notes, it reads like this:" = "With notes, it reads like this:";
 "Words only" = "Words only";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
@@ -1607,6 +1624,7 @@
 "never used" = "never used";
 "new or changed" = "new or changed";
 "no changes" = "no changes";
+"no page text" = "no page text";
 "no text" = "no text";
 "not a picture" = "not a picture";
 "not allowed" = "not allowed";

@@ -168,6 +168,18 @@ struct MessageBubble: View {
                     .lineLimit(2)
             }
 
+            if isUser {
+                // What the user showed the model with it (adr/0030).
+                ForEach(message.shared) { c in
+                    Label(SharedChip.title(c) + " · " + SharedChip.detail(c, image: c.text == nil && c.kind != .browserTab),
+                          systemImage: SharedChip.symbol(c.kind))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .help(Text(verbatim: c.kind == .browserTab ? c.source : c.heading))
+                }
+            }
+
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
                 tweakDraft(.image, i)

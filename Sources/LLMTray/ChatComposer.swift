@@ -18,6 +18,19 @@ final class ComposerModel: ObservableObject {
     @Published var draft = ""
     /// Always PNG -- ChatRequestBuilder sends them as image/png.
     @Published var attachments: [Data] = []
+    /// Windows, the screen or browser tabs shown with the message
+    /// (adr/0030): a capture goes as its image to a model that sees, as
+    /// its recognized text to one that doesn't.
+    @Published var shared: [SharedItem] = []
+    /// A capture or a tab being read: a chip with a spinner meanwhile.
+    @Published var isSharing = false
+
+    struct SharedItem: Identifiable {
+        var context: SharedContext
+        /// A capture's PNG, for a model that sees.
+        var image: Data?
+        var id: UUID { context.id }
+    }
     /// Only a vision-capable model can take images; switching to one that
     /// can't drops what's attached.
     /// What the model's template offers for thinking: the effort picker
@@ -41,12 +54,15 @@ final class ComposerModel: ObservableObject {
     }
     @Published var acceptsImages = false {
         didSet {
-            if !acceptsImages { attachments.removeAll() } else { notice = nil }
+            // A capture shown as an image goes too (a text model would get
+            // nothing of it).
+            if !acceptsImages { attachments.removeAll(); shared.removeAll { $0.image != nil } } else { notice = nil }
         }
     }
 
     var isEmpty: Bool {
-        draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty && recordings.isEmpty && !recorder.isRecording
+        draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty && recordings.isEmpty && shared.isEmpty
+            && !recorder.isRecording
     }
 
     /// A short note under the field (an image the model can't take), gone
@@ -101,11 +117,63 @@ final class ComposerModel: ObservableObject {
 
     /// Takes the draft and attachments for sending and clears them.
     /// What's sent: a recording still going is stopped and goes too.
-    func take() -> (text: String, images: [Data], audios: [Data]) {
+    func take() -> (text: String, images: [Data], audios: [Data], shared: [SharedContext]) {
         if let wav = recorder.stop() { recordings.append(wav) }
-        defer { draft = ""; attachments = []; recordings = [] }
-        return (draft, attachments, recordings)
+        defer { draft = ""; attachments = []; recordings = []; shared = [] }
+        return (draft, attachments + shared.compactMap(\.image), recordings, shared.map(\.context))
     }
+
+    /// Shows the model a window or the screen (adr/0030): the system
+    /// picker, one still; its image for a model that sees, its text for
+    /// one that doesn't.
+    func shareWindow(screen: Bool) {
+        guard !isSharing else { return }
+        isSharing = true
+        let vision = acceptsImages
+        Task {
+            defer { isSharing = false }
+            guard let capture = await ScreenShare.shared.capture(screen: screen) else { return }
+            var context = capture.context
+            var image: Data?
+            if vision {
+                image = ImageAttachment.pngData(capture.image)
+            } else {
+                let text = await ScreenShare.recognizeText(capture.image)
+                context = SharedContext(kind: context.kind, title: context.title, source: context.source, text: text)
+                if context.text == nil {
+                    showNotice(NSLocalizedString("No text was found in it, and this model can't see images: pick a vision model to show it as a picture.",
+                                                 comment: "chat: a window shown to a text-only model had no readable text"))
+                    return
+                }
+            }
+            shared.append(SharedItem(context: context, image: image))
+        }
+    }
+
+    #if !APP_STORE
+    /// Attaches the front tab of the browser last in front (adr/0030).
+    func shareTab(_ browser: BrowserTab.Browser) {
+        guard !isSharing else { return }
+        isSharing = true
+        Task {
+            defer { isSharing = false }
+            switch await ScreenShare.shared.readTab(browser) {
+            case .success(let tab):
+                shared.append(SharedItem(context: tab))
+                if tab.titleOnly {
+                    showNotice(String(format: NSLocalizedString("Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@.",
+                                                                comment: "chat: a Chromium browser's tab attached without its text"), browser.name))
+                }
+            case .failure(.notAllowed):
+                showNotice(String(format: NSLocalizedString("LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation.",
+                                                            comment: "chat: Automation for the browser was turned down"), browser.name))
+            case .failure(.noTab):
+                showNotice(String(format: NSLocalizedString("No open tab in %@.", comment: "chat: the browser has no window"), browser.name))
+            }
+        }
+    }
+    #endif
+
 
     func pickImages() {
         let panel = NSOpenPanel()
@@ -200,6 +268,7 @@ final class ComposerModel: ObservableObject {
 struct ChatComposer: View {
     @EnvironmentObject var chat: ChatClient
     @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
+    @AppStorage(Pref.screenSharingEnabled.name) private var sharingEnabled = Pref.screenSharingEnabled.defaultValue
     @ObservedObject private var mcp = MCPHub.shared
 
     /// The MCP servers' groups the + menu offers (switched on, tools reviewed).
@@ -270,7 +339,7 @@ struct ChatComposer: View {
     /// on the left, the thinking effort and Send on the right.
     private var card: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if !composer.attachments.isEmpty || !composer.recordings.isEmpty {
+            if !composer.attachments.isEmpty || !composer.recordings.isEmpty || !composer.shared.isEmpty || composer.isSharing {
                 attachmentStrip
             }
             // Not disabled during streaming: a disabled NSTextField
@@ -291,7 +360,7 @@ struct ChatComposer: View {
                     if composer.recorder.isRecording || composer.recorder.heldPending { RecordingBar(recorder: composer.recorder) }
                 }
             HStack(spacing: 12) {
-                if chat.currentSessionID != nil || composer.acceptsImages || folders.isEnabled {
+                if chat.currentSessionID != nil || composer.acceptsImages || folders.isEnabled || sharingEnabled {
                     addMenu
                 }
                 if composer.acceptsAudio {
@@ -378,6 +447,20 @@ struct ChatComposer: View {
             }
             if composer.acceptsImages {
                 Button("Attach Images…") { composer.pickImages() }
+            }
+            // Showing the model what's on screen (adr/0030).
+            if sharingEnabled {
+                Divider()
+                Button { composer.shareWindow(screen: false) } label: { Label("Show a Window…", systemImage: "macwindow") }
+                Button { composer.shareWindow(screen: true) } label: { Label("Show the Screen…", systemImage: "display") }
+                #if !APP_STORE
+                if let browser = ScreenShare.shared.currentBrowser {
+                    Button { composer.shareTab(browser) } label: {
+                        Label(String(format: NSLocalizedString("Attach Tab from %@", comment: "+ menu: the front tab of a browser (its name)"), browser.name),
+                              systemImage: "globe")
+                    }
+                }
+                #endif
             }
             // Documents (adr/0020): loads their tools into this saved chat,
             // for a model that wouldn't think of load_tools.
@@ -489,6 +572,18 @@ struct ChatComposer: View {
                         .accessibilityLabel("Remove recording")
                     }
                     .font(.callout)
+                    .padding(.horizontal, 8)
+                    .frame(height: 44)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.gray.opacity(0.15)))
+                }
+                ForEach(composer.shared) { item in
+                    SharedChip(item: item) { composer.shared.removeAll { $0.id == item.id } }
+                }
+                if composer.isSharing {
+                    HStack(spacing: 6) {
+                        ProgressView().controlSize(.small)
+                        Text("Waiting for your pick…").font(.callout).foregroundStyle(.secondary)
+                    }
                     .padding(.horizontal, 8)
                     .frame(height: 44)
                     .background(RoundedRectangle(cornerRadius: 6).fill(Color.gray.opacity(0.15)))
@@ -769,5 +864,99 @@ struct RecordingBar: View {
         .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .textBackgroundColor)))
         .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.red.opacity(0.5)))
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// A window, the screen or a tab about to be shown (adr/0030): its picture
+/// or symbol, what it is and what goes, a click to look at it, × to drop.
+struct SharedChip: View {
+    let item: ComposerModel.SharedItem
+    let remove: () -> Void
+    @State private var showsText = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            preview
+            VStack(alignment: .leading, spacing: 1) {
+                Text(verbatim: Self.title(item.context)).font(.callout.weight(.medium)).lineLimit(1)
+                Text(verbatim: Self.detail(item.context, image: item.image != nil)).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            }
+            .frame(maxWidth: 180, alignment: .leading)
+            Button(action: remove) { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }
+                .buttonStyle(.plain)
+                .help("Remove")
+                .accessibilityLabel("Remove")
+        }
+        .padding(.trailing, 8)
+        .frame(height: 44)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color.gray.opacity(0.15)))
+        .contentShape(Rectangle())
+        .onTapGesture { open() }
+        .pointingHandCursor()
+        .popover(isPresented: $showsText, arrowEdge: .top) {
+            ScrollView {
+                Text(verbatim: item.context.text ?? item.context.source)
+                    .font(.callout)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+            }
+            .frame(width: 380, height: 300)
+        }
+        .help(Text(verbatim: item.context.heading))
+    }
+
+    @ViewBuilder private var preview: some View {
+        if let data = item.image, let image = NSImage(data: data) {
+            Image(nsImage: image).resizable().aspectRatio(contentMode: .fill)
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        } else {
+            Image(systemName: Self.symbol(item.context.kind))
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .frame(width: 44, height: 44)
+        }
+    }
+
+    private func open() {
+        if let data = item.image {
+            ImageActions.openPreview(data, title: Self.title(item.context))
+        } else {
+            showsText = true
+        }
+    }
+
+    static func symbol(_ kind: SharedContext.Kind) -> String {
+        switch kind {
+        case .window: return "macwindow"
+        case .screen: return "display"
+        case .browserTab: return "globe"
+        }
+    }
+
+    static func title(_ c: SharedContext) -> String {
+        switch c.kind {
+        case .window:
+            return !c.title.isEmpty ? c.title : !c.source.isEmpty ? c.source : NSLocalizedString("Window", comment: "a shown window without a title")
+        case .screen:
+            return NSLocalizedString("Screen", comment: "the whole screen shown to the model")
+        case .browserTab:
+            return c.title.isEmpty ? (URL(string: c.source)?.host ?? c.source) : c.title
+        }
+    }
+
+    /// What goes: a picture or text (its size); for a tab, its site.
+    static func detail(_ c: SharedContext, image: Bool) -> String {
+        switch c.kind {
+        case .window, .screen:
+            let app = c.kind == .window && !c.title.isEmpty && !c.source.isEmpty ? c.source + " · " : ""
+            if image { return app + NSLocalizedString("Picture", comment: "a shown window goes as a picture") }
+            let size = ByteCountFormatter.string(fromByteCount: Int64(c.text?.utf8.count ?? 0), countStyle: .file)
+            return String(format: NSLocalizedString("Text · %@", comment: "a shown window goes as its recognized text (its size)"), size)
+        case .browserTab:
+            let host = URL(string: c.source)?.host ?? c.source
+            return c.text == nil ? host + " · " + NSLocalizedString("no page text", comment: "a tab attached with its title and address only") : host
+        }
     }
 }

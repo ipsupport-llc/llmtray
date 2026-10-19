@@ -784,10 +784,11 @@ struct ContentView: View {
         guard canChat, !chat.isBusy, !composer.isEmpty else { return }
         // Taken first: a recording too short to keep leaves nothing to send,
         // and nothing must start the model then.
-        let (text, images, audios) = composer.take()
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty else { return }
+        let (text, images, audios, shared) = composer.take()
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty
+            || !shared.isEmpty else { return }
         startModelIfStopped()
-        chat.send(prompt: text, images: images, audios: audios, port: port, modelAlias: requestModelName,
+        chat.send(prompt: text, images: images, audios: audios, shared: shared, port: port, modelAlias: requestModelName,
                   settings: chatSettings, server: server)
         isInputFocused = true
     }

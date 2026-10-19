@@ -40,6 +40,9 @@ public enum ToolTrust {
         /// The request carries the project's pinned files (adr/0012, "Pinned
         /// files"): file text from the turn's start, every turn while pinned.
         public var pinnedText = false
+        /// The user's message shows a window's or a page's text (adr/0030):
+        /// outside text from the turn's start, as pinned files are.
+        public var sharedText = false
 
         public init(projectText: Bool = false, folderText: Bool = false, changeResult: Bool = false, networkText: Bool = false,
                     pinnedText: Bool = false) {
@@ -51,11 +54,11 @@ public enum ToolTrust {
         }
 
         /// Anything that names files: guarded tools are off.
-        public var hasUntrustedText: Bool { projectText || folderText || changeResult || pinnedText || mcpText }
+        public var hasUntrustedText: Bool { projectText || folderText || changeResult || pinnedText || mcpText || sharedText }
         /// Outside text a change could be prompted by -- file, folder or web
         /// text: folder changes are off (a change's own result isn't: its
         /// names are the model's).
-        public var hasFileText: Bool { projectText || folderText || networkText || pinnedText || mcpText }
+        public var hasFileText: Bool { projectText || folderText || networkText || pinnedText || mcpText || sharedText }
         /// What this turn's tool results brought in (the pinned prefix aside).
         /// The listing doesn't count: a model learns a file's id from it
         /// before pinning the file the user asked for.

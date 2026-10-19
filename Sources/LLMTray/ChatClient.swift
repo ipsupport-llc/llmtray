@@ -358,6 +358,7 @@ final class ChatClient: ObservableObject {
             message.citations = pm.citations ?? []
             message.answerStats = pm.answerStats
             message.projectFilesAdded = pm.projectFilesAdded ?? []
+            message.shared = pm.shared ?? []
             message.mcpCalls = pm.mcpCalls ?? []
             message.seq = pm.seq
             message.sentAt = pm.sentAt
@@ -496,6 +497,7 @@ final class ChatClient: ObservableObject {
             persisted.answerStats = msg.answerStats
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
+            persisted.shared = msg.shared.isEmpty ? nil : msg.shared
             persisted.mcpCalls = msg.mcpCalls.isEmpty ? nil : msg.mcpCalls
             persisted.seq = msg.seq
             persisted.sentAt = msg.sentAt
@@ -647,10 +649,11 @@ final class ChatClient: ObservableObject {
     }
 
     func send(
-        prompt: String, images: [Data] = [], audios: [Data] = [], port: Int, modelAlias: String, settings: ChatSettings,
-        server: ServerManager
+        prompt: String, images: [Data] = [], audios: [Data] = [], shared: [SharedContext] = [], port: Int, modelAlias: String,
+        settings: ChatSettings, server: ServerManager
     ) {
-        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty else { return }
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty
+            || !shared.isEmpty else { return }
         // Groups loaded after outside text in an earlier turn: from this
         // message on (adr/0020).
         if !pendingToolGroups.isEmpty {
@@ -667,6 +670,7 @@ final class ChatClient: ObservableObject {
         message.audios = audios
         message.audioPrompts = audios.map { _ in NSLocalizedString("Recording", comment: "a spoken message's caption") }
         message.projectFilesAdded = projectFilesSinceLastMessage()
+        message.shared = shared
         // Memory meets the chat (from its start when new, from now when
         // opened again) and numbers the message (adr/0024).
         if let session = currentSessionID, MemoryManager.shared.isEnabled {
@@ -935,6 +939,11 @@ final class ChatClient: ObservableObject {
     /// -- read first, off the main thread, while the turn already shows as
     /// busy. A Stop or another chat meanwhile drops it.
     private func startTurn(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
+        // A window's or a page's text in the message the turn answers
+        // (adr/0030): outside text from the start.
+        if let last = messages.last(where: { $0.role == "user" && !$0.isToolContext }), last.shared.contains(where: { $0.text != nil }) {
+            toolbox.noteSharedText()
+        }
         let base = withProject(settings)
         guard let project = base.project, ProjectIndexer.shared.isEnabled else {
             return startAssistantResponse(port: port, modelAlias: modelAlias, settings: base, server: server)

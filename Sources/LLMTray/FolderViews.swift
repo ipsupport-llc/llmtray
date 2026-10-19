@@ -323,6 +323,7 @@ struct ChatFolderChips: View {
 struct FoldersPane: View {
     @ObservedObject private var manager = FolderAccessManager.shared
     @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
+    @AppStorage(Pref.screenSharingEnabled.name) private var screenSharingEnabled = Pref.screenSharingEnabled.defaultValue
     @State private var error: String?
     @State private var undoNote: String?
     /// An hour's grant leaves the list when it ends.
@@ -335,6 +336,15 @@ struct FoldersPane: View {
             Section("Documents") {
                 Toggle(isOn: $documentsEnabled) {
                     SettingLabel(title: "Let chats make documents", help: "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats.")
+                }
+            }
+            Section("Windows and pages") {
+                Toggle(isOn: $screenSharingEnabled) {
+                    #if APP_STORE
+                    SettingLabel(title: "Let chats see a window or the screen", help: "The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac.")
+                    #else
+                    SettingLabel(title: "Let chats see a window, the screen or a browser tab", help: "The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac.")
+                    #endif
                 }
             }
             Section("Folder access") {
