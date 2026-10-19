@@ -138,6 +138,9 @@ public enum Pref {
     public static let folderToolsEnabled = PrefKey("llmtray.folderTools.enabled", default: false)
     /// Chats may make PDF documents (make_document, adr/0020): off until turned on.
     public static let documentsEnabled = PrefKey("llmtray.documents.enabled", default: false)
+    /// The + menu may show the model a window, the screen or a browser tab
+    /// (adr/0030): off until turned on.
+    public static let screenSharingEnabled = PrefKey("llmtray.screenSharing.enabled", default: false)
 
     // Memory between chats (adr/0024): off until turned on.
     public static let memoryEnabled = PrefKey("llmtray.memory.enabled", default: false)

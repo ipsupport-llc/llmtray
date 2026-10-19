@@ -1596,7 +1596,13 @@ struct UpdatesPane: View {
     var body: some View {
         Form {
             Section("LLMTray") {
-                LabeledContent("Version", value: version)
+                LabeledContent("Version") {
+                    HStack {
+                        Text(verbatim: version)
+                        // Was in the tray menu's Help.
+                        Button("What's New…") { NotificationCenter.default.post(name: .showWhatsNew, object: nil) }
+                    }
+                }
                 #if !APP_STORE
                 Toggle(isOn: $autoCheck) {
                     SettingLabel(title: "Check for updates automatically", help: "Checks about once a day in the background and offers new versions.")
