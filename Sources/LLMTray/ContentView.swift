@@ -105,7 +105,7 @@ struct ContentView: View {
             ReviewPromptRow()
             if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
             conversation
-            openInWindowRow
+            openInWindowTip
         }
         .frame(width: 420)
         // The popover is as tall as its content, and an empty chat is short:
@@ -187,13 +187,12 @@ struct ContentView: View {
         .padding(.vertical, 8)
     }
 
-    /// The popover's way to the full chat window, in words: a small icon in
-    /// the header was all there was, and people took LLMTray for a menu-bar
-    /// widget. After a few messages here, once, a line says why.
-    private var openInWindowRow: some View {
-        VStack(spacing: 6) {
-            Divider()
-            if !chatWindowTipShown, chat.messages.filter({ $0.role == "user" }).count >= 3 {
+    /// After a few messages in the popover, once: a line saying why the
+    /// window (its button is at the top) is better for longer chats.
+    @ViewBuilder private var openInWindowTip: some View {
+        if !chatWindowTipShown, chat.messages.filter({ $0.role == "user" }).count >= 3 {
+            VStack(spacing: 6) {
+                Divider()
                 HStack(spacing: 6) {
                     Image(systemName: "lightbulb").foregroundStyle(.yellow)
                     Text("Longer chats are easier in the window: projects, files and every chat in a sidebar.")
@@ -205,18 +204,8 @@ struct ContentView: View {
                         .help("Don't show again")
                 }
                 .padding(.horizontal, 12)
+                .padding(.bottom, 8)
             }
-            Button {
-                chatWindowTipShown = true
-                NotificationCenter.default.post(name: .detachChat, object: nil)
-            } label: {
-                Label("Open in Window", systemImage: "macwindow.on.rectangle")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderless)
-            .keyboardShortcut("o", modifiers: [.command, .shift])
-            .help("The full chat window, with projects and every chat (⌘⇧O)")
-            .padding(.bottom, 8)
         }
     }
 

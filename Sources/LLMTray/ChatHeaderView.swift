@@ -220,13 +220,17 @@ struct ChatHeaderView: View {
                 Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
                     .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
-                Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
-                    Image(systemName: "macwindow.on.rectangle")
-                }
-                .buttonStyle(.plain)
-                .help("Open in Window -- closing the window puts the chat back in the menu bar")
-                .accessibilityLabel("Open in Window")
                 settingsButton
+                // At the top, in words: the full window is one click from
+                // opening the tray, not under the whole chat.
+                Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                    Label("Open in Window", systemImage: "macwindow.on.rectangle")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .fixedSize()
+                .keyboardShortcut("o", modifiers: [.command, .shift])
+                .help("The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar")
             }
         } else {
             HStack {
