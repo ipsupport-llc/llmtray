@@ -82,7 +82,7 @@ enum WebPageReader {
         var (title, text) = await Task.detached { (WebPageText.title(html), WebPageText.mainText(html)) }.value
         // Next to nothing but scripts: the page builds itself in a browser.
         if text.count < 400, html.range(of: "<script", options: .caseInsensitive) != nil,
-           let rendered = await Renderer.render(finalURL, proxyPort: proxy.port) {
+           let rendered = await Renderer.render(finalURL, proxy: proxy) {
             text = rendered.text
             title = rendered.title ?? title
         }
@@ -102,12 +102,17 @@ enum WebPageReader {
         config.httpShouldSetCookies = false
         config.timeoutIntervalForRequest = 15
         config.timeoutIntervalForResource = WebPageProxy.deadline
-        config.proxyConfigurations = [Self.proxyConfiguration(proxy.port)]
+        config.proxyConfigurations = [Self.proxyConfiguration(proxy)]
         return URLSession(configuration: config, delegate: RedirectGuard(), delegateQueue: nil)
     }
 
-    nonisolated static func proxyConfiguration(_ port: UInt16) -> ProxyConfiguration {
-        ProxyConfiguration(httpCONNECTProxy: NWEndpoint.hostPort(host: "127.0.0.1", port: NWEndpoint.Port(rawValue: port) ?? .any))
+    nonisolated static func proxyConfiguration(_ proxy: WebPageProxy) -> ProxyConfiguration {
+        var config = ProxyConfiguration(httpCONNECTProxy: NWEndpoint.hostPort(host: "127.0.0.1",
+                                                                              port: NWEndpoint.Port(rawValue: proxy.port) ?? .any))
+        config.applyCredential(username: proxy.user, password: proxy.password)
+        // Never around it: no direct connection if the proxy says no.
+        config.allowFailover = false
+        return config
     }
 
     /// The HTML (at most maxBytes, read as it comes), in its own encoding.
@@ -184,13 +189,13 @@ enum WebPageReader {
         private var view: WKWebView?
         private var continuation: CheckedContinuation<(text: String, title: String?)?, Never>?
 
-        static func render(_ url: URL, proxyPort: UInt16) async -> (text: String, title: String?)? {
-            await Renderer().load(url, proxyPort: proxyPort)
+        static func render(_ url: URL, proxy: WebPageProxy) async -> (text: String, title: String?)? {
+            await Renderer().load(url, proxy: proxy)
         }
 
-        private func load(_ url: URL, proxyPort: UInt16) async -> (text: String, title: String?)? {
+        private func load(_ url: URL, proxy: WebPageProxy) async -> (text: String, title: String?)? {
             let store = WKWebsiteDataStore.nonPersistent()
-            store.proxyConfigurations = [WebPageReader.proxyConfiguration(proxyPort)]
+            store.proxyConfigurations = [WebPageReader.proxyConfiguration(proxy)]
             let config = WKWebViewConfiguration()
             config.websiteDataStore = store
             // Loopback and other address literals don't go through a proxy:
@@ -198,6 +203,12 @@ enum WebPageReader {
             // rendered.
             guard let rules = await Self.literalBlocker() else { return nil }
             config.userContentController.add(rules)
+            // WebRTC opens its own sockets, around any proxy: gone before a
+            // page's scripts run, in every frame.
+            config.userContentController.addUserScript(WKUserScript(
+                source: "for (const n of ['RTCPeerConnection','webkitRTCPeerConnection','RTCDataChannel','RTCIceCandidate']) {"
+                    + "try { Object.defineProperty(window, n, {value: undefined, writable: false, configurable: false}); } catch (e) {} }",
+                injectionTime: .atDocumentStart, forMainFrameOnly: false))
             config.preferences.javaScriptCanOpenWindowsAutomatically = false
             config.mediaTypesRequiringUserActionForPlayback = .all
             let view = WKWebView(frame: NSRect(x: 0, y: 0, width: 1280, height: 900), configuration: config)
