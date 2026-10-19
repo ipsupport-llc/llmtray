@@ -2,6 +2,7 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+" · %@ drafted" = " · %@ у чернетках";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "«%@» змінилося з часу, коли ця відповідь посилалася на нього: сторінка %lld тепер може читатися інакше.";
 "\"%@\" is no longer in the project." = "«%@» більше не входить до проєкту.";
 "%.0f%% from drafts" = "%.0f%% з чернеток";
@@ -29,6 +30,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ уже існує й посилається на %@. Видаліть його спочатку, щоб установити LLMTray.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ не вдалося прочитати чати для пам’яті: інша модель читає його чати.";
 "%@ didn't download: %@" = "%@ не завантажено: %@";
+"%@ from cache" = "%@ з кешу";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ — посилання на папку, яка недоступна: підключіть диск або видаліть посилання.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ має обмеження: прийміть ліцензію на huggingface.co/%@, потім додайте токен Hugging Face у Налаштування → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ увімкнено в цьому чаті: перед кожним викликом у вас питатимуть підтвердження.";
@@ -36,7 +38,11 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ще не завантажено — знову ввімкніть генерацію зображень у Налаштуваннях.";
 "%@ isn't installed yet" = "%@ ще не встановлено";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "Для %@ потрібен ваш власний застосунок: додайте його ID клієнта й секрет у «Налаштувати», додайте показаний там URL переспрямування до свого застосунку, а потім натисніть «Увійти».";
-"%@ of %@ lines" = "%@ з %@ рядків";
+"%@ new" = "%@ нових";
+"%@ of %@ shown" = "Показано %@ з %@";
+"%@ requests" = "%@ запитів";
+"%@ s" = "%@ с";
+"%@ tok/s" = "%@ ток/с";
 "%@ wasn't found on Hugging Face." = "%@ не знайдено на Hugging Face.";
 "%@ · %@ left" = "%@ · залишилось %@";
 "%@ · %@ of %@" = "%@ · %@ із %@";
@@ -47,6 +53,7 @@
 "%@ — in project %@" = "%@ — у проєкті %@";
 "%@ — page %lld" = "%@ — сторінка %lld";
 "%@ → %@ available" = "Доступно: %@ → %@";
+"%@ → %@ tok" = "%@ → %@ ток";
 "%@ ★ from %lld reviews" = "%@ ★ з %lld відгуків";
 "%@ ★ from 1 review" = "%@ ★ з 1 відгуку";
 "%@ 🌐" = "%@ 🌐";
@@ -62,8 +69,10 @@
 "%lld failed" = "%lld не вдалося";
 "%lld files" = "%lld файлів";
 "%lld files couldn't be indexed" = "%lld файлів не вдалося індексувати";
+"%lld h later" = "через %lld год";
 "%lld interrupted: look at them in Finder" = "%lld перервано: перегляньте їх у Finder";
 "%lld items put back under their names." = "%lld елементів повернуто під їхні імена.";
+"%lld min later" = "через %lld хв";
 "%lld more" = "ще %lld";
 "%lld more…" = "Ще %lld…";
 "%lld need a look: see the list." = "%lld потребують перегляду: див. список.";
@@ -75,6 +84,7 @@
 "%lld requests" = "запитів: %lld";
 "%lld requests in flight (answered together up to Concurrent requests)" = "Запитів у роботі: %lld (одночасно — до значення «Паралельні запити»)";
 "%lld s" = "%lld с";
+"%lld s later" = "через %lld с";
 "%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld інструментів на сервері — нові або змінені: їх приховано в Чаті, доки ви їх не приймете.";
 "%lld tools changed on the server: Configure to accept them." = "На сервері змінено %lld інструментів: налаштуйте, щоб прийняти їх.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
@@ -86,6 +96,7 @@
 "+ MTP drafter %@" = "+ MTP‑складання %@";
 "1 hour" = "1 година";
 "30 s reached · release to send, Esc to drop" = "Досягнуто 30 с · відпустіть, щоб надіслати, Esc — щоб скасувати";
+"7 Days" = "7 днів";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Чат запитує перед тим, як переглядати папку, і показує кожну зміну як план для затвердження. Приватні місця (Library, keys, сам домашній каталог) ніколи не передаються.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Чат може переглядати дозволені вами папки та пропонувати нові папки, переміщення й перейменування. Ви підтверджуєте кожну зміну й можете скасувати її.";
 "A chat model" = "Модель для чату";
@@ -106,11 +117,13 @@
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Пісня зі словами або інструментальна — за описом (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Символьне посилання: сам посилальний файл, а не те, на що він вказує.";
 "A temporary chat can't hold files" = "Тимчасовий чат не може зберігати файли";
+"A window with no readable text was removed: this model can't see pictures." = "Вікно без читабельного тексту вилучено: ця модель не бачить зображень.";
 "AAC %lld kbit/s" = "AAC %lld кбіт/с";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — чіткі вокали, 8‑bit (рекомендовано)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чіткі вокали, GPTQ 4‑bit (менше пам’яті)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — чіткі вокали, повна точність";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — більш насичене звучання";
+"API key" = "Ключ API";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Близько %d токенів після системного промпту профілю. Модель із малим контекстом отримує менше (пам’ять займає щонайбільше 5%% контексту). Уже відкриті чати зберігають блок, із яким почали, доки не зміниться одна з його нотаток.";
 "About LLMTray" = "Про LLMTray";
 "About you" = "Про вас";
@@ -179,6 +192,7 @@
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Необов’язковий внесок: без підписок і блокування функцій. Спонсори можуть вказати ім’я для публікації.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Непевний елемент міг змінитися або ні: перегляньте його у Finder. Журнал зберігається в розділі «Налаштування › Файли».";
 "Another LLMTray is running" = "Інший LLMTray уже запущено";
+"Another chat is picking a window: finish that first." = "Інший чат вибирає вікно: спершу завершіть це.";
 "Another folder change is running: try again when it's done." = "Інша зміна папки виконується: повторіть спробу після завершення.";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
 "Another version next to this one (a new seed, the same request)" = "Інша версія поруч із цією (новий seed, той самий запит)";
@@ -187,6 +201,7 @@
 "Answer details" = "Деталі відповіді";
 "Answer in Russian, briefly" = "Відповідь російською, коротко";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Будь-які інші прапорці mlx_lm.server через пробіл, наприклад --draft-model <шлях>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Будь-хто у вашій мережі може користуватися сервером: ключ обмежує доступ клієнтами, яким ви його надасте.";
 "Anything else chats should know" = "Що ще чатам варто знати";
 "Apache License 2.0" = "Ліцензія Apache 2.0";
 "App language" = "Мова застосунку";
@@ -197,6 +212,7 @@
 "Approve Selected" = "Підтвердити вибране";
 "Apps & agents" = "Додатки й агенти";
 "Apps and agents" = "Додатки й агенти";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "Програми на цьому Mac підключаються без ключа; пристроям у вашій мережі він потрібен. Коли «Вимк.»: він потрібен кожному клієнту порту LLMTray, зокрема й на цьому Mac.";
 "Arguments, one per line" = "Аргументи, по одному в рядку";
 "Ask Later" = "Запитати пізніше";
 "Ask about LLMTray" = "Запитайте про LLMTray";
@@ -210,6 +226,7 @@
 "At most %d characters: a note is one short statement." = "Щонайбільше %d символів: нотатка — це одне коротке твердження.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не більше одного звіту на день, що охоплює один попередній день, надсилається на ipsupport.us. Незапланований день буде надіслано при наступному запуску, до 7 днів назад. Вимкнення видаляє те, що не було надіслано.";
 "Attach Images…" = "Приєднати зображення…";
+"Attach Tab from %@" = "Додати вкладку з %@";
 "Attach images" = "Приєднати зображення";
 "Attach images or allow folders" = "Приєднати зображення або дозволити папки";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention у 8-бітах, feed‑forward у 4-бітах — найкращий баланс розміру й стабільності, перевірено на однорідному 4‑бітному режимі.";
@@ -224,6 +241,7 @@
 "Automatic" = "Автоматично";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усереднюються в один результат нижче. Перед ними завжди йде пробний прогін, тож компіляція Metal-ядер під час першого виклику не спотворює цифри.";
 "Back" = "Назад";
+"Back to the newest (End)" = "Назад до найновішого (End)";
 "Balanced (default)" = "Збалансовано (Default)";
 "Barely fits the GPU memory" = "Майже поміщається в пам’ять GPU";
 "Be the first to be listed here." = "Станьте першим, кого тут зазначено.";
@@ -239,6 +257,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Імпортує чати, проєкти, профілі, моделі для зображень, музики, голосу та ембедингів і налаштування з версії з ipsupport.us (завершіть її спочатку). Чати й моделі тут збережено; її налаштування замінять ці. Моделі не займають додаткового місця на диску. Моделі чатів лишаються в папці моделей: виберіть її в Settings › Models.";
 "Browse Hugging Face…" = "Відкрити Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Вбудовано в macOS · лише для Чату LLMTray";
+"By" = "За";
 "Cached" = "У кеші";
 "Calculator" = "Калькулятор";
 "Calls" = "Виклики";
@@ -247,6 +266,7 @@
 "Can look · %@" = "Може переглядати · %@";
 "Can look · 1 hour" = "Може переглядати · 1 година";
 "Can look · Always" = "Може переглядати · Завжди";
+"Can't be read" = "Не вдається прочитати";
 "Can't change models while auto-tune is running" = "Не можна змінювати модель під час автопідбору";
 "Can't switch profiles while a request or the auto-tune is running" = "Не можна змінити профіль, поки триває запит або автопідбір";
 "Cancel" = "Скасувати";
@@ -296,13 +316,18 @@
 "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "Виберіть ~/Library/Application Support/LLMTray: папку з сесіями, проєктами та моделями тієї версії з ipsupport.us.";
 "Choose…" = "Вибрати…";
 "Clear" = "Очистити";
+"Clear Log" = "Очистити журнал";
+"Clear Statistics…" = "Очистити статистику…";
+"Clear or turn off" = "Очистити або вимкнути";
 "Clear search" = "Очистити пошук";
-"Clear the log" = "Очистити журнал";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Очистити чергу: індексоване залишається доступним для пошуку, інше позначається як неіндексоване";
 "Click to enable Project files: add files to the project and let its chats search them." = "Натисніть, щоб увімкнути файли проєкту: додайте файли до проєкту, і його розмови зможуть їх шукати.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Клацніть, щоб записати фрагмент; утримуйте, щоб говорити, і відпустіть, щоб надіслати (модель це почує).";
 "Click ■ to stop · Esc cancels" = "Клацніть ■, щоб зупинити · Esc скасовує";
+"Client" = "Клієнт";
 "Client ID" = "ID клієнта";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "Клієнти мають надсилати цей ключ (Authorization: Bearer <key> або x-api-key), інакше отримають 401. Власному Чату LLMTray він ніколи не потрібен.";
+"Clients using the current key get 401 until they're given the new one." = "Клієнти, що використовують поточний ключ, отримуватимуть 401, доки не отримають новий.";
 "Close" = "Закрити";
 "Close Tab" = "Закрити вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закриває це вікно. Налаштування › Основні › Налаштувати LLMTray… відкриває його знову.";
@@ -312,6 +337,7 @@
 "Command" = "Команда";
 "Command-line tool" = "Інструмент командного рядка";
 "Compact" = "Стиснути";
+"Compact rows" = "Стиснути рядки";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Стиснення замінює середину довгого чату одним переказом, який пише модель. Стільки повідомлень на початку зберігаються дослівно.";
 "Compaction" = "Стиснення";
 "Compaction failed: %@" = "Не вдалося стиснути: %@";
@@ -327,11 +353,14 @@
 "Copied" = "Скопійовано";
 "Copies %1$@ · index %2$@ on disk" = "Копії %1$@ · індекс %2$@ на диску";
 "Copy" = "Копіювати";
-"Copy Line" = "Копіювати рядок";
+"Copy Entry" = "Копіювати запис";
+"Copy First Line" = "Копіювати перший рядок";
+"Copy Path" = "Копіювати шлях";
+"Copy Shown" = "Копіювати показане";
 "Copy the details as text" = "Скопіювати деталі як текст";
-"Copy the lines shown" = "Копіювати показані рядки";
 "Copy the song as an audio file" = "Копіювати пісню як аудіофайл";
 "Copy the text" = "Копіювати текст";
+"Copy, save or clear" = "Копіювати, зберегти або очистити";
 "Copying the included runtime…" = "Копіювання вбудованого runtime…";
 "Correction" = "Виправлення";
 "Corrections" = "Виправлення";
@@ -343,10 +372,12 @@
 "Couldn't reach the server -- please try again later." = "Не вдається зв’язатися із сервером — спробуйте пізніше.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Не вдалося прочитати деякі частини чатів; повторна спроба о %@ (чому: Налаштування › Сервер › Журнал).";
 "Couldn't start the voice runner: %@" = "Не вдалося запустити voice runner: %@";
+"Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Підраховує запити й токени за моделлю, клієнтом і днем, а також швидкість їх виконання. Зберігається лише на цьому Mac і нікуди не надсилається.";
 "Countdown" = "Відлік";
 "Countdown: %lld s" = "Зворотний відлік: %lld с";
 "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Рахуються на цьому Mac для цієї версії LLMTray і нікуди не надсилаються; звіт про помилку містить ці числа. Наведіть на рядок, щоб побачити, що було виправлено (неправильний виклик моделі, який застосунок усе ж зрозумів) і які були помилки.";
 "Country facts" = "Факти про країну";
+"Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac." = "Підраховує запити й токени за моделлю, клієнтом («Чат», Codex, Claude Code, curl…) і днем, а також швидкість їх виконання: вкладка «Використання» у вікні «Сервер». Зберігається лише на цьому Mac.";
 "Crash reports (%lld)" = "Звіти про збої (%lld)";
 "Create Email…" = "Створити лист…";
 "Creativity" = "Креативність";
@@ -358,6 +389,8 @@
 "Current settings are already fastest" = "Поточні налаштування вже найшвидші";
 "Date" = "Дата";
 "Date & time" = "Дата й час";
+"Day" = "День";
+"Debug lines" = "Рядки налагодження";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Налагодження: під відповіддю показано, які інструменти модель викликала і з якими аргументами; розгорніть виклик, щоб побачити результат. Тільки для поточної розмови — виклики інструментів не зберігаються разом із нею.";
 "Default can't be renamed: every model falls back to it" = "Не можна перейменувати «Default»: на нього скидається кожна модель";
 "Delete" = "Видалити";
@@ -454,9 +487,10 @@
 "Enjoying LLMTray?" = "Сподобається LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Середовище, NAME=value в кожному рядку (ключі, токени й паролі зберігаються в Keychain)";
 "Errors" = "Помилки";
-"Errors: %@" = "Помилки: %@";
+"Errors: go to the next one (⌘E)" = "Помилки: перейти до наступної (⌘E)";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Кожен чат у цьому проєкті отримує ці інструкції після системного підказу в описі моделі. Зміни діють з наступного повідомлення.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
+"Every day's counts are removed. This can't be undone." = "Підрахунки за всі дні буде видалено. Це не можна скасувати.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Кожен запит, на який відповів сервер, — з чату та від інших застосунків і агентів через API — зберігається на цьому Mac. Медіани за моделлю й налаштуваннями.";
 "Everything" = "Усе";
 "Everything in that folder is here already." = "Усе з цієї папки вже тут.";
@@ -498,8 +532,8 @@
 "Folders" = "Папки";
 "Folders can't be added yet: %@. Add the files in them instead." = "Папки поки що не можна додати: %@. Додайте файли всередині них.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Папки, які чати можуть використовувати без запиту. Якщо чат потребує іншої папки, він попросить у чаті.";
-"Follow" = "Стежити";
 "Follow the description" = "Дотримуватися опису";
+"Follow: keep the newest in view. Scrolling up pauses it." = "Стеження: показувати найновіше. Прокручування вгору призупиняє його.";
 "For This Chat" = "Для цього чату";
 "For an Hour" = "На годину";
 "For faster answers (speculative decoding)" = "Для швидших відповідей (спекулятивне декодування)";
@@ -642,16 +676,19 @@
 "Keep first messages: %lld" = "Перших повідомлень зберігати: %lld";
 "Keep last messages: %lld" = "Останніх повідомлень зберігати: %lld";
 "Keep the loaded model" = "Зберегти завантажену модель";
-"Keep the newest line in view" = "Тримати найновіший рядок у полі зору";
+"Keep usage statistics" = "Зберігати статистику використання";
 "Keeps crashing -- see its log." = "Постійно аварійно завершується — див. його журнал.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Закріплює цей порт. Якщо інша програма вже його використовує, сервер не запуститься, доки ви не зміните порт у Параметрах.";
 "Kept free: %lld MB" = "Залишено вільними: %lld MB";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Зберігається лише на цьому Mac. Назви клієнтів проксі LLMTray визначає за їхнім User-Agent; запити, які Runtime обробив до того, як визначив їхню назву, зараховуються як «Інше».";
+"Key" = "Ключ";
 "Kind" = "Тип";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Посібник LLMTray";
 "LLMTray events" = "Події LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray завантажує це разом із моделлю, яку воно пришвидшує: завантажте цю модель.";
+"LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray не має дозволу читати вкладку %@: увімкніть це в Системних параметрах › Приватність і безпека › Автоматизація.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray не має дозволу на використання мікрофона.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray не має дозволу використовувати мікрофон. Дозвольте це в Системних налаштуваннях › Приватність і безпека › Мікрофон.";
 "LLMTray restarts now to load them." = "LLMTray зараз перезапуститься, щоб завантажити їх.";
@@ -671,6 +708,8 @@
 "Leave a Review" = "Залишити відгук";
 "Length" = "Довжина";
 "Let chats make documents" = "Дозволити чатам створювати документи";
+"Let chats see a window or the screen" = "Дозволити чатам бачити вікно або екран";
+"Let chats see a window, the screen or a browser tab" = "Дозволити чатам бачити вікно, екран або вкладку браузера";
 "Let chats work in folders" = "Дозволити чатам працювати в папках";
 "Let coding agents and scripts use your models." = "Дозволити кодувальним агентам і скриптам використовувати ваші моделі.";
 "Let the chat look in %@?" = "Дозволити чату переглянути %@?";
@@ -704,6 +743,7 @@
 "Maintenance" = "Обслуговування";
 "Make a 30-second calm lo-fi instrumental for studying" = "Створити 30‑секундний спокійний lo‑fi інструментал для навчання";
 "Make a Document…" = "Створити документ…";
+"Make a new key?" = "Створити новий ключ?";
 "Make again" = "Створити знову";
 "Make images and edit them." = "Створювати зображення й редагувати їх.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Створюйте зображення, пісні та розмовляйте за допомогою голосової моделі — усе на цьому Mac: увімкніть у Налаштуваннях.";
@@ -770,6 +810,8 @@
 "Never" = "Ніколи";
 "New Chat" = "Новий чат";
 "New Chat in Project" = "Новий чат у проєкті";
+"New Key" = "Новий ключ";
+"New Key…" = "Новий ключ…";
 "New Note" = "Нова нотатка";
 "New Profile…" = "Новий профіль…";
 "New Project…" = "Новий проєкт…";
@@ -802,13 +844,15 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Немає моделі embedding: файли шукаються за словами. Завантажте її в розділі «Налаштування › Файли», щоб шукати за змістом.";
 "No files yet" = "Файлів ще немає";
 "No folder changes yet." = "Поки що немає змін у папках.";
-"No lines match the filters" = "Немає рядків, що відповідають фільтрам";
 "No messages yet" = "Повідомлень поки немає";
 "No microphone is available." = "Мікрофон недоступний.";
 "No model uses it." = "Жодна модель його не використовує.";
 "No models found in this folder." = "У цій теці моделей немає.";
 "No models in this folder yet. The next step offers some to download." = "У цій папці ще немає моделей. Наступний крок пропонує кілька для завантаження.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Нотаток ще немає. Додайте те, що має знати кожен чат: «Відповідь російською, коротко», «Я збираю динамік на ESP32».";
+"No open tab in %@." = "У %@ немає відкритої вкладки.";
+"No requests yet in this period." = "У цьому періоді запитів ще не було.";
+"No requests yet today." = "Сьогодні запитів ще не було.";
 "No requests yet." = "Запитів поки немає.";
 "No runs yet." = "Прогонів ще не було.";
 "No server output yet" = "Виводу сервера ще немає";
@@ -816,6 +860,7 @@
 "No sign-in" = "Без входу";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Без підписок. Без блокування функцій. Підтримайте розвиток, якщо LLMTray вам корисний.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Немає рекомендацій для пам’яті цього Mac. Пошукайте модель на Hugging Face.";
+"No text was found in it, and this model can't see images: pick a vision model to show it as a picture." = "У ньому не знайдено тексту, а ця модель не бачить зображень: виберіть модель із підтримкою зору, щоб показати його як зображення.";
 "No thanks" = "Ні, дякую";
 "No tool calls yet in this version." = "У цій версії викликів інструментів ще немає.";
 "No update check at launch" = "Не перевіряти оновлення при запуску";
@@ -842,10 +887,12 @@
 "Nothing found for “%@”." = "Для «%@» нічого не знайдено.";
 "Nothing left to read: every chat was read from its start." = "Нічого більше читати: кожен чат прочитано від початку.";
 "Nothing logged yet." = "У журналі ще нічого немає.";
+"Nothing matches" = "Нічого не знайдено";
 "Nothing new to import" = "Немає нічого нового для імпорту";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
 "Nothing to pin until the file has been read" = "Нічого закріплювати, поки файл не буде прочитано";
+"Nothing was captured: the window may have closed. Try again." = "Нічого не захоплено: можливо, вікно закрилося. Спробуйте ще раз.";
 "Nothing: no note is sent to these chats now." = "Нічого: зараз до цих чатів не надсилається жодна нотатка.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Наразі її налаштування: виберіть %@ (вже обрано), а потім натисніть Import. Скасування збереже поточні налаштування.";
 "Now: %@ → %@ (until %@)" = "Зараз: %@ → %@ (до %@)";
@@ -862,9 +909,12 @@
 "On" = "Увімк.";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Разовий внесок: Кава $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Лише відтепер";
+"Only for connections from other devices" = "Лише для з’єднань з інших пристроїв";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Лише для обмежених моделей (Llama, деякі Gemma і репозиторії FLUX): прийміть ліцензію на сторінці моделі на Hugging Face, потім вставте тут токен для читання. Зберігається в Keychain, надсилається лише на huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Лише якщо хочете: чати отримують це насамперед, воно ніколи не спливає, і навчання ніколи його не змінює. Воно залишається на цьому комп’ютері.";
 "Only in the packaged app (not when run from a build folder)." = "Тільки в пакованому додатку (не при запуску з папки збірки).";
+"Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Лише назва й адреса вкладки: щоб отримати її текст, увімкніть у %@ параметр «Перегляд › Розробка › Дозволити JavaScript від Apple Events».";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "Зараз підключатися може лише цей Mac (доступ до локальної мережі вимкнено), тому ключ не запитується в жодного клієнта.";
 "Only this Mac can use the server" = "Тільки цей Mac може використовувати сервер";
 "Only turbo has this knob: sft has no song planner to vary." = "Цей регулятор є лише в turbo: у sft немає планувальника пісень для варіацій.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Публікується лише те, що ви тут введете, після ручної перевірки. Ваш Apple ID або електронну пошту ніколи не публікуємо.";
@@ -878,7 +928,7 @@
 "Open in New Tab" = "Відкрити в новій вкладці";
 "Open in Preview" = "Відкрити в Preview";
 "Open in Window" = "Відкрити у вікні";
-"Open in Window -- closing the window puts the chat back in the menu bar" = "Відкрити у вікні — закриття вікна повертає чат у рядок меню";
+"Open the server log" = "Відкрити серверний лог";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "Сумісно з OpenAI: вкажіть агенту з кодування або додатку цю адресу (копіює її)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Відкриває листа до команди LLMTray зі вкладеним звітом: версії, Mac, налаштування моделі та сервера, серверний лог і останні звіти про збої. Ваші чати ніколи не включаються, і ви спочатку бачите весь звіт.";
 "Opens at login" = "Відкривається при вході";
@@ -892,6 +942,7 @@
 "Past %lld messages" = "Понад %lld повідомлень";
 "Paste a Config" = "Вставити конфігурацію";
 "Paste a Config…" = "Вставити конфігурацію…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "Вставте його в клієнт як ключ API (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Зберігається у вашій Keychain.";
 "Pasted config" = "Вставлена конфігурація";
 "Pause" = "Призупинити";
 "Pause Indexing" = "Пауза індексації";
@@ -905,6 +956,7 @@
 "Pick a rating from 1 to 5 stars." = "Виберіть оцінку від 1 до 5 зірок.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Оберіть модель для чату. Завантаження почнеться одразу й триватиме у фоновому режимі.";
 "Picks a model that fits your Mac and enables only what you choose." = "Підбирає модель, що підходить для вашого Mac, і вмикає лише обране вами.";
+"Picture" = "Зображення";
 "Pictures over 50 MB can't be added: %@." = "Зображення понад 50 МБ не можна додати: %@.";
 "Pictures · %lld — for documents, not searched" = "Зображення · %lld — для документів, у пошуку не беруть участі";
 "Pin" = "Закріпити";
@@ -925,7 +977,6 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точність кешу уваги. 8 біт — майже без втрат, удвічі менше пам'яті. 4 біти — вчетверо менше, але помітно гірше на довгому контексті. Повний — найкраще, але найбільше пам'яті.";
 "Preference" = "Вподобання";
 "Preferences" = "Вподобання";
-"Prefill progress" = "Перебіг попереднього заповнення";
 "Prefill step" = "Крок префілу";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Натисніть «Почати» й говоріть. Динаміки працюють із поглинанням ехо; навушники все ще кращі.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Натисніть \"Start\" і говоріть. Використовуйте навушники: модель чує власний голос із динаміків.";
@@ -934,6 +985,8 @@
 "Previous 30 Days" = "Останні 30 днів";
 "Previous 7 Days" = "Останні 7 днів";
 "Pro Supporters" = "Pro Supporters";
+"Problems" = "Проблеми";
+"Problems %@" = "Проблеми %@";
 "Profile" = "Профіль";
 "Profiles" = "Профілі";
 "Project files" = "Файли проєкту";
@@ -948,6 +1001,7 @@
 "Projects" = "Проєкти";
 "Projects' files on disk" = "Файли проєктів на диску";
 "Prompt" = "Підказка";
+"Prompt %@ tokens, %@ from the cache · first token after %@ s · %@ tokens in %@ s" = "Підказка: %@ токенів, %@ з кешу · перший токен через %@ с · %@ токенів за %@ с";
 "Prompt & tools" = "Промпт та інструменти";
 "Prompt (last request)" = "Підказка (останній запит)";
 "Prompt cache" = "Кеш промптів";
@@ -1025,8 +1079,8 @@
 "Repaired" = "Виправлено";
 "Report a Bug" = "Повідомити про помилку";
 "Report a Bug…" = "Повідомити про помилку…";
-"Request stats" = "Статистика запитів";
 "Requests" = "Запити";
+"Require an API key" = "Вимагати ключ API";
 "Rescan" = "Оновити список";
 "Rescan Models" = "Оновити список моделей";
 "Rescan or manage models" = "Повторно просканувати або керувати моделями";
@@ -1065,19 +1119,20 @@
 "Sampling" = "Семплінг";
 "Save" = "Зберегти";
 "Save As…" = "Зберегти як…";
+"Save Log…" = "Зберегти журнал…";
 "Save memory" = "Заощадити пам’ять";
-"Save the whole log to a file…" = "Зберегти весь журнал у файл…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Збережені чати у фоновому режимі читаються для нотаток на основі того, що ви там написали. Під час повторного читання наявні нотатки підтверджуються, а не дублюються. Чати, позначені «Don't Remember», пропускаються.";
 "Saved chats will show up here." = "Збережені чати з’являться тут.";
 "Saved in your Keychain" = "Збережено в Keychain";
 "Save…" = "Зберегти…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Масштабує ширину й висоту, які просить модель. Balanced залишає 1024x1024 як є.";
+"Screen" = "Екран";
 "Search" = "Пошук";
 "Search Hugging Face (mlx models)…" = "Пошук на Hugging Face (моделі mlx)…";
 "Search by meaning is off for now: %@" = "Пошук за значенням наразі вимкнено: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Пошук за значенням використовує %@ (%@), уже завантажено на цей Mac. Без нього файли шукаються лише за словами; ви можете завантажити його пізніше.";
 "Search chats" = "Пошук чатів";
-"Search the log" = "Пошук у журналі";
+"Search the log (⌘F)" = "Пошук у журналі (⌘F)";
 "Searching the registry…" = "Пошук у реєстрі…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Секунд до того, як чорновик буде виконано в поточному вигляді. 0 — чекати, поки ви натиснете «Створити».";
 "Seen in" = "Видно в";
@@ -1094,9 +1149,9 @@
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Надсилається першим у кожному запиті вбудованого чату. У Default уже є короткий стартовий промпт — доповніть його або замініть. До зовнішніх API-клієнтів не застосовується.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Відправлено на ipsupport.us; без облікового запису й ідентифікаторів пристрою. Відгуки публікуються на сайті LLMTray після модерації.";
 "Server" = "Сервер";
-"Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Налаштування сервера змінилися — перезапустіть, щоб застосувати.";
+"Server…" = "Сервер…";
 "Set Up LLMTray" = "Налаштувати LLMTray";
 "Set Up LLMTray…" = "Налаштувати LLMTray…";
 "Setting up image generation (first time only)…" = "Налаштування генерації зображень (тільки вперше)…";
@@ -1113,9 +1168,11 @@
 "Shared by all chats" = "Спільно для всіх чатів";
 "Share…" = "Поділитися…";
 "Show" = "Показати";
+"Show All" = "Показати усе";
 "Show All %lld Lines" = "Показати всі %lld рядків";
 "Show All Files…" = "Показати всі файли…";
 "Show Chat Window" = "Показати вікно чату";
+"Show Everything" = "Показати усе";
 "Show Files" = "Показати файли";
 "Show Less" = "Показати менше";
 "Show Log…" = "Показати журнал…";
@@ -1123,12 +1180,13 @@
 "Show Previous Tab" = "Показати попередню вкладку";
 "Show Reports…" = "Показати звіти…";
 "Show What Chats Get…" = "Показати, що отримують чати…";
-"Show all" = "Показати все";
+"Show a Window…" = "Показати вікно…";
 "Show in Finder" = "Показати у Finder";
 "Show model controls in the chat window" = "Показувати елементи керування моделлю у вікні чату";
 "Show more" = "Показати ще";
 "Show only overrides" = "Лише перевизначені";
 "Show reasoning" = "Показувати міркування";
+"Show the Screen…" = "Показати екран…";
 "Show the profile files in Finder" = "Показати файли профілів у Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
 "Show the project's files" = "Показати файли проєкту";
@@ -1164,6 +1222,7 @@
 "Start" = "Почати";
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
+"Start a model and its output shows up here: loading, requests, errors." = "Почніть модель, і тут з’явиться її вивід: завантаження, запити, помилки.";
 "Start a new saved chat (⌘N) to add files to a project." = "Почніть новий збережений чат (⌘N), щоб додати файли до проєкту.";
 "Start server" = "Запустити сервер";
 "Start talking" = "Почніть говорити";
@@ -1219,6 +1278,7 @@
 "Temporary chat" = "Тимчасовий чат";
 "Temporary chats can only look in folders, for that chat only." = "Тимчасові чати можуть лише переглядати папки, тільки для цього чату.";
 "Temporary — not saved" = "Тимчасовий — не зберігається";
+"Text · %@" = "Текст · %@";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Індексуються текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods); зображення зберігаються для документів.";
 "Thank you!" = "Дякуємо!";
 "Thank you! List your name in Supporters?" = "Дякуємо! Додати ваше ім’я до Supporters?";
@@ -1229,6 +1289,8 @@
 "That isn't LLMTray's folder" = "Це не папка LLMTray";
 "That isn't an http(s) URL." = "Це не URL http(s).";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "%lld переміщень у Кошик не позначено: позначте ті, які хочете.";
+"The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac." = "Меню + може показати моделі вікно або весь екран — ви вибираєте це в системному засобі вибору, і робиться один знімок, не більше — або сторінку, відкриту у вашому браузері (її назву, адресу й текст; macOS запитує один раз для кожного браузера). Модель, яка не бачить зображень, отримає текст, прочитаний на цьому Mac.";
+"The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac." = "Меню + може показати моделі вікно або весь екран: ви вибираєте це в системному засобі вибору, і робиться один знімок, не більше. Модель, яка не бачить зображень, отримає текст із нього, прочитаний на цьому Mac.";
 "The App Store couldn't confirm the purchase." = "App Store не зміг підтвердити покупку.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Відкрито версію LLMTray з App Store. Спочатку завершіть її роботу (її іконка в смузі меню › Вихід), а потім знову відкрийте цю: обидві використовуватимуть той самий порт і завантажуватимуть моделі двічі.";
 "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "JSON із README сервера, з \"mcpServers\". Кожен сервер додається вимкненим, щоб ви переглянули його перед запуском.";
@@ -1268,12 +1330,15 @@
 "The exact text a new chat gets, before your first message." = "Точний текст, який отримує новий чат перед вашим першим повідомленням.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Сімейства моделей, використаних того дня (наприклад qwen або flux), ніколи їхні назви.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Першого разу на цей Mac завантажиться %@ (%@) — зараз, а не посеред розмови.";
-"The full chat window, with projects and every chat (⌘⇧O)" = "Повне вікно чату з проєктами та всіма розмовами (⌘⇧O)";
+"The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar" = "Повне вікно чату з проєктами та всіма чатами (⌘⇧O) — якщо його закрити, чат повернеться в рядок меню";
 "The image draft above is open: Generate or Skip it to keep chatting." = "Чернетку зображення вище відкрито: натисніть «Створити» або «Пропустити», щоб продовжити чат.";
 "The image edit draft above is open: Generate or Skip it to keep chatting." = "Чернетку редагування зображення вище відкрито: натисніть «Створити» або «Пропустити», щоб продовжити чат.";
 "The image generator is busy -- try again once it's done." = "Генератор зображень зайнятий — спробуйте пізніше, коли завершить роботу.";
 "The image generator is busy with another chat -- try again once it's done." = "Генератор зображень зайнятий іншим чатом — спробуйте пізніше, коли завершить роботу.";
 "The import stopped" = "Імпорт зупинено";
+"The key couldn't be saved in the Keychain." = "Не вдалося зберегти ключ у Keychain.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "Зараз не вдається прочитати ключ у Keychain (Keychain заблоковано?). Спробувати ще або створіть новий ключ.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "Зараз не вдається прочитати ключ у Keychain, тому всім зовнішнім клієнтам відмовлено. Створіть новий ключ або знову відкрийте Налаштування, коли Keychain буде розблоковано.";
 "The last change couldn't be saved." = "Не вдалося зберегти останню зміну.";
 "The log couldn't be saved" = "Не вдалося зберегти журнал";
 "The longest answer the model may write. Also capped by the model's own context length." = "Максимальна довжина відповіді. Також обмежена довжиною контексту моделі.";
@@ -1446,7 +1511,9 @@
 "Update failed: %@" = "Оновлення не вдалося: %@";
 "Update to %@" = "Оновити до %@";
 "Updates" = "Оновлення";
+"Usage" = "Використання";
 "Usage statistics" = "Статистика використання";
+"Usage statistics are off" = "Статистику використання вимкнено";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Статистика використання вимкнена: нічого не надсилається. Ось як виглядав би звіт, якби ви ввімкнули її (ID буде створено тоді).";
 "Usage statistics: the reports" = "Статистика використання: звіти";
 "Use" = "Використати";
@@ -1478,13 +1545,13 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab потребує приблизно %1$@ ГБ, більше ніж %2$@ ГБ, які може використовувати GPU: спочатку підніміть ліміт пам’яті GPU.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab потребує приблизно %1$@ ГБ; разом із %2$@ ГБ чат‑моделі це поміщається в %3$@ ГБ, які може використовувати GPU. Проте чат‑модель все одно розвантажується під час його роботи.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab використовує приблизно %@ ГБ пам’яті під час роботи.";
-"Voice Lab…" = "Voice Lab…";
 "Voice model" = "Голосова модель";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
 "Waiting for a model download to finish…" = "Очікування завершення завантаження моделі…";
 "Waiting for an image or song to finish…" = "Очікування завершення зображення або пісні…";
 "Waiting for another chat's image or music to finish…" = "Очікування завершення створення зображення чи музики в іншому чаті…";
 "Waiting for the chat or a generator to finish" = "Очікування завершення чату або генератора";
+"Waiting for your pick…" = "Очікування вибору…";
 "Waiting to be sent: %@" = "Очікує на відправлення: %@";
 "Waits for %@ to be loaded." = "Очікує завантаження %@.";
 "Waits for a model: start one to read your chats." = "Очікування моделі: запустіть її, щоб читати ваші чати.";
@@ -1492,8 +1559,7 @@
 "Waits for the model to be free." = "Очікує, доки модель звільниться.";
 "Waits for the model to be loaded." = "Очікує, доки модель буде завантажено.";
 "Walkie-talkie" = "Рація";
-"Warnings" = "Попередження";
-"Warnings: %@" = "Попередження: %@";
+"Warnings and errors: go to the next one" = "Попередження та помилки: перейти до наступного";
 "Weather" = "Погода";
 "Web" = "Веб";
 "Web search" = "Веб‑пошук";
@@ -1511,6 +1577,7 @@
 "What happened?" = "Що сталося?";
 "What the model says appears here." = "Тут відображається те, що каже модель.";
 "What this chat knows about you from earlier chats" = "Що цей чат знає про вас із попередніх чатів";
+"What to show" = "Що показувати";
 "What was copied before stays; importing again goes on from there. %@" = "Те, що вже скопіювано, залишається; повторний імпорт продовжиться з цього місця. %@";
 "What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Вивчене: пам’ять нотаток, яку ви не писали, не редагували, не закріплювали й не схвалювали. Усе: усі нотатки, крім «Про вас». Жодну з цих дій не можна скасувати.";
 "What you corrected before, so it isn't repeated." = "Що ви виправляли раніше, щоб це не повторювалося.";
@@ -1537,6 +1604,8 @@
 "Which model generates new images." = "Яка модель генерує нові зображення.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Під час мовлення моделі звук з мікрофона тихіший за це сприймається як тиша: слід власного голосу, який лишає придушення ехо, ігнорується, проте інший голос усе одно перериває. Підвищте, якщо модель чує себе, зменшіть, якщо не помічає вашого перебивання. Набирає чинності при наступному запуску.";
 "Wikipedia" = "Wikipedia";
+"Window" = "Вікно";
+"Windows and pages" = "Вікна й сторінки";
 "With notes, it reads like this:" = "Із нотатками це має такий вигляд:";
 "Words only" = "Тільки слова";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Робоча пам’ять для поетапного читання підказки; менше означає, що довгі підказки читаються дрібнішими, повільнішими кроками. Якщо разом з кешем підказок не більше 90%, решта тримає підказку, що читається.";
@@ -1588,7 +1657,9 @@
 "failed to build request" = "не вдалося сформувати запит";
 "failed: %@" = "помилка: %@";
 "finishing" = "завершення";
+"first %@ s" = "перші %@ с";
 "first token %.1f s" = "перший токен %.1f с";
+"first token in %@ on average" = "у середньому перший токен за %@";
 "for this chat" = "для цього чату";
 "generation %.1f tok/s" = "генерація %.1f ток/с";
 "hears audio" = "чутиме аудіо";
@@ -1609,6 +1680,7 @@
 "never used" = "ніколи не використовувався";
 "new or changed" = "нові або змінені";
 "no changes" = "без змін";
+"no page text" = "немає тексту сторінки";
 "no text" = "немає тексту";
 "not a picture" = "не зображення";
 "not allowed" = "не дозволено";
@@ -1625,6 +1697,7 @@
 "prompt %.0f tok/s" = "промпт %.0f ток/с";
 "queued" = "в черзі";
 "reading" = "читання";
+"reading the prompt %@" = "читання підказки %@";
 "reads images" = "зчитує зображення";
 "ready" = "готово";
 "ready (words only)" = "готово (тільки слова)";
@@ -1654,6 +1727,7 @@
 "~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:" = "~/.local/bin ще не в PATH вашого шелу. Додайте цей рядок у %@, потім відкрийте нове вікно терміналу:";
 "· %lld pinned" = "· %lld закріплено";
 "· size…" = "· розмір…";
+"×%lld" = "×%lld";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» не вдалося видалити: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не вдалося змінити закріплення: %2$@";
 "“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) переміщається в Кошик, звідки його ще можна відновити. %@ потребує цього: завантажте знову в Налаштування → Models, щоб використовувати.";

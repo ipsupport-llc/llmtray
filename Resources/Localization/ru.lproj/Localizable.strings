@@ -2,6 +2,7 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+" · %@ drafted" = " · %@ в черновиках";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "«%@» изменилась с момента цитирования в этом ответе: страница %lld может теперь выглядеть по‑другому.";
 "\"%@\" is no longer in the project." = "«%@» больше не в проекте.";
 "%.0f%% from drafts" = "%.0f%% из черновиков";
@@ -29,6 +30,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ уже существует и указывает на %@. Удалите его сначала, чтобы установить LLMTray.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ не удалось прочитать чаты для памяти: другая модель читает его чаты.";
 "%@ didn't download: %@" = "%@ не загрузился: %@";
+"%@ from cache" = "%@ из кэша";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ — ссылка на папку, которая недоступна: подключите диск или удалите ссылку.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ закрыт: примите его лицензию на huggingface.co/%@, затем добавьте токен Hugging Face в Настройки → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ включён в этом чате: перед каждым вызовом у вас будут спрашивать подтверждение.";
@@ -36,7 +38,11 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ещё не загружен — снова включите генерацию изображений в Настройках.";
 "%@ isn't installed yet" = "%@ ещё не установлен";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "Для %@ нужно собственное приложение: добавьте его Идентификатор клиента и секрет в разделе «Настроить», добавьте в своё приложение показанный там Redirect URL, затем нажмите «Войти».";
-"%@ of %@ lines" = "%@ из %@ строк";
+"%@ new" = "%@ новых";
+"%@ of %@ shown" = "Показано %@ из %@";
+"%@ requests" = "%@ запросов";
+"%@ s" = "%@ с";
+"%@ tok/s" = "%@ ток/с";
 "%@ wasn't found on Hugging Face." = "%@ не найден на Hugging Face.";
 "%@ · %@ left" = "%@ · осталось %@";
 "%@ · %@ of %@" = "%@ · %@ из %@";
@@ -47,6 +53,7 @@
 "%@ — in project %@" = "%@ — в проекте %@";
 "%@ — page %lld" = "%@ — страница %lld";
 "%@ → %@ available" = "Доступно: %@ → %@";
+"%@ → %@ tok" = "%@ → %@ tok";
 "%@ ★ from %lld reviews" = "%@ ★ по %lld отзывам";
 "%@ ★ from 1 review" = "%@ ★ по 1 отзыву";
 "%@ 🌐" = "%@ 🌐";
@@ -62,8 +69,10 @@
 "%lld failed" = "%lld не удалось";
 "%lld files" = "%lld файлов";
 "%lld files couldn't be indexed" = "%lld файлов не удалось проиндексировать";
+"%lld h later" = "через %lld ч";
 "%lld interrupted: look at them in Finder" = "%lld прервано: просмотрите их в Finder";
 "%lld items put back under their names." = "%lld элементов возвращено в их имена.";
+"%lld min later" = "через %lld мин";
 "%lld more" = "ещё %lld";
 "%lld more…" = "Ещё %lld…";
 "%lld need a look: see the list." = "%lld требуют просмотра: см. список.";
@@ -75,6 +84,7 @@
 "%lld requests" = "запросов: %lld";
 "%lld requests in flight (answered together up to Concurrent requests)" = "Запросов в работе: %lld (одновременно — до значения «Параллельные запросы»)";
 "%lld s" = "%lld с";
+"%lld s later" = "через %lld с";
 "%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld инструментов на сервере — новые или изменённые: скрыты от Чата, пока вы их не примете.";
 "%lld tools changed on the server: Configure to accept them." = "%lld инструментов на сервере изменены: нажмите «Настроить», чтобы принять их.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
@@ -86,6 +96,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 час";
 "30 s reached · release to send, Esc to drop" = "Достигнуто 30 с · отпустите, чтобы отправить, Esc — сбросить";
+"7 Days" = "7 дней";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Чат спрашивает разрешение перед просмотром папки и показывает каждое изменение как план для одобрения. Личные места (Library, keys, домашняя папка) никогда не передаются.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Чат может просматривать разрешённые папки и предлагать новые папки, перемещения и переименования. Вы подтверждаете каждое изменение и можете его отменить.";
 "A chat model" = "Модель для чата";
@@ -106,11 +117,13 @@
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Песня с вокалом или инструментальная композиция по описанию (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Символическая ссылка: ссылка сама по себе, а не объект, на который она указывает.";
 "A temporary chat can't hold files" = "Временный чат не может хранить файлы";
+"A window with no readable text was removed: this model can't see pictures." = "Окно без читаемого текста было удалено: эта модель не видит изображения.";
 "AAC %lld kbit/s" = "AAC %lld кбит/с";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — чистые вокалы, 8‑бит (рекомендуется)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чистые вокалы, GPTQ 4‑бит (меньше памяти)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — чистые вокалы, полная точность";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — более полный звук";
+"API key" = "Ключ API";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "Около %d токенов после системного промпта профиля. Модель с небольшим контекстом получает меньше (память занимает не более 5%% от него). Уже открытые чаты сохраняют блок, с которым были начаты, пока одна из его заметок не изменится.";
 "About LLMTray" = "О LLMTray";
 "About you" = "О вас";
@@ -179,6 +192,7 @@
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Необязательное пожертвование: без подписок, без ограничений функций. Спонсоры могут указать имя, которое будет опубликовано.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Элемент с неопределённым состоянием мог измениться, а мог и нет: посмотрите его в Finder. Журнал хранится в разделе «Настройки › Файлы».";
 "Another LLMTray is running" = "Другой LLMTray уже запущен";
+"Another chat is picking a window: finish that first." = "В другом чате уже выбирается окно: сначала завершите это.";
 "Another folder change is running: try again when it's done." = "Другое изменение папки выполняется: повторите попытку после завершения.";
 "Another model already uses this alias." = "Этот алиас уже занят другой моделью.";
 "Another version next to this one (a new seed, the same request)" = "Другая версия рядом с этой (новая seed, тот же запрос)";
@@ -187,6 +201,7 @@
 "Answer details" = "Сведения об ответе";
 "Answer in Russian, briefly" = "Ответ на русском, кратко";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Любые другие флаги mlx_lm.server через пробел, например --draft-model <путь>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Любой в вашей сети может использовать сервер: ключ ограничивает доступ клиентами, которым вы его дали.";
 "Anything else chats should know" = "Что еще чатам следует знать";
 "Apache License 2.0" = "Лицензия Apache 2.0";
 "App language" = "Язык приложения";
@@ -197,6 +212,7 @@
 "Approve Selected" = "Подтвердить выбранное";
 "Apps & agents" = "Приложения и агенты";
 "Apps and agents" = "Приложения и агенты";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "Приложения на этом Mac подключаются без ключа; устройствам в вашей сети он нужен. Если «Выкл.», он нужен каждому клиенту на порту LLMTray, включая этот Mac.";
 "Arguments, one per line" = "Аргументы, по одному в строке";
 "Ask Later" = "Напомнить позже";
 "Ask about LLMTray" = "Спросить о LLMTray";
@@ -210,6 +226,7 @@
 "At most %d characters: a note is one short statement." = "Не более %d символов: заметка — это одно короткое утверждение.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не более одного отчёта в день, охватывающего предыдущие сутки, отправляется на ipsupport.us. Неприведённый в тот день отчёт отправляется при следующем запуске — не позднее чем за 7 дней. Отключение удаляет несохранённые отчёты.";
 "Attach Images…" = "Прикрепить изображения…";
+"Attach Tab from %@" = "Прикрепить вкладку из %@";
 "Attach images" = "Прикрепить изображения";
 "Attach images or allow folders" = "Прикрепить изображения или разрешить папки";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention в 8‑бит, feed‑forward в 4‑бит — лучший баланс размера и устойчивости, проверено против единообразного 4‑бит.";
@@ -224,6 +241,7 @@
 "Automatic" = "Автоматически";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усредняются в один результат ниже. Перед ними всегда идёт пробный прогон, так что компиляция Metal-ядер при первом вызове не искажает цифры.";
 "Back" = "Назад";
+"Back to the newest (End)" = "Вернуться к последнему (End)";
 "Balanced (default)" = "Сбалансировано (Default)";
 "Barely fits the GPU memory" = "Едва помещается в память GPU";
 "Be the first to be listed here." = "Будьте первым, кто появится здесь.";
@@ -239,6 +257,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Импортирует чаты, проекты, профили, модели для изображений, музыки, голоса и embedding, а также настройки версии с ipsupport.us (сначала завершите её). Чаты и модели здесь сохраняются; её настройки заменят текущие. Модели не займут дополнительного места. Модели чатов остаются в вашей папке моделей: выберите её в разделе «Настройки › Модели».";
 "Browse Hugging Face…" = "Открыть Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Встроено в macOS · Только для чата LLMTray";
+"By" = "По";
 "Cached" = "В кэше";
 "Calculator" = "Калькулятор";
 "Calls" = "Вызовы";
@@ -247,6 +266,7 @@
 "Can look · %@" = "Может просматривать · %@";
 "Can look · 1 hour" = "Может просматривать · 1 час";
 "Can look · Always" = "Может просматривать · Всегда";
+"Can't be read" = "Не удаётся прочитать";
 "Can't change models while auto-tune is running" = "Нельзя менять модель во время автоподбора";
 "Can't switch profiles while a request or the auto-tune is running" = "Нельзя сменить профиль, пока идёт запрос или автоподбор";
 "Cancel" = "Отмена";
@@ -296,13 +316,18 @@
 "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "Выберите ~/Library/Application Support/LLMTray: папку с сессиями, проектами и моделями из версии с ipsupport.us.";
 "Choose…" = "Выбрать…";
 "Clear" = "Очистить";
+"Clear Log" = "Очистить журнал";
+"Clear Statistics…" = "Очистить статистику…";
+"Clear or turn off" = "Очистить или выключить.";
 "Clear search" = "Стереть поиск";
-"Clear the log" = "Очистить журнал.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Очистить очередь: то, что проиндексировано, останется доступным для поиска, остальное будет помечено как не индексированное";
 "Click to enable Project files: add files to the project and let its chats search them." = "Нажмите, чтобы включить файлы проекта: добавляйте файлы в проект и разрешите чатам проекта их искать.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "Нажмите, чтобы записать фрагмент; удерживайте, чтобы говорить, и отпустите, чтобы отправить (модель это услышит).";
 "Click ■ to stop · Esc cancels" = "Нажмите ■, чтобы остановить · Esc — отменить";
+"Client" = "Клиент";
 "Client ID" = "Идентификатор клиента";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "Клиенты должны передавать этот ключ (Authorization: Bearer <key> или x-api-key), иначе получат 401. Собственному чату LLMTray он никогда не нужен.";
+"Clients using the current key get 401 until they're given the new one." = "Клиенты, использующие текущий ключ, будут получать 401, пока им не дадут новый.";
 "Close" = "Закрыть";
 "Close Tab" = "Закрыть вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закрывает это окно. Снова открыть: Настройки › Основные › Настроить LLMTray…";
@@ -312,6 +337,7 @@
 "Command" = "Команда";
 "Command-line tool" = "Инструмент командной строки";
 "Compact" = "Сжать";
+"Compact rows" = "Сжать строки";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Сжатие заменяет середину длинного чата одним пересказом, который пишет модель. Столько сообщений в начале сохраняются дословно.";
 "Compaction" = "Сжатие";
 "Compaction failed: %@" = "Не удалось сжать: %@";
@@ -327,11 +353,14 @@
 "Copied" = "Скопировано";
 "Copies %1$@ · index %2$@ on disk" = "Копии %1$@ · индекс %2$@ на диске";
 "Copy" = "Копировать";
-"Copy Line" = "Копировать строку";
+"Copy Entry" = "Копировать запись";
+"Copy First Line" = "Копировать первую строку";
+"Copy Path" = "Копировать путь";
+"Copy Shown" = "Копировать показанное";
 "Copy the details as text" = "Скопировать сведения как текст";
-"Copy the lines shown" = "Скопировать показанные строки.";
 "Copy the song as an audio file" = "Скопировать композицию как аудиофайл";
 "Copy the text" = "Скопировать текст";
+"Copy, save or clear" = "Копировать, сохранить или очистить";
 "Copying the included runtime…" = "Копирование включённого runtime…";
 "Correction" = "Исправление";
 "Corrections" = "Исправления";
@@ -343,10 +372,12 @@
 "Couldn't reach the server -- please try again later." = "Не удалось связаться с сервером — попробуйте позже.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Не удалось прочитать некоторые части чатов; повторная попытка в %@ (почему: Настройки › Сервер › Журнал).";
 "Couldn't start the voice runner: %@" = "Не удалось запустить voice runner: %@";
+"Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Подсчитывать запросы и токены по моделям, клиентам и дням, а также скорость их выполнения. Хранится только на этом Mac и никуда не отправляется.";
 "Countdown" = "Обратный отсчёт";
 "Countdown: %lld s" = "Обратный отсчёт: %lld с";
 "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Считаются на этом Mac для этой версии LLMTray и никуда не отправляются; отчёт об ошибке включает эти числа. Наведите на строку, чтобы увидеть, что было исправлено (неправильный вызов модели, который приложение всё же поняло) и какие были ошибки.";
 "Country facts" = "Факты о стране";
+"Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac." = "Подсчитывает запросы и токены по моделям, клиентам (чат, Codex, Claude Code, curl…) и дням, а также скорость их выполнения: вкладка «Использование» в окне «Сервер». Хранится только на этом Mac.";
 "Crash reports (%lld)" = "Отчёты об ошибках (%lld)";
 "Create Email…" = "Создать письмо…";
 "Creativity" = "Творчество";
@@ -358,6 +389,8 @@
 "Current settings are already fastest" = "Текущие настройки уже самые быстрые";
 "Date" = "Дата";
 "Date & time" = "Дата и время";
+"Day" = "День";
+"Debug lines" = "Строки DEBUG";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Отладка: под ответом показывается, какие инструменты вызвала модель и с какими аргументами; разверните запись, чтобы увидеть возвращённое значение. Только для текущего чата — вызовы инструментов не сохраняются с ним.";
 "Default can't be renamed: every model falls back to it" = "«Default» нельзя переименовать: все модели по умолчанию к нему возвращаются";
 "Delete" = "Удалить";
@@ -454,9 +487,10 @@
 "Enjoying LLMTray?" = "Нравится LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Переменные среды, NAME=value по одной в строке (ключи, токены и пароли сохраняются в Связке ключей)";
 "Errors" = "Ошибки";
-"Errors: %@" = "Ошибки: %@";
+"Errors: go to the next one (⌘E)" = "Ошибки: перейти к следующей (⌘E)";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Каждый чат в этом проекте получает эти инструкции после системного запроса профиля модели. Изменение вступает в силу с следующего сообщения.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Каждый чат проекта получает весь текст файла; в этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
+"Every day's counts are removed. This can't be undone." = "Статистика за все дни будет удалена. Это действие нельзя отменить.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Каждый запрос, на который ответил сервер, — из чата и от других приложений и агентов через API — хранится на этом Mac. Медианы по модели и настройкам.";
 "Everything" = "Всё";
 "Everything in that folder is here already." = "Всё из этой папки уже присутствует здесь.";
@@ -498,8 +532,8 @@
 "Folders" = "Папки";
 "Folders can't be added yet: %@. Add the files in them instead." = "Папки пока нельзя добавить: %@. Добавьте вместо этого файлы из них.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Папки, которыми чаты могут пользоваться без запроса. Если чату нужна другая папка, он спросит в чате.";
-"Follow" = "Следить";
 "Follow the description" = "Следовать описанию";
+"Follow: keep the newest in view. Scrolling up pauses it." = "Следить: держать в поле зрения самое новое. При прокрутке вверх приостанавливается.";
 "For This Chat" = "Для этого чата";
 "For an Hour" = "На час";
 "For faster answers (speculative decoding)" = "Для более быстрых ответов (спекулятивная декодировка)";
@@ -642,16 +676,19 @@
 "Keep first messages: %lld" = "Первых сообщений сохранять: %lld";
 "Keep last messages: %lld" = "Последних сообщений сохранять: %lld";
 "Keep the loaded model" = "Оставить текущую модель загруженной";
-"Keep the newest line in view" = "Оставлять новейшую строку в поле зрения.";
+"Keep usage statistics" = "Оставить статистику использования";
 "Keeps crashing -- see its log." = "Постоянно аварийно завершает работу — см. Журнал.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Первые N токенов контекста хранятся в полной точности, дальше квантуются. Больше — точнее на длинных промптах, но меньше экономия памяти.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Фиксирует этот порт. Если другой процесс действительно его занял, сервер не запустится, пока вы не измените порт в Настройках.";
 "Kept free: %lld MB" = "Оставлено свободным: %lld MB";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Хранится только на этом Mac. Прокси LLMTray определяет названия клиентов по их User-Agent; запросы, которые Runtime обработал до того, как они были определены, учитываются как Other.";
+"Key" = "Ключ";
 "Kind" = "Тип";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Руководство LLMTray";
 "LLMTray events" = "События LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray загружает это вместе с моделью, которую оно ускоряет: загрузите эту модель.";
+"LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "У LLMTray нет разрешения читать вкладку в %@: включите его в «Системные настройки» › «Конфиденциальность и безопасность» › «Автоматизация».";
 "LLMTray isn't allowed to use the microphone." = "LLMTray не имеет доступа к микрофону.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray не разрешено использовать микрофон. Разрешите доступ в «Системные настройки» › «Конфиденциальность и безопасность» › «Микрофон».";
 "LLMTray restarts now to load them." = "LLMTray сейчас перезапустится, чтобы загрузить их.";
@@ -671,6 +708,8 @@
 "Leave a Review" = "Оставить отзыв";
 "Length" = "Длина";
 "Let chats make documents" = "Разрешить чатам создавать документы";
+"Let chats see a window or the screen" = "Разрешить чатам видеть окно или экран";
+"Let chats see a window, the screen or a browser tab" = "Разрешить чатам видеть окно, экран или вкладку браузера";
 "Let chats work in folders" = "Разрешить чатам работать в папках";
 "Let coding agents and scripts use your models." = "Разрешить агентам и скриптам использовать модели.";
 "Let the chat look in %@?" = "Разрешить чату просмотреть %@?";
@@ -704,6 +743,7 @@
 "Maintenance" = "Обслуживание";
 "Make a 30-second calm lo-fi instrumental for studying" = "Сделайте 30‑секундный спокойный lo‑fi инструментал для учёбы";
 "Make a Document…" = "Создать документ…";
+"Make a new key?" = "Создать новый ключ?";
 "Make again" = "Создать заново";
 "Make images and edit them." = "Создавать и редактировать изображения.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Создавайте изображения и музыку и разговаривайте с голосовой моделью прямо на этом Mac: включите их в Настройках.";
@@ -770,6 +810,8 @@
 "Never" = "Никогда";
 "New Chat" = "Новый чат";
 "New Chat in Project" = "Новый чат в проекте";
+"New Key" = "Новый ключ";
+"New Key…" = "Новый ключ…";
 "New Note" = "Новая заметка";
 "New Profile…" = "Новый профиль…";
 "New Project…" = "Новый проект…";
@@ -802,13 +844,15 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Нет модели embedding: файлы ищутся по словам. Скачайте её в разделе «Настройки › Файлы», чтобы искать по смыслу.";
 "No files yet" = "Файлов пока нет";
 "No folder changes yet." = "Пока нет изменений папок.";
-"No lines match the filters" = "Нет строк, соответствующих фильтрам";
 "No messages yet" = "Сообщений пока нет";
 "No microphone is available." = "Микрофон недоступен.";
 "No model uses it." = "Ни одна модель его не использует.";
 "No models found in this folder." = "В этой папке моделей нет.";
 "No models in this folder yet. The next step offers some to download." = "В этой папке пока нет моделей. На следующем шаге можно загрузить некоторые из них.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "Заметок пока нет. Добавьте то, что должен знать каждый чат: «Ответ на русском, кратко», «Я собираю колонку на ESP32».";
+"No open tab in %@." = "В %@ нет открытой вкладки.";
+"No requests yet in this period." = "В этом периоде запросов пока не было.";
+"No requests yet today." = "Сегодня запросов пока не было.";
 "No requests yet." = "Запросов пока нет.";
 "No runs yet." = "Прогонов ещё не было.";
 "No server output yet" = "Вывод сервера пока отсутствует";
@@ -816,6 +860,7 @@
 "No sign-in" = "Без входа";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Никаких подписок. Никаких блокировок функций. Поддержите развитие, если LLMTray оказался полезен.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Нет рекомендаций по памяти для этого Mac. Просмотрите модели на Hugging Face.";
+"No text was found in it, and this model can't see images: pick a vision model to show it as a picture." = "Текст в этом не найден, а эта модель не видит изображения: выберите vision-модель, чтобы показать это как картинку.";
 "No thanks" = "Нет, спасибо";
 "No tool calls yet in this version." = "В этой версии вызовов инструментов пока нет.";
 "No update check at launch" = "Не проверять обновления при запуске";
@@ -842,10 +887,12 @@
 "Nothing found for “%@”." = "По запросу «%@» ничего не найдено.";
 "Nothing left to read: every chat was read from its start." = "Читать больше нечего: каждый чат прочитан с начала.";
 "Nothing logged yet." = "Записей в журнале пока нет.";
+"Nothing matches" = "Ничего не найдено";
 "Nothing new to import" = "Нечего импортировать";
 "Nothing sent yet." = "Ещё ничего не отправлено.";
 "Nothing to change." = "Нечего менять.";
 "Nothing to pin until the file has been read" = "Нечего закреплять, пока файл не будет прочитан";
+"Nothing was captured: the window may have closed. Try again." = "Ничего не удалось захватить: возможно, окно закрылось. Повторите попытку.";
 "Nothing: no note is sent to these chats now." = "Ничего: сейчас в эти чаты не отправляется ни одна заметка.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Теперь её настройки: выберите %@ (уже выбран), затем Import. Отмена сохранит текущие настройки.";
 "Now: %@ → %@ (until %@)" = "Сейчас: %@ → %@ (до %@)";
@@ -862,9 +909,12 @@
 "On" = "Вкл.";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "Разовый платёж: Кофе $5, Pro Supporter $25, Founding Supporter $150.";
 "Only From Now On" = "Только с этого момента";
+"Only for connections from other devices" = "Только для подключений с других устройств";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Только для закрытых моделей (Llama, некоторые репозитории Gemma и FLUX): примите лицензию модели на её странице Hugging Face, затем вставьте сюда токен чтения. Хранится в Keychain, отправляется только на huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Только если хотите: чаты получают это в первую очередь, срок действия не истекает, а обучение никогда это не меняет. Это остается на этом компьютере.";
 "Only in the packaged app (not when run from a build folder)." = "Только в упакованном приложении (не при запуске из папки сборки).";
+"Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Только заголовок и адрес вкладки: чтобы получить её текст, включите «Вид» › «Разработка» › «Allow JavaScript from Apple Events» в %@.";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "Сейчас подключаться может только этот Mac (доступ по локальной сети выключен), поэтому ключ не запрашивается ни у одного клиента.";
 "Only this Mac can use the server" = "Только этот Mac может использовать сервер";
 "Only turbo has this knob: sft has no song planner to vary." = "Этот регулятор есть только у turbo: у sft нет планировщика песни для вариаций.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Публикуется только то, что вы введёте здесь, после проверки. Никогда не публикуются ваш Apple ID или электронная почта.";
@@ -878,7 +928,7 @@
 "Open in New Tab" = "Открыть в новой вкладке";
 "Open in Preview" = "Открыть в Preview";
 "Open in Window" = "Открыть в окне";
-"Open in Window -- closing the window puts the chat back in the menu bar" = "Открыть в окне — при закрытии окна чат возвращается в строку меню";
+"Open the server log" = "Открыть журнал сервера";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "Совместимо с OpenAI: укажите этот адрес в агенте или приложении (копирует адрес)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Откроет письмо для команды LLMTray с прикреплённым отчётом: версии, Mac, настройки модели и сервера, журнал сервера и недавние отчёты об ошибках. Ваши чаты никогда не включаются, вы сначала увидите весь отчёт.";
 "Opens at login" = "Открывать при входе";
@@ -892,6 +942,7 @@
 "Past %lld messages" = "Больше %lld сообщений";
 "Paste a Config" = "Вставить конфигурацию";
 "Paste a Config…" = "Вставить конфигурацию…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "Вставьте его в клиент как его ключ API (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Хранится в связке ключей.";
 "Pasted config" = "Вставленная конфигурация";
 "Pause" = "Пауза";
 "Pause Indexing" = "Пауза индексации";
@@ -905,6 +956,7 @@
 "Pick a rating from 1 to 5 stars." = "Выберите оценку от 1 до 5 звёзд.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Выберите модель для общения. Загрузка начнётся сразу и продолжится в фоне.";
 "Picks a model that fits your Mac and enables only what you choose." = "Выбирает модель, подходящую для вашего Mac, и включает только выбранные вами опции.";
+"Picture" = "Изображение";
 "Pictures over 50 MB can't be added: %@." = "Изображения больше 50 МБ нельзя добавить: %@.";
 "Pictures · %lld — for documents, not searched" = "Изображения · %lld — для документов, в поиске не участвуют";
 "Pin" = "Закрепить";
@@ -925,7 +977,6 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точность кэша внимания. 8 бит — почти без потерь, вдвое меньше памяти. 4 бита — вчетверо меньше, но заметно хуже на длинном контексте. Полный — лучше всего, но больше всего памяти.";
 "Preference" = "Предпочтение";
 "Preferences" = "Предпочтения";
-"Prefill progress" = "Ход предварительного заполнения";
 "Prefill step" = "Шаг префилла";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Нажмите «Запустить» и говорите. Подавление эха работает с динамиками; наушники по‑прежнему лучше.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Нажмите «Пуск» и говорите. Используйте наушники: модель слышит свой голос из колонок.";
@@ -934,6 +985,8 @@
 "Previous 30 Days" = "Последние 30 дней";
 "Previous 7 Days" = "Последние 7 дней";
 "Pro Supporters" = "Pro-спонсоры";
+"Problems" = "Проблемы";
+"Problems %@" = "Проблемы %@";
 "Profile" = "Профиль";
 "Profiles" = "Профили";
 "Project files" = "Файлы проекта";
@@ -948,6 +1001,7 @@
 "Projects" = "Проекты";
 "Projects' files on disk" = "Файлы проектов на диске";
 "Prompt" = "Подсказка";
+"Prompt %@ tokens, %@ from the cache · first token after %@ s · %@ tokens in %@ s" = "Подсказка: %@ токенов, %@ из кэша · первый токен через %@ с · %@ токенов за %@ с";
 "Prompt & tools" = "Промпт и инструменты";
 "Prompt (last request)" = "Подсказка (последний запрос)";
 "Prompt cache" = "Кэш промптов";
@@ -1025,8 +1079,8 @@
 "Repaired" = "Исправлено";
 "Report a Bug" = "Сообщить об ошибке";
 "Report a Bug…" = "Сообщить об ошибке…";
-"Request stats" = "Статистика запросов";
 "Requests" = "Запросы";
+"Require an API key" = "Требовать ключ API";
 "Rescan" = "Обновить список";
 "Rescan Models" = "Обновить список моделей";
 "Rescan or manage models" = "Пересканировать или управлять моделями";
@@ -1065,19 +1119,20 @@
 "Sampling" = "Сэмплинг";
 "Save" = "Сохранить";
 "Save As…" = "Сохранить как…";
+"Save Log…" = "Сохранить журнал…";
 "Save memory" = "Экономить память";
-"Save the whole log to a file…" = "Сохранить весь журнал в файл…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "Сохранённые чаты читаются в фоне для заметок на основе того, что вы там написали. При повторном чтении уже имеющиеся заметки подтверждаются, а не дублируются. Чаты с пометкой «Don't Remember» пропускаются.";
 "Saved chats will show up here." = "Сохранённые чаты появятся здесь.";
 "Saved in your Keychain" = "Сохранено в Keychain";
 "Save…" = "Сохранить…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Масштабирует ширину и высоту, которые просит модель. Balanced оставляет 1024x1024 как есть.";
+"Screen" = "Экран";
 "Search" = "Поиск";
 "Search Hugging Face (mlx models)…" = "Поиск на Hugging Face (модели mlx)…";
 "Search by meaning is off for now: %@" = "Поиск по смыслу пока отключён: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Поиск по смыслу использует %@ (%@), загруженную на этот Mac. Без неё файлы будут искаться только по словам; вы можете загрузить её позже.";
 "Search chats" = "Поиск по чатам";
-"Search the log" = "Поиск в журнале";
+"Search the log (⌘F)" = "Поиск в журнале (⌘F)";
 "Searching the registry…" = "Поиск в реестре…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Секунд до автоматического запуска черновика. 0: дождаться нажатия «Создать».";
 "Seen in" = "Видно в";
@@ -1094,9 +1149,9 @@
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Отправляется первым в каждом запросе встроенного чата. В Default уже есть короткий стартовый промпт — дополните его или замените. К внешним API-клиентам не применяется.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Отправлено на ipsupport.us: без учёта аккаунта и идентификаторов устройства. Отзывы публикуются на сайте LLMTray после модерации.";
 "Server" = "Сервер";
-"Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Настройки сервера изменились — перезапустите, чтобы применить.";
+"Server…" = "Сервер…";
 "Set Up LLMTray" = "Настройка LLMTray";
 "Set Up LLMTray…" = "Настроить LLMTray…";
 "Setting up image generation (first time only)…" = "Настройка генерации изображений (только первый запуск)…";
@@ -1113,9 +1168,11 @@
 "Shared by all chats" = "Общее для всех чатов";
 "Share…" = "Поделиться…";
 "Show" = "Показать";
+"Show All" = "Показать все";
 "Show All %lld Lines" = "Показать все строки (%lld)";
 "Show All Files…" = "Показать все файлы…";
 "Show Chat Window" = "Показать окно чата";
+"Show Everything" = "Показать всё";
 "Show Files" = "Показать файлы";
 "Show Less" = "Показать меньше";
 "Show Log…" = "Показать Журнал…";
@@ -1123,12 +1180,13 @@
 "Show Previous Tab" = "Показать предыдущую вкладку";
 "Show Reports…" = "Показать отчёты…";
 "Show What Chats Get…" = "Показать, что получают чаты…";
-"Show all" = "Показать всё";
+"Show a Window…" = "Показать окно…";
 "Show in Finder" = "Показать в Finder";
 "Show model controls in the chat window" = "Показывать элементы управления моделью в окне чата";
 "Show more" = "Показать ещё";
 "Show only overrides" = "Только переопределённые";
 "Show reasoning" = "Показывать рассуждения";
+"Show the Screen…" = "Показать экран…";
 "Show the profile files in Finder" = "Показать файлы профилей в Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показать файлы профилей в Finder — обычный JSON, можно править руками и переносить на другой Mac";
 "Show the project's files" = "Показать файлы проекта";
@@ -1164,6 +1222,7 @@
 "Start" = "Пуск";
 "Start LLMTray automatically when you log in to this Mac." = "Запускать LLMTray автоматически при входе в систему.";
 "Start Server" = "Запустить сервер";
+"Start a model and its output shows up here: loading, requests, errors." = "Запустите модель, и здесь появится её вывод: загрузка, запросы, ошибки.";
 "Start a new saved chat (⌘N) to add files to a project." = "Начните новый сохранённый чат (⌘N), чтобы добавить файлы в проект.";
 "Start server" = "Запустить сервер";
 "Start talking" = "Начать говорить";
@@ -1219,6 +1278,7 @@
 "Temporary chat" = "Временный чат";
 "Temporary chats can only look in folders, for that chat only." = "Временные чаты могут только просматривать папки и только для этого чата.";
 "Temporary — not saved" = "Временный — не сохраняется";
+"Text · %@" = "Текст · %@";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Индексируются текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods); изображения хранятся для документов.";
 "Thank you!" = "Спасибо!";
 "Thank you! List your name in Supporters?" = "Спасибо! Добавить ваше имя в список спонсоров?";
@@ -1229,6 +1289,8 @@
 "That isn't LLMTray's folder" = "Это не папка LLMTray";
 "That isn't an http(s) URL." = "Это не URL http(s).";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "%lld перемещений в корзину не отмечены: отметьте те, которые хотите.";
+"The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac." = "Меню «+» может показать модели окно, весь экран или страницу, открытую в браузере. Окно или экран вы выбираете в системном средстве выбора, и делается только один снимок — ничего больше. Для страницы передаются её заголовок, адрес и текст; macOS запрашивает разрешение один раз для каждого браузера. Модель, которая не видит изображения, получит текст, прочитанный на этом Mac.";
+"The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac." = "Меню «+» может показать модели окно или весь экран: вы выбираете его в системном средстве выбора, и делается только один снимок — ничего больше. Модель, которая не видит изображения, получит текст из него, прочитанный на этом Mac.";
 "The App Store couldn't confirm the purchase." = "App Store не смог подтвердить покупку.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Открыта версия LLMTray из App Store. Сначала выйдите из неё (значок в строке меню › «Выйти»), затем снова откройте эту версию: иначе обе будут использовать один и тот же порт и загружать модели дважды.";
 "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "JSON из README сервера, с \"mcpServers\". Каждый сервер добавляется выключенным, чтобы вы проверили его перед запуском.";
@@ -1268,12 +1330,15 @@
 "The exact text a new chat gets, before your first message." = "Точный текст, который новый чат получает до вашего первого сообщения.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Семейства моделей, использованных в этот день (например, qwen или flux), но не их имена.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "В первый раз на этот Mac скачается %@ (%@) — сейчас, а не посреди разговора.";
-"The full chat window, with projects and every chat (⌘⇧O)" = "Полное окно чата с проектами и всеми чатами (⌘⇧O)";
+"The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar" = "Полное окно чата с проектами и всеми чатами (⌘⇧O) — если закрыть его, чат вернётся в строку меню";
 "The image draft above is open: Generate or Skip it to keep chatting." = "Черновик изображения выше открыт: нажмите «Создать» или «Пропустить», чтобы продолжить чат.";
 "The image edit draft above is open: Generate or Skip it to keep chatting." = "Черновик редактирования изображения выше открыт: нажмите «Создать» или «Пропустить», чтобы продолжить чат.";
 "The image generator is busy -- try again once it's done." = "Генератор изображений занят — повторите попытку после завершения.";
 "The image generator is busy with another chat -- try again once it's done." = "Генератор изображений занят в другом чате — повторите попытку после завершения.";
 "The import stopped" = "Импорт остановлен";
+"The key couldn't be saved in the Keychain." = "Не удалось сохранить ключ в связке ключей.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "Сейчас не удаётся прочитать ключ из связки ключей (она заблокирована?). Повторите попытку или создайте новый ключ.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "Сейчас не удаётся прочитать ключ из связки ключей, поэтому всем внешним клиентам будет отказано. Создайте новый ключ или снова откройте Настройки после разблокировки связки ключей.";
 "The last change couldn't be saved." = "Не удалось сохранить последнее изменение.";
 "The log couldn't be saved" = "Не удалось сохранить журнал";
 "The longest answer the model may write. Also capped by the model's own context length." = "Максимальная длина ответа. Также ограничена длиной контекста модели.";
@@ -1446,7 +1511,9 @@
 "Update failed: %@" = "Обновление не удалось: %@";
 "Update to %@" = "Обновить до %@";
 "Updates" = "Обновления";
+"Usage" = "Использование";
 "Usage statistics" = "Статистика использования";
+"Usage statistics are off" = "Статистика использования выключена";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Статистика использования отключена: ничего не отправляется. Так выглядел бы отчёт при включении (ID формируется тогда).";
 "Usage statistics: the reports" = "Статистика использования: отчёты";
 "Use" = "Использовать";
@@ -1478,13 +1545,13 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab занимает примерно %1$@ ГБ, что больше, чем %2$@ ГБ, доступных GPU: сначала увеличьте лимит памяти GPU.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab занимает примерно %1$@ ГБ; вместе с %2$@ ГБ чат‑модели это помещается в %3$@ ГБ, доступных GPU. Тем не менее чат‑модель по‑прежнему выгружается во время работы.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Во время работы Voice Lab занимает примерно %@ ГБ памяти.";
-"Voice Lab…" = "Voice Lab…";
 "Voice model" = "Голосовая модель";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дождитесь окончания текущего запроса или бенчмарка -- перезапуск его оборвёт.";
 "Waiting for a model download to finish…" = "Ожидание завершения загрузки модели…";
 "Waiting for an image or song to finish…" = "Ожидание завершения изображения или песни…";
 "Waiting for another chat's image or music to finish…" = "Ожидание завершения создания изображения или музыки в другом чате…";
 "Waiting for the chat or a generator to finish" = "Ожидание завершения чата или генератора";
+"Waiting for your pick…" = "Ожидание выбора…";
 "Waiting to be sent: %@" = "Ожидает отправки: %@";
 "Waits for %@ to be loaded." = "Ожидает загрузки %@.";
 "Waits for a model: start one to read your chats." = "Ожидание модели: запустите ее, чтобы читать ваши чаты.";
@@ -1492,8 +1559,7 @@
 "Waits for the model to be free." = "Ожидает, пока модель освободится.";
 "Waits for the model to be loaded." = "Ожидает загрузки модели.";
 "Walkie-talkie" = "Рация";
-"Warnings" = "Предупреждения";
-"Warnings: %@" = "Предупреждения: %@";
+"Warnings and errors: go to the next one" = "Предупреждения и ошибки: перейти к следующему";
 "Weather" = "Погода";
 "Web" = "Веб";
 "Web search" = "Веб‑поиск";
@@ -1511,6 +1577,7 @@
 "What happened?" = "Что произошло?";
 "What the model says appears here." = "Здесь появится то, что говорит модель.";
 "What this chat knows about you from earlier chats" = "Что этот чат знает о вас из предыдущих чатов";
+"What to show" = "Что показывать";
 "What was copied before stays; importing again goes on from there. %@" = "Скопированное ранее остаётся; повторный импорт продолжится с этого места. %@";
 "What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "Выученное: память заметок выучила то, что вы не писали, не редактировали, не закрепляли и не подтверждали. Всё: все заметки, кроме «О вас». Ни одно действие нельзя отменить.";
 "What you corrected before, so it isn't repeated." = "Что вы исправляли раньше, чтобы это не повторялось.";
@@ -1537,6 +1604,8 @@
 "Which model generates new images." = "Какая модель генерирует новые изображения.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Пока модель говорит, звук микрофона тише этого уровня воспринимается как тишина: следы собственного голоса, которые остаются после удаления эха, не учитываются, но по‑прежнему можно прерывать речь голосом. Повышайте, если модель слышит себя; понижайте, если она не замечает ваши прерывания. Вступает в силу при следующем запуске.";
 "Wikipedia" = "Wikipedia";
+"Window" = "Окно";
+"Windows and pages" = "Окна и страницы";
 "With notes, it reads like this:" = "С заметками это читается так:";
 "Words only" = "Только слова";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Рабочая память для поэтапного чтения подсказки; меньше значит чтение длинных подсказок меньшими, более медленными блоками. Если кеш подсказок и это вместе не превышают 90%: остаток держит текущую читаемую подсказку.";
@@ -1588,7 +1657,9 @@
 "failed to build request" = "не удалось составить запрос";
 "failed: %@" = "сбой: %@";
 "finishing" = "завершение";
+"first %@ s" = "первые %@ с";
 "first token %.1f s" = "первый токен %.1f с";
+"first token in %@ on average" = "в среднем первый токен через %@";
 "for this chat" = "для этого чата";
 "generation %.1f tok/s" = "генерация %.1f ток/с";
 "hears audio" = "слышит аудио";
@@ -1609,6 +1680,7 @@
 "never used" = "никогда не использовалась";
 "new or changed" = "новые или изменённые";
 "no changes" = "без изменений";
+"no page text" = "нет текста страницы";
 "no text" = "нет текста";
 "not a picture" = "не изображение";
 "not allowed" = "не разрешено";
@@ -1625,6 +1697,7 @@
 "prompt %.0f tok/s" = "промпт %.0f ток/с";
 "queued" = "в очереди";
 "reading" = "чтение";
+"reading the prompt %@" = "чтение подсказки %@";
 "reads images" = "читает изображения";
 "ready" = "готово";
 "ready (words only)" = "готово (только по словам)";
@@ -1654,6 +1727,7 @@
 "~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:" = "В ~/.local/bin ещё нет в PATH вашей оболочки. Добавьте эту строку в %@, затем откройте новое окно терминала:";
 "· %lld pinned" = "· %lld закреплено";
 "· size…" = "· размер…";
+"×%lld" = "×%lld";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» невозможно удалить: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не удалось изменить закрепление: %2$@";
 "“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) будет перемещена в Корзину — оттуда её можно восстановить. Она нужна для «%@»: чтобы пользоваться, скачайте её снова в Настройках.";

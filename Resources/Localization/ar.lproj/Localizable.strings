@@ -2,6 +2,7 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+" · %@ drafted" = " · %@ مُسوَّدة";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "تغير «%@» منذ اقتباس هذا الجواب منه: قد يكون محتوى الصفحة %lld مختلفًا الآن.";
 "\"%@\" is no longer in the project." = "لم يعد «%@» موجودًا في المشروع.";
 "%.0f%% from drafts" = "%.0f%% من المسودات";
@@ -29,6 +30,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "المسار %@ موجود بالفعل ويشير إلى %@. أزله أولاً لتثبيت إصدار LLMTray.";
 "%@ couldn't read chats for memory: another model reads its chats." = "تعذّرت على %@ قراءة الدردشات من أجل الذاكرة: يقرأ نموذج آخر دردشاته.";
 "%@ didn't download: %@" = "لم يتم تنزيل %@: %@";
+"%@ from cache" = "%@ من الذاكرة المؤقتة";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‏%@ رابط لمجلد غير متاح: صِل القرص الخاص به، أو أزل الرابط.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ مُقيَّد: اقبل ترخيصه على huggingface.co/%@، ثم أضف رمز Hugging Face في الإعدادات → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ قيد التشغيل في هذه الدردشة: سيُطلب منك التأكيد قبل كل استدعاء.";
@@ -36,7 +38,11 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "لم يتم تنزيل %@ بعد — أعد تمكين توليد الصور في الإعدادات.";
 "%@ isn't installed yet" = "لم يُثَبَّت %@ بعد";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "يتطلب %@ تطبيقك الخاص: أضِف معرّف العميل والسر الخاص به في «تكوين»، وأضِف Redirect URL المعروض هناك إلى تطبيقك، ثم سجّل الدخول.";
-"%@ of %@ lines" = "%@ من %@ سطرًا";
+"%@ new" = "%@ جديد";
+"%@ of %@ shown" = "المعروض %@ من %@";
+"%@ requests" = "%@ طلبات";
+"%@ s" = "%@ ث";
+"%@ tok/s" = "%@ رمز/ث";
 "%@ wasn't found on Hugging Face." = "لم يُعثر على %@ في Hugging Face.";
 "%@ · %@ left" = "%@ · تبقى %@";
 "%@ · %@ of %@" = "%@ · %@ من %@";
@@ -47,6 +53,7 @@
 "%@ — in project %@" = "%@ — في المشروع %@";
 "%@ — page %lld" = "%@ — الصفحة %lld";
 "%@ → %@ available" = "يتوفر %@ → %@";
+"%@ → %@ tok" = "%@ → %@ رمز";
 "%@ ★ from %lld reviews" = "%@ ★ من %lld تقييمًا";
 "%@ ★ from 1 review" = "%@ ★ من تقييم واحد";
 "%@ 🌐" = "%@ 🌐";
@@ -62,8 +69,10 @@
 "%lld failed" = "%lld فشل";
 "%lld files" = "%lld ملفًا";
 "%lld files couldn't be indexed" = "تعذر فهرسة %lld ملفًا";
+"%lld h later" = "بعد %lld س";
 "%lld interrupted: look at them in Finder" = "%lld مقطوعة: راجعها في Finder";
 "%lld items put back under their names." = "أُعيد وضع %lld عناصر تحت أسمائها.";
+"%lld min later" = "بعد %lld د";
 "%lld more" = "المزيد: %lld";
 "%lld more…" = "المزيد: %lld…";
 "%lld need a look: see the list." = "%lld تحتاج إلى معاينة: راجع القائمة.";
@@ -75,6 +84,7 @@
 "%lld requests" = "%lld طلبات";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld طلبًا جارٍ تنفيذها (تُجاب معًا حتى حد الطلبات المتزامنة)";
 "%lld s" = "%lld ث";
+"%lld s later" = "بعد %lld ث";
 "%lld tools are new or changed on the server: hidden from the chat until you accept them." = "هناك %lld أداة جديدة أو تم تغييرها على الخادم: مخفية عن الدردشة حتى توافق عليها.";
 "%lld tools changed on the server: Configure to accept them." = "تم تغيير %lld أداة على الخادم: قم بالتكوين لقبولها.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
@@ -86,6 +96,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "ساعة واحدة";
 "30 s reached · release to send, Esc to drop" = "بلغت 30 ث · اترك للإرسال، Esc للإفلات";
+"7 Days" = "7 أيام";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "يطلب الدردشة إذناً قبل النظر داخل مجلد، ويعرض كل تغيير كخطة للموافقة. الأماكن الخاصة (Library، keys، مجلد المنزل نفسه) لا تُشارك أبداً.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "يمكن للمحادثة البحث في المجلدات التي تسمح بها واقتراح مجلدات جديدة، ونقلها وإعادة تسميتها. أنت تُوافق على كل تغيير ويمكنك التراجع عنه.";
 "A chat model" = "نموذج دردشة";
@@ -106,11 +117,13 @@
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "أغنية بكلمات مُغناة أو مقطوعة موسيقية، من وصف (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "رابط رمزي: الرابط نفسه، وليس ما يشير إليه.";
 "A temporary chat can't hold files" = "المحادثة المؤقتة لا يمكنها احتواء ملفات";
+"A window with no readable text was removed: this model can't see pictures." = "أُزيلت نافذة لا تحتوي على نص قابل للقراءة: لا يمكن لهذا النموذج رؤية الصور.";
 "AAC %lld kbit/s" = "AAC %lld كيلوبت/ث";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — غناء واضح، 8-bit (موصى به)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — غناء واضح، GPTQ 4-bit (استخدام ذاكرة أقل)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — غناء واضح، دقة كاملة";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — صوت أكثر امتلاءً";
+"API key" = "مفتاح API";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "حوالي %d رموز، بعد موجه النظام للملف الشخصي. يحصل النموذج ذو السياق الصغير على أقل من ذلك (تأخذ الذاكرة 5%% منه كحد أقصى). تحتفظ الدردشات المفتوحة بالفعل بالكتلة التي بدأت بها حتى تتغير إحدى ملاحظاتها.";
 "About LLMTray" = "حول LLMTray";
 "About you" = "عنك";
@@ -179,6 +192,7 @@
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "بقشيش اختياري: لا اشتراكات، لا قفل ميزات. يمكن للمتبرعين اختيار الاسم الذي يظهر بكتابته.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "قد يكون عنصر غير مؤكد قد تغيّر أو لم يتغيّر: افحصه في Finder. تحتفظ الإعدادات > الملفات بالسجل.";
 "Another LLMTray is running" = "هناك نسخة أخرى من LLMTray تعمل";
+"Another chat is picking a window: finish that first." = "توجد دردشة أخرى تختار نافذة: أنهِ ذلك أولاً.";
 "Another folder change is running: try again when it's done." = "هناك تغيير مجلد آخر قيد التشغيل: حاول مرة أخرى بعد الانتهاء.";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
 "Another version next to this one (a new seed, the same request)" = "نسخة أخرى بجانب هذه (بذرة جديدة، نفس الطلب)";
@@ -187,6 +201,7 @@
 "Answer details" = "تفاصيل الإجابة";
 "Answer in Russian, briefly" = "الإجابة بالروسية باختصار";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "أي علامات mlx_lm.server أخرى، مفصولة بمسافات، مثل --draft-model <path>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "يمكن لأي شخص على شبكتك استخدام الخادم: يقتصر استخدامه على العملاء الذين تمنحهم المفتاح.";
 "Anything else chats should know" = "أي شيء آخر يجب أن تعرفه الدردشات";
 "Apache License 2.0" = "رخصة Apache 2.0";
 "App language" = "لغة التطبيق";
@@ -197,6 +212,7 @@
 "Approve Selected" = "الموافقة على المحدد";
 "Apps & agents" = "التطبيقات والـ agents";
 "Apps and agents" = "التطبيقات والـ agents";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "تتصل التطبيقات على هذا الـ Mac من دون المفتاح؛ أما الأجهزة على شبكتك فتحتاج إليه. عند إيقافه: يحتاج إليه كل عميل على منفذ LLMTray، بما في ذلك هذا الـ Mac.";
 "Arguments, one per line" = "الوسيطات، واحدة في كل سطر";
 "Ask Later" = "اسأل لاحقًا";
 "Ask about LLMTray" = "اطرح سؤالاً عن LLMTray";
@@ -210,6 +226,7 @@
 "At most %d characters: a note is one short statement." = "%d حرفًا كحد أقصى: الملاحظة عبارة قصيرة واحدة.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "تقرير واحد كحد أقصى يومياً إلى ipsupport.us، يغطي يومًا واحدًا مضى. يُرسل أي يوم لم يُرسل بعد عند التشغيل التالي، حتى 7 أيام إلى الخلف. إيقاف هذا الخيار يحذف ما لم يُرسل.";
 "Attach Images…" = "إرفاق صور…";
+"Attach Tab from %@" = "إرفاق علامة تبويب من %@";
 "Attach images" = "إرفاق صور";
 "Attach images or allow folders" = "إرفاق صور أو السماح بالمجلدات";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "الانتباه بعمق 8-بت، والتفاؤل الأمامي بعمق 4-بت — أفضل توازن بين الحجم والثبات، تم التحقق منه مقابل 4-بت الموحد.";
@@ -224,6 +241,7 @@
 "Automatic" = "تلقائي";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "يُحسب متوسطها في نتيجة واحدة أدناه. تسبقها دائمًا عملية إحماء مؤقتة، لذلك لا يؤثر وقت ترجمة نواة Metal عند أول استدعاء في الأرقام.";
 "Back" = "رجوع";
+"Back to the newest (End)" = "العودة إلى الأحدث (End)";
 "Balanced (default)" = "متوازن (Default)";
 "Barely fits the GPU memory" = "يكاد يناسب ذاكرة GPU";
 "Be the first to be listed here." = "كن أول من يظهر هنا.";
@@ -239,6 +257,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ينقل المحادثات والمشاريع والملفات الشخصية ونماذج الصورة والموسيقى والصوت والتضمين وإعدادات النسخة من ipsupport.us (أغلقها أولاً). تبقى المحادثات والنماذج الموجودة هنا؛ إعداداته هي التي سيتم استبدالها. النماذج لا تتطلب مساحة قرص إضافية. تظل نماذج المحادثة في مجلد النماذج الخاص بك: اختره في الإعدادات › Models.";
 "Browse Hugging Face…" = "تصفّح Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "مضمّن في macOS · للدردشة في LLMTray فقط";
+"By" = "حسب";
 "Cached" = "مخزّن مؤقتًا";
 "Calculator" = "آلة حاسبة";
 "Calls" = "الاستدعاءات";
@@ -247,6 +266,7 @@
 "Can look · %@" = "يمكنه الاطلاع · %@";
 "Can look · 1 hour" = "يمكنه الاطلاع · ساعة واحدة";
 "Can look · Always" = "يمكنه الاطلاع · دائمًا";
+"Can't be read" = "يتعذّر قراءته";
 "Can't change models while auto-tune is running" = "لا يمكن تغيير النماذج أثناء تشغيل الضبط التلقائي.";
 "Can't switch profiles while a request or the auto-tune is running" = "لا يمكن تبديل ملفات التعريف أثناء تشغيل طلب أو الضبط التلقائي.";
 "Cancel" = "إلغاء";
@@ -296,13 +316,18 @@
 "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "اختر ~/Library/Application Support/LLMTray: المجلد الذي يحتوي الجلسات والمشاريع والنماذج الخاصة بالنسخة من ipsupport.us.";
 "Choose…" = "اختيار…";
 "Clear" = "مسح";
+"Clear Log" = "مسح السجل";
+"Clear Statistics…" = "مسح الإحصاءات…";
+"Clear or turn off" = "مسح أو إيقاف";
 "Clear search" = "مسح البحث";
-"Clear the log" = "مسح السجل.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "مسح الطابور: ما فُهرِس يبقى قابلاً للبحث، والباقي يُعلَّم كغير مفهرس";
 "Click to enable Project files: add files to the project and let its chats search them." = "انقر لتمكين ملفات المشروع: أضِف ملفات إلى المشروع ودع محادثاته تبحث فيها.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "انقر لتسجيل مقطع؛ اضغط مطوّلًا للتحدث ثم اترك للإرسال (سيسمعه النموذج).";
 "Click ■ to stop · Esc cancels" = "انقر ■ للإيقاف · Esc للإلغاء";
+"Client" = "العميل";
 "Client ID" = "معرّف العميل";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "يجب أن يرسل العملاء هذا المفتاح (Authorization: Bearer <key> أو x-api-key)، وإلا سيحصلون على 401. لا تحتاج الدردشة في LLMTray إليه مطلقًا.";
+"Clients using the current key get 401 until they're given the new one." = "ستحصل العملاء التي تستخدم المفتاح الحالي على 401 إلى أن يُزوَّدوا بالمفتاح الجديد.";
 "Close" = "إغلاق";
 "Close Tab" = "إغلاق التبويب";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. الإعدادات › عام › إعداد LLMTray… يفتحها من جديد.";
@@ -312,6 +337,7 @@
 "Command" = "الأمر";
 "Command-line tool" = "أداة سطر الأوامر";
 "Compact" = "مضغوط";
+"Compact rows" = "صفوف مضغوطة";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "يستبدل الضغط وسط دردشة طويلة بملخص واحد يكتبه النموذج. يُحتفظ بهذا العدد من الرسائل في البداية كما هي حرفيًا.";
 "Compaction" = "الضغط";
 "Compaction failed: %@" = "فشل الضغط: %@";
@@ -327,11 +353,14 @@
 "Copied" = "تم النسخ";
 "Copies %1$@ · index %2$@ on disk" = "نسخ %1$@ · فهرس %2$@ على القرص";
 "Copy" = "نسخ";
-"Copy Line" = "نسخ السطر";
+"Copy Entry" = "نسخ الإدخال";
+"Copy First Line" = "نسخ السطر الأول";
+"Copy Path" = "نسخ المسار";
+"Copy Shown" = "نسخ المعروض";
 "Copy the details as text" = "انسخ التفاصيل كنص";
-"Copy the lines shown" = "نسخ الأسطر المعروضة.";
 "Copy the song as an audio file" = "انسخ الأغنية كملف صوتي";
 "Copy the text" = "انسخ النص";
+"Copy, save or clear" = "انسخ أو احفظ أو امسح.";
 "Copying the included runtime…" = "جارٍ نسخ الـ runtime المضمن…";
 "Correction" = "تصحيح";
 "Corrections" = "التصحيحات";
@@ -343,10 +372,12 @@
 "Couldn't reach the server -- please try again later." = "تعذر الوصول إلى الخادم — حاول مرة أخرى لاحقاً.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "تعذّرت قراءة بعض أجزاء الدردشات؛ ستتم إعادة المحاولة في %@ (السبب: الإعدادات › الخادم › السجل).";
 "Couldn't start the voice runner: %@" = "تعذر بدء مشغّل الصوت: %@";
+"Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "يعدّ الطلبات والرموز لكل نموذج وعميل ويوم، ومدى سرعة تشغيلها. يُحتفَظ بها على هذا الـ Mac فقط، ولا تُرسَل إلى أي مكان.";
 "Countdown" = "العد التنازلي";
 "Countdown: %lld s" = "العد التنازلي: %lld ث";
 "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "تُحسب على هذا الـ Mac لهذا الإصدار من LLMTray ولا تُرسل أبدًا؛ يتضمن تقرير الخطأ الأعداد. مرّر المؤشر فوق صف لترى ما تم إصلاحه (استدعاء غير سليم من النموذج فهمه التطبيق مع ذلك) وما الأخطاء التي حدثت.";
 "Country facts" = "حقائق عن البلد";
+"Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac." = "يعدّ الطلبات والرموز لكل نموذج وعميل (مثل الدردشة وCodex وClaude Code وcurl…) ويوم، ومدى سرعة تشغيلها: علامة تبويب «الاستخدام» في نافذة الخادم. يُحتفَظ بها على هذا الـ Mac فقط.";
 "Crash reports (%lld)" = "تقارير الأعطال (%lld)";
 "Create Email…" = "إنشاء رسالة…";
 "Creativity" = "الإبداع";
@@ -358,6 +389,8 @@
 "Current settings are already fastest" = "الإعدادات الحالية هي الأسرع بالفعل";
 "Date" = "التاريخ";
 "Date & time" = "التاريخ والوقت";
+"Day" = "اليوم";
+"Debug lines" = "أسطر DEBUG";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "التصحيح: أسفل الإجابة، الأدوات التي استدعاها النموذج ومع الوسائط المستخدمة؛ وسّع أيّ استدعاء لرؤية ما أعاد. يخصّ المحادثة الحالية فقط — الاستدعاءات لا تُحفَظ معها.";
 "Default can't be renamed: every model falls back to it" = "لا يمكن إعادة تسمية Default: كل نموذج يعود إليه افتراضيًا";
 "Delete" = "حذف";
@@ -454,9 +487,10 @@
 "Enjoying LLMTray?" = "هل تستمتع بـ LLMTray؟";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "البيئة، NAME=value في كل سطر (تُنقل المفاتيح والرموز المميزة وكلمات السر إلى سلسلة المفاتيح)";
 "Errors" = "الأخطاء";
-"Errors: %@" = "الأخطاء: %@";
+"Errors: go to the next one (⌘E)" = "الأخطاء: انتقل إلى التالي (⌘E).";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "تحصل كل محادثة في المشروع على كامل نص الملف؛ البحث على الويب وتوليد الصور أو الموسيقى متوقفان في تلك المحادثات طالما الملف مثبت.";
+"Every day's counts are removed. This can't be undone." = "ستُزال إحصاءات كل الأيام. لا يمكن التراجع عن هذا.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "كل طلب يجيب عنه الخادم، من الدردشة ومن التطبيقات والوكلاء الأخرى عبر الواجهة البرمجية، محفوظ على هذا الـ Mac. الوسيط لكل نموذج وإعدادات.";
 "Everything" = "كل شيء";
 "Everything in that folder is here already." = "كل شيء في ذلك المجلد موجود هنا بالفعل.";
@@ -498,8 +532,8 @@
 "Folders" = "المجلدات";
 "Folders can't be added yet: %@. Add the files in them instead." = "لا يمكن إضافة المجلدات بعد: %@. أضف الملفات الموجودة فيها بدلًا من ذلك.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "المجلدات التي يمكن للمحادثات استخدامها دون سؤال. عندما تحتاج محادثة إلى مجلد آخر، ستطلبه في المحادثة.";
-"Follow" = "متابعة";
 "Follow the description" = "التقِ بالوصف";
+"Follow: keep the newest in view. Scrolling up pauses it." = "المتابعة: أبقِ الأحدث ظاهرًا. يؤدي التمرير لأعلى إلى إيقافها مؤقتًا.";
 "For This Chat" = "لهذه الدردشة";
 "For an Hour" = "لمدة ساعة";
 "For faster answers (speculative decoding)" = "لإجابات أسرع (توقّع فك التشفير)";
@@ -642,16 +676,19 @@
 "Keep first messages: %lld" = "الاحتفاظ بالرسائل الأولى: %lld";
 "Keep last messages: %lld" = "الاحتفاظ بالرسائل الأخيرة: %lld";
 "Keep the loaded model" = "الإبقاء على النموذج المحمّل";
-"Keep the newest line in view" = "إبقاء أحدث سطر ظاهرًا.";
+"Keep usage statistics" = "الاحتفاظ بإحصاءات الاستخدام";
 "Keeps crashing -- see its log." = "يستمر في التعطل -- راجع سجله.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "يُبقي أول N من رموز السياق بالدقة الكاملة قبل تكميمها. القيم الأعلى تقلل توفير الذاكرة مقابل دقة أفضل في الموجهات الطويلة.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "يحتفظ بهذا المنفذ. إذا كان تطبيق آخر يستخدمه بالفعل، فلن يبدأ الخادم حتى تغيّر المنفذ في الإعدادات.";
 "Kept free: %lld MB" = "محفوظة خالية: %lld ميغابايت";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "يُحتفَظ بها على هذا الـ Mac فقط. يسمّي وكيل LLMTray العملاء استنادًا إلى User-Agent الخاص بهم؛ وتُحتسَب الطلبات التي خدمها الـ runtime قبل تسميتهم ضمن «أخرى».";
+"Key" = "المفتاح";
 "Kind" = "النوع";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "دليل LLMTray";
 "LLMTray events" = "أحداث LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "يجلبه LLMTray مع النموذج الذي يسرّعه: نزّل ذلك النموذج.";
+"LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "لا يُسمح لـ LLMTray بقراءة علامة التبويب في %@: شغِّل ذلك في إعدادات النظام › الخصوصية والأمن › الأتمتة.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray غير مسموح له باستخدام الميكروفون.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "لا يُسمح لـ LLMTray باستخدام الميكروفون. اسمح له من إعدادات النظام › الخصوصية والأمان › الميكروفون.";
 "LLMTray restarts now to load them." = "يعيد LLMTray التشغيل الآن لتحميلها.";
@@ -671,6 +708,8 @@
 "Leave a Review" = "اترك مراجعة";
 "Length" = "الطول";
 "Let chats make documents" = "السماح للمحادثات بإنشاء مستندات";
+"Let chats see a window or the screen" = "السماح للدردشات برؤية نافذة أو الشاشة";
+"Let chats see a window, the screen or a browser tab" = "السماح للدردشات برؤية نافذة أو الشاشة أو علامة تبويب في المتصفح";
 "Let chats work in folders" = "السماح للدردشات بالعمل في المجلدات";
 "Let coding agents and scripts use your models." = "اسمح للـ agents والنصوص البرمجية باستخدام نماذجك.";
 "Let the chat look in %@?" = "هل تسمح للدردشة بالنظر داخل %@؟";
@@ -704,6 +743,7 @@
 "Maintenance" = "الصيانة";
 "Make a 30-second calm lo-fi instrumental for studying" = "أنشئ مقطعًا هادئًا lo-fi مدته 30 ثانية للمذاكرة";
 "Make a Document…" = "إنشاء مستند…";
+"Make a new key?" = "إنشاء مفتاح جديد؟";
 "Make again" = "إنشاء مجدداً";
 "Make images and edit them." = "إنشاء صور وتحريرها.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "أنشئ صوراً وأغانيَ وتحدّث مع نموذج صوتي، كل ذلك على هذا الـ Mac: فعّلها في الإعدادات.";
@@ -770,6 +810,8 @@
 "Never" = "أبدًا";
 "New Chat" = "دردشة جديدة";
 "New Chat in Project" = "محادثة جديدة في المشروع";
+"New Key" = "مفتاح جديد";
+"New Key…" = "مفتاح جديد…";
 "New Note" = "ملاحظة جديدة";
 "New Profile…" = "ملف تعريف جديد…";
 "New Project…" = "مشروع جديد…";
@@ -802,13 +844,15 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "لا يوجد نموذج تضمين: تُبحث الملفات بالكلمات. نزِّلَه من الإعدادات > Files للبحث بالمعنى.";
 "No files yet" = "لا توجد ملفات بعد";
 "No folder changes yet." = "لا توجد تغييرات في المجلد حتى الآن.";
-"No lines match the filters" = "لا توجد أسطر تطابق عوامل التصفية";
 "No messages yet" = "لا توجد رسائل بعد";
 "No microphone is available." = "لا يوجد ميكروفون متاح.";
 "No model uses it." = "لا يستخدمه أي نموذج.";
 "No models found in this folder." = "لم يتم العثور على نماذج في هذا المجلد.";
 "No models in this folder yet. The next step offers some to download." = "لا توجد نماذج في هذا المجلد بعد. الخطوة التالية تعرض بعضها للتنزيل.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "لا توجد ملاحظات بعد. أضف ما ينبغي أن تعرفه كل دردشة: «الإجابة بالروسية باختصار»، «أصنع مكبر صوت ESP32».";
+"No open tab in %@." = "لا توجد علامة تبويب مفتوحة في %@.";
+"No requests yet in this period." = "لا توجد طلبات بعد في هذه الفترة.";
+"No requests yet today." = "لا توجد طلبات بعد اليوم.";
 "No requests yet." = "لا طلبات بعد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
 "No server output yet" = "لا توجد مخرجات من الخادم بعد";
@@ -816,6 +860,7 @@
 "No sign-in" = "لا يتطلب تسجيل الدخول";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "لا اشتراكات. لا قفل للميزات. ادعم التطوير إذا كان LLMTray مفيداً لك.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "لا اقتراحات لذاكرة هذا الـ Mac. تصفح Hugging Face لعرض نموذج.";
+"No text was found in it, and this model can't see images: pick a vision model to show it as a picture." = "لم يتم العثور على نص فيه، ولا يمكن لهذا النموذج رؤية الصور: اختر نموذج رؤية لعرضه كصورة.";
 "No thanks" = "لا، شكراً";
 "No tool calls yet in this version." = "لا توجد استدعاءات أدوات في هذا الإصدار بعد.";
 "No update check at launch" = "لا تحقق من التحديث عند التشغيل";
@@ -842,10 +887,12 @@
 "Nothing found for “%@”." = "لم يتم العثور على أي شيء لـ %@.";
 "Nothing left to read: every chat was read from its start." = "لم يبقَ شيء لقراءته: قُرئت كل دردشة من بدايتها.";
 "Nothing logged yet." = "لا يوجد شيء في السجل بعد.";
+"Nothing matches" = "لا توجد مطابقات";
 "Nothing new to import" = "لا يوجد شيء جديد للاستيراد";
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
 "Nothing to pin until the file has been read" = "لا شيء لتثبيته حتى يتم قراءة الملف";
+"Nothing was captured: the window may have closed. Try again." = "لم يتم التقاط أي شيء: ربما أُغلقت النافذة. حاول مرة أخرى.";
 "Nothing: no note is sent to these chats now." = "لا شيء: لا تُرسل أي ملاحظة إلى هذه الدردشات الآن.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "الآن إعداداته: اختر %@ (محدد بالفعل)، ثم استيراد. إلغاء يحتفظ بالإعدادات هنا.";
 "Now: %@ → %@ (until %@)" = "الآن: %@ ← %@ (حتى %@)";
@@ -862,9 +909,12 @@
 "On" = "تشغيل";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "مرة واحدة: قهوة $5، راعٍ محترف $25، راعٍ مؤسس $150.";
 "Only From Now On" = "من الآن فصاعدًا فقط";
+"Only for connections from other devices" = "لاتصالات الأجهزة الأخرى فقط";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "خاص بالنماذج المقيَّدة فقط (Llama، بعض مستودعات Gemma وFLUX): اقبل ترخيص النموذج في صفحته على Hugging Face، ثم ألصق رمز قراءة هنا. يُخزَّن في Keychain ويُرسل فقط إلى huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "اختياري فقط: تحصل عليه الدردشات أولًا، ولا تنتهي صلاحيته أبدًا، ولا يغيّره التعلم أبدًا. يبقى على هذا الكمبيوتر.";
 "Only in the packaged app (not when run from a build folder)." = "متاح فقط في التطبيق المعبأ (ليس عند التشغيل من مجلد build).";
+"Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "عنوان علامة التبويب وعنوانها فقط: للحصول على نصها، شغِّل «عرض › المطور › Allow JavaScript from Apple Events» في %@.";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "يمكن لهذا الـ Mac فقط الاتصال الآن (تم إيقاف الوصول إلى الشبكة المحلية)، لذلك لا يُطلب المفتاح من أي عميل.";
 "Only this Mac can use the server" = "هذا الـ Mac فقط يمكنه استخدام الخادم";
 "Only turbo has this knob: sft has no song planner to vary." = "هذا الضابط متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "ما تكتبه هنا فقط يُنشر بعد مراجعته. لن يتم نشر Apple ID أو بريدك الإلكتروني.";
@@ -878,7 +928,7 @@
 "Open in New Tab" = "فتح في تبويب جديد";
 "Open in Preview" = "افتح في Preview";
 "Open in Window" = "فتح في نافذة";
-"Open in Window -- closing the window puts the chat back in the menu bar" = "فتح في نافذة — إغلاق النافذة يعيد الدردشة إلى شريط القوائم";
+"Open the server log" = "فتح سجل الخادم";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "متوافق مع OpenAI: وجّه وكيل ترميز أو تطبيقًا إلى هذا العنوان (يُنسخ)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "يفتح رسالة بريد إلى فريق LLMTray مع إرفاق تقرير: الإصدارات، جهاز Mac، إعدادات النموذج والخادم، سجل الخادم وتقارير الأعطال الأخيرة. المحادثات الخاصة بك لا تُضمَّن أبداً، وستعرض التقرير كاملاً أولاً.";
 "Opens at login" = "يفتح عند تسجيل الدخول";
@@ -892,6 +942,7 @@
 "Past %lld messages" = "آخر %lld رسالة";
 "Paste a Config" = "لصق إعداد";
 "Paste a Config…" = "لصق إعداد…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "الصقه في العميل بوصفه مفتاح API الخاص به (OPENAI_API_KEY، ‏ANTHROPIC_API_KEY…). يُحتفَظ به في سلسلة المفاتيح.";
 "Pasted config" = "الإعداد الملصق";
 "Pause" = "إيقاف مؤقت";
 "Pause Indexing" = "إيقاف الفهرسة مؤقتًا";
@@ -905,6 +956,7 @@
 "Pick a rating from 1 to 5 stars." = "اختر تقييماً من 1 إلى 5 نجوم.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "اختر واحدًا للدردشة معه. يبدأ التنزيل فورًا ويستمر في الخلفية.";
 "Picks a model that fits your Mac and enables only what you choose." = "يختار نموذجًا مناسبًا لجهاز Mac ويشغّل فقط الميزات التي تختارها.";
+"Picture" = "صورة";
 "Pictures over 50 MB can't be added: %@." = "لا يمكن إضافة صور أكبر من 50 ميجابايت: %@.";
 "Pictures · %lld — for documents, not searched" = "صور · %lld — للمستندات، غير قابلة للبحث";
 "Pin" = "تثبيت";
@@ -925,7 +977,6 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "دقة ذاكرة الانتباه المؤقتة. 8 بت: شبه عديم الفقدان، بنصف الذاكرة. 4 بت: ربع الذاكرة، وأسوأ بوضوح مع السياق الطويل. كاملة: الأفضل، وتستهلك أكبر قدر من الذاكرة.";
 "Preference" = "تفضيل";
 "Preferences" = "التفضيلات";
-"Prefill progress" = "تقدّم التعبئة المسبقة";
 "Prefill step" = "خطوة الملء المسبق";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "اضغط بدء وتكلم. السماعات تعمل مع إلغاء الصدى؛ لكن سماعات الرأس لا تزال الأفضل.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "اضغط ابدأ وتكلم. استخدم سماعات رأس: النموذج يسمع صوته من مكبرات الصوت.";
@@ -934,6 +985,8 @@
 "Previous 30 Days" = "الثلاثون يومًا الماضية";
 "Previous 7 Days" = "السبعة أيام الماضية";
 "Pro Supporters" = "الرعاة المحترفون";
+"Problems" = "المشكلات";
+"Problems %@" = "المشكلات %@";
 "Profile" = "ملف التعريف";
 "Profiles" = "ملفات التعريف";
 "Project files" = "ملفات المشروع";
@@ -948,6 +1001,7 @@
 "Projects" = "المشاريع";
 "Projects' files on disk" = "ملفات المشاريع على القرص";
 "Prompt" = "المطالبة";
+"Prompt %@ tokens, %@ from the cache · first token after %@ s · %@ tokens in %@ s" = "المطالبة %@ رمزًا، %@ من ذاكرة التخزين المؤقت · أول رمز بعد %@ ث · %@ رمزًا خلال %@ ث";
 "Prompt & tools" = "الموجّه والأدوات";
 "Prompt (last request)" = "المطالبة (آخر طلب)";
 "Prompt cache" = "ذاكرة الموجّه المؤقتة";
@@ -1025,8 +1079,8 @@
 "Repaired" = "مُصلحة";
 "Report a Bug" = "الإبلاغ عن خلل";
 "Report a Bug…" = "الإبلاغ عن خلل…";
-"Request stats" = "إحصاءات الطلبات";
 "Requests" = "الطلبات";
+"Require an API key" = "طلب مفتاح API";
 "Rescan" = "إعادة الفحص";
 "Rescan Models" = "إعادة فحص النماذج";
 "Rescan or manage models" = "إعادة فحص أو إدارة النماذج";
@@ -1065,19 +1119,20 @@
 "Sampling" = "أخذ العينات";
 "Save" = "حفظ";
 "Save As…" = "حفظ باسم…";
+"Save Log…" = "حفظ السجل…";
 "Save memory" = "توفير الذاكرة";
-"Save the whole log to a file…" = "حفظ السجل بالكامل في ملف…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "تُقرأ الدردشات المحفوظة لاستخراج ملاحظات في الخلفية، من ما كتبته هناك. عند القراءة مرة أخرى، تُؤكَّد الملاحظات الموجودة بالفعل ولا تُضاعَف. تُتخطّى الدردشات المعلَّمة «عدم التذكّر».";
 "Saved chats will show up here." = "ستظهر الدردشات المحفوظة هنا.";
 "Saved in your Keychain" = "محفوظ في Keychain";
 "Save…" = "حفظ…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "يضبط مقياس أي عرض/ارتفاع يطلبه النموذج. يحافظ الوضع المتوازن على 1024x1024 كما هي.";
+"Screen" = "الشاشة";
 "Search" = "بحث";
 "Search Hugging Face (mlx models)…" = "البحث في Hugging Face (نماذج mlx)…";
 "Search by meaning is off for now: %@" = "البحث بحسب المعنى معطّل الآن: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "البحث بحسب المعنى يستخدم %@ (%@)، تم تنزيله على هذا الـMac الآن. بدونه تُبحث الملفات بالكلمات فقط؛ يمكنك تنزيله لاحقًا من هنا.";
 "Search chats" = "بحث في الدردشات";
-"Search the log" = "بحث في السجل";
+"Search the log (⌘F)" = "ابحث في السجل (⌘F).";
 "Searching the registry…" = "جارٍ البحث في السجل…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "ثوانٍ قبل أن ينفّذ المسودة كما هي. 0: الانتظار حتى تضغط إنشاء.";
 "Seen in" = "يظهر في";
@@ -1094,9 +1149,9 @@
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "تُرسل أولًا مع كل طلب دردشة داخل التطبيق. يتضمن Default مطالبة بدء قصيرة؛ يمكنك توسيعها أو استبدالها. لا تُطبَّق على عملاء API الخارجيين.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "أُرسِل إلى ipsupport.us؛ لا حساب، ولا معرفات جهاز. تُنشر المراجعات على موقع LLMTray بعد المراجعة.";
 "Server" = "الخادم";
-"Server Log" = "سجل الخادم";
 "Server log" = "سجل الخادم";
 "Server settings changed -- restart to apply them." = "تغيّرت إعدادات الخادم — أعد التشغيل لتطبيقها.";
+"Server…" = "الخادم…";
 "Set Up LLMTray" = "إعداد LLMTray";
 "Set Up LLMTray…" = "إعداد LLMTray…";
 "Setting up image generation (first time only)…" = "جارٍ إعداد توليد الصور (لأول مرة فقط)…";
@@ -1113,9 +1168,11 @@
 "Shared by all chats" = "مشترك بين كل الدردشات";
 "Share…" = "مشاركة…";
 "Show" = "إظهار";
+"Show All" = "إظهار الكل";
 "Show All %lld Lines" = "إظهار كل الأسطر الـ %lld";
 "Show All Files…" = "عرض كل الملفات…";
 "Show Chat Window" = "إظهار نافذة الدردشة";
+"Show Everything" = "إظهار كل شيء";
 "Show Files" = "إظهار الملفات";
 "Show Less" = "إظهار أقل";
 "Show Log…" = "إظهار السجل…";
@@ -1123,12 +1180,13 @@
 "Show Previous Tab" = "عرض التبويب السابق";
 "Show Reports…" = "إظهار التقارير…";
 "Show What Chats Get…" = "إظهار ما تتلقاه الدردشات…";
-"Show all" = "إظهار الكل";
+"Show a Window…" = "إظهار نافذة…";
 "Show in Finder" = "عرض في Finder";
 "Show model controls in the chat window" = "إظهار عناصر تحكم النموذج في نافذة الدردشة";
 "Show more" = "إظهار المزيد";
 "Show only overrides" = "إظهار التجاوزات فقط";
 "Show reasoning" = "إظهار الاستدلال";
+"Show the Screen…" = "إظهار الشاشة…";
 "Show the profile files in Finder" = "إظهار ملفات ملف التعريف في Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "اعرض ملفات ملف التعريف في Finder — بصيغة JSON عادية، قابلة للتحرير يدويًا وللنسخ إلى Mac آخر.";
 "Show the project's files" = "إظهار ملفات المشروع";
@@ -1164,6 +1222,7 @@
 "Start" = "ابدأ";
 "Start LLMTray automatically when you log in to this Mac." = "شغّل LLMTray تلقائيًا عند تسجيل الدخول إلى هذا الـ Mac.";
 "Start Server" = "بدء الخادم";
+"Start a model and its output shows up here: loading, requests, errors." = "ابدأ نموذجًا وستظهر مخرجاته هنا: التحميل والطلبات والأخطاء.";
 "Start a new saved chat (⌘N) to add files to a project." = "ابدأ محادثة محفوظة جديدة (⌘N) لإضافة ملفات إلى مشروع.";
 "Start server" = "ابدأ الخادم.";
 "Start talking" = "ابدأ التحدّث";
@@ -1219,6 +1278,7 @@
 "Temporary chat" = "دردشة مؤقتة";
 "Temporary chats can only look in folders, for that chat only." = "الدردشات المؤقتة يمكنها فقط النظر داخل المجلدات، لتلك الدردشة فقط.";
 "Temporary — not saved" = "مؤقت — غير محفوظ";
+"Text · %@" = "نص · %@";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "يتم فهرسة ملفات النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)؛ ويُحتفظ بالصور لاستخدامها في المستندات.";
 "Thank you!" = "شكراً لك!";
 "Thank you! List your name in Supporters?" = "شكراً لك! هل تريد إدراج اسمك بين الرعاة؟";
@@ -1229,6 +1289,8 @@
 "That isn't LLMTray's folder" = "هذا ليس مجلد LLMTray";
 "That isn't an http(s) URL." = "هذا ليس URL من نوع http(s).";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "تم إلغاء تحديد %lld عناصر مُدرجة إلى سلة المهملات: حدّد العناصر التي تريدها.";
+"The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac." = "يمكن لقائمة + أن تعرض للنموذج نافذة أو الشاشة بأكملها — تختارها في أداة الاختيار الخاصة بالنظام، وتُلتقط صورة واحدة فقط، لا أكثر — أو الصفحة المفتوحة في المتصفح (عنوانها وعنوانها ونصها؛ يطلب macOS الإذن مرة واحدة لكل متصفح). يحصل النموذج الذي لا يمكنه رؤية الصور على النص، ويُقرأ على هذا الـ Mac.";
+"The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac." = "يمكن لقائمة + أن تعرض للنموذج نافذة أو الشاشة بأكملها: تختارها في أداة الاختيار الخاصة بالنظام، وتُلتقط صورة واحدة فقط، لا أكثر. يحصل النموذج الذي لا يمكنه رؤية الصور على النص الموجود فيها، ويُقرأ على هذا الـ Mac.";
 "The App Store couldn't confirm the purchase." = "تعذر على App Store تأكيد الشراء.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "إصدار App Store من LLMTray مفتوح. أنهِه أولًا (أيقونته في شريط القائمة › إنهاء)، ثم افتح هذا الإصدار من جديد: سيستخدم الاثنان المنفذ نفسه ويحمّلان النماذج مرتين.";
 "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "JSON الذي يورده README الخاص بالخادم، مع \"mcpServers\". يُضاف كل خادم وهو متوقف، لكي تراجعه قبل تشغيله.";
@@ -1268,12 +1330,15 @@
 "The exact text a new chat gets, before your first message." = "النص الدقيق الذي تتلقاه دردشة جديدة قبل رسالتك الأولى.";
 "The families of the models used that day (such as qwen or flux), never their names." = "عائلات النماذج المستخدمة في ذلك اليوم (مثل qwen أو flux)، دون أسماء النماذج.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "في المرة الأولى، يؤدي هذا إلى تنزيل %@ (%@) إلى هذا الـ Mac الآن، بدلًا من أثناء الدردشة.";
-"The full chat window, with projects and every chat (⌘⇧O)" = "نافذة المحادثة الكاملة، مع المشاريع وكل المحادثات (⌘⇧O)";
+"The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar" = "نافذة الدردشة الكاملة، مع المشاريع وكل دردشة (⌘⇧O) — يؤدي إغلاقها إلى إعادة الدردشة إلى شريط القائمة";
 "The image draft above is open: Generate or Skip it to keep chatting." = "مسودة الصورة أعلاه مفتوحة: اضغط «إنشاء» أو «تخطى» لمتابعة الدردشة.";
 "The image edit draft above is open: Generate or Skip it to keep chatting." = "مسودة تعديل الصورة أعلاه مفتوحة: اضغط «إنشاء» أو «تخطى» لمتابعة الدردشة.";
 "The image generator is busy -- try again once it's done." = "مولد الصور مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The image generator is busy with another chat -- try again once it's done." = "مولد الصور مشغول في دردشة أخرى — حاول مرة أخرى بعد الانتهاء.";
 "The import stopped" = "توقّف الاستيراد";
+"The key couldn't be saved in the Keychain." = "تعذّر حفظ المفتاح في سلسلة المفاتيح.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "يتعذّر قراءة المفتاح الموجود في سلسلة المفاتيح الآن (هل سلسلة المفاتيح مقفلة؟). حاول مرة أخرى، أو أنشئ مفتاحًا جديدًا.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "يتعذّر قراءة المفتاح الموجود في سلسلة المفاتيح الآن، لذلك يُرفَض كل عميل خارجي. أنشئ مفتاحًا جديدًا، أو أعد فتح الإعدادات بعد إلغاء قفل سلسلة المفاتيح.";
 "The last change couldn't be saved." = "تعذّر حفظ آخر تغيير.";
 "The log couldn't be saved" = "تعذّر حفظ السجل";
 "The longest answer the model may write. Also capped by the model's own context length." = "أطول إجابة يمكن أن يكتبها النموذج. يحدّها أيضًا طول السياق الخاص بالنموذج.";
@@ -1446,7 +1511,9 @@
 "Update failed: %@" = "فشل التحديث: %@";
 "Update to %@" = "تحديث إلى %@";
 "Updates" = "التحديثات";
+"Usage" = "الاستخدام";
 "Usage statistics" = "إحصاءات الاستخدام";
+"Usage statistics are off" = "إحصاءات الاستخدام متوقفة";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "إحصاءات الاستخدام معطلة: لا يُرسل شيء. هذا شكل التقرير إذا قمت بتشغيلها (يُنشأ المعرّف عندها).";
 "Usage statistics: the reports" = "إحصاءات الاستخدام: التقارير";
 "Use" = "استخدام";
@@ -1478,13 +1545,13 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "يستهلك Voice Lab نحو %1$@ غيغابايت، وهو أكثر من %2$@ غيغابايت التي قد يستخدمها الـGPU: ارفع حد ذاكرة الـGPU أولاً.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "يستهلك Voice Lab نحو %1$@ غيغابايت؛ بمَصاحبة %2$@ غيغابايت لنموذج الدردشة يتوافق مع %3$@ غيغابايت التي قد يستخدمها الـGPU. مع ذلك يُفرغ نموذج الدردشة أثناء تشغيله.";
 "Voice Lab takes about %@ GB of memory while it runs." = "يستخدم Voice Lab نحو %@ غيغابايت من الذاكرة أثناء التشغيل.";
-"Voice Lab…" = "Voice Lab…";
 "Voice model" = "نموذج الصوت";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
 "Waiting for a model download to finish…" = "في انتظار انتهاء تنزيل الموديل…";
 "Waiting for an image or song to finish…" = "انتظار انتهاء صورة أو أغنية…";
 "Waiting for another chat's image or music to finish…" = "بانتظار انتهاء صورة أو مقطع موسيقي من محادثة أخرى…";
 "Waiting for the chat or a generator to finish" = "انتظار انتهاء المحادثة أو المولِّد";
+"Waiting for your pick…" = "بانتظار اختيارك…";
 "Waiting to be sent: %@" = "في انتظار الإرسال: %@";
 "Waits for %@ to be loaded." = "ينتظر تحميل %@.";
 "Waits for a model: start one to read your chats." = "ينتظر نموذجًا: ابدأ واحدًا لقراءة دردشاتك.";
@@ -1492,8 +1559,7 @@
 "Waits for the model to be free." = "ينتظر حتى يصبح النموذج متاحًا.";
 "Waits for the model to be loaded." = "ينتظر حتى يتم تحميل النموذج.";
 "Walkie-talkie" = "وضع الهاتف النقال";
-"Warnings" = "التحذيرات";
-"Warnings: %@" = "التحذيرات: %@";
+"Warnings and errors: go to the next one" = "التحذيرات والأخطاء: انتقل إلى التالي.";
 "Weather" = "الطقس";
 "Web" = "الويب";
 "Web search" = "بحث ويب";
@@ -1511,6 +1577,7 @@
 "What happened?" = "ماذا حدث؟";
 "What the model says appears here." = "ما يقوله النموذج سيظهر هنا.";
 "What this chat knows about you from earlier chats" = "ما تعرفه هذه الدردشة عنك من دردشات سابقة";
+"What to show" = "ما سيتم إظهاره";
 "What was copied before stays; importing again goes on from there. %@" = "ما تم نسخه سابقاً يبقى؛ الاستيراد مرة أخرى يستأنف من هناك. %@";
 "What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "ما تم تعلّمه: ملاحظات تعلّمتها ذاكرة الملاحظات ولم تكتبها أنت أو تحرّرها أو تثبّتها أو توافق عليها. كل شيء: كل ملاحظة باستثناء عنك. لا يمكن التراجع عن أيٍّ منهما.";
 "What you corrected before, so it isn't repeated." = "ما صححته سابقًا، حتى لا يتكرر.";
@@ -1537,6 +1604,8 @@
 "Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "أثناء حديث النموذج، أي صوت من الميكروفون أضعف من هذا يُعامل كصمت: أثر صوته الذي يتركه إلغاء الصدى يبقى خارجًا، لكن صوت أعلى منه لا يزال يقاطع. ارفعه إذا كان النموذج يسمع نفسه، اخفضه إذا كان يفشل في سماع مقاطعتك. يسري عند البدء التالي.";
 "Wikipedia" = "Wikipedia";
+"Window" = "نافذة";
+"Windows and pages" = "النوافذ والصفحات";
 "With notes, it reads like this:" = "مع الملاحظات، يُقرأ هكذا:";
 "Words only" = "كلمات فقط";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "ذاكرة العمل لقراءة المطالبة على أجزاء؛ القليل يقرأ المطالبات الطويلة بخطوات أصغر وأبطأ. عندما يكون مجموع ذاكرة التخزين المؤقت للمطالبات في حد أقصى 90%: الباقي يحتفظ بالمطالبة الجاري قراءتها.";
@@ -1588,7 +1657,9 @@
 "failed to build request" = "فشل في إنشاء الطلب";
 "failed: %@" = "فشل: %@";
 "finishing" = "جارٍ الإنهاء";
+"first %@ s" = "أول %@ ث";
 "first token %.1f s" = "أول رمز %.1f ث";
+"first token in %@ on average" = "أول رمز بعد %@ في المتوسط";
 "for this chat" = "لهذه الدردشة";
 "generation %.1f tok/s" = "التوليد %.1f رمز/ث";
 "hears audio" = "يسمع الصوت";
@@ -1609,6 +1680,7 @@
 "never used" = "لم يُستخدم أبداً";
 "new or changed" = "جديدة أو تم تغييرها";
 "no changes" = "لا تغييرات";
+"no page text" = "لا يوجد نص في الصفحة";
 "no text" = "لا يوجد نص";
 "not a picture" = "ليست صورة";
 "not allowed" = "غير مسموح";
@@ -1625,6 +1697,7 @@
 "prompt %.0f tok/s" = "الموجّه %.0f رمز/ث";
 "queued" = "قيد الانتظار";
 "reading" = "جارٍ القراءة";
+"reading the prompt %@" = "قراءة المطالبة %@";
 "reads images" = "يقرأ الصور";
 "ready" = "جاهز";
 "ready (words only)" = "جاهز (بالكلمات فقط)";
@@ -1654,6 +1727,7 @@
 "~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:" = "لم يَضَف ~/.local/bin إلى PATH في الشل بعد. أضف هذا السطر إلى %@، ثم افتح نافذة طرفية جديدة:";
 "· %lld pinned" = "· %lld مثبت";
 "· size…" = "· الحجم…";
+"×%lld" = "×%lld";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» لم يتم إزالته: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: لم يتمكن من تغيير التثبيت: %2$@";
 "“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) ينتقل إلى سلة المهملات، حيث يمكنك استعادته. %@ بحاجة إليه: أعد تنزيله من الإعدادات لاستخدامه.";

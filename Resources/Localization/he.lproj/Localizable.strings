@@ -2,6 +2,7 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+" · %@ drafted" = " · %@ נוסחו";
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "״%@״ השתנה מאז שהתשובה הזאת ציינה אותו: ייתכן שעמוד %lld ייראה שונה עכשיו.";
 "\"%@\" is no longer in the project." = "״%@״ כבר לא חלק מהפרויקט.";
 "%.0f%% from drafts" = "%.0f%% מטיוטות";
@@ -29,6 +30,7 @@
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ כבר קיים ומצביע אל %@. הסר אותו תחילה כדי להתקין את של LLMTray.";
 "%@ couldn't read chats for memory: another model reads its chats." = "%@ לא הצליח לקרוא צ׳אטים לצורך הזיכרון: מודל אחר קורא את הצ׳אטים שלו.";
 "%@ didn't download: %@" = "%@ לא הורד: %@";
+"%@ from cache" = "%@ מהמטמון";
 "%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‎%@ הוא קישור לתיקיה שאינה זמינה: חבר/י את הדיסק שלה או הסר/י את הקישור.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
 "%@ is on in this chat: you'll be asked before each call." = "%@ פועל בצ׳אט הזה: תישאל לפני כל קריאה.";
@@ -36,7 +38,11 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
 "%@ isn't installed yet" = "%@ עדיין לא מותקן";
 "%@ needs your own app: add its Client ID and secret in Configure, add the Redirect URL shown there to your app, then Sign In." = "‏%@ מחייב יישום משלכם: הוסיפו את מזהה לקוח והסוד שלו ב״הגדר״, הוסיפו ליישום שלכם את URL ההפניה שמוצג שם, ואז בחרו ״התחברות״.";
-"%@ of %@ lines" = "%@ מתוך %@ שורות";
+"%@ new" = "%@ חדשים";
+"%@ of %@ shown" = "מוצגים %@ מתוך %@";
+"%@ requests" = "%@ בקשות";
+"%@ s" = "%@ s";
+"%@ tok/s" = "%@ tok/s";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
 "%@ · %@ left" = "%@ · נותרו %@";
 "%@ · %@ of %@" = "%@ · %@ מתוך %@";
@@ -47,6 +53,7 @@
 "%@ — in project %@" = "%@ — בפרויקט %@";
 "%@ — page %lld" = "%@ — עמוד %lld";
 "%@ → %@ available" = "זמין: %@ → %@";
+"%@ → %@ tok" = "%@ → %@ tok";
 "%@ ★ from %lld reviews" = "%@ ★ מתוך %lld חוות דעת";
 "%@ ★ from 1 review" = "%@ ★ מתוך חוות דעת אחת";
 "%@ 🌐" = "%@ 🌐";
@@ -62,8 +69,10 @@
 "%lld failed" = "%lld נכשלו";
 "%lld files" = "%lld קבצים";
 "%lld files couldn't be indexed" = "לא ניתן לאנדקס %lld קבצים";
+"%lld h later" = "אחרי %lld ש׳";
 "%lld interrupted: look at them in Finder" = "%lld נקטעו: הסתכל ב־Finder";
 "%lld items put back under their names." = "%lld פריטים הוחזרו לשמותיהם.";
+"%lld min later" = "אחרי %lld דק׳";
 "%lld more" = "%lld נוספים";
 "%lld more…" = "%lld נוספים…";
 "%lld need a look: see the list." = "יש לבדוק %lld: ראה את הרשימה.";
@@ -75,6 +84,7 @@
 "%lld requests" = "%lld בקשות";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld בקשות בביצוע (נענות יחד עד לערך של „בקשות בו־זמניות”)";
 "%lld s" = "%lld שנ׳";
+"%lld s later" = "אחרי %lld שנ׳";
 "%lld tools are new or changed on the server: hidden from the chat until you accept them." = "%lld כלים חדשים או שהשתנו בשרת: מוסתרים מהצ׳אט עד לאישור שלך.";
 "%lld tools changed on the server: Configure to accept them." = "%lld כלים השתנו בשרת: יש להגדיר כדי לאשר אותם.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
@@ -86,6 +96,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "שעה";
 "30 s reached · release to send, Esc to drop" = "הגעת ל־30 שנ׳ · שחרר כדי לשלוח, Esc כדי להשליך";
+"7 Days" = "7 ימים";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "שיחה מבקשת רשות לפני שהיא מסתכלת בתיקייה ומציגה כל שינוי כ־תכנית לאישור. מקומות פרטיים (Library, keys, תיקיית הבית עצמה) אינם משותפים לעולם.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "שיחה יכולה לחפש בתיקיות שתאשר ולהציע תיקיות חדשות, העברות ושינויים בשמות. אתה מאשר כל שינוי ויכול לבטלו.";
 "A chat model" = "מודל צ'אט";
@@ -106,11 +117,13 @@
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "שיר עם מילים מושרות, או אינסטרומנטל, מתיאור (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "קישור סמלי: הקישור עצמו, לא מה שהוא מצביע אליו.";
 "A temporary chat can't hold files" = "צ'אט זמני לא יכול להכיל קבצים";
+"A window with no readable text was removed: this model can't see pictures." = "הוסר חלון ללא טקסט קריא: המודל הזה לא יכול לראות תמונות.";
 "AAC %lld kbit/s" = "AAC %lld קבט/ש";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — ווקל בהיר, 8‑bit (מומלץ)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — ווקל בהיר, GPTQ 4‑bit (דורש פחות זיכרון)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — ווקל בהיר, בדיוק מלא";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — צליל עשיר יותר";
+"API key" = "מפתח API";
 "About %d tokens, after the profile's system prompt. A model with a small context gets less (memory takes at most 5%% of it). Chats already open keep the block they started with until one of its notes changes." = "כ־%d אסימונים, אחרי הנחיית המערכת של הפרופיל. מודל עם הקשר קטן מקבל פחות (הזיכרון תופס לכל היותר 5%% ממנו). צ'אטים שכבר פתוחים שומרים את הבלוק שאיתו התחילו עד שאחת מההערות שלו משתנה.";
 "About LLMTray" = "על LLMTray";
 "About you" = "עליך";
@@ -179,6 +192,7 @@
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "טיפ אופציונלי: ללא מנויים, ללא חסימות תכונות. תומכים יכולים לבחור להופיע בשם שהם מזינים.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "ייתכן שפריט שמצבו לא ודאי השתנה ואולי לא: יש לבדוק אותו ב־Finder. היומן נשמר ב־הגדרות > קבצים.";
 "Another LLMTray is running" = "עוד LLMTray פועל";
+"Another chat is picking a window: finish that first." = "צ׳אט אחר בוחר חלון: סיים אותו קודם.";
 "Another folder change is running: try again when it's done." = "שינוי תיקייה אחר בפועל: נסה שוב כשייגמר.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
 "Another version next to this one (a new seed, the same request)" = "גרסה נוספת לצד זו (seed חדש, אותו בקשה)";
@@ -187,6 +201,7 @@
 "Answer details" = "פרטי התשובה";
 "Answer in Russian, briefly" = "תשובה ברוסית, בקצרה";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "דגלי mlx_lm.server נוספים, מופרדים ברווחים, למשל --draft-model <path>.";
+"Anyone on your network can use the server: a key keeps it to the clients you give it to." = "כל מי שנמצא ברשת שלך יכול להשתמש בשרת: מפתח מגביל את הגישה ללקוחות שאת/ה נותן/ת להם אותו.";
 "Anything else chats should know" = "כל דבר נוסף שצ׳אטים צריכים לדעת";
 "Apache License 2.0" = "רישיון Apache 2.0";
 "App language" = "שפת היישום";
@@ -197,6 +212,7 @@
 "Approve Selected" = "אשר נבחרים";
 "Apps & agents" = "אפליקציות וסוכנים";
 "Apps and agents" = "אפליקציות וסוכנים";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "אפליקציות שפועלות על ה-Mac הזה לא צריכות את המפתח; מכשירים ברשת שלך כן. כשזה כבוי: כל לקוח שמתחבר ליציאה של LLMTray צריך אותו, כולל ה-Mac הזה.";
 "Arguments, one per line" = "ארגומנטים, אחד בכל שורה";
 "Ask Later" = "שאל מאוחר יותר";
 "Ask about LLMTray" = "שאל על LLMTray";
@@ -210,6 +226,7 @@
 "At most %d characters: a note is one short statement." = "עד %d תווים: הערה היא משפט קצר אחד.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "דוח אחד לכל היותר ביום, עבור יום עבר אחד, נשלח ל-ipsupport.us. יום שלא נשלח יישלח בהשקה הבאה, עד 7 ימים אחורה. כיבוי האפשרות מוחק מה שלא נשלח.";
 "Attach Images…" = "צרף תמונות…";
+"Attach Tab from %@" = "צרף כרטיסייה מ-%@";
 "Attach images" = "צרף תמונות";
 "Attach images or allow folders" = "צרף תמונות או אפשר תיקיות";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ב‑8‑bit, feed‑forward ב‑4‑bit — האיזון הטוב ביותר בין גודל ליציבות, מאומת מול 4‑bit אחיד.";
@@ -224,6 +241,7 @@
 "Automatic" = "אוטומטי";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "התוצאות אוחדו לממוצע אחד למטה. לפני כל אחת מהן תמיד מתבצעת הרצת חימום חד־פעמית, כך שזמן ההידור של ליבת Metal בקריאה הראשונה אף פעם לא מעוות את המספרים.";
 "Back" = "חזור";
+"Back to the newest (End)" = "חזור לחדש ביותר (סיום)";
 "Balanced (default)" = "מאוזן (Default)";
 "Barely fits the GPU memory" = "מתאים בקושי לזיכרון ה‑GPU";
 "Be the first to be listed here." = "היה הראשון שיופיע כאן.";
@@ -239,6 +257,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "יבא את השיחות, הפרויקטים, הפרופילים, מודלי תמונה, מוזיקה, קול והטמעה ואת ההגדרות מהגרסה ב-ipsupport.us (סגור אותה קודם). השיחות והמודלים כאן נותרות; ההגדרות שלה יחליפו את אלה. המודלים לא תופסים שטח דיסק נוסף. מודלי שיחה נשארים בתיקיית המודלים שלך: בחר אותה ב‑Settings › Models.";
 "Browse Hugging Face…" = "עיון ב־Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "מובנה ב‑macOS · רק בצ׳אט של LLMTray";
+"By" = "לפי";
 "Cached" = "מטמון";
 "Calculator" = "מחשבון";
 "Calls" = "קריאות";
@@ -247,6 +266,7 @@
 "Can look · %@" = "יכול לצפות · %@";
 "Can look · 1 hour" = "יכול לצפות · שעה";
 "Can look · Always" = "יכול לצפות · תמיד";
+"Can't be read" = "לא ניתן לקריאה";
 "Can't change models while auto-tune is running" = "אי אפשר להחליף דגמים בזמן שהכוונון האוטומטי פועל";
 "Can't switch profiles while a request or the auto-tune is running" = "אי אפשר להחליף פרופילים בזמן שבקשה או הכוונון האוטומטי פועלים";
 "Cancel" = "ביטול";
@@ -296,13 +316,18 @@
 "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "בחר ~/Library/Application Support/LLMTray: התיקיה עם ה‑sessions, הפרוייקטים והמודלים של הגרסה מ‑ipsupport.us.";
 "Choose…" = "בחירה…";
 "Clear" = "נקה";
+"Clear Log" = "נקה יומן";
+"Clear Statistics…" = "נקה סטטיסטיקות…";
+"Clear or turn off" = "נקה או כבה";
 "Clear search" = "נקה חיפוש";
-"Clear the log" = "נקה את היומן.";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "נקה תור: מה שאונדקס נשאר לחיפוש, השאר מסומן כ'לא מאונדקס'";
 "Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת קבצי פרויקט: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Click to record a clip; hold to talk and release to send (the model hears it)" = "לחץ כדי להקליט קטע; החזק כדי לדבר ושחרר כדי לשלוח (המודל שומע זאת)";
 "Click ■ to stop · Esc cancels" = "לחץ על ■ כדי לעצור · Esc מבטל";
+"Client" = "לקוח";
 "Client ID" = "מזהה לקוח";
+"Clients must send this key (Authorization: Bearer <key>, or x-api-key) or get 401. LLMTray's own chat never needs it." = "לקוחות חייבים לשלוח את המפתח הזה (Authorization: Bearer <key> או x-api-key), אחרת יקבלו 401. הצ׳אט של LLMTray עצמו אף פעם לא צריך אותו.";
+"Clients using the current key get 401 until they're given the new one." = "לקוחות שמשתמשים במפתח הנוכחי יקבלו 401 עד שיקבלו את החדש.";
 "Close" = "סגור";
 "Close Tab" = "סגור כרטיסייה";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "סוגר את החלון הזה. הגדרות › כללי › הגדר את LLMTray… פותח אותו שוב.";
@@ -312,6 +337,7 @@
 "Command" = "פקודה";
 "Command-line tool" = "כלי שורת פקודה";
 "Compact" = "קומפקטי";
+"Compact rows" = "שורות קומפקטיות";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "דחיסה מחליפה את אמצע השיחה הארוכה בסיכום אחד שנכתב על ידי המודל. זהו מספר ההודעות מתחילת השיחה שיישמרו מילה במילה.";
 "Compaction" = "דחיסה";
 "Compaction failed: %@" = "כיווץ נכשל: %@";
@@ -327,11 +353,14 @@
 "Copied" = "הועתק";
 "Copies %1$@ · index %2$@ on disk" = "עותקים %1$@ · אינדקס %2$@ בדיסק";
 "Copy" = "העתק";
-"Copy Line" = "העתק שורה";
+"Copy Entry" = "העתק רשומה";
+"Copy First Line" = "העתק שורה ראשונה";
+"Copy Path" = "העתק נתיב";
+"Copy Shown" = "העתק את המוצג";
 "Copy the details as text" = "העתק את הפרטים כטקסט";
-"Copy the lines shown" = "העתק את השורות המוצגות.";
 "Copy the song as an audio file" = "העתק את השיר כקובץ שמע";
 "Copy the text" = "העתק את הטקסט";
+"Copy, save or clear" = "העתק, שמור או נקה";
 "Copying the included runtime…" = "מעתיק את ה‑runtime הכלול…";
 "Correction" = "תיקון";
 "Corrections" = "תיקונים";
@@ -343,10 +372,12 @@
 "Couldn't reach the server -- please try again later." = "לא ניתן היה להגיע לשרת — נסה שוב מאוחר יותר.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "לא ניתן היה לקרוא חלקים מסוימים מהצ׳אטים; ננסה שוב ב-%@ (למה: הגדרות › שרת › יומן).";
 "Couldn't start the voice runner: %@" = "לא ניתן להפעיל את ה־voice runner: %@";
+"Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "סופר בקשות וטוקנים לפי מודל, לקוח ויום, וגם כמה מהר הן רצו. נשמר רק על ה-Mac הזה, ולא נשלח לשום מקום.";
 "Countdown" = "ספירה לאחור";
 "Countdown: %lld s" = "ספירה לאחור: %lld שניות";
 "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "נספרות ב-Mac הזה עבור גרסה זו של LLMTray ולעולם אינן נשלחות; דוח באג כולל את הספירות. רחפו מעל שורה כדי לראות מה תוקן (קריאה פגומה של המודל שהאפליקציה הבינה בכל זאת) ואילו שגיאות היו.";
 "Country facts" = "עובדות על מדינות";
+"Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac." = "סופר בקשות וטוקנים לפי מודל, לקוח (הצ׳אט, Codex, Claude Code, curl…) ויום, וגם כמה מהר הן רצו: הכרטיסייה ״שימוש״ בחלון ״שרת״. נשמר רק על ה-Mac הזה.";
 "Crash reports (%lld)" = "דוחות קריסה (%lld)";
 "Create Email…" = "צור דוא״ל…";
 "Creativity" = "יצירתיות";
@@ -358,6 +389,8 @@
 "Current settings are already fastest" = "ההגדרות הנוכחיות כבר המהירות ביותר";
 "Date" = "תאריך";
 "Date & time" = "תאריך ושעה";
+"Day" = "יום";
+"Debug lines" = "שורות DEBUG";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "ניפוי שגיאות: מתחת לתשובה, אילו כלים המודל קרא ואילו ארגומנטים העביר; הרחיבו אחד כדי לראות מה הוחזר. מתייחס רק לשיחה הנוכחית — קריאות כלים אינן נשמרות איתה.";
 "Default can't be renamed: every model falls back to it" = "לא ניתן לשנות את השם של Default: כל דגם חוזר אליו כברירת מחדל";
 "Delete" = "מחק";
@@ -454,9 +487,10 @@
 "Enjoying LLMTray?" = "נהנים מ‑LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "סביבה, NAME=value בכל שורה (מפתחות, אסימונים וסיסמאות נשמרים ב-Keychain)";
 "Errors" = "שגיאות";
-"Errors: %@" = "שגיאות: %@";
+"Errors: go to the next one (⌘E)" = "שגיאות: עבור אל השגיאה הבאה (⌘E)";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
+"Every day's counts are removed. This can't be undone." = "הספירות של כל הימים יוסרו. אי אפשר לבטל את הפעולה.";
 "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
 "Everything" = "הכול";
 "Everything in that folder is here already." = "הכל בתיקיה הזו כבר כאן.";
@@ -498,8 +532,8 @@
 "Folders" = "תיקיות";
 "Folders can't be added yet: %@. Add the files in them instead." = "לא ניתן להוסיף תיקיות עדיין: %@. הוסף במקום זאת את הקבצים שבתוכן.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "תיקיות שהצ'אטים יכולים להשתמש בהן בלי לשאול. כשהצ'אט צריך תיקיה אחרת, הוא יבקש ממך בצ'אט.";
-"Follow" = "עקוב";
 "Follow the description" = "היצמד לתיאור";
+"Follow: keep the newest in view. Scrolling up pauses it." = "מעקב: השאר את החדש ביותר בתצוגה. גלילה למעלה משהה את המעקב.";
 "For This Chat" = "לעבור שיחה זו";
 "For an Hour" = "לשעה";
 "For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
@@ -642,16 +676,19 @@
 "Keep first messages: %lld" = "השאר הודעות ראשונות: %lld";
 "Keep last messages: %lld" = "השאר הודעות אחרונות: %lld";
 "Keep the loaded model" = "השאר את המודל הטעון";
-"Keep the newest line in view" = "השאר את השורה החדשה ביותר בתצוגה.";
+"Keep usage statistics" = "החזק סטטיסטיקות שימוש";
 "Keeps crashing -- see its log." = "ממשיך לקרוס -- עיין ביומן שלו.";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "שומר את N הטוקנים הראשונים של ההקשר בדיוק מלא לפני קוונטיזציה. ערך גבוה יותר מחליף חיסכון בזיכרון בדיוק בהנחיות ארוכות.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "משמר את פורט זה. אם אפליקציה אחרת כבר משתמשת בו, השרת לא יתחל עד שתשנה את הפורט ב־Settings.";
 "Kept free: %lld MB" = "שמורים פנויים: %lld MB";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "נשמר רק על ה-Mac הזה. שמות הלקוחות נקבעים על ידי ה-proxy של LLMTray לפי ה-User-Agent שלהם; בקשות שה‑runtime שירת לפני שהוא נתן להן שם נספרות כ״אחר״.";
+"Key" = "מפתח";
 "Kind" = "סוג";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "מדריך LLMTray";
 "LLMTray events" = "אירועי LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray מוריד אותו עם המודל שהוא מאיץ: הורד את המודל הזה.";
+"LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "ל-LLMTray אין הרשאה לקרוא את הכרטיסייה של %@: הפעל זאת ב״הגדרות המערכת״ › ״פרטיות ואבטחה״ › ״אוטומציה״.";
 "LLMTray isn't allowed to use the microphone." = "אין ל‑LLMTray הרשאה להשתמש במיקרופון.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "ל־LLMTray אין הרשאה להשתמש במיקרופון. אפשר זאת בהגדרות המערכת › פרטיות ואבטחה › מיקרופון.";
 "LLMTray restarts now to load them." = "LLMTray יאתחל עכשיו כדי לטעון אותם.";
@@ -671,6 +708,8 @@
 "Leave a Review" = "השאר חוות דעת";
 "Length" = "אורך";
 "Let chats make documents" = "אפשר לשיחות ליצור מסמכים";
+"Let chats see a window or the screen" = "אפשר לצ׳אטים לראות חלון או את המסך";
+"Let chats see a window, the screen or a browser tab" = "אפשר לצ׳אטים לראות חלון, את המסך או כרטיסייה בדפדפן";
 "Let chats work in folders" = "אפשר לשיחות לפעול בתיקיות";
 "Let coding agents and scripts use your models." = "אפשר לסוכני קוד וסקריפטים להשתמש במודלים שלך.";
 "Let the chat look in %@?" = "להרשות לשיחה להסתכל ב־%@?";
@@ -704,6 +743,7 @@
 "Maintenance" = "תחזוקה";
 "Make a 30-second calm lo-fi instrumental for studying" = "הכן קטע אינסטרומנטלי שקט ל‑lo‑fi למשך 30 שניות ללמידה";
 "Make a Document…" = "צור מסמך…";
+"Make a new key?" = "ליצור מפתח חדש?";
 "Make again" = "צור שוב";
 "Make images and edit them." = "יצירת תמונות ועריכתן.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "צור תמונות ושירים ודבר עם מודל קולי — הכל ב‑Mac הזה: הפעל אותם בהגדרות.";
@@ -770,6 +810,8 @@
 "Never" = "אף פעם";
 "New Chat" = "שיחה חדשה";
 "New Chat in Project" = "צ'אט חדש בפרויקט";
+"New Key" = "מפתח חדש";
+"New Key…" = "מפתח חדש…";
 "New Note" = "הערה חדשה";
 "New Profile…" = "פרופיל חדש…";
 "New Project…" = "פרויקט חדש…";
@@ -802,13 +844,15 @@
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "אין דגם הטמעה: החיפוש בקבצים נעשה לפי המילים שלהם. יש להוריד אותו ב־הגדרות > קבצים לחיפוש לפי משמעות.";
 "No files yet" = "אין קבצים עדיין";
 "No folder changes yet." = "עדיין אין שינויים בתיקיות.";
-"No lines match the filters" = "אין שורות התואמות למסננים";
 "No messages yet" = "עדיין אין הודעות";
 "No microphone is available." = "אין מיקרופון זמין.";
 "No model uses it." = "אף מודל לא משתמש בו.";
 "No models found in this folder." = "לא נמצאו מודלים בתיקייה זו.";
 "No models in this folder yet. The next step offers some to download." = "אין מודלים בתיקייה זו עדיין. השלב הבא מציע כמה להורדה.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "אין עדיין הערות. הוסף מה שכל צ׳אט צריך לדעת: „תשובה ברוסית, בקצרה”, „אני בונה רמקול ESP32”.";
+"No open tab in %@." = "אין כרטיסייה פתוחה ב-%@.";
+"No requests yet in this period." = "עדיין אין בקשות בתקופה הזאת.";
+"No requests yet today." = "עדיין אין בקשות היום.";
 "No requests yet." = "אין עדיין בקשות.";
 "No runs yet." = "עדיין אין הרצות.";
 "No server output yet" = "עדיין אין פלט מהשרת";
@@ -816,6 +860,7 @@
 "No sign-in" = "ללא התחברות";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "ללא מנויים. ללא חסימות תכונות. תמכו בפיתוח אם LLMTray שימושי לכם.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "אין הצעות לזיכרון של Mac זה. דפדפו ב‑Hugging Face אחרי מודל.";
+"No text was found in it, and this model can't see images: pick a vision model to show it as a picture." = "לא נמצא בו טקסט, והמודל הזה לא יכול לראות תמונות: בחר מודל עם ראייה כדי להציג אותו כתמונה.";
 "No thanks" = "לא תודה";
 "No tool calls yet in this version." = "עדיין אין קריאות לכלים בגרסה זו.";
 "No update check at launch" = "אין בדיקת עדכון בהפעלה";
@@ -842,10 +887,12 @@
 "Nothing found for “%@”." = "לא נמצא דבר עבור „%@“.";
 "Nothing left to read: every chat was read from its start." = "לא נשאר מה לקרוא: כל צ׳אט נקרא מההתחלה.";
 "Nothing logged yet." = "עדיין לא נרשם דבר.";
+"Nothing matches" = "ללא התאמות";
 "Nothing new to import" = "אין משהו חדש לייבא";
 "Nothing sent yet." = "טרם נשלח דבר.";
 "Nothing to change." = "אין דבר לשנות.";
 "Nothing to pin until the file has been read" = "אין מה לסמן עד שהקובץ ייקרא";
+"Nothing was captured: the window may have closed. Try again." = "לא נקלט דבר: ייתכן שהחלון נסגר. נסה שוב.";
 "Nothing: no note is sent to these chats now." = "כלום: אף הערה לא נשלחת לצ׳אטים האלה עכשיו.";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "עכשיו ההגדרות שלה: בחר %@ (כבר מסומן), ואז Import. ביטול ישאיר את ההגדרות כאן.";
 "Now: %@ → %@ (until %@)" = "עכשיו: %@ ← %@ (עד %@)";
@@ -862,9 +909,12 @@
 "On" = "פועל";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "תשלום חד־פעמי: קפה $5, תומך פרו $25, תומך מייסד $150.";
 "Only From Now On" = "רק מעכשיו";
+"Only for connections from other devices" = "רק לחיבורים ממכשירים אחרים";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "רק למודלים מוגבלים (Llama, חלק מהרפוזיטוריות של Gemma ו‑FLUX): קבל את רישיון המודל בעמוד ה‑Hugging Face שלו, ואז הדבק כאן אסימון קריאה. נשמר ב‑Keychain ונשלח רק ל‑huggingface.co.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "רק אם ברצונך: צ׳אטים מקבלים את זה קודם, זה אף פעם לא פג, והלמידה אף פעם לא משנה את זה. זה נשאר במחשב הזה.";
 "Only in the packaged app (not when run from a build folder)." = "זמין רק באפליקציה המארוזת (לא כשמריצים מתוך תיקיית build).";
+"Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "רק הכותרת והכתובת של הכרטיסייה: כדי לקבל את הטקסט שלה, הפעל ב-%@ את ״View״ › ״Developer״ › ״Allow JavaScript from Apple Events״.";
+"Only this Mac can connect now (local network access is off), so no client is asked for the key." = "רק ה-Mac הזה יכול להתחבר עכשיו (הגישה לרשת המקומית כבויה), ולכן אף לקוח לא מתבקש לספק את המפתח.";
 "Only this Mac can use the server" = "רק Mac זה יכול להשתמש בשרת";
 "Only turbo has this knob: sft has no song planner to vary." = "רק ל‑turbo קיים הכפתור הזה: ל‑sft אין מתכנן שירים לשינויים.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "מפורסם רק מה שתזינו כאן, לאחר בדיקה אנושית. לא יפורסם מעולם Apple ID או דואר אלקטרוני שלכם.";
@@ -878,7 +928,7 @@
 "Open in New Tab" = "פתח בכרטיסייה חדשה";
 "Open in Preview" = "פתח ב‑Preview";
 "Open in Window" = "פתח בחלון";
-"Open in Window -- closing the window puts the chat back in the menu bar" = "פתח בחלון — סגירת החלון מחזירה את השיחה לשורת התפריט";
+"Open the server log" = "פתח את לוג השרת";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "תואם OpenAI: כוונו סוכן קוד או אפליקציה לכתובת זו (מעתיק אותה)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "פותח דוא״ל לצוות LLMTray עם דוח מצורף: גרסאות, ה‑Mac, הגדרות המודל והשרת, לוג השרת ודוחות קריסה אחרונים. השיחות שלך לא ייכללו, ותוכל לעיין בדוח כולו קודם.";
 "Opens at login" = "נפתח בכניסה";
@@ -892,6 +942,7 @@
 "Past %lld messages" = "%lld ההודעות האחרונות";
 "Paste a Config" = "הדבק תצורה";
 "Paste a Config…" = "הדבק תצורה…";
+"Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain." = "הדבק/י אותו בלקוח כמפתח ה-API שלו (OPENAI_API_KEY, ANTHROPIC_API_KEY…). נשמר ב-Keychain שלך.";
 "Pasted config" = "תצורה שהודבקה";
 "Pause" = "השהה";
 "Pause Indexing" = "השהה אינדוקס";
@@ -905,6 +956,7 @@
 "Pick a rating from 1 to 5 stars." = "בחר דירוג מ‑1 עד 5 כוכבים.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "בחר אחד לשיחה. הורדה תתחיל מיד ותמשיך ברקע.";
 "Picks a model that fits your Mac and enables only what you choose." = "בוחר מודל שמתאים ל‑Mac שלך ומפעיל רק את מה שתבחר.";
+"Picture" = "תמונה";
 "Pictures over 50 MB can't be added: %@." = "אי‑אפשר להוסיף תמונות מעל 50 MB: %@.";
 "Pictures · %lld — for documents, not searched" = "תמונות · %lld — לשימוש במסמכים, לא נבחנות בחיפוש";
 "Pin" = "נעץ";
@@ -925,7 +977,6 @@
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
 "Preference" = "העדפה";
 "Preferences" = "העדפות";
-"Prefill progress" = "התקדמות המילוי מראש";
 "Prefill step" = "שלב מילוי מקדים";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "לחץ על Start ודבר. רמקולים פועלים עם הדחקת הד; אוזניות עדיפות עדיין.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "הקש על 'התחל' ותדבר. השתמש באוזניות: המודל שומע את קולו מהרמקולים.";
@@ -934,6 +985,8 @@
 "Previous 30 Days" = "30 הימים האחרונים";
 "Previous 7 Days" = "7 הימים האחרונים";
 "Pro Supporters" = "תומכי פרו";
+"Problems" = "בעיות";
+"Problems %@" = "בעיות %@";
 "Profile" = "פרופיל";
 "Profiles" = "פרופילים";
 "Project files" = "קבצי פרויקט";
@@ -948,6 +1001,7 @@
 "Projects" = "פרויקטים";
 "Projects' files on disk" = "קבצי הפרויקטים בדיסק";
 "Prompt" = "הנחיה";
+"Prompt %@ tokens, %@ from the cache · first token after %@ s · %@ tokens in %@ s" = "הנחיה %@ טוקנים, %@ מהמטמון · טוקן ראשון אחרי %@ שנ׳ · %@ טוקנים ב-%@ שנ׳";
 "Prompt & tools" = "הנחיה וכלים";
 "Prompt (last request)" = "הנחיה (הבקשה האחרונה)";
 "Prompt cache" = "מטמון ההנחיה";
@@ -1025,8 +1079,8 @@
 "Repaired" = "תוקנו";
 "Report a Bug" = "דווח על תקלה";
 "Report a Bug…" = "דווח על תקלה…";
-"Request stats" = "סטטיסטיקות בקשות";
 "Requests" = "בקשות";
+"Require an API key" = "לדרוש מפתח API";
 "Rescan" = "סרוק מחדש";
 "Rescan Models" = "סרוק מודלים מחדש";
 "Rescan or manage models" = "סריקה מחדש או ניהול דגמים.";
@@ -1065,19 +1119,20 @@
 "Sampling" = "דגימה";
 "Save" = "שמור";
 "Save As…" = "שמור בשם…";
+"Save Log…" = "שמור יומן…";
 "Save memory" = "חסוך זיכרון";
-"Save the whole log to a file…" = "שמור את כל היומן בקובץ…";
 "Saved chats are read for notes in the background, from what you wrote there. Read again, notes already there are confirmed, not doubled. Chats marked \"Don't Remember\" are skipped." = "צ'אטים שמורים נקראים ברקע כדי ליצור הערות, לפי מה שכתבת שם. בקריאה חוזרת, הערות שכבר קיימות מאושרות ולא מוכפלות. צ'אטים שמסומנים ״לא לזכור״ מדולגים.";
 "Saved chats will show up here." = "צ'אטים שנשמרו יופיעו כאן.";
 "Saved in your Keychain" = "שמור ב‑Keychain שלך";
 "Save…" = "שמור…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "משנה את קנה המידה של כל רוחב/גובה שהמודל מבקש. ״מאוזן״ משאיר 1024x1024 כפי שהוא.";
+"Screen" = "מסך";
 "Search" = "חיפוש";
 "Search Hugging Face (mlx models)…" = "חיפוש ב-Hugging Face (מודלים של mlx)…";
 "Search by meaning is off for now: %@" = "חיפוש לפי משמעות כבוי לעת עתה: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "חיפוש לפי משמעות משתמש ב־%@ (%@), שהורד עכשיו למחשב זה. בלעדיו מחפשים קבצים רק לפי מילים; ניתן להורידו כאן מאוחר יותר.";
 "Search chats" = "חפש צ'אטים";
-"Search the log" = "חיפוש ביומן";
+"Search the log (⌘F)" = "חפש ביומן (⌘F)";
 "Searching the registry…" = "מחפש ברישום…";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "שניות לפני שהטיוטה ממשיכה כפי שהיא. 0: המתן עד שתלחץ 'צור'.";
 "Seen in" = "מוצג ב";
@@ -1094,9 +1149,9 @@
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "נשלח ראשון בכל בקשת צ׳אט בתוך היישום. Default כולל הנחיית פתיחה קצרה -- אפשר להרחיב אותה או להחליף אותה. לא חל על לקוחות API חיצוניים.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "נשלח ל-ipsupport.us; ללא חשבון, ללא מזהי מכשיר. חוות הדעת מפורסמות באתר LLMTray לאחר בדיקה.";
 "Server" = "שרת";
-"Server Log" = "יומן השרת";
 "Server log" = "יומן השרת";
 "Server settings changed -- restart to apply them." = "הגדרות השרת השתנו -- יש להפעיל מחדש כדי להחיל אותן.";
+"Server…" = "שרת…";
 "Set Up LLMTray" = "הגדר את LLMTray";
 "Set Up LLMTray…" = "הגדר את LLMTray…";
 "Setting up image generation (first time only)…" = "מגדיר/ה יצירת תמונות (הפעם הראשונה בלבד)…";
@@ -1113,9 +1168,11 @@
 "Shared by all chats" = "משותף לכל הצ׳אטים";
 "Share…" = "שיתוף…";
 "Show" = "הצג";
+"Show All" = "הצג הכול";
 "Show All %lld Lines" = "הצג את כל %lld השורות";
 "Show All Files…" = "הצג את כל הקבצים…";
 "Show Chat Window" = "הצג חלון שיחה";
+"Show Everything" = "הצג הכול";
 "Show Files" = "הצג קבצים";
 "Show Less" = "הצג פחות";
 "Show Log…" = "הצג יומן…";
@@ -1123,12 +1180,13 @@
 "Show Previous Tab" = "הצג כרטיסייה הקודמת";
 "Show Reports…" = "הצג דוחות…";
 "Show What Chats Get…" = "הצג את מה צ׳אטים מקבלים…";
-"Show all" = "הצג הכול";
+"Show a Window…" = "הצג חלון…";
 "Show in Finder" = "הצג ב‑Finder";
 "Show model controls in the chat window" = "הצג בקרות מודל בחלון הצ'אט";
 "Show more" = "הצג עוד";
 "Show only overrides" = "הצגת עקיפות בלבד";
 "Show reasoning" = "הצגת הנמקה";
+"Show the Screen…" = "הצג את המסך…";
 "Show the profile files in Finder" = "הצג את קובצי הפרופיל ב-Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "מציג את קובצי הפרופיל ב-Finder -- JSON פשוט, ניתן לעריכה ידנית ולהעתקה ל-Mac אחר.";
 "Show the project's files" = "הצג את קבצי הפרויקט";
@@ -1164,6 +1222,7 @@
 "Start" = "התחל";
 "Start LLMTray automatically when you log in to this Mac." = "הפעלת LLMTray אוטומטית בעת ההתחברות ל-Mac זה.";
 "Start Server" = "הפעל שרת";
+"Start a model and its output shows up here: loading, requests, errors." = "התחל מודל והפלט שלו יופיע כאן: טעינה, בקשות, שגיאות.";
 "Start a new saved chat (⌘N) to add files to a project." = "התחל צ'אט שמור חדש (⌘N) כדי להוסיף קבצים לפרויקט.";
 "Start server" = "מפעיל את השרת.";
 "Start talking" = "התחל לדבר";
@@ -1219,6 +1278,7 @@
 "Temporary chat" = "צ'אט זמני";
 "Temporary chats can only look in folders, for that chat only." = "שיחות זמניות יכולות רק להסתכל בתיקיות, ורק עבור אותה שיחה.";
 "Temporary — not saved" = "זמני — לא נשמר";
+"Text · %@" = "טקסט · %@";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "קבצי טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF, HTML וגיליונות (xlsx, ods) מאונדקסים; תמונות נשמרות לשימוש במסמכים.";
 "Thank you!" = "תודה!";
 "Thank you! List your name in Supporters?" = "תודה! לפרסם את שמך ברשימת התומכים?";
@@ -1229,6 +1289,8 @@
 "That isn't LLMTray's folder" = "זו לא התיקיה של LLMTray";
 "That isn't an http(s) URL." = "זו לא כתובת URL מסוג http(s).";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "העברות ה־%lld לסל המחזור לא מסומנות: סמן את אלה שברצונך.";
+"The + menu can show the model a window or the whole screen -- you pick it in the system's picker, and one picture is taken, nothing more -- or the page open in your browser (its title, address and text; macOS asks once per browser). A model that can't see images gets the text, read on this Mac." = "בתפריט + אפשר להראות למודל חלון או את כל המסך -- אתה בוחר זאת בבורר של המערכת, ונלקחת תמונה אחת בלבד -- או את הדף שפתוח בדפדפן שלך (הכותרת, הכתובת והטקסט שלו; macOS מבקש הרשאה פעם אחת לכל דפדפן). מודל שלא יכול לראות תמונות יקבל את הטקסט, שנקרא על ה-Mac הזה.";
+"The + menu can show the model a window or the whole screen: you pick it in the system's picker, and one picture is taken, nothing more. A model that can't see images gets the text in it, read on this Mac." = "בתפריט + אפשר להראות למודל חלון או את כל המסך: אתה בוחר זאת בבורר של המערכת, ונלקחת תמונה אחת בלבד, לא יותר. מודל שלא יכול לראות תמונות יקבל את הטקסט שבו, שנקרא על ה-Mac הזה.";
 "The App Store couldn't confirm the purchase." = "App Store לא הצליח לאשר את הרכישה.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "גרסת ה‑App Store של LLMTray פתוחה. סגור אותה קודם (באייקון בשורת התפריטים › Quit), ואז פתח את זו שוב: שתיהן ישתמשו באותו פורט ויטענו מודלים פעמיים.";
 "The JSON a server's README gives, with \"mcpServers\". Each server is added switched off, to review before it runs." = "ה-JSON שמופיע ב-README של השרת, עם \"mcpServers\". כל שרת נוסף במצב כבוי, כדי לסקור אותו לפני שיפעל.";
@@ -1268,12 +1330,15 @@
 "The exact text a new chat gets, before your first message." = "הטקסט המדויק ששיחה חדשה מקבלת, לפני ההודעה הראשונה שלך.";
 "The families of the models used that day (such as qwen or flux), never their names." = "משפחות המודלים ששומשו באותו יום (למשל qwen או flux), לא שמות המודלים.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "בפעם הראשונה, פעולה זו מורידה את %@ (%@) ל‑Mac הזה עכשיו, במקום באמצע צ׳אט.";
-"The full chat window, with projects and every chat (⌘⇧O)" = "חלון הצ'אט המלא, עם פרויקטים וכל שיחה (⌘⇧O)";
+"The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar" = "חלון הצ׳אט המלא, עם פרויקטים וכל הצ׳אטים (⌘⇧O) — סגירתו מחזירה את הצ׳אט לשורת התפריטים";
 "The image draft above is open: Generate or Skip it to keep chatting." = "טיוטת התמונה שלמעלה פתוחה: צור או דלג כדי להמשיך לשוחח.";
 "The image edit draft above is open: Generate or Skip it to keep chatting." = "טיוטת עריכת התמונה שלמעלה פתוחה: צור או דלג כדי להמשיך לשוחח.";
 "The image generator is busy -- try again once it's done." = "מחולל התמונות עסוק — נסה שוב כאשר יסיים.";
 "The image generator is busy with another chat -- try again once it's done." = "מחולל התמונות עסוק בשיחה אחרת — נסה שוב כאשר יסיים.";
 "The import stopped" = "הייבוא נעצר";
+"The key couldn't be saved in the Keychain." = "לא ניתן היה לשמור את המפתח ב-Keychain.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "אי אפשר לקרוא עכשיו את המפתח שב-Keychain (האם ה-Keychain נעול?). נסה שוב, או צור/י מפתח חדש.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "אי אפשר לקרוא עכשיו את המפתח שב-Keychain, ולכן כל לקוח חיצוני נדחה. צור/י מפתח חדש, או פתח/י מחדש את הגדרות אחרי שה-Keychain ייפתח.";
 "The last change couldn't be saved." = "לא ניתן היה לשמור את השינוי האחרון.";
 "The log couldn't be saved" = "לא ניתן היה לשמור את היומן";
 "The longest answer the model may write. Also capped by the model's own context length." = "התשובה הארוכה ביותר שהמודל רשאי לכתוב. מוגבלת גם לפי אורך ההקשר של המודל עצמו.";
@@ -1446,7 +1511,9 @@
 "Update failed: %@" = "העדכון נכשל: %@";
 "Update to %@" = "עדכן ל־%@";
 "Updates" = "עדכונים";
+"Usage" = "שימוש";
 "Usage statistics" = "סטטיסטיקות שימוש";
+"Usage statistics are off" = "סטטיסטיקות שימוש כבויות";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "סטטיסטיקת שימוש כבויה: לא נשלח דבר. כך ייראה דוח אם תפעילו אותן (ה‑ID יוּצר אז).";
 "Usage statistics: the reports" = "סטטיסטיקת שימוש: הדוחות";
 "Use" = "השתמש";
@@ -1478,13 +1545,13 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab תופס כ‑%1$@ GB, יותר מ‑%2$@ GB שה‑GPU עשוי להשתמש בהם: הגדל קודם את מגבלת זיכרון ה‑GPU.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab תופס כ‑%1$@ GB; ביחד עם %2$@ GB של מודל הצ'אט זה נכנס בתוך %3$@ GB שה‑GPU עשוי להשתמש בהם. עם זאת, מודל הצ'אט מנותק בזמן הריצה.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab צורך כ‑%@ GB זיכרון בזמן הריצה.";
-"Voice Lab…" = "Voice Lab…";
 "Voice model" = "מודל קול";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
 "Waiting for a model download to finish…" = "ממתין להשלמת הורדת המודל…";
 "Waiting for an image or song to finish…" = "ממתין לסיום יצירת תמונה או שיר…";
 "Waiting for another chat's image or music to finish…" = "מחכה לסיום יצירת תמונה או מוזיקה משיחה אחרת…";
 "Waiting for the chat or a generator to finish" = "ממתין לשיחה או לגנרטור שיסיים";
+"Waiting for your pick…" = "ממתין לבחירה שלך…";
 "Waiting to be sent: %@" = "ממתין להשליחה: %@";
 "Waits for %@ to be loaded." = "ממתין לטעינת %@.";
 "Waits for a model: start one to read your chats." = "ממתין למודל: התחל מודל כדי לקרוא את הצ׳אטים שלך.";
@@ -1492,8 +1559,7 @@
 "Waits for the model to be free." = "ממתין עד שהמודל יהיה פנוי.";
 "Waits for the model to be loaded." = "ממתין עד שהמודל ייטען.";
 "Walkie-talkie" = "ווקי‑טוקי";
-"Warnings" = "אזהרות";
-"Warnings: %@" = "אזהרות: %@";
+"Warnings and errors: go to the next one" = "אזהרות ושגיאות: עבור אל הפריט הבא";
 "Weather" = "מזג אוויר";
 "Web" = "אינטרנט";
 "Web search" = "חיפוש באינטרנט";
@@ -1511,6 +1577,7 @@
 "What happened?" = "מה קרה?";
 "What the model says appears here." = "מה שהמודל אומר יופיע כאן.";
 "What this chat knows about you from earlier chats" = "מה הצ׳אט הזה יודע עליך מצ׳אטים קודמים";
+"What to show" = "מה להציג";
 "What was copied before stays; importing again goes on from there. %@" = "מה שהועתק קודם נשאר; ייבוא חוזר ימשיך משם. %@";
 "What was learned: the notes memory learned that you haven't written, edited, pinned or approved. Everything: every note but About you. Neither can be undone." = "מה שנלמד: דברים שזיכרון ההערות למד ושלא כתבת, ערכת, הצמדת או אישרת. הכול: כל הערה מלבד עליך. אי אפשר לבטל אף אחת מהפעולות.";
 "What you corrected before, so it isn't repeated." = "מה שתיקנת בעבר, כדי שזה לא יחזור.";
@@ -1537,6 +1604,8 @@
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "בעת דיבור המודל, צליל מהמיקרופון שחלש מ‑זה ייתפס כשתיקה: שארית הקול שהסרת הדהוד משאירה תישאר מחוץ, וקול מעליה עדיין יפריע. הגדל אם המודל שומע את עצמו, הקטן אם הוא מפספס את ההפרעות שלך. ייכנס לתוקף בהפעלה הבאה.";
 "Wikipedia" = "Wikipedia";
+"Window" = "חלון";
+"Windows and pages" = "חלונות ודפים";
 "With notes, it reads like this:" = "עם הערות, זה נקרא כך:";
 "Words only" = "מילים בלבד";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
@@ -1588,7 +1657,9 @@
 "failed to build request" = "בניית הבקשה נכשלה";
 "failed: %@" = "נכשל: %@";
 "finishing" = "מסיים";
+"first %@ s" = "%@ השניות הראשונות";
 "first token %.1f s" = "טוקן ראשון %.1f ש׳";
+"first token in %@ on average" = "טוקן ראשון תוך %@ בממוצע";
 "for this chat" = "לשיחה זו";
 "generation %.1f tok/s" = "יצירה %.1f טוקנים/ש׳";
 "hears audio" = "שומע אודיו";
@@ -1609,6 +1680,7 @@
 "never used" = "לא בשימוש מעולם";
 "new or changed" = "חדשים או שהשתנו";
 "no changes" = "אין שינויים";
+"no page text" = "אין טקסט בדף";
 "no text" = "אין טקסט";
 "not a picture" = "לא תמונה";
 "not allowed" = "לא מותר";
@@ -1625,6 +1697,7 @@
 "prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";
 "queued" = "בתור";
 "reading" = "קורא";
+"reading the prompt %@" = "קורא את ההנחיה %@";
 "reads images" = "קורא תמונות";
 "ready" = "מוכן";
 "ready (words only)" = "מוכן (מילים בלבד)";
@@ -1654,6 +1727,7 @@
 "~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:" = "~/.local/bin עדיין לא ב‑PATH של ה‑shell שלך. הוסף שורה זו ל‑%@, ואז פתח חלון טרמינל חדש:";
 "· %lld pinned" = "· %lld מסומנים";
 "· size…" = "· גודל…";
+"×%lld" = "×%lld";
 "“%1$@” couldn't be removed: %2$@" = "לא ניתן להסיר “%1$@”: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: לא ניתן לשנות את הסימון: %2$@";
 "“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) מועבר לשמור־אשפה, שם ניתן לשחזרו. %@ זקוק/ה לו: הורד/י אותו שוב ב‑Settings כדי להשתמש בו.";
