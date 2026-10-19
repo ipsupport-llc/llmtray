@@ -59,7 +59,7 @@ struct DocumentRef: Codable, Equatable, Identifiable {
 struct ChatMessage: Identifiable, Equatable {
     /// An image, a song or a document: what a save keeps a content-less
     /// message for, compaction stops before, and a turn counts as made.
-    var hasMedia: Bool { !images.isEmpty || !audios.isEmpty || !documents.isEmpty }
+    var hasMedia: Bool { !images.isEmpty || !audios.isEmpty || !documents.isEmpty || !shared.isEmpty }
 
     let id = UUID()
     var role: String   // "user" | "assistant" | "tool"
@@ -116,6 +116,10 @@ struct ChatMessage: Identifiable, Equatable {
     // message before it (ProjectFilesNote) -- told to the model with it,
     // shown under the bubble, saved with it.
     var projectFilesAdded: [String] = []
+    /// A user message: windows, the screen or browser tabs shown with it
+    /// (adr/0030) -- their text told to the model with it, chips on the
+    /// bubble, saved with it.
+    var shared: [SharedContext] = []
     /// The MCP calls behind this answer (adr/0027), one line each under it.
     var mcpCalls: [MCPCallRecord] = []
     // A "tool" result refusing a call (see ToolResult.refused): left out of

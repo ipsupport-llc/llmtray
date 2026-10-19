@@ -274,6 +274,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(detachChatSoon), name: .detachChat, object: nil
         )
         NotificationCenter.default.addObserver(
+            self, selector: #selector(sharingWillPick), name: .sharingWillPick, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(sharingDidPick), name: .sharingDidPick, object: nil
+        )
+        // Which browser "Attach Tab" means: the last one in front (adr/0030).
+        ScreenShare.shared.startWatchingApps()
+        NotificationCenter.default.addObserver(
             self, selector: #selector(showAboutPanel), name: .showAbout, object: nil
         )
         NotificationCenter.default.addObserver(
@@ -486,6 +494,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hosting.sizingOptions = []
         chatWindow.show(hosting)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Where the chat was while a window or the screen is picked
+    /// (adr/0030): it steps aside, so the picker shows what's under it,
+    /// and comes back after.
+    private enum ChatBeforePick { case none, popover, window }
+    private var chatBeforePick = ChatBeforePick.none
+
+    @objc private func sharingWillPick() {
+        if chatPresentation.isDetached, chatWindow.window?.isVisible == true {
+            chatBeforePick = .window
+            chatWindow.window?.orderOut(nil)
+        } else if popover.isShown {
+            chatBeforePick = .popover
+            popover.performClose(nil)
+        } else {
+            chatBeforePick = .none
+        }
+    }
+
+    @objc private func sharingDidPick() {
+        switch chatBeforePick {
+        case .window: showChatWindow()
+        case .popover:
+            if let button = statusItem.button, !popover.isShown {
+                popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        case .none: break
+        }
+        chatBeforePick = .none
     }
 
     /// The chat window was closed: the chat goes back into the popover.
