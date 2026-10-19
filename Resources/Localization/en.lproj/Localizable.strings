@@ -876,6 +876,7 @@
 "Open in New Tab" = "Open in New Tab";
 "Open in Preview" = "Open in Preview";
 "Open in Window" = "Open in Window";
+"Open the server log" = "Open the server log";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "OpenAI-compatible: point a coding agent or app at this address (copies it)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";
 "Opens at login" = "Opens at login";
@@ -1475,7 +1476,6 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab takes about %@ GB of memory while it runs.";
-"Voice Lab…" = "Voice Lab…";
 "Voice model" = "Voice model";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Waiting for a model download to finish…" = "Waiting for a model download to finish…";
