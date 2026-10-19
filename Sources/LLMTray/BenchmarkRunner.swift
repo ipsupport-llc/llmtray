@@ -212,6 +212,7 @@ final class BenchmarkRunner: ObservableObject {
     private static func record(_ lines: [(stats: RequestStats, payload: JournalLine)]) {
         for line in lines {
             SpeedJournalStore.shared.record(line.stats, modelPath: line.payload.modelPath, arguments: line.payload.arguments)
+            UsageStore.shared.record(line.stats, modelPath: line.payload.modelPath)
         }
     }
 

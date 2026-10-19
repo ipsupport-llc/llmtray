@@ -14,8 +14,13 @@ public struct RequestStats: Codable, Equatable, Sendable {
     public var decodeSeconds: Double
     /// Tokens that came from accepted drafts (speculative decoding).
     public var drafted: Int
+    /// Who sent it, as LLMTray's proxy named it (UsageClient); nil from a
+    /// runtime before that, or a request that didn't come through it.
+    public var client: String?
 
-    public init(prompt: Int, cached: Int, firstTokenSeconds: Double, tokens: Int, decodeSeconds: Double, drafted: Int) {
+    public init(prompt: Int, cached: Int, firstTokenSeconds: Double, tokens: Int, decodeSeconds: Double, drafted: Int,
+                client: String? = nil) {
+        self.client = client
         self.prompt = prompt
         self.cached = cached
         self.firstTokenSeconds = firstTokenSeconds
@@ -38,7 +43,7 @@ public struct RequestStats: Codable, Equatable, Sendable {
     }
 
     static let pattern = try! NSRegularExpression(pattern:
-        #"Request stats: prompt=(\d+) cached=(\d+) first_token_s=([\d.]+) tokens=(\d+) decode_s=([\d.]+) drafted=(\d+)"#)
+        #"Request stats: prompt=(\d+) cached=(\d+) first_token_s=([\d.]+) tokens=(\d+) decode_s=([\d.]+) drafted=(\d+)(?: client=(.+))?$"#)
 
     /// From the text after a log record's prefix.
     public static func parse(_ text: String) -> RequestStats? {
@@ -47,8 +52,9 @@ public struct RequestStats: Codable, Equatable, Sendable {
         func s(_ i: Int) -> String { ns.substring(with: m.range(at: i)) }
         guard let prompt = Int(s(1)), let cached = Int(s(2)), let first = Double(s(3)), let tokens = Int(s(4)),
               let decode = Double(s(5)), let drafted = Int(s(6)) else { return nil }
+        let client = m.range(at: 7).location != NSNotFound ? s(7).trimmingCharacters(in: .whitespaces) : nil
         return RequestStats(prompt: prompt, cached: cached, firstTokenSeconds: first, tokens: tokens,
-                            decodeSeconds: decode, drafted: drafted)
+                            decodeSeconds: decode, drafted: drafted, client: client?.isEmpty == false ? client : nil)
     }
 }
 
