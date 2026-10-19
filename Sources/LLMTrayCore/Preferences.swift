@@ -25,6 +25,9 @@ public enum Pref {
     public static let apiKeyNetworkOnly = PrefKey("llmtray.apiKey.networkOnly", default: true)
     /// Usage statistics (UsageLedger) are kept: off until turned on.
     public static let usageStatsEnabled = PrefKey("llmtray.usageStats.enabled", default: false)
+    /// Experimental: a MoE model that doesn't fit runs with its routed
+    /// experts read from disk as needed (runtime --experts-on-disk).
+    public static let expertsOnDisk = PrefKey("llmtray.expertsOnDisk.enabled", default: false)
     /// `ModelSwitchPolicy` raw value: an outside client asking for another model.
     public static let modelSwitchPolicy = PrefKey("llmtray.modelSwitchPolicy", default: ModelSwitchPolicy.auto.rawValue)
     public static let verboseServerLogging = PrefKey("llmtray.verboseServerLogging", default: false)
