@@ -239,7 +239,14 @@ final class WebPageProxy: @unchecked Sendable {
             addresses = MCPOAuth.IPAddress.resolve(host)
         }
         let networks = LocalNetworks.current()
-        guard !addresses.isEmpty, !addresses.contains(where: { $0.isLocal || networks.contains($0) }) else { return nil }
+        let nat64 = LocalNetworks.nat64Prefixes()
+        guard !addresses.isEmpty, !addresses.contains(where: { address in
+            if address.isLocal || networks.contains(address) { return true }
+            // This network's own NAT64 prefix: the IPv4 address inside.
+            guard case .v6(let b) = address, nat64.contains(where: { $0 == Array(b[0..<12]) }) else { return false }
+            let v4 = MCPOAuth.IPAddress.v4(UInt32(b[12]) << 24 | UInt32(b[13]) << 16 | UInt32(b[14]) << 8 | UInt32(b[15]))
+            return v4.isLocal || networks.contains(v4)
+        }) else { return nil }
         return addresses.first?.text
     }
 }
@@ -253,6 +260,16 @@ enum LocalNetworks {
         let mask: [UInt8]
         func contains(_ ip: [UInt8]) -> Bool {
             ip.count == address.count && zip(zip(ip, address), mask).allSatisfy { ($0.0 & $1) == ($0.1 & $1) }
+        }
+    }
+
+    /// The NAT64 prefixes (/96) of the network this Mac is on, if it
+    /// translates IPv6 to IPv4: what ipv4only.arpa resolves to (RFC 7050).
+    /// None elsewhere.
+    static func nat64Prefixes() -> [[UInt8]] {
+        MCPOAuth.IPAddress.resolve("ipv4only.arpa").compactMap { address in
+            guard case .v6(let b) = address else { return nil }
+            return Array(b[0..<12])
         }
     }
 
