@@ -23,6 +23,8 @@ public enum Pref {
     /// ...but only those connecting from another device: this Mac's apps
     /// go without it.
     public static let apiKeyNetworkOnly = PrefKey("llmtray.apiKey.networkOnly", default: true)
+    /// Usage statistics (UsageLedger) are kept: off until turned on.
+    public static let usageStatsEnabled = PrefKey("llmtray.usageStats.enabled", default: false)
     /// `ModelSwitchPolicy` raw value: an outside client asking for another model.
     public static let modelSwitchPolicy = PrefKey("llmtray.modelSwitchPolicy", default: ModelSwitchPolicy.auto.rawValue)
     public static let verboseServerLogging = PrefKey("llmtray.verboseServerLogging", default: false)

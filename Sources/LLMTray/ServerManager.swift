@@ -1105,7 +1105,7 @@ final class ServerManager: ObservableObject {
     func removeExternalRuntime() {
         stop()
         let dir = RuntimePaths.externalRuntimeDir
-        let keep: Set<String> = ["sessions", "profiles", SpeedJournalStore.fileName]
+        let keep: Set<String> = ["sessions", "profiles", SpeedJournalStore.fileName, UsageStore.fileName]
         for item in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where !keep.contains(item) {
             try? FileManager.default.removeItem(atPath: dir + "/" + item)
         }

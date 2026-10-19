@@ -1337,6 +1337,7 @@ struct ServerPane: View {
     @AppStorage(Pref.prefillSharePercent) private var prefillSharePercent
     @AppStorage(Pref.autoRestartStallThreshold) private var autoRestartStallThreshold
     @AppStorage(Pref.verboseServerLogging) private var verboseLogging
+    @AppStorage(Pref.usageStatsEnabled) private var usageStatsEnabled
 
     /// Idle-unloaded counts as running: the listener still holds the port.
     private var isStopped: Bool {
@@ -1394,8 +1395,15 @@ struct ServerPane: View {
                     Toggle(isOn: $verboseLogging) {
                         SettingLabel(title: "Verbose server logging", help: "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.")
                     }
+                    Toggle(isOn: $usageStatsEnabled) {
+                        SettingLabel(title: "Keep usage statistics", help: "Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac.")
+                    }
                     LabeledContent {
-                        Button("Open Server Log…") { NotificationCenter.default.post(name: .showServerLog, object: nil) }
+                        Button("Open Server Log…") {
+                            // The log, not whichever tab was last.
+                            UserDefaults.standard.set("log", forKey: "llmtray.serverWindow.tab")
+                            NotificationCenter.default.post(name: .showServerLog, object: nil)
+                        }
                     } label: {
                         SettingLabel(title: "Server log", help: "Live output of the model process: loading, errors, requests.")
                     }

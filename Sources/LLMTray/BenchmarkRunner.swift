@@ -207,16 +207,21 @@ final class BenchmarkRunner: ObservableObject {
     struct JournalLine {
         var modelPath: String
         var arguments: [String]
+        /// Usage statistics were on when the line came, and when.
+        var countsUsage = false
+        var date = Date()
     }
 
     private static func record(_ lines: [(stats: RequestStats, payload: JournalLine)]) {
         for line in lines {
             SpeedJournalStore.shared.record(line.stats, modelPath: line.payload.modelPath, arguments: line.payload.arguments)
+            if line.payload.countsUsage { UsageStore.shared.record(line.stats, modelPath: line.payload.modelPath, at: line.payload.date) }
         }
     }
 
     static func serverReported(_ stats: RequestStats, modelPath: String, arguments: [String]) {
-        record(journalFilter.offer(stats, JournalLine(modelPath: modelPath, arguments: arguments)))
+        record(journalFilter.offer(stats, JournalLine(modelPath: modelPath, arguments: arguments,
+                                                      countsUsage: UsageStore.shared.isEnabled)))
     }
 
     func runBenchmark(port: Int, modelAlias: String, promptTokens: Int, maxTokens: Int, trials: Int) async {

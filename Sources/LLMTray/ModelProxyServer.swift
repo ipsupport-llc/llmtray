@@ -651,9 +651,16 @@ final class ModelProxyServer {
         request.httpMethod = method
         // The app's token stays here: the model server has no use for it.
         for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased()
-            && key != BackgroundRequest.header.lowercased() {
+            && key != BackgroundRequest.header.lowercased() && key != UsageClient.header.lowercased() {
             request.setValue(value, forHTTPHeaderField: key)
         }
+        // Who sent it, for the usage statistics: the runtime names it in its
+        // stats line. Set here only, never taken from the client.
+        request.setValue(UsageClient.name(
+            userAgent: headers["user-agent"],
+            fromApp: headers[AppRequestToken.header.lowercased()] == AppRequestToken.value,
+            background: headers[BackgroundRequest.header.lowercased()] == BackgroundRequest.value
+        ), forHTTPHeaderField: UsageClient.header)
         if !body.isEmpty {
             request.httpBody = body
         }
