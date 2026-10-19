@@ -705,7 +705,8 @@ final class ServerManager: ObservableObject {
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
             memoryShares: Self.memoryShares,
             supportsLowMemoryWeights: memory.supportsLowMemoryWeights,
-            mtpHead: head && memory.supportsMTPHead && ModelDiscovery.declaresMTPHead(forModelPath: modelPath)
+            mtpHead: head && memory.supportsMTPHead && ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
+            expertsOnDiskShare: memory.expertsOnDiskShare
         )
     }
 
@@ -716,6 +717,8 @@ final class ServerManager: ObservableObject {
         var gpuHeadroomBytes: Int64?
         var supportsLowMemoryWeights = false
         var supportsMTPHead = false
+        /// Experts on disk (experimental): the share kept in memory.
+        var expertsOnDiskShare: Double?
     }
 
     /// Read once per model folder, installed runtime (a runtime update
@@ -741,7 +744,7 @@ final class ServerManager: ObservableObject {
         let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + server + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
             + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)|\(lowMemoryWeights)"
             // A downloaded MTP head adds to the weights.
-            + "|\(withMTPHead)"
+            + "|\(withMTPHead)|\(UserDefaults.standard[Pref.expertsOnDisk])"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
         let supportsLowMemory = MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
@@ -757,13 +760,24 @@ final class ServerManager: ObservableObject {
             let tables = MLXRuntimeInstaller.declaredLookupTables(modelTypes: ModelWeights.modelTypes(inFolder: modelPath))
             weights = max(0, weights - ModelWeights.lookupTableBytes(inFolder: modelPath, tables: tables))
         }
+        // Experimental: a MoE model that doesn't fit keeps only a share of
+        // its routed experts in memory; the rest is sized by what stays.
+        var expertsShare: Double?
+        if UserDefaults.standard[Pref.expertsOnDisk], MLXRuntimeInstaller.serverSupportsFlag("--experts-on-disk") {
+            let experts = ModelWeights.routedExpertBytes(inFolder: modelPath)
+            if let share = ServerLaunch.expertsOnDiskShare(gpuLimitBytes: limit, weightsBytes: weights, expertBytes: experts, shares: shares) {
+                expertsShare = share
+                weights -= Int64(Double(experts) * (1 - share))
+            }
+        }
         let scratchMB = ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
         let facts = MemoryFacts(
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
             bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
             gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights),
             supportsLowMemoryWeights: supportsLowMemory,
-            supportsMTPHead: MLXRuntimeInstaller.supportsMTPHead
+            supportsMTPHead: MLXRuntimeInstaller.supportsMTPHead,
+            expertsOnDiskShare: expertsShare
         )
         memoryFactsCache[key] = facts
         return facts

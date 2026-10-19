@@ -1338,6 +1338,7 @@ struct ServerPane: View {
     @AppStorage(Pref.autoRestartStallThreshold) private var autoRestartStallThreshold
     @AppStorage(Pref.verboseServerLogging) private var verboseLogging
     @AppStorage(Pref.usageStatsEnabled) private var usageStatsEnabled
+    @AppStorage(Pref.expertsOnDisk) private var expertsOnDisk
 
     /// Idle-unloaded counts as running: the listener still holds the port.
     private var isStopped: Bool {
@@ -1406,6 +1407,11 @@ struct ServerPane: View {
                         }
                     } label: {
                         SettingLabel(title: "Server log", help: "Live output of the model process: loading, errors, requests.")
+                    }
+                }
+                Section("Experimental") {
+                    Toggle(isOn: $expertsOnDisk) {
+                        SettingLabel(title: "Run big MoE models with experts on disk", help: "A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model.")
                     }
                 }
                 ToolCallsSection()

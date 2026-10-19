@@ -432,6 +432,37 @@ public enum ModelWeights {
         return sum
     }
 
+    /// Bytes of a MoE model's routed experts, stacked one array per
+    /// projection (`...switch_mlp.gate_proj.weight` [experts, ...]): what
+    /// the runtime's --experts-on-disk can leave on disk. 0 for a dense
+    /// model, or experts kept another way.
+    public static func routedExpertBytes(inFolder path: String) -> Int64 {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let config = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return 0 }
+        let text = config["text_config"] as? [String: Any] ?? [:]
+        let keys = ["num_experts", "num_local_experts", "n_routed_experts"]
+        guard let experts = keys.lazy.compactMap({ (text[$0] ?? config[$0]) as? Int }).first, experts > 1,
+              let names = try? FileManager.default.contentsOfDirectory(atPath: path) else { return 0 }
+        return names.filter { $0.hasSuffix(".safetensors") }.reduce(Int64(0)) { sum, name in
+            let file = URL(fileURLWithPath: path).appendingPathComponent(name).resolvingSymlinksInPath()
+            let (header, dataBytes) = safetensorsHeader(file)
+            return sum + routedExpertBytes(header: header, dataBytes: dataBytes, experts: experts)
+        }
+    }
+
+    static func routedExpertBytes(header: [String: Any], dataBytes: Int64, experts: Int) -> Int64 {
+        var sum: Int64 = 0
+        for (key, value) in header where key != "__metadata__" {
+            guard key.contains(".switch_mlp.") || key.contains(".switch_glu."),
+                  let info = value as? [String: Any], let shape = info["shape"] as? [NSNumber], shape.first?.intValue == experts,
+                  let offsets = info["data_offsets"] as? [NSNumber], offsets.count == 2 else { continue }
+            let (start, end) = (offsets[0].int64Value, offsets[1].int64Value)
+            guard start >= 0, end >= start, end <= dataBytes else { return 0 }
+            sum += end - start
+        }
+        return sum
+    }
+
     /// A safetensors file's JSON header and the size of the data after it
     /// (empty and 0 when unreadable).
     static func safetensorsHeader(_ url: URL) -> ([String: Any], Int64) {

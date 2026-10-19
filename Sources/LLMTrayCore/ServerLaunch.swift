@@ -48,10 +48,15 @@ public enum ServerLaunch {
         public var memoryShares: MemoryShares
         /// The runtime has --mmap-lookup-tables and --lazy-towers.
         public var supportsLowMemoryWeights: Bool
+        /// `--experts-on-disk`: the share of routed experts kept in memory
+        /// (Settings > Server > Experimental, a MoE model that doesn't fit).
+        public var expertsOnDiskShare: Double?
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
-                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false) {
+                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false,
+                    expertsOnDiskShare: Double? = nil) {
+            self.expertsOnDiskShare = expertsOnDiskShare
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -95,6 +100,24 @@ public enum ServerLaunch {
 
     /// GPU memory left beside the model's weights (negative: they don't
     /// fit); nil when the GPU limit isn't known.
+    /// Memory beside resident weights for the KV cache and a prompt's work
+    /// when experts are on disk.
+    public static let expertsOnDiskReserveBytes: Int64 = 5 << 29   // 2.5 GB
+
+    /// `--experts-on-disk`: the share of a MoE model's routed experts kept in
+    /// memory so the rest of it, the margin and a reserve for its work fit
+    /// the GPU limit; 0.1 at the least. nil when it fits as it is (no
+    /// reason to read from disk) or isn't MoE.
+    public static func expertsOnDiskShare(gpuLimitBytes: UInt64?, weightsBytes: Int64, expertBytes: Int64,
+                                          shares: MemoryShares = .default) -> Double? {
+        guard expertBytes > 0, let limit = gpuLimitBytes,
+              let headroom = gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weightsBytes),
+              headroom < GPUFit.tightHeadroomBytes else { return nil }
+        let room = Int64(clamping: limit) - (weightsBytes - expertBytes) - shares.marginBytes - expertsOnDiskReserveBytes
+        let share = Double(room) / Double(expertBytes)
+        return min(0.9, max(0.1, (share * 20).rounded(.down) / 20))
+    }
+
     public static func gpuHeadroomBytes(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int64? {
         gpuLimitBytes.map { Int64(clamping: $0) - weightsBytes }
     }
@@ -250,6 +273,9 @@ public enum ServerLaunch {
         }
         if let mb = c.bufferCacheMB, !p.extraServerArgs.contains("--buffer-cache-mb") {
             args += ["--buffer-cache-mb", String(mb)]
+        }
+        if let share = c.expertsOnDiskShare {
+            args += ["--experts-on-disk", String(format: "%.2f", share)]
         }
         args += p.extraServerArgs.split(separator: " ").map(String.init)
         // The model process listens on this Mac only, whatever the extra
