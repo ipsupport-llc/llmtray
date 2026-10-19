@@ -37,6 +37,8 @@ struct UsageView: View {
     @State private var confirmsClear = false
     /// Read again every minute: Today moves on at midnight.
     @State private var now = Date()
+    /// Bumped when the window comes to the front: the table is made again.
+    @State private var shown = 0
     private let tick = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     private var selectedPeriod: UsageLedger.Period { UsageLedger.Period(rawValue: period) ?? .week }
@@ -45,6 +47,10 @@ struct UsageView: View {
     var body: some View {
         Group { if enabled { statistics } else { off } }
             .onReceive(tick) { now = $0 }
+            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+                now = Date()
+                shown += 1
+            }
             .confirmationDialog("Clear the usage statistics?", isPresented: $confirmsClear) {
                 Button("Clear", role: .destructive) { store.clear() }
             } message: {
@@ -149,6 +155,15 @@ struct UsageView: View {
             TableColumn("Decode") { Text(verbatim: $0.counts.decodeTokensPerSecond.map(Self.rate) ?? "—").monospacedDigit() }.width(76)
             TableColumn("First token") { Text(verbatim: $0.counts.meanFirstTokenSeconds.map(Self.seconds) ?? "—").monospacedDigit() }.width(76)
         }
+        // Made again when its rows come or go (a new model, client or day)
+        // and when the window comes back: the native table could miss rows
+        // added while the window was behind others, until reopened.
+        .id(TableKey(names: lines.map(\.name), shown: shown))
+    }
+
+    private struct TableKey: Hashable {
+        let names: [String]
+        let shown: Int
     }
 
     static func count(_ n: Int) -> String { n.formatted(.number.notation(.compactName)) }
