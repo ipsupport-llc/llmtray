@@ -1393,7 +1393,11 @@ struct ServerPane: View {
                         SettingLabel(title: "Keep usage statistics", help: "Counts requests and tokens per model, client (the chat, Codex, Claude Code, curl…) and day, and how fast they ran: the Server window's Usage tab. Kept only on this Mac.")
                     }
                     LabeledContent {
-                        Button("Open Server Log…") { NotificationCenter.default.post(name: .showServerLog, object: nil) }
+                        Button("Open Server Log…") {
+                            // The log, not whichever tab was last.
+                            UserDefaults.standard.set("log", forKey: "llmtray.serverWindow.tab")
+                            NotificationCenter.default.post(name: .showServerLog, object: nil)
+                        }
                     } label: {
                         SettingLabel(title: "Server log", help: "Live output of the model process: loading, errors, requests.")
                     }

@@ -43,7 +43,7 @@ public struct RequestStats: Codable, Equatable, Sendable {
     }
 
     static let pattern = try! NSRegularExpression(pattern:
-        #"Request stats: prompt=(\d+) cached=(\d+) first_token_s=([\d.]+) tokens=(\d+) decode_s=([\d.]+) drafted=(\d+)(?: client=(.+))?$"#)
+        #"Request stats: prompt=(\d+) cached=(\d+) first_token_s=([\d.]+) tokens=(\d+) decode_s=([\d.]+) drafted=(\d+)(?: client=([A-Za-z0-9._-][A-Za-z0-9 ._-]*[A-Za-z0-9._-]|[A-Za-z0-9._-]))?"#)
 
     /// From the text after a log record's prefix.
     public static func parse(_ text: String) -> RequestStats? {

@@ -35,12 +35,21 @@ struct UsageView: View {
     @AppStorage("llmtray.usage.period") private var period = UsageLedger.Period.week.rawValue
     @AppStorage("llmtray.usage.grouping") private var grouping = UsageLedger.Grouping.model.rawValue
     @State private var confirmsClear = false
+    /// Read again every minute: Today moves on at midnight.
+    @State private var now = Date()
+    private let tick = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     private var selectedPeriod: UsageLedger.Period { UsageLedger.Period(rawValue: period) ?? .week }
     private var selectedGrouping: UsageLedger.Grouping { UsageLedger.Grouping(rawValue: grouping) ?? .model }
 
     var body: some View {
-        if enabled { statistics } else { off }
+        Group { if enabled { statistics } else { off } }
+            .onReceive(tick) { now = $0 }
+            .confirmationDialog("Clear the usage statistics?", isPresented: $confirmsClear) {
+                Button("Clear", role: .destructive) { store.clear() }
+            } message: {
+                Text("Every day's counts are removed. This can't be undone.")
+            }
     }
 
     private var off: some View {
@@ -54,13 +63,18 @@ struct UsageView: View {
             Button("Turn On") { enabled = true }
                 .buttonStyle(.borderedProminent)
                 .padding(.top, 4)
+            // What was kept before it was turned off can still go.
+            if !store.ledger.rows.isEmpty {
+                Button("Clear Statistics…") { confirmsClear = true }
+                    .buttonStyle(.link)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var statistics: some View {
-        let lines = store.ledger.lines(selectedPeriod, by: selectedGrouping)
-        let total = store.ledger.total(selectedPeriod)
+        let lines = store.ledger.lines(selectedPeriod, by: selectedGrouping, now: now)
+        let total = UsageLedger.total(lines)
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Picker("", selection: $period) {
@@ -97,11 +111,6 @@ struct UsageView: View {
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(14)
-        .confirmationDialog("Clear the usage statistics?", isPresented: $confirmsClear) {
-            Button("Clear", role: .destructive) { store.clear() }
-        } message: {
-            Text("Every day's counts are removed. This can't be undone.")
-        }
     }
 
     private func summary(_ c: UsageLedger.Counts) -> some View {
@@ -148,11 +157,16 @@ struct UsageView: View {
     static func seconds(_ x: Double) -> String { String(format: NSLocalizedString("%@ s", comment: "usage: seconds"), x.formatted(.number.precision(.fractionLength(x < 10 ? 2 : 1)))) }
 
     /// "2026-10-18" as the locale writes a day ("Oct 18, 2026").
-    static func dayName(_ day: String) -> String {
+    private static let dayParser: DateFormatter = {
         let parser = DateFormatter()
         parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.calendar = UsageLedger.localCalendar
         parser.dateFormat = "yyyy-MM-dd"
-        guard let date = parser.date(from: day) else { return day }
+        return parser
+    }()
+
+    static func dayName(_ day: String) -> String {
+        guard let date = dayParser.date(from: day) else { return day }
         return date.formatted(date: .abbreviated, time: .omitted)
     }
 }

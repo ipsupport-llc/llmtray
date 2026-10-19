@@ -13,6 +13,9 @@ final class UsageLedgerTests: XCTestCase {
         XCTAssertEqual(UsageClient.name(userAgent: "  ", fromApp: false, background: false), "Other")
         XCTAssertEqual(UsageClient.name(userAgent: nil, fromApp: false, background: false), "Other")
         XCTAssertEqual(UsageClient.name(userAgent: "(((", fromApp: false, background: false), "Other")
+        XCTAssertEqual(UsageClient.name(userAgent: "customized-agent/1.0", fromApp: false, background: false), "customized-agent")
+        XCTAssertEqual(UsageClient.name(userAgent: "ツール/1.0", fromApp: false, background: false), "Other")
+        XCTAssertEqual(UsageClient.name(userAgent: "Zed/0.200", fromApp: false, background: false), "Zed")
     }
 
     func testStatsLineWithClient() {
@@ -20,6 +23,12 @@ final class UsageLedgerTests: XCTestCase {
         XCTAssertEqual(RequestStats.parse(line)?.client, "Claude Code")
         XCTAssertNil(RequestStats.parse("Request stats: prompt=10 cached=4 first_token_s=0.5 tokens=20 decode_s=1.0 drafted=0")?.client)
         XCTAssertEqual(RequestStats.parse(line)?.tokens, 20)
+        // Text after the numbers or the name doesn't lose the line.
+        let base = "Request stats: prompt=10 cached=4 first_token_s=0.5 tokens=20 decode_s=1.0 drafted=0"
+        XCTAssertEqual(RequestStats.parse(base + " ")?.tokens, 20)
+        XCTAssertEqual(RequestStats.parse(base + " peak_mb=5")?.tokens, 20)
+        XCTAssertNil(RequestStats.parse(base + " client=")?.client)
+        XCTAssertEqual(RequestStats.parse(base + " client=Codex extra=1")?.client, "Codex extra")
     }
 
     func testSumsAndPeriods() {
@@ -49,7 +58,9 @@ final class UsageLedgerTests: XCTestCase {
         XCTAssertNil(week[1].counts.decodeTokensPerSecond)
         XCTAssertNil(week[1].counts.prefillTokensPerSecond)
 
-        XCTAssertEqual(ledger.total(.all, now: now, calendar: calendar).requests, 4)
+        XCTAssertEqual(UsageLedger.total(ledger.lines(.all, by: .model, now: now, calendar: calendar)).requests, 4)
+        // A day after today (the clock moved back) isn't in Today.
+        XCTAssertTrue(ledger.lines(.today, by: .day, now: now.addingTimeInterval(-86400), calendar: calendar).isEmpty)
         XCTAssertEqual(ledger.lines(.all, by: .day, now: now, calendar: calendar).map(\.name),
                        ["2027-01-15", "2027-01-12", "2026-12-16"])
 

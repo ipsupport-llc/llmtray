@@ -50,10 +50,24 @@ public enum UsageClient {
         if fromApp { return background ? appBackground : app }
         guard let agent = userAgent?.trimmingCharacters(in: .whitespaces), !agent.isEmpty else { return "Other" }
         let lower = agent.lowercased()
-        if let hit = known.first(where: { lower.contains($0.match) }) { return hit.name }
+        // At a word's start: "zed" isn't in "customized".
+        if let hit = known.first(where: { startsWord(lower, $0.match) }) { return hit.name }
         let product = agent.split(whereSeparator: { $0 == "/" || $0 == " " || $0 == "(" }).first.map(String.init) ?? ""
-        let clean = String(product.filter { $0.isLetter || $0.isNumber || " ._-".contains($0) }.prefix(24))
+        // ASCII only: it goes on in an HTTP header.
+        let clean = String(product.filter { $0.isASCII && ($0.isLetter || $0.isNumber || " ._-".contains($0)) }.prefix(24))
         return clean.isEmpty ? "Other" : clean
+    }
+}
+
+extension UsageClient {
+    /// `word` in `text` where nothing letter-like comes right before it.
+    static func startsWord(_ text: String, _ word: String) -> Bool {
+        var start = text.startIndex
+        while let r = text.range(of: word, range: start..<text.endIndex) {
+            if r.lowerBound == text.startIndex || !text[text.index(before: r.lowerBound)].isLetter { return true }
+            start = text.index(after: r.lowerBound)
+        }
+        return false
     }
 }
 
@@ -114,6 +128,25 @@ public struct UsageLedger: Codable, Equatable, Sendable {
             decodeSeconds += other.decodeSeconds
         }
 
+        private enum CodingKeys: String, CodingKey {
+            case requests, promptTokens, cachedTokens, generatedTokens, firstTokenSeconds
+            case prefillTokens, prefillSeconds, decodeTokens, decodeSeconds
+        }
+
+        /// Fields added later read as 0: an older file still opens.
+        public init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            requests = try c.decodeIfPresent(Int.self, forKey: .requests) ?? 0
+            promptTokens = try c.decodeIfPresent(Int.self, forKey: .promptTokens) ?? 0
+            cachedTokens = try c.decodeIfPresent(Int.self, forKey: .cachedTokens) ?? 0
+            generatedTokens = try c.decodeIfPresent(Int.self, forKey: .generatedTokens) ?? 0
+            firstTokenSeconds = try c.decodeIfPresent(Double.self, forKey: .firstTokenSeconds) ?? 0
+            prefillTokens = try c.decodeIfPresent(Int.self, forKey: .prefillTokens) ?? 0
+            prefillSeconds = try c.decodeIfPresent(Double.self, forKey: .prefillSeconds) ?? 0
+            decodeTokens = try c.decodeIfPresent(Int.self, forKey: .decodeTokens) ?? 0
+            decodeSeconds = try c.decodeIfPresent(Double.self, forKey: .decodeSeconds) ?? 0
+        }
+
         /// Share of prompt tokens the cache already had.
         public var cachedShare: Double? { promptTokens > 0 ? Double(cachedTokens) / Double(promptTokens) : nil }
         public var prefillTokensPerSecond: Double? { prefillSeconds > 0 ? Double(prefillTokens) / prefillSeconds : nil }
@@ -131,12 +164,20 @@ public struct UsageLedger: Codable, Equatable, Sendable {
 
     public init(rows: [Row] = []) { self.rows = rows }
 
-    public static func day(_ date: Date, calendar: Calendar = .current) -> String {
+    /// Days are counted in the Gregorian calendar, in this Mac's time zone,
+    /// whatever calendar the user reads dates in: keys stay comparable.
+    public static var localCalendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = .current
+        return c
+    }
+
+    public static func day(_ date: Date, calendar: Calendar = localCalendar) -> String {
         let c = calendar.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
     }
 
-    public mutating func record(_ stats: RequestStats, model: String, at date: Date, calendar: Calendar = .current) {
+    public mutating func record(_ stats: RequestStats, model: String, at date: Date, calendar: Calendar = localCalendar) {
         let key = Key(day: Self.day(date, calendar: calendar), model: model, client: stats.client ?? "Other")
         if let i = rows.lastIndex(where: { $0.key == key }) {
             rows[i].counts.add(stats)
@@ -160,7 +201,7 @@ public struct UsageLedger: Codable, Equatable, Sendable {
 
     /// The rows of `period` (ending `now`), summed per model, client or
     /// day: the most requests first, days newest first.
-    public func lines(_ period: Period, by grouping: Grouping, now: Date = Date(), calendar: Calendar = .current) -> [Line] {
+    public func lines(_ period: Period, by grouping: Grouping, now: Date = Date(), calendar: Calendar = localCalendar) -> [Line] {
         let first: String? = {
             switch period {
             case .all: return nil
@@ -170,8 +211,10 @@ public struct UsageLedger: Codable, Equatable, Sendable {
                 return Self.day(start, calendar: calendar)
             }
         }()
+        // Not after today either (a clock or time zone moved back).
+        let today = Self.day(now, calendar: calendar)
         var sums: [String: Counts] = [:]
-        for row in rows where first.map({ row.key.day >= $0 }) ?? true {
+        for row in rows where (first.map { row.key.day >= $0 } ?? true) && (period == .all || row.key.day <= today) {
             let name: String
             switch grouping {
             case .model: name = row.key.model
@@ -185,10 +228,10 @@ public struct UsageLedger: Codable, Equatable, Sendable {
         return lines.sorted { $0.counts.requests != $1.counts.requests ? $0.counts.requests > $1.counts.requests : $0.name < $1.name }
     }
 
-    /// The whole period in one.
-    public func total(_ period: Period, now: Date = Date(), calendar: Calendar = .current) -> Counts {
+    /// What `lines` add up to.
+    public static func total(_ lines: [Line]) -> Counts {
         var total = Counts()
-        for line in lines(period, by: .day, now: now, calendar: calendar) { total.add(line.counts) }
+        for line in lines { total.add(line.counts) }
         return total
     }
 }

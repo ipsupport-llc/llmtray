@@ -17,15 +17,26 @@ final class UsageStore: ObservableObject {
     static var path: String { RuntimePaths.externalRuntimeDir + "/" + fileName }
 
     private init() {
-        ledger = FileManager.default.contents(atPath: Self.path)
-            .flatMap { try? JSONDecoder().decode(UsageLedger.self, from: $0) } ?? UsageLedger()
+        guard let data = FileManager.default.contents(atPath: Self.path) else {
+            ledger = UsageLedger()
+            return
+        }
+        if let loaded = try? JSONDecoder().decode(UsageLedger.self, from: data) {
+            ledger = loaded
+        } else {
+            // Unreadable: kept aside, not written over by the next save.
+            try? FileManager.default.removeItem(atPath: Self.path + ".unreadable")
+            try? FileManager.default.moveItem(atPath: Self.path, toPath: Self.path + ".unreadable")
+            ledger = UsageLedger()
+        }
     }
 
     var isEnabled: Bool { UserDefaults.standard[Pref.usageStatsEnabled] }
 
-    func record(_ stats: RequestStats, modelPath: String) {
-        guard isEnabled else { return }
-        ledger.record(stats, model: URL(fileURLWithPath: modelPath).lastPathComponent, at: Date())
+    /// `date`: when the server reported it (a line held back during a
+    /// benchmark comes later).
+    func record(_ stats: RequestStats, modelPath: String, at date: Date) {
+        ledger.record(stats, model: URL(fileURLWithPath: modelPath).lastPathComponent, at: date)
         dirty = true
         guard saveTask == nil else { return }
         scheduleSave(after: 3)
