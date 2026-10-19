@@ -31,6 +31,22 @@ public struct SharedContext: Codable, Equatable, Sendable, Identifiable {
     /// is for a model that doesn't see (noteForModel).
     public var hasPicture = false
 
+    private enum CodingKeys: String, CodingKey { case id, kind, title, source, text, truncated, titleOnly, hasPicture }
+
+    /// Fields added later decode as absent: a saved chat never fails to
+    /// open over them.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        kind = try c.decode(Kind.self, forKey: .kind)
+        title = try c.decodeIfPresent(String.self, forKey: .title) ?? ""
+        source = try c.decodeIfPresent(String.self, forKey: .source) ?? ""
+        text = try c.decodeIfPresent(String.self, forKey: .text)
+        truncated = try c.decodeIfPresent(Bool.self, forKey: .truncated) ?? false
+        titleOnly = try c.decodeIfPresent(Bool.self, forKey: .titleOnly) ?? false
+        hasPicture = try c.decodeIfPresent(Bool.self, forKey: .hasPicture) ?? false
+    }
+
     /// The most text one shared item adds to a message, in characters.
     public static let maxText = 6000
 

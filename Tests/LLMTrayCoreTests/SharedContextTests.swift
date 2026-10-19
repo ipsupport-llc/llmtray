@@ -66,6 +66,18 @@ final class SharedContextTests: XCTestCase {
         XCTAssertTrue(BrowserTab.script(for: chrome).hasPrefix("with timeout of"))
     }
 
+    func testDecodesWithoutLaterFields() throws {
+        let json = #"{"id":"6F9619FF-8B86-D011-B42D-00C04FC964FF","kind":"window","title":"A","source":"B"}"#
+        let c = try JSONDecoder().decode(SharedContext.self, from: Data(json.utf8))
+        XCTAssertEqual(c.title, "A")
+        XCTAssertFalse(c.hasPicture)
+        XCTAssertNil(c.text)
+        let round = try JSONDecoder().decode(SharedContext.self, from: JSONEncoder().encode(
+            SharedContext(kind: .window, title: "A", source: "B", text: "t", hasPicture: true)))
+        XCTAssertTrue(round.hasPicture)
+        XCTAssertEqual(round.text, "t")
+    }
+
     func testSharedTextIsOutsideText() {
         var state = ToolTrust.TurnState()
         XCTAssertTrue(ToolTrust.allows(.guarded, state))

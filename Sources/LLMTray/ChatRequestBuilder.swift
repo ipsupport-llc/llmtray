@@ -180,10 +180,13 @@ enum ChatRequestBuilder {
             return dict
         }
         // Files added to the project since the last message: said first.
-        // Then what the user showed (adr/0030).
+        // Then what the user showed (adr/0030). A capture's text is left
+        // out only when its picture goes too: each capture's picture is
+        // here (one went missing, say, and every capture's text goes).
+        let seesPictures = message.images.count >= message.shared.filter(\.hasPicture).count
         let notes = message.role == "user"
             ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 }
-                + message.shared.map { $0.noteForModel(seesPicture: !message.images.isEmpty) } : []
+                + message.shared.map { $0.noteForModel(seesPicture: seesPictures) } : []
         let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
         if message.role == "user", !message.images.isEmpty || !message.audios.isEmpty {
             // Attachments are always normalized to PNG before landing in
