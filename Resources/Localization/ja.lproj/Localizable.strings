@@ -1034,6 +1034,7 @@
 "Read Past Chats…" = "過去のチャットを読む…";
 "Read What Wasn't Read" = "未読分を読む";
 "Read chats" = "チャットを読み取る";
+"Read web pages" = "Webページを読む";
 "Reading a chat…" = "チャットを読み込み中…";
 "Reading a prompt: up to %lld%" = "プロンプト読み取り: 最大 %lld%";
 "Reading chats" = "チャットの読み取り";
