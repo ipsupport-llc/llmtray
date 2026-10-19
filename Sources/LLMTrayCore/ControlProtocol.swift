@@ -220,10 +220,14 @@ public struct ControlStatus: Codable, Equatable, Sendable {
     /// the app's own (no model-switch prompt for the user's own terminal).
     public var appTokenHeader: String
     public var appToken: String
+    /// Clients on this Mac must send the API key (Settings › Server). nil
+    /// from an app before the key existed.
+    public var apiKeyForLocal: Bool?
 
     public init(state: String, message: String? = nil, model: String? = nil, modelPath: String? = nil,
                 selectedModel: String? = nil, port: Int, idleUnloaded: Bool, appVersion: String,
-                baseURL: String, appTokenHeader: String, appToken: String) {
+                baseURL: String, appTokenHeader: String, appToken: String, apiKeyForLocal: Bool? = nil) {
+        self.apiKeyForLocal = apiKeyForLocal
         self.state = state
         self.message = message
         self.model = model

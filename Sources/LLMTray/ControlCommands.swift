@@ -70,7 +70,8 @@ final class ControlCommands {
             appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev",
             baseURL: ControlStatus.baseURL(port: port),
             // Only this user's processes reach the socket (adr/0019 §3).
-            appTokenHeader: AppRequestToken.header, appToken: AppRequestToken.value
+            appTokenHeader: AppRequestToken.header, appToken: AppRequestToken.value,
+            apiKeyForLocal: UserDefaults.standard[Pref.apiKeyRequired] && !UserDefaults.standard[Pref.apiKeyNetworkOnly]
         )
     }
 
