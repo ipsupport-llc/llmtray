@@ -104,6 +104,7 @@
 "A deleted project" = "削除されたプロジェクト";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "1つのチャットから学習した事実や観察は、別のチャットにも現れる（またはあなたが承認する）まで待機します。1つの質問だけで、あなたがどういう人かは決めません。あなたが依頼した内容（好みや修正）はすぐに使用されます。";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "GPUメモリに収まらない mixture-of-experts モデル（Gemma 4 26B-A4B、Nemotron 30B-A3B、Qwen MoE…）では、エキスパートの一部だけをメモリに保持し、残りは必要に応じて SSD から読み込みます。収まるモデルより数倍遅くなりますが、動作します。この種のモデルを次回起動したときに有効になります。";
 "A model is a tool, not an authority" = "モデルはツールであり、権威ではありません";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "ノートは、この期間確認されないと重要度が半分になり、その約3倍の期間で期限切れになります。ピン留め済みのノートは期限切れになりません。";
 "A package: moved as one item." = "パッケージ：1 件の項目として移動されます。";
@@ -495,6 +496,7 @@
 "Everything" = "すべて";
 "Everything in that folder is here already." = "そのフォルダ内のものはすでにここにあります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
+"Experimental" = "実験的";
 "Experimental — English only" = "実験的 — 英語のみ";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "実験的 — 英語のみ。Voice Lab 実行中はチャットモデルがアンロードされ、終了後に再読み込みされます。";
 "Expired" = "期限切れ";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "各回答の直後";
 "Room in each chat: %lld tokens" = "各チャットの余裕：%lldトークン";
 "Run benchmark" = "ベンチマークを実行";
+"Run big MoE models with experts on disk" = "エキスパートをディスクに置いて大規模な MoE モデルを実行";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU メモリ制限を上げるには Terminal で実行してください；Mac を再起動するとリセットされます。";
 "Run without asking:" = "確認なしで実行:";
 "Running" = "実行中";

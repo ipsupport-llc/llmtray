@@ -104,6 +104,7 @@
 "A deleted project" = "Proyek yang dihapus";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Fakta atau pengamatan yang dipelajari dari satu obrolan menunggu hingga obrolan lain menunjukkannya juga (atau Anda menyetujuinya): satu pertanyaan tidak menentukan siapa Anda. Hal yang Anda minta -- preferensi, koreksi -- langsung digunakan.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix yang lebih penuh dan terdengar matang; lirik kurang jelas. Sekitar 20 s untuk 30 s musik.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "Model mixture-of-experts (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) yang tidak muat dalam memori GPU hanya menyimpan sebagian expert di memori dan membaca sisanya dari SSD saat diperlukan. Beberapa kali lebih lambat daripada model yang muat, tetapi tetap dapat berjalan. Berlaku saat model seperti itu dimulai berikutnya.";
 "A model is a tool, not an authority" = "Model adalah alat, bukan otoritas";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Catatan bernilai setengah setelah selama ini tanpa dikonfirmasi, dan kedaluwarsa setelah kira-kira tiga kali lebih lama. Catatan Tersemat tidak pernah kedaluwarsa.";
 "A package: moved as one item." = "Sebuah paket: dipindahkan sebagai satu item.";
@@ -495,6 +496,7 @@
 "Everything" = "Semua";
 "Everything in that folder is here already." = "Semua di folder itu sudah ada di sini.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Persis apa yang dikirim LLMTray ke ipsupport.us, per bidang. Tidak ada yang lain keluar dari Mac Anda.";
+"Experimental" = "Eksperimental";
 "Experimental — English only" = "Eksperimental — hanya Bahasa Inggris";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Eksperimental — hanya Bahasa Inggris. Model chat dibongkar saat Voice Lab berjalan, dan dimuat ulang setelahnya.";
 "Expired" = "Kedaluwarsa";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "Tepat setelah setiap jawaban";
 "Room in each chat: %lld tokens" = "Ruang di setiap obrolan: %lld token";
 "Run benchmark" = "Jalankan benchmark";
+"Run big MoE models with experts on disk" = "Jalankan model MoE besar dengan expert di disk";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Jalankan di Terminal untuk menaikkan batas memori GPU; akan kembali saat Mac di-restart.";
 "Run without asking:" = "Jalankan tanpa bertanya:";
 "Running" = "Berjalan";

@@ -104,6 +104,7 @@
 "A deleted project" = "Un proyecto eliminado";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Un dato u observación aprendido de un Chat espera hasta que otro Chat también lo muestre (o hasta que lo apruebes): una pregunta no define quién eres. Lo que pidas —preferencias, correcciones— se usa de inmediato.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mezcla más completa y acabada; las letras se oyen menos claras. Unos 20 s para 30 s de música.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "Un modelo de mezcla de expertos (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) que no cabe en la memoria de la GPU mantiene solo parte de sus expertos en memoria y lee los demás desde el SSD cuando los necesita. Es varias veces más lento que un modelo que sí cabe, pero funciona. Surte efecto la próxima vez que se inicie un modelo de este tipo.";
 "A model is a tool, not an authority" = "Un modelo es una herramienta, no una autoridad";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "Una nota cuenta la mitad después de este tiempo sin confirmarse y caduca tras aproximadamente el triple. Las notas fijadas nunca caducan.";
 "A package: moved as one item." = "Un paquete: movido como un solo elemento.";
@@ -495,6 +496,7 @@
 "Everything" = "Todo";
 "Everything in that folder is here already." = "Todo lo de esa carpeta ya está aquí.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactamente lo que LLMTray envía a ipsupport.us, campo por campo. Nada más sale de tu Mac.";
+"Experimental" = "Experimental";
 "Experimental — English only" = "Experimental — solo inglés";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Experimental — solo inglés. El modelo de chat se descarga mientras Voice Lab está en ejecución y se recarga después.";
 "Expired" = "Caducadas";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "Justo después de cada respuesta";
 "Room in each chat: %lld tokens" = "Espacio en cada Chat: %lld tokens";
 "Run benchmark" = "Ejecutar prueba";
+"Run big MoE models with experts on disk" = "Ejecutar modelos MoE grandes con expertos en disco";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Ejecuta esto en Terminal para aumentar el límite de memoria GPU; se restablece al reiniciar el Mac.";
 "Run without asking:" = "Ejecutar sin preguntar:";
 "Running" = "En ejecución";

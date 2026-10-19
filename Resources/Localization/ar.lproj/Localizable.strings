@@ -104,6 +104,7 @@
 "A deleted project" = "مشروع محذوف";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "أي حقيقة أو ملاحظة متعلّمة من دردشة واحدة تنتظر حتى تظهر في دردشة أخرى أيضًا (أو توافق عليها): سؤال واحد لا يحدد من أنت. أما ما تطلبه — مثل التفضيلات والتصحيحات — فيُستخدم فورًا.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "مكس أكثر امتلاءً ومظهرًا مكتملًا؛ كلمات الأغنية تبدو أقل وضوحًا. حوالي 20 s لمقطع موسيقي مدته 30 s.";
+"A mixture-of-experts model (Gemma 4 26B-A4B, Nemotron 30B-A3B, Qwen MoE…) that doesn't fit the GPU memory keeps only part of its experts in memory and reads the others from the SSD as it needs them. Several times slower than a model that fits, but it runs. Takes effect on the next start of such a model." = "يحتفظ نموذج من نوع mixture-of-experts ‏(Gemma 4 26B-A4B وNemotron 30B-A3B وQwen MoE…) الذي لا يلائم ذاكرة GPU بجزء فقط من خبرائه في الذاكرة، ويقرأ الباقي من SSD عند الحاجة. يكون أبطأ بعدة مرات من نموذج يلائم الذاكرة، لكنه يعمل. يسري هذا عند بدء تشغيل نموذج من هذا النوع في المرة التالية.";
 "A model is a tool, not an authority" = "النموذج أداة، وليس سلطةً";
 "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "تُحسب الملاحظة بنصف أهميتها بعد هذه المدة من دون تأكيدها، وتنتهي صلاحيتها بعد نحو ثلاثة أضعاف هذه المدة. لا تنتهي صلاحية الملاحظات المثبّتة أبدًا.";
 "A package: moved as one item." = "حزمة: نُقلت كعنصر واحد.";
@@ -495,6 +496,7 @@
 "Everything" = "كل شيء";
 "Everything in that folder is here already." = "كل شيء في ذلك المجلد موجود هنا بالفعل.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "بالضبط ما يرسله LLMTray إلى ipsupport.us، حقلًا بحقل. لا شيء آخر يغادر جهاز Mac الخاص بك.";
+"Experimental" = "تجريبي";
 "Experimental — English only" = "تجريبي — الإنجليزية فقط";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "تجريبي — الإنجليزية فقط. يُفرغ نموذج الدردشة أثناء تشغيل Voice Lab ويُعاد تحميله بعد الانتهاء.";
 "Expired" = "منتهية الصلاحية";
@@ -1107,6 +1109,7 @@
 "Right after each answer" = "مباشرة بعد كل إجابة";
 "Room in each chat: %lld tokens" = "المساحة في كل دردشة: %lld رمزًا مميزًا";
 "Run benchmark" = "تشغيل الاختبار المعياري";
+"Run big MoE models with experts on disk" = "تشغيل نماذج MoE الكبيرة مع الخبراء على القرص";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "شغّله في Terminal لزيادة حد ذاكرة GPU؛ سيُعاد تعيينه عند إعادة تشغيل الـMac.";
 "Run without asking:" = "تشغيل من دون طلب إذن:";
 "Running" = "قيد التشغيل";
