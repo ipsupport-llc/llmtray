@@ -197,7 +197,7 @@
 "Approve Selected" = "Approve Selected";
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
-"Apps on this Mac go without the key; devices on your network need it. Off: every client needs it, this Mac's too." = "Apps on this Mac go without the key; devices on your network need it. Off: every client needs it, this Mac's too.";
+"Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too." = "Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too.";
 "Arguments, one per line" = "Arguments, one per line";
 "Ask Later" = "Ask Later";
 "Ask about LLMTray" = "Ask about LLMTray";
@@ -248,6 +248,7 @@
 "Can look · %@" = "Can look · %@";
 "Can look · 1 hour" = "Can look · 1 hour";
 "Can look · Always" = "Can look · Always";
+"Can't be read" = "Can't be read";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -1285,6 +1286,8 @@
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
 "The key couldn't be saved in the Keychain." = "The key couldn't be saved in the Keychain.";
+"The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key." = "The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key.";
+"The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked." = "The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked.";
 "The last change couldn't be saved." = "The last change couldn't be saved.";
 "The log couldn't be saved" = "The log couldn't be saved";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";

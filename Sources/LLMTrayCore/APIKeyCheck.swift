@@ -24,6 +24,12 @@ public enum APIKeyCheck {
     ///   required key that can't be read refuses every outside request).
     /// - `fromLoopback`: the connection came from this Mac.
     /// - `fromApp`: LLMTray's own request (its chat, the CLI).
+    /// A browser's CORS preflight: OPTIONS with the Origin and the method it
+    /// asks about. It carries no key; it gets only the CORS headers.
+    public static func isPreflight(method: String, headers: [String: String]) -> Bool {
+        method == "OPTIONS" && headers["origin"] != nil && headers["access-control-request-method"] != nil
+    }
+
     public static func allows(headers: [String: String], key: String?, required: Bool, networkOnly: Bool,
                               fromLoopback: Bool, fromApp: Bool) -> Bool {
         guard required, !fromApp, !(networkOnly && fromLoopback) else { return true }
@@ -55,7 +61,10 @@ public enum APIKeyCheck {
         while out.count < 32 {
             if pool.isEmpty {
                 var more = [UInt8](repeating: 0, count: 32)
-                _ = SecRandomCopyBytes(kSecRandomDefault, more.count, &more)
+                // Never zeros for want of randomness: a UUID's then.
+                guard SecRandomCopyBytes(kSecRandomDefault, more.count, &more) == errSecSuccess else {
+                    return "llmtray-" + UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                }
                 pool = more[...]
             }
             let byte = pool.removeFirst()

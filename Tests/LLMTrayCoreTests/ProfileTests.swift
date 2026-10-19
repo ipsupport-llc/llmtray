@@ -327,7 +327,8 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertEqual(value(args, "--draft-model"), "org/drafter")
         XCTAssertEqual(value(args, "--decode-concurrency"), "4")
         XCTAssertEqual(value(args, "--log-level"), "DEBUG")
-        XCTAssertEqual(Array(args.suffix(3)), ["--foo", "1", "--bar"])
+        // The extra arguments, then the loopback host no extra one overrides.
+        XCTAssertEqual(Array(args.suffix(5)), ["--foo", "1", "--bar", "--host", "127.0.0.1"])
         XCTAssertFalse(ServerLaunch.extraArgsSetDrafter(r))
     }
 }

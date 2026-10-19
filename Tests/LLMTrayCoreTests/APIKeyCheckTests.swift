@@ -33,6 +33,12 @@ final class APIKeyCheckTests: XCTestCase {
         XCTAssertFalse(allows(["authorization": "Bearer "], key: ""))
     }
 
+    func testPreflightOnlyWithOriginAndMethod() {
+        XCTAssertTrue(APIKeyCheck.isPreflight(method: "OPTIONS", headers: ["origin": "http://x", "access-control-request-method": "POST"]))
+        XCTAssertFalse(APIKeyCheck.isPreflight(method: "OPTIONS", headers: [:]))
+        XCTAssertFalse(APIKeyCheck.isPreflight(method: "POST", headers: ["origin": "http://x", "access-control-request-method": "POST"]))
+    }
+
     func testGeneratedKeys() {
         let a = APIKeyCheck.generate(), b = APIKeyCheck.generate()
         XCTAssertTrue(a.hasPrefix("llmtray-"))

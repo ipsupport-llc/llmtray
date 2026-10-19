@@ -1416,7 +1416,9 @@ extension ServerPane {
             Toggle(isOn: Binding(get: { apiKeyRequired }, set: { on in
                 if on {
                     guard let key = APIKey.ensure() else {
-                        keyError = NSLocalizedString("The key couldn't be saved in the Keychain.", comment: "settings: API key")
+                        keyError = APIKey.unreadable
+                            ? NSLocalizedString("The key in the Keychain can't be read now (is the Keychain locked?). Try again, or make a new key.", comment: "settings: API key")
+                            : NSLocalizedString("The key couldn't be saved in the Keychain.", comment: "settings: API key")
                         return
                     }
                     apiKey = key
@@ -1429,7 +1431,7 @@ extension ServerPane {
             if apiKeyRequired {
                 LabeledContent {
                     HStack(spacing: 6) {
-                        Text(verbatim: showsKey ? (apiKey ?? "") : String(repeating: "•", count: 16))
+                        Text(verbatim: apiKey == nil ? NSLocalizedString("Can't be read", comment: "settings: the API key isn't readable") : showsKey ? (apiKey ?? "") : String(repeating: "•", count: 16))
                             .font(.system(.callout, design: .monospaced))
                             .textSelection(.enabled)
                             .lineLimit(1)
@@ -1437,16 +1439,18 @@ extension ServerPane {
                             .buttonStyle(.borderless)
                             .help(showsKey ? "Hide" : "Show")
                         Button("Copy") {
+                            guard let apiKey else { return }
                             NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(apiKey ?? "", forType: .string)
+                            NSPasteboard.general.setString(apiKey, forType: .string)
                         }
+                        .disabled(apiKey == nil)
                         Button("New Key…") { regenerateKey() }
                     }
                 } label: {
                     SettingLabel(title: "Key", help: "Paste it into the client as its API key (OPENAI_API_KEY, ANTHROPIC_API_KEY…). Kept in your Keychain.")
                 }
                 Toggle(isOn: $apiKeyNetworkOnly) {
-                    SettingLabel(title: "Only for connections from other devices", help: "Apps on this Mac go without the key; devices on your network need it. Off: every client needs it, this Mac's too.")
+                    SettingLabel(title: "Only for connections from other devices", help: "Apps on this Mac go without the key; devices on your network need it. Off: every client of LLMTray's port needs it, this Mac's too.")
                 }
                 if apiKeyNetworkOnly && !allowLAN {
                     Text("Only this Mac can connect now (local network access is off), so no client is asked for the key.")
@@ -1458,7 +1462,14 @@ extension ServerPane {
             }
             if let keyError { Text(keyError).font(.caption).foregroundStyle(.red) }
         }
-        .onAppear { if apiKeyRequired { apiKey = APIKey.value } }
+        .onAppear {
+            guard apiKeyRequired else { return }
+            APIKey.refresh()
+            apiKey = APIKey.value
+            keyError = apiKey == nil
+                ? NSLocalizedString("The key in the Keychain can't be read now, so every outside client is refused. Make a new key, or reopen Settings once the Keychain is unlocked.", comment: "settings: API key")
+                : nil
+        }
     }
 
     private func regenerateKey() {

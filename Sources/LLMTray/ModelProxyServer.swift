@@ -167,9 +167,9 @@ final class ModelProxyServer {
         // The API key, when one is required: checked on the headers, before
         // a body is read. A browser's CORS preflight carries no key.
         let defaults = UserDefaults.standard
-        if head.method != "OPTIONS",
-           !APIKeyCheck.allows(headers: head.headers, key: APIKey.value, required: defaults[Pref.apiKeyRequired],
-                               networkOnly: defaults[Pref.apiKeyNetworkOnly], fromLoopback: APIKey.isLoopback(connection.endpoint),
+        if defaults[Pref.apiKeyRequired], !APIKeyCheck.isPreflight(method: head.method, headers: head.headers),
+           !APIKeyCheck.allows(headers: head.headers, key: APIKey.value, required: true,
+                               networkOnly: defaults[Pref.apiKeyNetworkOnly], fromLoopback: APIKey.isThisMac(connection.endpoint),
                                fromApp: head.headers[AppRequestToken.header.lowercased()] == AppRequestToken.value) {
             readingConnections.remove(ObjectIdentifier(connection))
             let route = head.path.split(separator: "?", maxSplits: 1).first.map(String.init) ?? head.path
