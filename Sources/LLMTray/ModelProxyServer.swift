@@ -164,6 +164,18 @@ final class ModelProxyServer {
     }
 
     private func startBody(_ head: HTTPRequestHead, bodySoFar: Data, connection: NWConnection, internalPort: Int) {
+        // The API key, when one is required: checked on the headers, before
+        // a body is read. A browser's CORS preflight carries no key.
+        let defaults = UserDefaults.standard
+        if defaults[Pref.apiKeyRequired], !APIKeyCheck.isPreflight(method: head.method, headers: head.headers),
+           !APIKeyCheck.allows(headers: head.headers, key: APIKey.value, required: true,
+                               networkOnly: defaults[Pref.apiKeyNetworkOnly], fromLoopback: APIKey.isThisMac(connection.endpoint),
+                               fromApp: head.headers[AppRequestToken.header.lowercased()] == AppRequestToken.value) {
+            readingConnections.remove(ObjectIdentifier(connection))
+            let route = head.path.split(separator: "?", maxSplits: 1).first.map(String.init) ?? head.path
+            sendJSON(connection: connection, status: "401 Unauthorized", APIKeyCheck.unauthorizedBody(route: route))
+            return
+        }
         if bodySoFar.count >= head.contentLength {
             route(method: head.method, path: head.path, headers: head.headers, body: bodySoFar.prefix(head.contentLength), connection: connection, internalPort: internalPort)
         } else {
