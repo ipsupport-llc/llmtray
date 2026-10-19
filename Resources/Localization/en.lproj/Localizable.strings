@@ -876,7 +876,6 @@
 "Open in New Tab" = "Open in New Tab";
 "Open in Preview" = "Open in Preview";
 "Open in Window" = "Open in Window";
-"Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
 "OpenAI-compatible: point a coding agent or app at this address (copies it)" = "OpenAI-compatible: point a coding agent or app at this address (copies it)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";
 "Opens at login" = "Opens at login";
@@ -1266,7 +1265,7 @@
 "The exact text a new chat gets, before your first message." = "The exact text a new chat gets, before your first message.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
-"The full chat window, with projects and every chat (⌘⇧O)" = "The full chat window, with projects and every chat (⌘⇧O)";
+"The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar" = "The full chat window, with projects and every chat (⌘⇧O) -- closing it puts the chat back in the menu bar";
 "The image draft above is open: Generate or Skip it to keep chatting." = "The image draft above is open: Generate or Skip it to keep chatting.";
 "The image edit draft above is open: Generate or Skip it to keep chatting." = "The image edit draft above is open: Generate or Skip it to keep chatting.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
