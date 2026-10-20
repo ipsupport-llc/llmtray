@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "يُبقي أول N من رموز السياق بالدقة الكاملة قبل تكميمها. القيم الأعلى تقلل توفير الذاكرة مقابل دقة أفضل في الموجهات الطويلة.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "يحتفظ بهذا المنفذ. إذا كان تطبيق آخر يستخدمه بالفعل، فلن يبدأ الخادم حتى تغيّر المنفذ في الإعدادات.";
 "Kept free: %lld MB" = "محفوظة خالية: %lld ميغابايت";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "يُحتفَظ بها على هذا الـ Mac فقط. يسمّي وكيل LLMTray العملاء استنادًا إلى User-Agent الخاص بهم؛ وتُحتسَب الطلبات التي خدمها الـ runtime قبل تسميتهم ضمن «أخرى».";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "يُحتفَظ به على هذا الـ Mac فقط. تُسمّى العملاء من خلال وكيل LLMTray استنادًا إلى User-Agent الخاص بها؛ ويظهر البرنامج الذي لا يعرّف نفسه باسم الـ API الذي يستدعيه، مع لغته، مثل OpenAI API (Go)؛ وتُحتسب الطلبات السابقة لقيام الـ runtime بتسمية العملاء ضمن «أخرى».";
 "Key" = "المفتاح";
 "Kind" = "النوع";
 "LLMTray" = "LLMTray";
