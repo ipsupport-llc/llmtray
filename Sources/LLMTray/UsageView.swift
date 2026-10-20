@@ -116,7 +116,7 @@ struct UsageView: View {
             } else {
                 table(lines)
             }
-            Text("Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other.")
+            Text("Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other.")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(14)

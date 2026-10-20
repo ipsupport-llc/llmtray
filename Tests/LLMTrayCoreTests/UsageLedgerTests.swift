@@ -10,11 +10,20 @@ final class UsageLedgerTests: XCTestCase {
         XCTAssertEqual(UsageClient.name(userAgent: "curl/8.7.1", fromApp: false, background: false), "curl")
         XCTAssertEqual(UsageClient.name(userAgent: "OpenAI/Python 1.99.0", fromApp: false, background: false), "OpenAI SDK (Python)")
         XCTAssertEqual(UsageClient.name(userAgent: "MyTool/3.1 (whatever)", fromApp: false, background: false), "MyTool")
-        XCTAssertEqual(UsageClient.name(userAgent: "  ", fromApp: false, background: false), "Other")
-        XCTAssertEqual(UsageClient.name(userAgent: nil, fromApp: false, background: false), "Other")
-        XCTAssertEqual(UsageClient.name(userAgent: "(((", fromApp: false, background: false), "Other")
+        XCTAssertEqual(UsageClient.name(userAgent: "  ", fromApp: false, background: false, route: "/v1/chat/completions"), "OpenAI API")
+        XCTAssertEqual(UsageClient.name(userAgent: nil, fromApp: false, background: false, route: "/v1/messages"), "Anthropic API")
+        XCTAssertEqual(UsageClient.name(userAgent: "(((", fromApp: false, background: false, route: "/v1/responses"), "Responses API")
+        // A program that didn't name itself: the API it calls, its language.
+        XCTAssertEqual(UsageClient.name(userAgent: "Go-http-client/1.1", fromApp: false, background: false, route: "/v1/chat/completions"), "OpenAI API (Go)")
+        XCTAssertEqual(UsageClient.name(userAgent: "python-requests/2.32.3", fromApp: false, background: false, route: "/v1/messages?beta=true"), "Anthropic API (Python)")
+        // Only a library's own name first, exactly: programs keep theirs.
+        XCTAssertEqual(UsageClient.name(userAgent: "MyApp/1.0 CFNetwork/1496 Darwin/23", fromApp: false, background: false, route: "/v1/chat/completions"), "MyApp")
+        XCTAssertEqual(UsageClient.name(userAgent: "JavaScriptClient/1.0", fromApp: false, background: false), "JavaScriptClient")
+        XCTAssertEqual(UsageClient.name(userAgent: "node-custom/1.0", fromApp: false, background: false), "node-custom")
+        XCTAssertEqual(UsageClient.name(userAgent: "node/22.1", fromApp: false, background: false, route: "/v1/responses"), "Responses API (Node)")
+        XCTAssertEqual(UsageClient.name(userAgent: "ipsupport-code/1.4", fromApp: false, background: false, route: "/v1/chat/completions"), "ipsupport-code")
         XCTAssertEqual(UsageClient.name(userAgent: "customized-agent/1.0", fromApp: false, background: false), "customized-agent")
-        XCTAssertEqual(UsageClient.name(userAgent: "ツール/1.0", fromApp: false, background: false), "Other")
+        XCTAssertEqual(UsageClient.name(userAgent: "ツール/1.0", fromApp: false, background: false, route: "/v1/chat/completions"), "OpenAI API")
         XCTAssertEqual(UsageClient.name(userAgent: "Zed/0.200", fromApp: false, background: false), "Zed")
     }
 

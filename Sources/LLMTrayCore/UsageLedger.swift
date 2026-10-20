@@ -32,9 +32,7 @@ public enum UsageClient {
         ("anthropic/js", "Anthropic SDK (JS)"),
         ("openai/python", "OpenAI SDK (Python)"),
         ("openai/js", "OpenAI SDK (JS)"),
-        ("python-requests", "Python"),
-        ("python-httpx", "Python"),
-        ("aiohttp", "Python"),
+        ("ipsupport-code", "ipsupport-code"),
         ("curl/", "curl"),
         ("wget/", "wget"),
         ("postman", "Postman"),
@@ -42,20 +40,44 @@ public enum UsageClient {
         ("mozilla/", "Browser"),
     ]
 
+    /// An HTTP library's own User-Agent -- its first product, exactly: a
+    /// program that didn't name itself. The language, for "OpenAI API (Go)".
+    /// ("MyApp/1.0 CFNetwork/…" names MyApp: it stays MyApp.)
+    static let libraries: [String: String] = [
+        "go-http-client": "Go",
+        "python-requests": "Python", "python-httpx": "Python", "python-urllib": "Python", "aiohttp": "Python",
+        "node-fetch": "Node", "undici": "Node", "axios": "Node", "node": "Node",
+        "okhttp": "Java", "java": "Java", "java-http-client": "Java", "dart": "Dart", "reqwest": "Rust", "hyper": "Rust",
+        "cfnetwork": "Swift",
+    ]
+
+    /// Which API a route is: what an unnamed client is called by.
+    public static func api(route: String) -> String {
+        let path = route.split(separator: "?").first.map(String.init) ?? route
+        if path.hasSuffix("/messages") { return "Anthropic API" }
+        if path.hasSuffix("/responses") { return "Responses API" }
+        if path.hasSuffix("/completions") || path.hasSuffix("/embeddings") { return "OpenAI API" }
+        return "API"
+    }
+
     /// The name for a request: the app's own (its token) by whether it's
-    /// background work, anyone else's by its User-Agent -- a known client's
-    /// name, else the agent's first product name ("Foo/1.2 (…)" → "Foo"),
-    /// else "Other".
-    public static func name(userAgent: String?, fromApp: Bool, background: Bool) -> String {
+    /// background work; a known client's name; for a program that didn't
+    /// name itself (no User-Agent, or an HTTP library's) the API it calls
+    /// and its language ("OpenAI API (Go)"); else the agent's first product
+    /// name ("Foo/1.2 (…)" → "Foo").
+    public static func name(userAgent: String?, fromApp: Bool, background: Bool, route: String = "") -> String {
         if fromApp { return background ? appBackground : app }
-        guard let agent = userAgent?.trimmingCharacters(in: .whitespaces), !agent.isEmpty else { return "Other" }
+        let api = api(route: route)
+        guard let agent = userAgent?.trimmingCharacters(in: .whitespaces), !agent.isEmpty else { return api }
         let lower = agent.lowercased()
         // At a word's start: "zed" isn't in "customized".
         if let hit = known.first(where: { startsWord(lower, $0.match) }) { return hit.name }
+        let first = lower.split(whereSeparator: { $0 == "/" || $0 == " " || $0 == "(" }).first.map(String.init) ?? ""
+        if let language = libraries[first] { return "\(api) (\(language))" }
         let product = agent.split(whereSeparator: { $0 == "/" || $0 == " " || $0 == "(" }).first.map(String.init) ?? ""
         // ASCII only: it goes on in an HTTP header.
         let clean = String(product.filter { $0.isASCII && ($0.isLetter || $0.isNumber || " ._-".contains($0)) }.prefix(24))
-        return clean.isEmpty ? "Other" : clean
+        return clean.isEmpty ? api : clean
     }
 }
 

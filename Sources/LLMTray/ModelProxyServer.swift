@@ -659,7 +659,8 @@ final class ModelProxyServer {
         request.setValue(UsageClient.name(
             userAgent: headers["user-agent"],
             fromApp: headers[AppRequestToken.header.lowercased()] == AppRequestToken.value,
-            background: headers[BackgroundRequest.header.lowercased()] == BackgroundRequest.value
+            background: headers[BackgroundRequest.header.lowercased()] == BackgroundRequest.value,
+            route: path
         ), forHTTPHeaderField: UsageClient.header)
         if !body.isEmpty {
             request.httpBody = body
