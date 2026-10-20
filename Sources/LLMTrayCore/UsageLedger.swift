@@ -40,14 +40,15 @@ public enum UsageClient {
         ("mozilla/", "Browser"),
     ]
 
-    /// An HTTP library's own User-Agent, a program that didn't name itself:
-    /// the language, for "OpenAI API (Go)".
-    static let libraries: [(match: String, language: String)] = [
-        ("go-http-client", "Go"),
-        ("python-requests", "Python"), ("python-httpx", "Python"), ("python-urllib", "Python"), ("aiohttp", "Python"),
-        ("node-fetch", "Node"), ("undici", "Node"), ("axios", "Node"), ("node", "Node"),
-        ("okhttp", "Java"), ("java", "Java"), ("dart", "Dart"), ("reqwest", "Rust"), ("hyper", "Rust"),
-        ("cfnetwork", "Swift"), ("urlsession", "Swift"),
+    /// An HTTP library's own User-Agent -- its first product, exactly: a
+    /// program that didn't name itself. The language, for "OpenAI API (Go)".
+    /// ("MyApp/1.0 CFNetwork/…" names MyApp: it stays MyApp.)
+    static let libraries: [String: String] = [
+        "go-http-client": "Go",
+        "python-requests": "Python", "python-httpx": "Python", "python-urllib": "Python", "aiohttp": "Python",
+        "node-fetch": "Node", "undici": "Node", "axios": "Node", "node": "Node",
+        "okhttp": "Java", "java": "Java", "java-http-client": "Java", "dart": "Dart", "reqwest": "Rust", "hyper": "Rust",
+        "cfnetwork": "Swift",
     ]
 
     /// Which API a route is: what an unnamed client is called by.
@@ -71,7 +72,8 @@ public enum UsageClient {
         let lower = agent.lowercased()
         // At a word's start: "zed" isn't in "customized".
         if let hit = known.first(where: { startsWord(lower, $0.match) }) { return hit.name }
-        if let library = libraries.first(where: { startsWord(lower, $0.match) }) { return "\(api) (\(library.language))" }
+        let first = lower.split(whereSeparator: { $0 == "/" || $0 == " " || $0 == "(" }).first.map(String.init) ?? ""
+        if let language = libraries[first] { return "\(api) (\(language))" }
         let product = agent.split(whereSeparator: { $0 == "/" || $0 == " " || $0 == "(" }).first.map(String.init) ?? ""
         // ASCII only: it goes on in an HTTP header.
         let clean = String(product.filter { $0.isASCII && ($0.isLetter || $0.isNumber || " ._-".contains($0)) }.prefix(24))
