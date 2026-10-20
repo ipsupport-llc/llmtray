@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Закріплює цей порт. Якщо інша програма вже його використовує, сервер не запуститься, доки ви не зміните порт у Параметрах.";
 "Kept free: %lld MB" = "Залишено вільними: %lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Зберігається лише на цьому Mac. Назви клієнтів проксі LLMTray визначає за їхнім User-Agent; запити, які Runtime обробив до того, як визначив їхню назву, зараховуються як «Інше».";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "Зберігається лише на цьому Mac. Проксі LLMTray називає клієнтів за їхнім User-Agent; програма, яка себе не називає, показується як API, яке вона викликає, разом зі своєю мовою, наприклад OpenAI API (Go); запити, надіслані до того, як Runtime почав називати клієнтів, зараховуються як «Інше».";
 "Key" = "Ключ";
 "Kind" = "Тип";
 "LLMTray" = "LLMTray";

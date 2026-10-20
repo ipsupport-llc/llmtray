@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Giữ N token đầu tiên của ngữ cảnh ở độ chính xác đầy đủ trước khi lượng tử hóa. Giá trị cao hơn đánh đổi mức tiết kiệm bộ nhớ để lấy độ chính xác với prompt dài.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Giữ cổng này. Nếu ứng dụng khác đang dùng, server sẽ không khởi động cho đến khi bạn thay đổi cổng trong Cài đặt.";
 "Kept free: %lld MB" = "Giữ trống: %lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Chỉ được giữ trên Máy Mac này. Trình khách được proxy của LLMTray đặt tên theo User-Agent của chúng; các yêu cầu mà Runtime phục vụ trước khi được đặt tên sẽ được tính là Khác.";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "Chỉ được giữ trên Máy Mac này. Máy khách được proxy của LLMTray đặt tên theo User-Agent; chương trình không tự nêu tên sẽ hiển thị là API mà chương trình gọi, kèm ngôn ngữ của chương trình đó, chẳng hạn như OpenAI API (Go); các yêu cầu từ trước khi Runtime đặt tên máy khách sẽ được tính là Mục khác.";
 "Key" = "Khóa";
 "Kind" = "Loại";
 "LLMTray" = "LLMTray";

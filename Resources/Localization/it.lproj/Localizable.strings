@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene i primi N token di contesto a precisione piena prima della quantizzazione. Un valore più alto riduce il risparmio di memoria ma aumenta l’accuratezza nei prompt lunghi.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Mantiene questa porta. Se un’altra app la sta usando, il server non si avvierà finché non cambi la porta in Impostazioni.";
 "Kept free: %lld MB" = "Mantenuto libero: %lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Conservate solo su questo Mac. I client vengono denominati dal proxy di LLMTray in base al loro User-Agent; le richieste gestite dal runtime prima che venissero denominati contano come Altro.";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "Conservato solo su questo Mac. I client sono denominati dal proxy di LLMTray in base al loro User-Agent; un programma che non si identifica viene mostrato come l’API che chiama, con il relativo linguaggio, ad esempio OpenAI API (Go); le richieste precedenti al momento in cui il runtime ha denominato i client vengono conteggiate come Altro.";
 "Key" = "Chiave";
 "Kind" = "Tipo";
 "LLMTray" = "LLMTray";

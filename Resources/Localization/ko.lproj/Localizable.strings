@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "양자화하기 전에 컨텍스트의 처음 N개 토큰을 전체 정밀도로 유지합니다. 값이 높을수록 메모리 절약은 줄지만 긴 프롬프트의 정확도가 높아집니다.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "이 포트를 유지합니다. 다른 앱이 실제로 포트를 사용 중이라면 Settings에서 포트를 변경할 때까지 서버가 시작되지 않습니다.";
 "Kept free: %lld MB" = "비워둠: %lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "오직 이 Mac에만 보관됩니다. 클라이언트 이름은 LLMTray의 프록시가 User-Agent를 바탕으로 지정하며, 그전에 런타임이 처리한 요청은 ‘기타’로 집계됩니다.";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "이 Mac에만 보관됩니다. 클라이언트 이름은 LLMTray의 프록시가 User-Agent를 바탕으로 지정합니다. 프로그램이 자체 이름을 밝히지 않으면 OpenAI API (Go)처럼 호출하는 API 이름과 언어로 표시되며, 런타임이 클라이언트 이름을 지정하기 전의 요청은 기타로 집계됩니다.";
 "Key" = "키";
 "Kind" = "종류";
 "LLMTray" = "LLMTray";

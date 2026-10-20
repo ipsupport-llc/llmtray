@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Bağlamın ilk N token’ını nicelemeden önce tam hassasiyette tutar. Daha yüksek değer, uzun istemlerde doğruluk için bellek tasarrufundan ödün verir.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Bu bağlantı noktasını tutar. Gerçekten başka bir uygulama kullanıyorsa, sunucu Settings bölümünden portu değiştirene kadar başlamaz.";
 "Kept free: %lld MB" = "Boş bırakılan: %lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "Yalnızca bu Mac’te tutulur. İstemciler, LLMTray’in proxy’si tarafından User-Agent’larına göre adlandırılır; Runtime’ın bunları adlandırmadan önce işlediği istekler Diğer olarak sayılır.";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "Yalnızca bu Mac’te tutulur. İstemciler, User-Agent bilgilerine göre LLMTray’in proxy’si tarafından adlandırılır; kendini adlandırmayan bir program, diliyle birlikte çağırdığı API olarak görünür; örneğin OpenAI API (Go); Runtime istemcileri adlandırmadan önceki istekler Diğer olarak sayılır.";
 "Key" = "Anahtar";
 "Kind" = "Tür";
 "LLMTray" = "LLMTray";

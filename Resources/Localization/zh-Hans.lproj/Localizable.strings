@@ -683,7 +683,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "保留此端口。如果另一个应用确实占用，服务器不会启动，直到你在“设置”中更改端口。";
 "Kept free: %lld MB" = "保留空闲：%lld MB";
-"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; requests the runtime served before it named them count as Other." = "仅保留在这台 Mac 上。客户端名称由 LLMTray 的代理根据其 User-Agent 命名；运行时在命名前处理的请求会计为“其他”。";
+"Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other." = "仅保留在这台 Mac 上。客户端名称由 LLMTray 的代理根据其 User-Agent 命名；未提供自身名称的程序会显示为其调用的 API 及所用语言，例如 OpenAI API (Go)；在运行时对客户端进行命名之前的请求计入“其他”。";
 "Key" = "密钥";
 "Kind" = "类型";
 "LLMTray" = "LLMTray";
