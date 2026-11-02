@@ -152,6 +152,12 @@ final class MfluxManager: ObservableObject {
     /// §4. Keep the two versions equal.)
     static let mfluxVersion = "0.21.0"
     static var mfluxRequirement: String { "mflux==\(mfluxVersion)" }
+    /// Pillow 13's PIL._typing imports numbers._IntegralLike, which exists
+    /// only on Python 3.15; mflux 0.21.0 imports PIL._typing, so with Pillow
+    /// 13 on 3.14 image generation fails to start. runtime/mflux_runtime.json
+    /// pins the same for the App Store build. Lift with a newer mflux.
+    static let pillowRequirement = "pillow<13"
+    static let pillowMajorLimit = 13
 
     #if APP_STORE
     private var venvPython: String { BundledRuntime.python }
@@ -189,12 +195,12 @@ final class MfluxManager: ObservableObject {
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
         // Also when an install from before the pin has another version.
-        if !FileManager.default.fileExists(atPath: saveBinary) || installedMfluxVersion() != Self.mfluxVersion {
+        if !FileManager.default.fileExists(atPath: saveBinary) || !isAtPin {
             let installing = NSLocalizedString("Installing mflux…", comment: "")
             statusText = installing
             do {
                 // Minutes on a first run: which package it's on, not a bare "Installing…".
-                try await PipProgress.install(venvPython, [Self.mfluxRequirement, "huggingface_hub"]) { [weak self] detail in
+                try await PipProgress.install(venvPython, [Self.mfluxRequirement, Self.pillowRequirement, "huggingface_hub"]) { [weak self] detail in
                     self?.statusText = installing + " " + detail
                 }
             } catch let failure as ProcessRunner.Failure {
@@ -213,20 +219,33 @@ final class MfluxManager: ObservableObject {
 
     /// Set up, but mflux isn't at the pin: generate() updates it first.
     var needsUpdate: Bool {
-        FileManager.default.fileExists(atPath: venvPython) && installedMfluxVersion() != Self.mfluxVersion
+        FileManager.default.fileExists(atPath: venvPython) && !isAtPin
+    }
+
+    /// mflux at the pin, and a Pillow it runs with (one from before the
+    /// Pillow pin may be 13).
+    private var isAtPin: Bool {
+        guard installedMfluxVersion() == Self.mfluxVersion else { return false }
+        guard let pillow = installedVersion(of: "pillow"), let major = Int(pillow.prefix { $0.isNumber }) else { return true }
+        return major < Self.pillowMajorLimit
     }
 
     /// The mflux version in the venv, from its dist-info folder's name
     /// (mflux-0.21.0.dist-info) -- no Python started for it.
-    private func installedMfluxVersion() -> String? {
+    private func installedMfluxVersion() -> String? { installedVersion(of: "mflux") }
+
+    /// A package's version in the venv, from its dist-info folder's name;
+    /// the name in any case (Pillow-10.0.0 or pillow-12.3.0).
+    private func installedVersion(of package: String) -> String? {
         #if APP_STORE
         let site = URL(fileURLWithPath: BundledRuntime.packages)
         #else
         guard let site = PythonPackageLicenses.sitePackages(venv: URL(fileURLWithPath: venvDir)) else { return nil }
         #endif
         guard let items = try? FileManager.default.contentsOfDirectory(atPath: site.path) else { return nil }
-        return items.first { $0.hasPrefix("mflux-") && $0.hasSuffix(".dist-info") }
-            .map { String($0.dropFirst("mflux-".count).dropLast(".dist-info".count)) }
+        let prefix = package.lowercased() + "-"
+        return items.first { $0.lowercased().hasPrefix(prefix) && $0.hasSuffix(".dist-info") }
+            .map { String($0.dropFirst(prefix.count).dropLast(".dist-info".count)) }
     }
 
     /// Explicit, user-initiated warm-up: installs mflux if needed, then
@@ -320,7 +339,7 @@ final class MfluxManager: ObservableObject {
         // -- its internals may not match the runner's otherwise. Only the
         // package, into the app's own venv; nothing about the chat is
         // written. One that can't be updated (offline) says so.
-        if installedMfluxVersion() != Self.mfluxVersion {
+        if !isAtPin {
             do {
                 // In a task of its own: Stop (or another chat) cancels the
                 // run, but pip is never cut off halfway through replacing
@@ -333,7 +352,7 @@ final class MfluxManager: ObservableObject {
                 throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
                                                       Self.mfluxVersion, error.localizedDescription))
             }
-            guard installedMfluxVersion() == Self.mfluxVersion else {
+            guard isAtPin else {
                 throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
                                                       Self.mfluxVersion, NSLocalizedString("the installed version didn't change", comment: "")))
             }
