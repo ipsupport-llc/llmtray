@@ -10,6 +10,40 @@ extension Notification.Name {
     static let showSupport = Notification.Name("LLMTray.showSupport")
 }
 
+/// A quiet line about supporting LLMTray, for places people already look
+/// (What's New, the Usage tab): a link to the Support window and a close
+/// button. Closing it, or a tip, hides every one for good (adr/0017:
+/// nothing nags).
+struct SupportNote: View {
+    /// The line's text; a default when nil.
+    var text: String?
+    @AppStorage(SupportNote.hiddenKey) private var hidden = false
+    static let hiddenKey = "llmtray.support.noteHidden"
+
+    var body: some View {
+        if !hidden {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Image(systemName: "heart").foregroundStyle(.secondary).font(.caption)
+                Text(verbatim: (text ?? NSLocalizedString("LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development.", comment: "support note")) + " ")
+                    .foregroundStyle(.secondary)
+                // Only the label is translated: the link stays as written.
+                + Text(LocalizedStringKey("[\(NSLocalizedString("Support LLMTray…", comment: ""))](llmtray-support:)"))
+                Spacer(minLength: 4)
+                Button { hidden = true } label: { Image(systemName: "xmark").font(.caption2) }
+                    .buttonStyle(.borderless).foregroundStyle(.tertiary)
+                    .help(Text("Don't show this again"))
+            }
+            .font(.caption)
+            .fixedSize(horizontal: false, vertical: true)
+            .environment(\.openURL, OpenURLAction { url in
+                guard url.scheme == "llmtray-support" else { return .systemAction }
+                NotificationCenter.default.post(name: .showSupport, object: nil)
+                return .handled
+            })
+        }
+    }
+}
+
 /// The supporters list (adr/0017 §5): the copy cached from ipsupport-api
 /// (checked again when read), else the one bundled in the app, refreshed at
 /// most once a day when the Support window opens. Offline it shows what it
@@ -123,6 +157,7 @@ final class TipJar: ObservableObject {
         await transaction.finish()
         guard transaction.revocationDate == nil, let tier = SupporterTier(productID: transaction.productID) else { return }
         remember(Purchase(tier: tier, jws: result.jwsRepresentation))
+        UserDefaults.standard.set(true, forKey: SupportNote.hiddenKey)
         await refreshFounding()
     }
 
@@ -169,6 +204,7 @@ final class TipJar: ObservableObject {
                     return
                 }
                 await transaction.finish()
+                UserDefaults.standard.set(true, forKey: SupportNote.hiddenKey)
                 justBought = Purchase(tier: tier, jws: verification.jwsRepresentation)
                 await refreshFounding()
             case .pending, .userCancelled:

@@ -41,6 +41,7 @@
 "%@ requests" = "%@ requests";
 "%@ s" = "%@ s";
 "%@ tok/s" = "%@ tok/s";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development.";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ · %@ of %@" = "%@ · %@ of %@";
@@ -427,6 +428,7 @@
 "Don't Remember This Chat…" = "Don't Remember This Chat…";
 "Don't remember this chat?" = "Don't remember this chat?";
 "Don't show again" = "Don't show again";
+"Don't show this again" = "Don't show this again";
 "Done" = "Done";
 "Done talking: the model answers" = "Done talking: the model answers";
 "Done: %lld changes made." = "Done: %lld changes made.";
@@ -688,6 +690,7 @@
 "LLMTray Guide" = "LLMTray Guide";
 "LLMTray events" = "LLMTray events";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray fetches it with the model it speeds up: download that model.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";

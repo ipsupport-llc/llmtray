@@ -62,6 +62,7 @@ private struct WhatsNewView: View {
                     }
                 }
             }
+            SupportNote()
             HStack {
                 Spacer()
                 Button("Continue", action: close)
