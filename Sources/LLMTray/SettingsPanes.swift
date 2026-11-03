@@ -714,6 +714,9 @@ struct ProfilesPane: View {
     @State private var onlyOverrides = false
     @State private var imageModelDownloadError: String?
     @State private var musicDownloadError: String?
+    /// What the download started here is getting: its progress row.
+    @State private var downloadingImage: ImageGenModel?
+    @State private var downloadingMusic: MusicModel?
 
     private var selectedID: String { profiles.profile(id: navigation.profileID) != nil ? navigation.profileID : Profile.defaultID }
     private var selected: Profile { profiles.profile(id: selectedID) ?? profiles.defaultProfile }
@@ -983,7 +986,12 @@ struct ProfilesPane: View {
                     Toggle("", isOn: b(\.tools.unloadModelDuringImageGen)).labelsHidden()
                 }
                 if chat.isDownloadingModel, !chat.mfluxStatusText.isEmpty {
-                    HStack { ProgressView().controlSize(.small); Text(chat.mfluxStatusText).font(.caption).foregroundStyle(.secondary) }
+                    if let model = downloadingImage ?? Self.named(in: chat.mfluxStatusText, ImageGenModel.allCases, \.displayName) {
+                        MediaDownloadProgress(status: chat.mfluxStatusText, entries: [MediaModels.entry(model)],
+                                              total: FeatureSetup.downloadBytes(model))
+                    } else {
+                        HStack { ProgressView().controlSize(.small); Text(chat.mfluxStatusText).font(.caption).foregroundStyle(.secondary) }
+                    }
                 }
                 if let imageModelDownloadError {
                     Text(imageModelDownloadError).font(.caption).foregroundStyle(.red)
@@ -1035,7 +1043,14 @@ struct ProfilesPane: View {
                     .fixedSize()
                 }
                 if chat.isDownloadingModel, !chat.musicStatusText.isEmpty {
-                    HStack { ProgressView().controlSize(.small); Text(chat.musicStatusText).font(.caption).foregroundStyle(.secondary) }
+                    if let model = downloadingMusic ?? Self.named(in: chat.musicStatusText, MusicModel.allCases, \.displayName)
+                        ?? (chat.musicStatusText.contains(MusicManager.plannerName) ? .turbo : nil) {
+                        MediaDownloadProgress(status: chat.musicStatusText,
+                                              entries: [MediaModels.entry(model)] + (model.usesPlanner ? [MediaModels.musicPlanner] : []),
+                                              total: FeatureSetup.downloadBytes(model))
+                    } else {
+                        HStack { ProgressView().controlSize(.small); Text(chat.musicStatusText).font(.caption).foregroundStyle(.secondary) }
+                    }
                 }
                 if let musicDownloadError {
                     Text(musicDownloadError).font(.caption).foregroundStyle(.red)
@@ -1250,10 +1265,12 @@ struct ProfilesPane: View {
         guard !setup.isDownloadingModel else { return }
         guard confirmDownload(title: title, model: model.displayName, size: model.approximateDownloadDescription) else { return }
         musicDownloadError = nil
+        downloadingMusic = model
         Task {
             if let error = await download(id) {
                 musicDownloadError = error.localizedDescription
             }
+            if downloadingMusic == model { downloadingMusic = nil }
         }
     }
 
@@ -1282,12 +1299,20 @@ struct ProfilesPane: View {
         guard !setup.isDownloadingModel else { return }
         guard confirmDownload(title: title, model: model.displayName, size: model.approximateDownloadDescription) else { return }
         imageModelDownloadError = nil
+        downloadingImage = model
         let id = selectedID
         Task {
             if let error = await download(id) {
                 imageModelDownloadError = error.localizedDescription
             }
+            if downloadingImage == model { downloadingImage = nil }
         }
+    }
+
+    /// The model a status line names ("Downloading <name>…"), the longest
+    /// name that fits: Settings reopened during a download it didn't start.
+    private static func named<M>(in status: String, _ models: [M], _ name: (M) -> String) -> M? {
+        models.filter { status.contains(name($0)) }.max { name($0).count < name($1).count }
     }
 
     private func confirmDownload(title: String, model: String, size: String) -> Bool {
@@ -1297,6 +1322,41 @@ struct ProfilesPane: View {
         alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         return alert.runModal() == .alertFirstButtonReturn
+    }
+}
+
+/// An image or music model's download in Settings: its status, and a bar
+/// from what its download folders hold against its size, once a second
+/// (snapshot_download reports nothing; never quite 100% before it's
+/// done). Until bytes arrive (pip still installing), a moving bar.
+struct MediaDownloadProgress: View {
+    let status: String
+    let entries: [MediaModels.Entry]
+    let total: Int64
+    @State private var fraction: Double?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: status).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+            HStack(spacing: 8) {
+                if let fraction {
+                    ProgressView(value: fraction).controlSize(.small)
+                    Text(verbatim: DownloadQueueRow.progressText(fraction, of: total))
+                        .font(.caption).monospacedDigit().foregroundStyle(.secondary).fixedSize()
+                } else {
+                    ProgressView().progressViewStyle(.linear).controlSize(.small)
+                }
+            }
+        }
+        .task(id: entries.map(\.repo)) {
+            // Another model's download in the same row starts from nothing.
+            fraction = nil
+            while !Task.isCancelled {
+                let bytes = await Task.detached(priority: .utility) { MediaModels.bytesDownloading(entries) }.value
+                if !Task.isCancelled, bytes > 0, total > 0 { fraction = min(0.99, Double(bytes) / Double(total)) }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+        }
     }
 }
 
