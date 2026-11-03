@@ -1632,7 +1632,6 @@
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
-"[Support LLMTray…](llmtray-support:)" = "[Support LLMTray…](llmtray-support:)";
 "a new setting (%@): uninstall and install it again to give it" = "a new setting (%@): uninstall and install it again to give it";
 "always" = "always";
 "and %lld more" = "and %lld more";

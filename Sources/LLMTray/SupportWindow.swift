@@ -26,7 +26,8 @@ struct SupportNote: View {
                 Image(systemName: "heart").foregroundStyle(.secondary).font(.caption)
                 Text(verbatim: (text ?? NSLocalizedString("LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development.", comment: "support note")) + " ")
                     .foregroundStyle(.secondary)
-                + Text("[Support LLMTray…](llmtray-support:)")
+                // Only the label is translated: the link stays as written.
+                + Text(LocalizedStringKey("[\(NSLocalizedString("Support LLMTray…", comment: ""))](llmtray-support:)"))
                 Spacer(minLength: 4)
                 Button { hidden = true } label: { Image(systemName: "xmark").font(.caption2) }
                     .buttonStyle(.borderless).foregroundStyle(.tertiary)
