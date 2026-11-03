@@ -70,7 +70,7 @@ The user's brief:
   optional listing, right after a completed purchase.
 - **Where it can be found** (2026-11-02, the user's request: easier to
   find, never in the way). All passive, all open the Support window:
-  - tray menu › Help › *Support LLMTray…*;
+  - Help › *Support LLMTray…*, in the tray menu and the app menu bar;
   - one line at the bottom of What's New;
   - one line on the Usage tab, only past 100,000 tokens, with the count
     ("1.2M tokens run locally with LLMTray so far…").

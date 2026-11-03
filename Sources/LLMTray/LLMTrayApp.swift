@@ -94,6 +94,8 @@ struct LLMTrayApp: App {
             }
             CommandGroup(replacing: .help) {
                 Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
+                Divider()
+                Button("Support LLMTray…") { NotificationCenter.default.post(name: .showSupport, object: nil) }
             }
             // No File menu (the only scene is Settings), so no Close ⌘W:
             // the chat window, Settings and the logs close with it here. A
