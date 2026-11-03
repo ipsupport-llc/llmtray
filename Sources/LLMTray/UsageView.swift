@@ -116,11 +116,24 @@ struct UsageView: View {
             } else {
                 table(lines)
             }
+            usageNote
             Text("Kept only on this Mac. Clients are named by LLMTray's proxy from their User-Agent; a program that doesn't name itself shows as the API it calls, with its language, like OpenAI API (Go); requests from before the runtime named clients count as Other.")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(14)
     }
+
+    /// Past `supportNoteTokens` in all: what LLMTray did, with the support
+    /// note (hidden for good once closed, adr/0017).
+    @ViewBuilder private var usageNote: some View {
+        let all = UsageLedger.total(store.ledger.lines(.all, by: .model, now: now))
+        let tokens = all.promptTokens + all.generatedTokens
+        if tokens >= Self.supportNoteTokens {
+            SupportNote(text: String(format: NSLocalizedString("%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development.", comment: "usage tab: support note, the token count"), Self.count(tokens)))
+        }
+    }
+
+    static let supportNoteTokens = 100_000
 
     private func summary(_ c: UsageLedger.Counts) -> some View {
         HStack(spacing: 10) {

@@ -637,6 +637,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         #endif
         item(NSLocalizedString("Report a Bug…", comment: ""), #selector(showBugReport), in: help)
+        // Where people look for it, never in their way (adr/0017: nothing nags).
+        help.addItem(.separator())
+        item(NSLocalizedString("Support LLMTray…", comment: ""), #selector(showSupport), in: help)
         let helpItem = NSMenuItem(title: NSLocalizedString("Help", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
         helpItem.submenu = help
         menu.addItem(helpItem)

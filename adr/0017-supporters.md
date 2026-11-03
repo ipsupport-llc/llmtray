@@ -68,6 +68,16 @@ The user's brief:
     style, then Pro, then Coffee.
 - **Nothing nags.** No popups and no counters. The only prompt is the
   optional listing, right after a completed purchase.
+- **Where it can be found** (2026-11-02, the user's request: easier to
+  find, never in the way). All passive, all open the Support window:
+  - tray menu › Help › *Support LLMTray…*;
+  - one line at the bottom of What's New;
+  - one line on the Usage tab, only past 100,000 tokens, with the count
+    ("1.2M tokens run locally with LLMTray so far…").
+
+  The two lines share one close button state: closed once, both are gone
+  for good; a tip in the App Store build hides them too. No timers, no
+  windows of their own, no badges.
 - **A purchase is verified on device** (StoreKit 2's signed `Transaction`)
   and needs no server. A "thank you" state is kept locally.
 - **Offline, the section still works.** The app shows the manifest it
