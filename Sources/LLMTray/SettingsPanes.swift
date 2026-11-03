@@ -1043,7 +1043,8 @@ struct ProfilesPane: View {
                     .fixedSize()
                 }
                 if chat.isDownloadingModel, !chat.musicStatusText.isEmpty {
-                    if let model = downloadingMusic ?? Self.named(in: chat.musicStatusText, MusicModel.allCases, \.displayName) {
+                    if let model = downloadingMusic ?? Self.named(in: chat.musicStatusText, MusicModel.allCases, \.displayName)
+                        ?? (chat.musicStatusText.contains(MusicManager.plannerName) ? .turbo : nil) {
                         MediaDownloadProgress(status: chat.musicStatusText,
                                               entries: [MediaModels.entry(model)] + (model.usesPlanner ? [MediaModels.musicPlanner] : []),
                                               total: FeatureSetup.downloadBytes(model))
@@ -1348,8 +1349,9 @@ struct MediaDownloadProgress: View {
             }
         }
         .task(id: entries.map(\.repo)) {
+            // Another model's download in the same row starts from nothing.
+            fraction = nil
             while !Task.isCancelled {
-                let entries = entries
                 let bytes = await Task.detached(priority: .utility) { MediaModels.bytesDownloading(entries) }.value
                 if !Task.isCancelled, bytes > 0, total > 0 { fraction = min(0.99, Double(bytes) / Double(total)) }
                 try? await Task.sleep(nanoseconds: 1_000_000_000)

@@ -105,6 +105,8 @@ final class MusicManager: ObservableObject {
 
     /// The 5 Hz LM planner, 1.7B: a folder of the official repo.
     static let lmRepo = "ACE-Step/Ace-Step1.5"
+    /// The planner's name in the download status (Settings maps it to turbo).
+    static let plannerName = "ACE-Step 1.5 LM"
     static let lmFolder = "acestep-5Hz-lm-1.7B"
 
     static var venvDir: String { AudioRuntime.venvDir }
@@ -163,7 +165,7 @@ final class MusicManager: ObservableObject {
         if model.usesPlanner, !MediaModels.isInstalled(MediaModels.musicPlanner) {
             let target = MediaModels.downloadPath(MediaModels.musicPlanner)
             try FileManager.default.createDirectory(atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
-            statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), "ACE-Step 1.5 LM")
+            statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), Self.plannerName)
             let temp = target + ".partial-\(UUID().uuidString)"
             do {
                 try await fetch(repo: Self.lmRepo, patterns: [Self.lmFolder + "/*"], into: temp, move: false)
