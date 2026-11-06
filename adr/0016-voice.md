@@ -214,9 +214,10 @@ Bold is the proposed default of each row.
 
 - **Speak** on every answer (next to Copy): reads that answer, and
   becomes **Stop** while it reads.
-- **Read answers aloud**, a toggle in the chat's turn actions (per chat,
-  saved with it): each new answer is spoken sentence by sentence as it
-  streams.
+- **Read answers aloud**, a speaker button in the chat's turn actions
+  and a toggle in Settings: each new answer is spoken sentence by sentence
+  as it streams. One setting for every chat, like the thinking effort
+  (built so; per-chat was planned).
   - Reasoning and tool calls are never spoken.
   - Markdown, tables, links and citations are reduced to speakable text
     (Core, tested). A code block becomes "code in the chat".
@@ -231,10 +232,14 @@ Bold is the proposed default of each row.
   - **Consent line** under the clip picker: "Use your own voice, or a
     voice you have permission to use." The clip is copied into the app's
     support folder and never leaves the Mac.
-- **Language**: each sentence goes through `NLLanguageRecognizer`,
-  constrained to Chatterbox's 23 languages. Russian text is stressed
-  first. A sentence in a language Chatterbox lacks is read by the system
-  voice.
+- **Language**: the answer's first sentences pick its language
+  (`NLLanguageRecognizer`); each sentence is then checked again, with the
+  answer's language as the fallback when the guess is unsure. Russian is
+  stressed first. An answer in a language Chatterbox lacks is read by the
+  system voice, whole: two voices taking turns inside one answer would
+  sound like two people.
+- **The clip** is stored as a 16-bit WAV (its first 30 s), whatever the
+  user picked (M4A, MP3...).
 
 ### How it runs
 

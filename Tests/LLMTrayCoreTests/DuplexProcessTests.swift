@@ -2,7 +2,7 @@ import XCTest
 @testable import LLMTrayCore
 
 final class DuplexProcessTests: XCTestCase {
-    private final class Collected: @unchecked Sendable {
+    fileprivate final class Collected: @unchecked Sendable {
         private let lock = NSLock()
         private var data = Data()
         private var decoder = VoiceFrameDecoder()
@@ -16,7 +16,7 @@ final class DuplexProcessTests: XCTestCase {
         var decoded: [VoiceFrame] { lock.lock(); defer { lock.unlock() }; return frames }
     }
 
-    private final class ExitBox: @unchecked Sendable {
+    fileprivate final class ExitBox: @unchecked Sendable {
         private let lock = NSLock()
         private var stored: DuplexProcess.Exit?
         var value: DuplexProcess.Exit? {
@@ -126,6 +126,86 @@ final class DuplexProcessTests: XCTestCase {
         try child.start(onStdout: { out.append($0) }, onExit: { exit.value = $0; exited.fulfill() })
         child.closeStdin()
         wait(exited)
+        XCTAssertEqual(exit.value?.status, 0)
+        XCTAssertEqual(out.decoded.map(\.kind), [.ready])
+    }
+}
+
+/// Spoken answers' runner (runtime/llmtray_tts_runner.py, adr/0016) in its
+/// --selftest mode: a tone per sentence, no model, any Python 3.
+final class SpeechRunnerTests: XCTestCase {
+    private var runner: String {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("runtime/llmtray_tts_runner.py").path
+    }
+
+    private func python() throws -> String {
+        let candidates = ["/usr/bin/python3", "/opt/homebrew/bin/python3", "/usr/local/bin/python3"]
+        guard let python = candidates.first(where: { FileManager.default.isExecutableFile(atPath: $0) }) else {
+            throw XCTSkip("no python3")
+        }
+        return python
+    }
+
+    private func json(_ object: [String: Any]) -> Data { try! JSONSerialization.data(withJSONObject: object) }
+
+    func testSentencesComeBackInOrderWithTheirIDs() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"],
+                                  environment: ["PYTHONDONTWRITEBYTECODE": "1"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        let exit = DuplexProcessTests.ExitBox()
+        try child.start(onStdout: { out.append($0) }, onExit: { exit.value = $0; exited.fulfill() })
+        child.write(VoiceFrame(.voice, payload: json(["clip": NSNull()])).encoded)
+        child.write(VoiceFrame(.speak, payload: json(["id": 1, "text": "Hello.", "lang": "en"])).encoded)
+        child.write(VoiceFrame(.speak, payload: json(["id": 2, "text": "  ", "lang": "en"])).encoded)
+        child.write(VoiceFrame(.speak, payload: json(["id": 3, "text": "Привет.", "lang": "ru"])).encoded)
+        // Q and EOF drop what's queued: wait for the last sentence first.
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, !out.decoded.contains(where: { $0.kind == .replyDone && $0.text.contains("\"id\": 3") }) {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+        child.closeStdin()
+        wait(for: [exited], timeout: 20)
+        XCTAssertEqual(exit.value?.status, 0)
+        let frames = out.decoded
+        XCTAssertEqual(frames.first?.kind, .ready)
+        let ready = try XCTUnwrap(JSONSerialization.jsonObject(with: frames[0].payload) as? [String: Any])
+        XCTAssertEqual(ready["sample_rate"] as? Int, 24000)
+        // id 2 is empty: done with no audio.
+        let order = frames.dropFirst().filter { $0.kind != .speech }.map { f -> String in
+            let id = (try? JSONSerialization.jsonObject(with: f.payload) as? [String: Any])?["id"] as? Int ?? -1
+            return "\(Character(UnicodeScalar(f.type)))\(id)"
+        }
+        XCTAssertEqual(order, ["B1", "Z1", "Z2", "B3", "Z3"])
+        let speech = frames.filter { $0.kind == .speech }
+        XCTAssertFalse(speech.isEmpty)
+        XCTAssertTrue(speech.allSatisfy { $0.payload.count % 2 == 0 && $0.payload.count <= 48_000 })
+    }
+
+    func testQuitDropsWhatIsQueued() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        try child.start(onStdout: { out.append($0) }, onExit: { _ in exited.fulfill() })
+        var batch = Data()
+        for id in 1...50 {
+            batch += VoiceFrame(.speak, payload: json(["id": id, "text": String(repeating: "long sentence ", count: 20), "lang": "en"])).encoded
+        }
+        child.write(batch + VoiceFrame(.quit).encoded)
+        wait(for: [exited], timeout: 20)
+        // At most the one being made when Q came; never all fifty.
+        XCTAssertLessThan(out.decoded.filter { $0.kind == .replyDone }.count, 50)
+    }
+
+    func testExitsAtEOF() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        let exit = DuplexProcessTests.ExitBox()
+        try child.start(onStdout: { out.append($0) }, onExit: { exit.value = $0; exited.fulfill() })
+        child.closeStdin()
+        wait(for: [exited], timeout: 20)
         XCTAssertEqual(exit.value?.status, 0)
         XCTAssertEqual(out.decoded.map(\.kind), [.ready])
     }

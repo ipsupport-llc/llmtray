@@ -54,7 +54,13 @@ enum MediaModels {
         let voice = VoiceLabModel.all.map {
             Entry(repo: $0.repo, kind: .voice, name: $0.displayName, legacy: app + "/voice_models/" + $0.folderName, check: .configAndIndex)
         }
-        return image + music + voice
+        // Spoken answers' Chatterbox voice (adr/0016): never in an older
+        // place, so the legacy path is only a name nobody uses.
+        let speech = SpokenVoiceFile.folders.map {
+            Entry(repo: $0.repo, kind: .voice, name: $0.name, legacy: app + "/voice_models/" + $0.repo.replacingOccurrences(of: "/", with: "--"),
+                  check: .folder)
+        }
+        return image + music + voice + speech
     }()
 
     static var repos: [String] { all.map(\.repo) }
@@ -196,6 +202,7 @@ enum MediaModels {
     static func entry(_ model: ImageGenModel) -> Entry { entry(repo: model.hfRepo)! }
     static func entry(_ model: MusicModel) -> Entry { entry(repo: model.hfRepo)! }
     static func entry(_ model: VoiceLabModel) -> Entry { entry(repo: model.repo)! }
+    static func entry(_ file: SpokenVoiceFile) -> Entry { entry(repo: file.repo)! }
     static var musicPlanner: Entry { entry(repo: musicPlannerFolder)! }
 
     /// At launch, before anything uses them: each model found only in the

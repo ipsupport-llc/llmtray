@@ -50,6 +50,14 @@ final class OrphanScanTests: XCTestCase {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "  980     1", with: "  980  2592")), [])
     }
 
+    func testOrphanedSpeechRunner() {
+        let line = "  981     1 3100000 \(python) /Applications/LLMTray.app/Contents/Resources/runtime/llmtray_tts_runner.py --model /m/mlx-community/chatterbox-multilingual-v3 --s3tokenizer /m/mlx-community/S3TokenizerV2 HF_HUB_OFFLINE=1 LLMTRAY_SPEECH_RUNNER=1"
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line), [
+            OrphanProcess(kind: .speechRunner, pid: 981, residentBytes: 3_100_000 * 1024, model: "chatterbox-multilingual-v3"),
+        ])
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_SPEECH_RUNNER", with: "LLMTRAY_VOICE_RUNNER")), [])
+    }
+
     func testRunningLLMTraysChildIsKept() {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: server(pid: 4312, ppid: 2592)), [])
     }

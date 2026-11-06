@@ -184,7 +184,14 @@ PY
   "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --target "$PKG_DIR" \
     "mlx-lm @ https://github.com/$PINNED_REPO/archive/$PINNED_REF.zip" \
     "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/$AUDIO_COMMIT.tar.gz" \
-    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}"
+    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}" \
+    "onnxruntime==1.31.1" "razdel==0.5.0"
+  # Spoken answers' Russian stress (adr/0016): ruaccent without its
+  # declared dependencies -- they serve only its full mode, which imports
+  # rupostagger (GPL-3.0); LLMTray runs its tiny mode. Same pins as
+  # AudioRuntime.requirements / noDepsRequirements.
+  "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$PKG_DIR" \
+    "ruaccent==1.5.8.3"
   cp -R "$MFLUX_DIR"/mflux "$MFLUX_DIR"/mflux-*.dist-info "$PKG_DIR"/
   # scipy (mlx-audio's) from its macOS 12 wheel, same version: the macOS 14
   # wheels call Accelerate's legacy BLAS / LAPACK names (_sgemm, _lsame_ ...),
@@ -199,6 +206,9 @@ PY
   # Every runner exits with the app (the sandbox can't stop a leftover one).
   cp "$REPO_ROOT/runtime/appstore/sitecustomize.py" "$PKG_DIR/sitecustomize.py"
   PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, scipy.sparse.linalg, scipy.signal, sys; print('packages ok', sys.version.split()[0])"
+  # Spoken answers' Russian stress: ruaccent went in --no-deps, so check it
+  # imports with what the main install resolved.
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import onnxruntime, razdel; from ruaccent import RUAccent; print('ruaccent ok')"
   # The image models LLMTray runs load without the excluded packages.
   PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mflux.models.z_image.variants.z_image, mflux.models.flux2.variants.txt2img.flux2_klein, mflux.models.flux2.variants.edit.flux2_klein_edit; print('mflux ok')"
   # Nothing excluded came back through another package -- by content, not
@@ -286,7 +296,7 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) -print -quit)"
   [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
   # What ships still imports (the checks above ran before the strip).
-  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy, scipy.sparse.linalg; print('stripped packages ok')"
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy, scipy.sparse.linalg, onnxruntime; from ruaccent import RUAccent; print('stripped packages ok')"
   # No binary calls what App Review lists as deprecated Accelerate API (its
   # 2026-10-07 rejection of 0.8.8: scipy's _superlu, cython_blas / _lapack).
   # Fails closed: no list, or a binary it can't read, stops the build.

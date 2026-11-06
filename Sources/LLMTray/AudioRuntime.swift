@@ -74,8 +74,18 @@ final class AudioRuntime: ObservableObject {
             "mlx==0.32.2", "mlx-lm==0.31.1", "transformers==5.17.0", "pyyaml", "huggingface_hub",
             // sts extras (VoiceChat's tokenizers)
             "sentencepiece>=0.2.0",
+            // Spoken answers' Russian stress (adr/0016): ruaccent's ONNX
+            // models and its sentence splitter. ruaccent itself is
+            // `noDepsRequirements`.
+            "onnxruntime==1.31.1", "razdel==0.5.0",
         ]
     }
+
+    /// Installed with `--no-deps` after the rest: ruaccent's declared
+    /// dependencies pull in what only its full mode uses, and that mode
+    /// imports rupostagger (GPL-3.0). LLMTray uses its tiny mode only
+    /// (runtime/llmtray_ru_stress.py).
+    static let noDepsRequirements = ["ruaccent==1.5.8.3"]
 
     static var venvDir: String { RuntimePaths.externalRuntimeDir + "/music_venv" }
     #if APP_STORE
@@ -103,7 +113,9 @@ final class AudioRuntime: ObservableObject {
     /// mlx-audio was force-reinstalled don't match, so those venvs (still
     /// on an older fork commit, pip having kept it) install once more.
     private static let stampHeader = "# llmtray audio runtime v2: mlx-audio force-reinstalled and checked"
-    private static var wantedStamp: String { ([stampHeader] + requirements).joined(separator: "\n") }
+    private static var wantedStamp: String {
+        ([stampHeader] + requirements + noDepsRequirements.map { "--no-deps " + $0 }).joined(separator: "\n")
+    }
 
     /// The venv is there with exactly these requirements.
     #if !APP_STORE
@@ -183,6 +195,7 @@ final class AudioRuntime: ObservableObject {
             // replace the package itself, then check which commit it is.
             report(installing + " " + NSLocalizedString("finishing", comment: "pip install detail: the last step of an install"))
             try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", "--no-deps", Self.requirements[0]])
+            try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--no-deps"] + Self.noDepsRequirements)
             try await run(Self.venvPython, [
                 "-c",
                 """
@@ -285,6 +298,15 @@ final class AudioRuntime: ObservableObject {
             from huggingface_hub import snapshot_download
             snapshot_download("\(repo)", \(allow)local_dir="\(dir)")
             """,
+        ])
+    }
+
+    /// Fetches ruaccent's pinned files into `dir` and builds the stress
+    /// dictionary there (runtime/llmtray_ru_stress.py build). Resumable:
+    /// files already there are kept.
+    func buildRussianStress(into dir: String) async throws {
+        try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
+            RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "build", dir,
         ])
     }
 
