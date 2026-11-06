@@ -112,6 +112,11 @@ def build(folder):
         with open(os.path.join(folder, "accents_overlay.json"), "w", encoding="utf-8") as f:
             json.dump(overlay, f, ensure_ascii=False)
         os.remove(source)   # the npz replaces it
+    # Complete only with every file in place and the dictionary readable.
+    missing = [f for f in files() if f != "dictionary/accents.json.gz" and not os.path.exists(os.path.join(folder, f))]
+    if missing:
+        raise SystemExit("missing: " + ", ".join(missing))
+    HashDict.load(folder)
     with open(os.path.join(folder, STAMP), "w") as f:
         json.dump({"repo": REPO, "revision": REV}, f)
 

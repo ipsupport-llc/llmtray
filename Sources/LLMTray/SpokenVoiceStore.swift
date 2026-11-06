@@ -35,6 +35,8 @@ final class SpokenVoiceStore: ObservableObject {
     @Published private(set) var progress: Double?
     /// Bumped when files arrive or go (views re-read the disk).
     @Published private(set) var revision = 0
+    /// Bytes of the folders this download already moved into place.
+    private var finishedBytes: Int64 = 0
 
     private init() {}
 
@@ -46,7 +48,9 @@ final class SpokenVoiceStore: ObservableObject {
         let fm = FileManager.default
         switch file {
         case .model:
+            // conds.safetensors: the built-in voice, from another repo.
             return fm.fileExists(atPath: dir + "/model.safetensors") && fm.fileExists(atPath: dir + "/config.json")
+                && fm.fileExists(atPath: dir + "/conds.safetensors")
         case .tokenizer:
             return fm.fileExists(atPath: dir + "/model.safetensors")
         case .russianStress:
@@ -95,6 +99,7 @@ final class SpokenVoiceStore: ObservableObject {
         try MediaModels.checkModelsFolder()
         let missing = SpokenVoiceFile.folders.filter { !Self.isInPlace($0) }
         guard !missing.isEmpty else { return }
+        finishedBytes = 0
         let fm = FileManager.default
         let total = missing.reduce(Int64(0)) { $0 + $1.downloadBytes + ($1 == .model ? SpokenVoiceFile.builtInVoice.downloadBytes : 0) }
         var have: Int64 = 0
@@ -106,6 +111,7 @@ final class SpokenVoiceStore: ObservableObject {
             throw StoreError.diskFull(needed: max(0, total - have), free: free)
         }
         // What's on disk so far, once a second.
+        // Folders done so far count with what the current one holds.
         let partials = missing.map(Self.partialDir)
         let watch = Task { @MainActor [weak self] in
             while !Task.isCancelled {
@@ -113,7 +119,7 @@ final class SpokenVoiceStore: ObservableObject {
                 var bytes: Int64 = 0
                 for dir in partials { bytes += await Self.size(dir) }
                 guard !Task.isCancelled, let self, self.isBusy else { return }
-                self.progress = min(0.99, Double(bytes) / Double(max(1, total)))
+                self.progress = min(0.99, Double(self.finishedBytes + bytes) / Double(max(1, total)))
             }
         }
         defer { watch.cancel() }
@@ -137,6 +143,7 @@ final class SpokenVoiceStore: ObservableObject {
             try MediaModels.clearIncompleteTarget(entry)
             try fm.moveItem(atPath: partial, toPath: MediaModels.downloadPath(entry))
             MediaModels.didDownload()
+            finishedBytes += file.downloadBytes + (file == .model ? SpokenVoiceFile.builtInVoice.downloadBytes : 0)
         }
     }
 

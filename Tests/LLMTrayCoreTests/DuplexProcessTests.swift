@@ -160,7 +160,11 @@ final class SpeechRunnerTests: XCTestCase {
         child.write(VoiceFrame(.speak, payload: json(["id": 1, "text": "Hello.", "lang": "en"])).encoded)
         child.write(VoiceFrame(.speak, payload: json(["id": 2, "text": "  ", "lang": "en"])).encoded)
         child.write(VoiceFrame(.speak, payload: json(["id": 3, "text": "Привет.", "lang": "ru"])).encoded)
-        child.write(VoiceFrame(.quit).encoded)
+        // Q and EOF drop what's queued: wait for the last sentence first.
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, !out.decoded.contains(where: { $0.kind == .replyDone && $0.text.contains("\"id\": 3") }) {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
         child.closeStdin()
         wait(for: [exited], timeout: 20)
         XCTAssertEqual(exit.value?.status, 0)
@@ -177,6 +181,21 @@ final class SpeechRunnerTests: XCTestCase {
         let speech = frames.filter { $0.kind == .speech }
         XCTAssertFalse(speech.isEmpty)
         XCTAssertTrue(speech.allSatisfy { $0.payload.count % 2 == 0 && $0.payload.count <= 48_000 })
+    }
+
+    func testQuitDropsWhatIsQueued() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        try child.start(onStdout: { out.append($0) }, onExit: { _ in exited.fulfill() })
+        var batch = Data()
+        for id in 1...50 {
+            batch += VoiceFrame(.speak, payload: json(["id": id, "text": String(repeating: "long sentence ", count: 20), "lang": "en"])).encoded
+        }
+        child.write(batch + VoiceFrame(.quit).encoded)
+        wait(for: [exited], timeout: 20)
+        // At most the one being made when Q came; never all fifty.
+        XCTAssertLessThan(out.decoded.filter { $0.kind == .replyDone }.count, 50)
     }
 
     func testExitsAtEOF() throws {

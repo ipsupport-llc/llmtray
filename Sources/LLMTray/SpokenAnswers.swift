@@ -38,6 +38,9 @@ final class SpokenAnswers: ObservableObject {
     private var streamClient: ObjectIdentifier?
     /// The message `stream` holds (it may have no sentence yet).
     private var streamMessage: UUID?
+    /// A streaming message the user stopped (or talked over with Speak):
+    /// its later deltas aren't read.
+    private var silenced: UUID?
     private var answerLanguage: String?
 
     private init() {
@@ -67,9 +70,11 @@ final class SpokenAnswers: ObservableObject {
 
     /// A delta of the answer `messageID` streaming in `client`'s chat.
     func streamed(client: ObjectIdentifier, messageID: UUID, delta: String) {
-        guard readsAloud else { return }
+        guard readsAloud, messageID != silenced else { return }
         if streamClient != client {
-            // Another chat's answer: what was being read stops.
+            // Another chat streaming at the same time waits its turn: the
+            // answer being streamed and read keeps the voice.
+            if streamClient != nil, stream != nil { return }
             stop()
             streamClient = client
         }
@@ -100,6 +105,7 @@ final class SpokenAnswers: ObservableObject {
 
     /// A new message is sent, Stop pressed, the voice changed.
     func stop() {
+        if let streamMessage { silenced = streamMessage }
         stream = nil
         streamClient = nil
         streamMessage = nil
@@ -368,14 +374,22 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         ])
         let reader = SpeechFrameReader()
         do {
-            try child.start(onStdout: { [weak self] data in
+            // Every callback names its child: an old runner's last frames
+            // or its exit, arriving after a new one started, are ignored.
+            try child.start(onStdout: { [weak self, weak child] data in
                 let frames = (try? reader.append(data)) ?? []
-                DispatchQueue.main.async { MainActor.assumeIsolated { frames.forEach { self?.handle($0) } } }
+                DispatchQueue.main.async { MainActor.assumeIsolated {
+                    guard let self, let child, self.process === child else { return }
+                    frames.forEach { self.handle($0) }
+                } }
             }, onStderr: { [weak self] data in
                 let text = String(decoding: data, as: UTF8.self)
                 DispatchQueue.main.async { MainActor.assumeIsolated { self?.keepStderr(text) } }
-            }, onExit: { [weak self] _ in
-                DispatchQueue.main.async { MainActor.assumeIsolated { self?.exited() } }
+            }, onExit: { [weak self, weak child] _ in
+                DispatchQueue.main.async { MainActor.assumeIsolated {
+                    guard let self, let child, self.process === child else { return }
+                    self.exited()
+                } }
             })
         } catch {
             return fail(String(format: NSLocalizedString("Couldn't start the voice: %@", comment: "spoken answers"), error.localizedDescription))
@@ -415,6 +429,9 @@ final class ChatterboxSpeaker: SentenceSpeaker {
                 outstanding.remove(id)
                 NSLog("LLMTray: spoken answer sentence failed: %@", message)
                 checkIdle()
+            } else if info?["fatal"] as? Bool == false {
+                // A bad clip: the voice it had stays.
+                NSLog("LLMTray: spoken answers: %@", message)
             } else {
                 fail(String(format: NSLocalizedString("The voice failed: %@", comment: "spoken answers"), message))
             }
@@ -467,10 +484,7 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         send(VoiceFrame(.quit))
         process?.closeStdin()
         process = nil
-        output?.stop()
-        audio?.stop()
-        output = nil
-        audio = nil
+        closeAudio()
     }
 
     private func keepStderr(_ text: String) {
@@ -478,12 +492,8 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     }
 
     private func exited() {
-        guard process != nil else { return }   // quit on purpose
         process = nil
-        output?.stop()
-        audio?.stop()
-        output = nil
-        audio = nil
+        closeAudio()
         if !outstanding.isEmpty {
             let last = stderrTail.split(separator: "\n").last.map(String.init) ?? ""
             fail(String(format: NSLocalizedString("The voice stopped: %@", comment: "spoken answers"), last))
@@ -492,11 +502,22 @@ final class ChatterboxSpeaker: SentenceSpeaker {
 
     private func fail(_ message: String) {
         NSLog("LLMTray: %@", message)
+        generation += 1
         outstanding = []
         playing = 0
+        current = nil
+        ended = false
         process?.kill()
         process = nil
+        closeAudio()
         onFailure?(message)
+    }
+
+    private func closeAudio() {
+        output?.stop()
+        audio?.stop()
+        output = nil
+        audio = nil
     }
 
     private static func json(_ object: [String: Any]) -> Data {

@@ -17,7 +17,8 @@
 #                   B  begin   {"id": n}           before a sentence's audio
 #                   S  speech  int16 PCM, mono, at the ready sample rate
 #                   Z  done    {"id": n, "rtf": x} (rtf: compute s per audio s)
-#                   E  error   {"id": n or null, "message": "..."}
+#                   E  error   {"id": n or null, "message": "...", "fatal": bool}
+#                              (fatal: the runner can't go on; a bad clip isn't)
 #                   L  log line
 # A sentence's audio comes in one piece (Chatterbox doesn't stream), cut
 # into S frames of at most a second.
@@ -110,8 +111,12 @@ class Inbox:
             self.generation += 1
 
     def close(self):
+        """Q or EOF: quit now, nothing queued is made."""
         with self.cond:
             self.closed = True
+            self.queue.clear()
+            self.voice = None
+            self.generation += 1
             self.cond.notify()
 
     def take(self):
@@ -139,14 +144,17 @@ def reader(stream, inbox):
             if frame is None:
                 break
             kind, payload = frame
-            if kind == "P":
-                inbox.put(json.loads(payload.decode("utf-8")))
-            elif kind == "V":
-                inbox.set_voice(json.loads(payload.decode("utf-8")).get("clip"))
-            elif kind == "C":
-                inbox.cancel()
-            elif kind == "Q":
-                break
+            try:
+                if kind == "P":
+                    inbox.put(json.loads(payload.decode("utf-8")))
+                elif kind == "V":
+                    inbox.set_voice(json.loads(payload.decode("utf-8")).get("clip"))
+                elif kind == "C":
+                    inbox.cancel()
+                elif kind == "Q":
+                    break
+            except ValueError as e:   # one bad frame: said, and skipped
+                send("E", {"id": None, "message": "bad %s frame: %s" % (kind, e), "fatal": False})
     except Exception as e:   # a broken pipe or a bad frame: stop
         log("input: %s" % e)
     inbox.close()
@@ -230,7 +238,7 @@ def serve(speaker, inbox):
             try:
                 speaker.use_clip(item[1])
             except Exception as e:
-                send("E", {"id": None, "message": "The voice clip couldn't be used: %s" % e})
+                send("E", {"id": None, "message": "The voice clip couldn't be used: %s" % e, "fatal": False})
             continue
         _, generation, request = item
         rid = request.get("id")
@@ -241,7 +249,7 @@ def serve(speaker, inbox):
         try:
             wav, rtf = speaker.speak(text, str(request.get("lang") or "en"))
         except Exception as e:
-            send("E", {"id": rid, "message": str(e)})
+            send("E", {"id": rid, "message": str(e), "fatal": False})
             continue
         if not inbox.current(generation):
             continue   # cancelled while it was being made
@@ -249,6 +257,8 @@ def serve(speaker, inbox):
         data = pcm16(wav)
         step = rate * 2   # a second of int16
         for i in range(0, len(data), step):
+            if not inbox.current(generation):
+                break   # cancelled while being sent
             send("S", data[i:i + step])
         send("Z", {"id": rid, "rtf": round(rtf, 3)})
 
@@ -286,7 +296,7 @@ def main():
         try:
             speaker = Speaker(arg("--model"), arg("--s3tokenizer"), arg("--stress"))
         except Exception as e:
-            send("E", {"id": None, "message": "The voice model didn't load: %s" % e})
+            send("E", {"id": None, "message": "The voice model didn't load: %s" % e, "fatal": True})
             return 1
         name = os.path.basename(os.path.normpath(arg("--model")))
     send("R", {"sample_rate": speaker.sample_rate, "model": name,

@@ -667,6 +667,8 @@ final class ChatClient: ObservableObject {
             hasUnsavedChanges = true
         }
         toolbox.startTurn()
+        // A new message: the answer being read stops (adr/0016).
+        SpokenAnswers.shared.stop()
         toolRoundsThisTurn = 0
         turnCallResults = [:]
         turnStats = nil
@@ -1497,6 +1499,9 @@ final class ChatClient: ObservableObject {
     }
 
     func cancel() {
+        // Stop means quiet too: the rest isn't read (before isStreaming
+        // drops, which would read it).
+        SpokenAnswers.shared.stop()
         isWaitingForModelLoad = false
         isWaitingForModelDownload = false
         waitingBehind = nil
