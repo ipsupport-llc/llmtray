@@ -1,6 +1,10 @@
 # 0016 — Voice
 
-**Status: accepted** (2026-09-27, by the user). Steps 1–2 (the base, Voice Lab with VoiceChat 11B) are being built.
+**Status: accepted** (2026-09-27, by the user). Steps 1–2 (the base, Voice Lab with VoiceChat 11B) are built.
+**Amended** 2026-11-06 (the user: "да, вноси в ADR и поехали"): the neural
+voice is Chatterbox Multilingual V3, not Qwen3-TTS; spoken answers and the
+neural voice ship together as step 4 — see "Spoken answers with
+Chatterbox" below.
 
 ## Why
 
@@ -42,7 +46,8 @@ to be measured on a 26 GB M5 before we commit):
 | STT | Whisper large-v3-turbo | 99 languages, the safe fallback |
 | STT | Qwen3-ASR | strongest on accents and noise, larger |
 | TTS | **macOS system voices** (AVSpeechSynthesizer) | free, no download, Russian included |
-| TTS | **Qwen3-TTS** 0.6B / 1.7B | natural, streaming, Russian among its languages |
+| TTS | ~~Qwen3-TTS 0.6B / 1.7B~~ | replaced 2026-11-06, see below |
+| TTS | **Chatterbox Multilingual V3** 0.5B | MIT, 23 languages incl. Russian, voice cloning from ~10 s; in our mlx-audio fork |
 | TTS | Kokoro 82M | tiny and fast, no Russian |
 | VAD | **Silero VAD** | end of speech, barge-in |
 
@@ -119,34 +124,162 @@ Bold is the proposed default of each row.
   aren't read out (a speakable-text filter in Core, tested); a code block
   becomes "code in the chat".
 - **TTS**: system voices by default (no download, Russian voices exist;
-  premium voices are the user's to install in macOS Settings); Qwen3-TTS as
-  the opt-in neural voice.
-- **Barge-in**: speaking while an answer is read stops the playback (VAD on
-  the mic, only while speaking an answer).
+  premium voices are the user's to install in macOS Settings); Chatterbox
+  Multilingual V3 as the opt-in neural voice (below).
+- **Barge-in** (step 5): speaking while an answer is read stops the
+  playback (VAD on the mic, only while speaking an answer).
 - **Hands-free conversation** (later step): VAD ends the turn after silence,
   no button; the mic reopens after the spoken answer. Off by default.
-- Reasoning is never spoken; tool calls say only "one moment" if they take
-  longer than two seconds.
+- Reasoning is never spoken. In hands-free mode (step 5) a tool call that
+  takes longer than two seconds says "one moment"; in step 4 tool calls
+  aren't spoken.
 
 ### Out of scope
 
 - A system-wide dictation hotkey (a separate feature later).
-- Voice cloning (models support it; not until there's a reason and a
-  consent story).
+- ~~Voice cloning~~: now in, for Chatterbox (below), with the consent
+  line there.
 - Telephony, wake words.
+
+## Spoken answers with Chatterbox (2026-11-06)
+
+### Why Chatterbox, not Qwen3-TTS
+
+- **Licence**: MIT (code and weights, Resemble AI). 23 languages, Russian
+  among them. A voice is cloned from a ~10 s clip; a built-in voice comes
+  with the weights.
+- **Version**: Multilingual **V3** (`t3_mtl23ls_v3`, Resemble 2026-06-10):
+  same 0.5B size as V2, better speaker similarity, fewer hallucinated
+  tails and repeats.
+- **Already in our runtime**: our mlx-audio fork, at the commit LLMTray
+  pins (0.5.6), has `chatterbox` with multilingual v2/v3 and `lang_code`.
+  MLX weights: `mlx-community/chatterbox-multilingual-v3` (2.71 GB, MIT)
+  plus `mlx-community/S3TokenizerV2` (0.49 GB). The tokenizer is converted
+  from FunAudioLLM/CosyVoice2-0.5B, so it is **Apache-2.0**, not MIT.
+- **Built-in voice**: the multilingual MLX repo has no `conds.safetensors`.
+  The built-in voice comes from `mlx-community/chatterbox-fp16`'s (105 KB,
+  MIT), converted from Resemble's own `conds.pt`, which their multilingual
+  model loads too.
+- Chatterbox **Turbo** (350M) and **Nano** (110M) are faster but
+  English-only. They're not offered now; Turbo is in the fork if an
+  English-only fast voice is wanted later.
+- Not used: **Chatterbox-Flash** (English, CUDA and FlashInfer only);
+  **Dramabox** (LTX-2 Community License, not MIT).
+
+### Russian stress
+
+- Chatterbox reads Russian without stress marks badly. mlx-audio's
+  chatterbox stresses Russian with `russian_text_stresser`
+  (Vuizur/add-stress-to-epub), and without it it only logs a warning.
+  That package is **AGPL-3.0**. It is never installed or bundled, and the
+  runner checks at start that it can't be imported.
+- **We stress the text ourselves**, before it reaches the model, with
+  **ruaccent** (MIT, code and models) in **tiny mode only**. The full mode
+  imports rupostagger, which is GPL-3.0, so ruaccent is installed with
+  `--no-deps`. The scheme is already in use in IPSupport's own speech service:
+  - its accents dictionary (3.19M words) is kept as a sorted array of
+    64-bit word hashes plus the stress position: about 28 MB instead of
+    ~1.8 GB as a Python dict;
+  - the ONNX models run only where the dictionary can't answer: tiny2.1
+    for homographs, the е/ё resolver only when a ё-homograph is present,
+    nn_accent for unknown words;
+  - a few context rules (замок, плачу, положите, оплатите);
+  - a rule fallback for words nobody stresses (ё stressed; -ация,
+    -ировать, -изм, -ист; otherwise the next-to-last syllable).
+- **Measured**: 5 errors in 30 assistant-style sentences, against 23 for
+  StressRNN; about 3 ms a sentence, ~200 MB resident.
+- **Files**: from HF `ruaccent/accentuator`, pinned to revision
+  `b78ae5ea1e62beaf138bed1865cd8c3b0b5ca855` (MIT), about 84 MB once
+  built. They're downloaded with the voice and the dictionary is built
+  once on the Mac. ruaccent's own `load()` is never called, because it
+  fetches the whole repository; the pieces are wired by hand.
+- **Runtime**: onnxruntime and razdel join `AudioRuntime.requirements`.
+  ruaccent goes in as a second pip step with `--no-deps`. transformers,
+  numpy and huggingface_hub are already there.
+- **App Store build**: its packages are baked into the bundle by
+  `scripts/build_full_app.sh`, which has its own package list (it reads
+  only the mlx-audio commit from `AudioRuntime`). onnxruntime and razdel
+  go into that list, and ruaccent into a `--no-deps` step. onnxruntime's
+  native library is signed with the rest, and its licence (MIT) goes in
+  the notices.
+- **Where files live**: the bundle is read-only. The stress pack (the
+  built dictionary and the ONNX models), the voice model and the
+  tokenizer all go in the models folder (the container, in the App Store
+  build), downloaded by the app as data. A voice clip goes in the app's
+  support folder.
+- **Not yet run on macOS**, only on Linux. The first test is on the Mac,
+  then in the App Store sandbox.
+
+### What the user sees
+
+- **Speak** on every answer (next to Copy): reads that answer, and
+  becomes **Stop** while it reads.
+- **Read answers aloud**, a toggle in the chat's turn actions (per chat,
+  saved with it): each new answer is spoken sentence by sentence as it
+  streams.
+  - Reasoning and tool calls are never spoken.
+  - Markdown, tables, links and citations are reduced to speakable text
+    (Core, tested). A code block becomes "code in the chat".
+  - A new answer, Stop, or switching chats stops the speech.
+- **Settings > Voice > Spoken answers**:
+  - **Voice**: System (default; the macOS voice for the text's language)
+    or Chatterbox.
+  - **Chatterbox**: download (model, tokenizer and the Russian stress
+    pack, about 3.3 GB, size shown before), remove, and the voice:
+    **built-in**, or **from a clip**. A clip is a WAV/M4A of 5–30 s;
+    10 s or more is best.
+  - **Consent line** under the clip picker: "Use your own voice, or a
+    voice you have permission to use." The clip is copied into the app's
+    support folder and never leaves the Mac.
+- **Language**: each sentence goes through `NLLanguageRecognizer`,
+  constrained to Chatterbox's 23 languages. Russian text is stressed
+  first. A sentence in a language Chatterbox lacks is read by the system
+  voice.
+
+### How it runs
+
+- **`llmtray_tts_runner.py`** runs in the audio venv. It speaks Voice
+  Lab's binary frame format (a type byte, a 4-byte length, the payload)
+  in both directions, with its own frame types:
+  - app to runner: `P` speak {id, text, lang}, `V` voice {clip or null
+    for built-in}, `C` cancel everything queued, `Q` quit;
+  - runner to app: `R` ready {sample_rate}, `B` {id} before a sentence's
+    audio, `S` PCM16, `Z` {id, rtf} when the sentence is done, `E` {id,
+    message}, `L` log.
+
+  The app starts it on the first sentence and stops it after 5 minutes
+  idle or when the app quits.
+- **Playback**: a `SpeechPlayer` (Voice Lab's) made at the sample rate
+  the `R` frame gives (24 kHz for Chatterbox). While sentence *n* plays,
+  sentence *n+1* synthesizes. Stop drops what's queued and playing
+  (`cancelPlayback`, not `flush`, which plays the rest) and sends `C`.
+- **Memory**: unlike the other generators, spoken answers must run
+  **next to** a chat model that is generating, so nothing is unloaded.
+  The real footprint is unknown: the download is 3.2 GB, and Voice Lab
+  ran well above its weights (a 9.2 GB download used 15.6 GB). It is
+  measured on the base M5 before stable. Settings shows the GPUFit
+  estimate as a notice, as the other features do; it doesn't block.
+- **Speed is not measured yet.** If the runner can't keep up with
+  playback, it falls behind sentence by sentence, with gaps; first audio
+  comes one sentence's synthesis late. The base M5 numbers go here before
+  this ships as stable.
+
+### Later
+
+- Barge-in and hands-free mode go with push-to-talk STT (steps 3 and 5).
+  Barge-in needs the microphone open while speaking, and echo
+  cancellation with it.
 
 ## Order of work
 
 1. Base: Voice pane, mic capture + permission, the runner with framing,
    playback, memory display. Tests: framing, the speakable-text filter
    (for step 3), fits-next-to-model math.
-2. Voice Lab with PersonaPlex 7B — measure memory, latency (first audio
-   after the user stops), and whether the full duplex works through the
-   runner's pipes; if pipes add too much latency, the runner opens a local
-   Unix socket instead.
+2. Voice Lab with VoiceChat 11B (built; PersonaPlex stays a later
+   opt-in) — memory, latency and duplex over the runner's pipes measured.
 3. Push-to-talk STT into the composer.
-4. Spoken answers (system voices), barge-in.
-5. Qwen3-TTS, hands-free mode.
+4. Spoken answers: system voices and Chatterbox Multilingual V3 (above).
+5. Barge-in and hands-free mode, after step 3.
 
 Each step ships on its own; step 2 alone is the toy that was asked for.
 
@@ -160,6 +293,12 @@ Each step ships on its own; step 2 alone is the toy that was asked for.
   bypassed) + CC-BY-4.0; gated on Hugging Face.
 - Moshi: weights CC-BY 4.0, moshi_mlx MIT.
 - speech-swift: Apache-2.0.
+- Chatterbox (all variants used here) and its mlx-community conversions:
+  MIT. `mlx-community/S3TokenizerV2`: Apache-2.0 (from CosyVoice2-0.5B).
+  ruaccent code and `ruaccent/accentuator` models and dictionaries: MIT.
+  onnxruntime: MIT. razdel: MIT. (Checked 2026-11-06.)
+- Never shipped: `russian_text_stresser` (AGPL-3.0), and rupostagger
+  (GPL-3.0, pulled in by ruaccent's full mode).
 
 ## Open questions
 
