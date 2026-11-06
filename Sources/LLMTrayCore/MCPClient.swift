@@ -408,7 +408,13 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
                 } catch {}
                 self?.lock.withLock { _ = self?.readers.removeValue(forKey: key) }
             }
-            lock.withLock { readers[key] = reader }
+            // Closed while the request was out: stop the reader at once.
+            let isClosed = lock.withLock { () -> Bool in
+                if closed { return true }
+                readers[key] = reader
+                return false
+            }
+            if isClosed { reader.cancel() }
         } else {
             var body = Data()
             for try await byte in bytes {
@@ -447,11 +453,14 @@ struct SSEEvents {
     private var data: [UInt8] = []
     private var hasData = false
     private var afterCR = false
+    /// Set when the data outgrew `maxEvent`; the next `feed` throws.
+    private var overflow = false
 
     init(maxEvent: Int) { self.maxEvent = maxEvent }
 
     /// The data of the event this byte ended, if it ended one.
     mutating func feed(_ byte: UInt8) throws -> Data? {
+        if overflow { throw TooLarge() }
         if afterCR {
             afterCR = false
             if byte == 0x0A { return nil }
@@ -464,7 +473,8 @@ struct SSEEvents {
             return endLine()
         default:
             line.append(byte)
-            if line.count + data.count > maxEvent { throw TooLarge() }
+            // A line may carry up to one event's worth plus its field name.
+            if line.count > maxEvent + 16 { throw TooLarge() }
             return nil
         }
     }
@@ -473,7 +483,7 @@ struct SSEEvents {
     /// still counts.
     mutating func finish() -> Data? {
         if !line.isEmpty { _ = endLine() }
-        return dispatch()
+        return overflow ? nil : dispatch()
     }
 
     private mutating func endLine() -> Data? {
@@ -487,6 +497,7 @@ struct SSEEvents {
             value = value.dropFirst()
             if value.first == UInt8(ascii: " ") { value = value.dropFirst() }
         }
+        if data.count + value.count + (hasData ? 1 : 0) > maxEvent { overflow = true; return nil }
         if hasData { data.append(0x0A) }
         data.append(contentsOf: value)
         hasData = true
@@ -494,6 +505,7 @@ struct SSEEvents {
     }
 
     private mutating func dispatch() -> Data? {
+        if overflow { return nil }
         defer { data.removeAll(keepingCapacity: true); hasData = false }
         return hasData && !data.isEmpty ? Data(data) : nil
     }

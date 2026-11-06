@@ -32,6 +32,9 @@ final class MCPSSETests: XCTestCase {
 
     func testAnEventOverTheLimitIsRefused() {
         XCTAssertThrowsError(try events("data: 0123456789\n\n", max: 8))
+        XCTAssertThrowsError(try events("data: 0123\ndata: 4567\n\n", max: 8))  // 9 with the joining newline
+        // The limit is on the data, not the field name around it.
+        XCTAssertEqual(try events("data: 01234567\n\n", max: 8), ["01234567"])
     }
 
     /// A notification, then the reply, in one stream: both arrive, apart.
