@@ -126,12 +126,13 @@ Bold is the proposed default of each row.
 - **TTS**: system voices by default (no download, Russian voices exist;
   premium voices are the user's to install in macOS Settings); Chatterbox
   Multilingual V3 as the opt-in neural voice (below).
-- **Barge-in**: speaking while an answer is read stops the playback (VAD on
-  the mic, only while speaking an answer).
+- **Barge-in** (step 5): speaking while an answer is read stops the
+  playback (VAD on the mic, only while speaking an answer).
 - **Hands-free conversation** (later step): VAD ends the turn after silence,
   no button; the mic reopens after the spoken answer. Off by default.
-- Reasoning is never spoken; tool calls say only "one moment" if they take
-  longer than two seconds.
+- Reasoning is never spoken. In hands-free mode (step 5) a tool call that
+  takes longer than two seconds says "one moment"; in step 4 tool calls
+  aren't spoken.
 
 ### Out of scope
 
@@ -152,8 +153,13 @@ Bold is the proposed default of each row.
   tails and repeats.
 - **Already in our runtime**: our mlx-audio fork, at the commit LLMTray
   pins (0.5.6), has `chatterbox` with multilingual v2/v3 and `lang_code`.
-  MLX weights: `mlx-community/chatterbox-multilingual-v3` (2.71 GB) plus
-  `mlx-community/S3TokenizerV2` (0.49 GB), both MIT.
+  MLX weights: `mlx-community/chatterbox-multilingual-v3` (2.71 GB, MIT)
+  plus `mlx-community/S3TokenizerV2` (0.49 GB). The tokenizer is converted
+  from FunAudioLLM/CosyVoice2-0.5B, so it is **Apache-2.0**, not MIT.
+- **Built-in voice**: the multilingual MLX repo has no `conds.safetensors`.
+  The built-in voice comes from `mlx-community/chatterbox-fp16`'s (105 KB,
+  MIT), converted from Resemble's own `conds.pt`, which their multilingual
+  model loads too.
 - Chatterbox **Turbo** (350M) and **Nano** (110M) are faster but
   English-only. They're not offered now; Turbo is in the fork if an
   English-only fast voice is wanted later.
@@ -187,9 +193,20 @@ Bold is the proposed default of each row.
   built. They're downloaded with the voice and the dictionary is built
   once on the Mac. ruaccent's own `load()` is never called, because it
   fetches the whole repository; the pieces are wired by hand.
-- **Runtime**: onnxruntime, razdel and ruaccent join the audio runtime's
-  requirements (and the App Store build's bundled runtime). transformers,
+- **Runtime**: onnxruntime and razdel join `AudioRuntime.requirements`.
+  ruaccent goes in as a second pip step with `--no-deps`. transformers,
   numpy and huggingface_hub are already there.
+- **App Store build**: its packages are baked into the bundle by
+  `scripts/build_full_app.sh`, which has its own package list (it reads
+  only the mlx-audio commit from `AudioRuntime`). onnxruntime and razdel
+  go into that list, and ruaccent into a `--no-deps` step. onnxruntime's
+  native library is signed with the rest, and its licence (MIT) goes in
+  the notices.
+- **Where files live**: the bundle is read-only. The stress pack (the
+  built dictionary and the ONNX models), the voice model and the
+  tokenizer all go in the models folder (the container, in the App Store
+  build), downloaded by the app as data. A voice clip goes in the app's
+  support folder.
 - **Not yet run on macOS**, only on Linux. The first test is on the Mac,
   then in the App Store sandbox.
 
@@ -221,17 +238,27 @@ Bold is the proposed default of each row.
 
 ### How it runs
 
-- **`llmtray_tts_runner.py`** runs in the audio venv. It takes JSON lines
-  on stdin (`speak` {id, text, lang}, `cancel`, `voice` {clip path}) and
-  writes audio back with the Voice Lab framing (`VoiceFrames`: PCM16
-  frames, then a JSON `done` or `error` per id). It is started on the
-  first sentence and quits after 5 minutes idle or when the app quits.
-- **Playback**: `SpeechPlayer` (Voice Lab's). While sentence *n* plays,
-  sentence *n+1* synthesizes. Stop flushes the player and cancels the
-  runner's queue.
-- **Memory**: about 3.5 GB of GPU memory while loaded. It counts against
-  the GPU limit beside the chat model, as the other runners do. If it
-  doesn't fit, the system voice is used and a one-time note says why.
+- **`llmtray_tts_runner.py`** runs in the audio venv. It speaks Voice
+  Lab's binary frame format (a type byte, a 4-byte length, the payload)
+  in both directions, with its own frame types:
+  - app to runner: `P` speak {id, text, lang}, `V` voice {clip or null
+    for built-in}, `C` cancel everything queued, `Q` quit;
+  - runner to app: `R` ready {sample_rate}, `B` {id} before a sentence's
+    audio, `S` PCM16, `Z` {id, rtf} when the sentence is done, `E` {id,
+    message}, `L` log.
+
+  The app starts it on the first sentence and stops it after 5 minutes
+  idle or when the app quits.
+- **Playback**: a `SpeechPlayer` (Voice Lab's) made at the sample rate
+  the `R` frame gives (24 kHz for Chatterbox). While sentence *n* plays,
+  sentence *n+1* synthesizes. Stop drops what's queued and playing
+  (`cancelPlayback`, not `flush`, which plays the rest) and sends `C`.
+- **Memory**: unlike the other generators, spoken answers must run
+  **next to** a chat model that is generating, so nothing is unloaded.
+  The real footprint is unknown: the download is 3.2 GB, and Voice Lab
+  ran well above its weights (a 9.2 GB download used 15.6 GB). It is
+  measured on the base M5 before stable. Settings shows the GPUFit
+  estimate as a notice, as the other features do; it doesn't block.
 - **Speed is not measured yet.** If the runner can't keep up with
   playback, it falls behind sentence by sentence, with gaps; first audio
   comes one sentence's synthesis late. The base M5 numbers go here before
@@ -248,10 +275,8 @@ Bold is the proposed default of each row.
 1. Base: Voice pane, mic capture + permission, the runner with framing,
    playback, memory display. Tests: framing, the speakable-text filter
    (for step 3), fits-next-to-model math.
-2. Voice Lab with PersonaPlex 7B — measure memory, latency (first audio
-   after the user stops), and whether the full duplex works through the
-   runner's pipes; if pipes add too much latency, the runner opens a local
-   Unix socket instead.
+2. Voice Lab with VoiceChat 11B (built; PersonaPlex stays a later
+   opt-in) — memory, latency and duplex over the runner's pipes measured.
 3. Push-to-talk STT into the composer.
 4. Spoken answers: system voices and Chatterbox Multilingual V3 (above).
 5. Barge-in and hands-free mode, after step 3.
@@ -268,9 +293,10 @@ Each step ships on its own; step 2 alone is the toy that was asked for.
   bypassed) + CC-BY-4.0; gated on Hugging Face.
 - Moshi: weights CC-BY 4.0, moshi_mlx MIT.
 - speech-swift: Apache-2.0.
-- Chatterbox (all variants used here): MIT. mlx-community conversions:
-  MIT. ruaccent code and `ruaccent/accentuator` models and dictionaries:
-  MIT (checked 2026-11-06).
+- Chatterbox (all variants used here) and its mlx-community conversions:
+  MIT. `mlx-community/S3TokenizerV2`: Apache-2.0 (from CosyVoice2-0.5B).
+  ruaccent code and `ruaccent/accentuator` models and dictionaries: MIT.
+  onnxruntime: MIT. razdel: MIT. (Checked 2026-11-06.)
 - Never shipped: `russian_text_stresser` (AGPL-3.0), and rupostagger
   (GPL-3.0, pulled in by ruaccent's full mode).
 
