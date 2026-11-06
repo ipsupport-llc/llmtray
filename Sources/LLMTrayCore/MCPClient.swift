@@ -393,22 +393,18 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
             // most 8 MB per event and 32 MB per stream; cancelled by close.
             let key = UUID()
             let reader = Task.detached { [weak self] in
-                var event = ""
+                // Bytes, not `bytes.lines`: that drops empty lines, and an
+                // empty line is what ends an event.
+                var events = SSEEvents(maxEvent: Self.maxBody)
                 var total = 0
                 do {
-                    for try await line in bytes.lines {
+                    for try await byte in bytes {
                         if Task.isCancelled { break }
-                        total += line.utf8.count + 1
-                        if total > Self.maxBody * 4 { break }
-                        if line.hasPrefix("data:") {
-                            event += (event.isEmpty ? "" : "\n") + line.dropFirst(5).trimmingCharacters(in: .whitespaces)
-                            if event.utf8.count > Self.maxBody { break }
-                        } else if line.isEmpty, !event.isEmpty {
-                            deliver(Data(event.utf8))
-                            event = ""
-                        }
+                        total += 1
+                        if total > Self.maxBody * 4 { throw SSEEvents.TooLarge() }
+                        if let event = try events.feed(byte) { deliver(event) }
                     }
-                    if !event.isEmpty, !Task.isCancelled { deliver(Data(event.utf8)) }
+                    if !Task.isCancelled, let event = events.finish() { deliver(event) }
                 } catch {}
                 self?.lock.withLock { _ = self?.readers.removeValue(forKey: key) }
             }
@@ -437,6 +433,69 @@ public final class MCPHTTPTransport: MCPTransport, @unchecked Sendable {
             _ = try? await session.data(for: request)
         }
         closer?("closed")
+    }
+}
+
+/// The data of server-sent events, fed a byte at a time. Lines end in
+/// "\n", "\r\n" or "\r"; an empty line ends an event; of the fields only
+/// `data` matters (its lines joined with "\n"); an event without data is
+/// skipped. One event may hold at most `maxEvent` bytes.
+struct SSEEvents {
+    struct TooLarge: Error {}
+    let maxEvent: Int
+    private var line: [UInt8] = []
+    private var data: [UInt8] = []
+    private var hasData = false
+    private var afterCR = false
+
+    init(maxEvent: Int) { self.maxEvent = maxEvent }
+
+    /// The data of the event this byte ended, if it ended one.
+    mutating func feed(_ byte: UInt8) throws -> Data? {
+        if afterCR {
+            afterCR = false
+            if byte == 0x0A { return nil }
+        }
+        switch byte {
+        case 0x0D:
+            afterCR = true
+            return endLine()
+        case 0x0A:
+            return endLine()
+        default:
+            line.append(byte)
+            if line.count + data.count > maxEvent { throw TooLarge() }
+            return nil
+        }
+    }
+
+    /// At the end of the stream: an event cut off without its empty line
+    /// still counts.
+    mutating func finish() -> Data? {
+        if !line.isEmpty { _ = endLine() }
+        return dispatch()
+    }
+
+    private mutating func endLine() -> Data? {
+        defer { line.removeAll(keepingCapacity: true) }
+        if line.isEmpty { return dispatch() }
+        let name = Array("data".utf8)
+        guard line.starts(with: name) else { return nil }
+        var value = line.dropFirst(name.count)
+        if let colon = value.first {
+            guard colon == UInt8(ascii: ":") else { return nil }  // "database: …"
+            value = value.dropFirst()
+            if value.first == UInt8(ascii: " ") { value = value.dropFirst() }
+        }
+        if hasData { data.append(0x0A) }
+        data.append(contentsOf: value)
+        hasData = true
+        return nil
+    }
+
+    private mutating func dispatch() -> Data? {
+        defer { data.removeAll(keepingCapacity: true); hasData = false }
+        return hasData && !data.isEmpty ? Data(data) : nil
     }
 }
 
