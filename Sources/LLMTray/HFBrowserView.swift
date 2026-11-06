@@ -255,7 +255,7 @@ private struct MediaDownloadControl: View {
         switch entry.kind {
         case .image: return mflux.isBusy
         case .music: return music.isBusy
-        case .voice: return voice.isBusy
+        case .voice: return voice.isBusy || SpokenVoiceStore.shared.isBusy
         }
     }
 
@@ -306,6 +306,11 @@ private struct MediaDownloadControl: View {
                     guard let m = MusicModel.allCases.first(where: { MediaModels.entry($0) == entry }) else { return }
                     try await music.download(m)
                 case .voice:
+                    if SpokenVoiceFile.folders.contains(where: { $0.repo == entry.repo }) {
+                        // Chatterbox's parts come together (adr/0016).
+                        try await SpokenVoiceStore.shared.download()
+                        return
+                    }
                     guard let m = VoiceLabModel.all.first(where: { MediaModels.entry($0) == entry }) else { return }
                     try await voice.download(m)
                 }

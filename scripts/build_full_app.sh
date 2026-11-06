@@ -184,7 +184,14 @@ PY
   "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --target "$PKG_DIR" \
     "mlx-lm @ https://github.com/$PINNED_REPO/archive/$PINNED_REF.zip" \
     "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/$AUDIO_COMMIT.tar.gz" \
-    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}"
+    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}" \
+    "onnxruntime==1.31.1" "razdel==0.5.0"
+  # Spoken answers' Russian stress (adr/0016): ruaccent without its
+  # declared dependencies -- they serve only its full mode, which imports
+  # rupostagger (GPL-3.0); LLMTray runs its tiny mode. Same pins as
+  # AudioRuntime.requirements / noDepsRequirements.
+  "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$PKG_DIR" \
+    "ruaccent==1.5.8.3"
   cp -R "$MFLUX_DIR"/mflux "$MFLUX_DIR"/mflux-*.dist-info "$PKG_DIR"/
   # scipy (mlx-audio's) from its macOS 12 wheel, same version: the macOS 14
   # wheels call Accelerate's legacy BLAS / LAPACK names (_sgemm, _lsame_ ...),

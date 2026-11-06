@@ -573,6 +573,7 @@ struct ChatComposer: View {
             ChatMemoryChip()
             ChatFolderChips()
             Spacer()
+            ReadAloudToggle()
             if let tps = chat.lastTokensPerSecond {
                 Text(String(format: "%.1f tok/s", tps))
                     .font(.caption)
@@ -985,6 +986,33 @@ struct SharedChip: View {
         case .browserTab:
             let host = URL(string: c.source)?.host ?? c.source
             return c.text == nil ? host + " · " + NSLocalizedString("no page text", comment: "a tab attached with its title and address only") : host
+        }
+    }
+}
+
+/// "Read answers aloud" (adr/0016): each new answer is spoken as it
+/// streams; Stop while one is read.
+private struct ReadAloudToggle: View {
+    @ObservedObject private var spoken = SpokenAnswers.shared
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if spoken.speakingMessage != nil {
+                Button { spoken.stop() } label: {
+                    Image(systemName: "stop.circle").font(.caption)
+                }
+                .buttonStyle(.plain)
+                .help(Text("Stop reading the answer"))
+                .accessibilityLabel(Text("Stop reading the answer"))
+            }
+            Button { spoken.readsAloud.toggle() } label: {
+                Image(systemName: spoken.readsAloud ? "speaker.wave.2.fill" : "speaker.slash").font(.caption)
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(spoken.readsAloud ? .accentColor : .secondary)
+            .help(Text(spoken.readsAloud ? "Answers are read aloud -- click to stop" : "Read answers aloud"))
+            .accessibilityLabel(Text("Read answers aloud"))
+            .accessibilityValue(Text(spoken.readsAloud ? "On" : "Off"))
         }
     }
 }

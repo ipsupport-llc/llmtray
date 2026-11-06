@@ -1039,6 +1039,7 @@ final class ServerManager: ObservableObject {
             case .musicRunner: what = "music-generation runner"
             case .embedRunner: what = "embed runner"
             case .voiceRunner: what = "Voice Lab runner"
+            case .speechRunner: what = "spoken answers runner"
             }
             let model = orphan.model.map { ", \($0)" } ?? ""
             let memory = ByteCountFormatter.string(fromByteCount: orphan.residentBytes, countStyle: .memory)

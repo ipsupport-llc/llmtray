@@ -258,6 +258,9 @@ struct MessageBubble: View {
                 Label("Share…", systemImage: "square.and.arrow.up").font(.caption)
             }
             .buttonStyle(.plain)
+            if !isUser {
+                SpeakButton(messageID: message.id, text: message.content)
+            }
             // How the answer was made: an LLM text answer's, when known.
             if !isUser, let stats = message.answerStats {
                 AnswerInfoButton(id: message.id, stats: stats)
@@ -475,5 +478,21 @@ private struct ToolCallRow: View {
             }
             return "\(key): \(value)"
         }.joined(separator: ", ")
+    }
+}
+
+/// Speak on an answer (adr/0016): reads it aloud, Stop while it reads.
+private struct SpeakButton: View {
+    let messageID: UUID
+    let text: String
+    @ObservedObject private var spoken = SpokenAnswers.shared
+
+    var body: some View {
+        let speaking = spoken.speakingMessage == messageID
+        Button { spoken.toggle(messageID: messageID, markdown: text) } label: {
+            Label(speaking ? "Stop" : "Speak", systemImage: speaking ? "stop.circle" : "speaker.wave.2").font(.caption)
+        }
+        .buttonStyle(.plain)
+        .help(Text(speaking ? "Stop reading the answer" : "Read the answer aloud"))
     }
 }

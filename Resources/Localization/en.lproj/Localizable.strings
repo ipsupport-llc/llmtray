@@ -100,6 +100,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";
 "A client" = "A client";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "A clip under 10 s works, but 10 s or more imitates the voice better.";
 "A deleted project" = "A deleted project";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
@@ -200,6 +201,7 @@
 "Answer (all requests)" = "Answer (all requests)";
 "Answer details" = "Answer details";
 "Answer in Russian, briefly" = "Answer in Russian, briefly";
+"Answers are read aloud -- click to stop" = "Answers are read aloud -- click to stop";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Anyone on your network can use the server: a key keeps it to the clients you give it to.";
 "Anything else chats should know" = "Anything else chats should know";
@@ -257,6 +259,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Built into macOS · LLMTray's chat only";
+"Built-in" = "Built-in";
 "By" = "By";
 "Cached" = "Cached";
 "Calculator" = "Calculator";
@@ -294,6 +297,11 @@
 "Chats outside projects" = "Chats outside projects";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3" = "Chatterbox Multilingual V3";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox doesn't speak this language (%@): the system voice read the answer.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox isn't downloaded: the system voice read the answer.";
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
 "Check for Runtime Updates" = "Check for Runtime Updates";
@@ -307,7 +315,9 @@
 "Checks for updates automatically" = "Checks for updates automatically";
 "Chip" = "Chip";
 "Choose Another Folder…" = "Choose Another Folder…";
+"Choose Clip…" = "Choose Clip…";
 "Choose Files…" = "Choose Files…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use.";
 "Choose a folder chats may use." = "Choose a folder chats may use.";
 "Choose a folder the chat may look in." = "Choose a folder the chat may look in.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Choose a folder the chat may propose changes in. You approve every change.";
@@ -331,6 +341,7 @@
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
+"Code in the chat." = "Code in the chat.";
 "Coding agents" = "Coding agents";
 "Coffee" = "Coffee";
 "Comes with %@" = "Comes with %@";
@@ -372,6 +383,7 @@
 "Couldn't reach the server -- please try again later." = "Couldn't reach the server -- please try again later.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log).";
 "Couldn't start the voice runner: %@" = "Couldn't start the voice runner: %@";
+"Couldn't start the voice: %@" = "Couldn't start the voice: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere.";
 "Countdown" = "Countdown";
 "Countdown: %lld s" = "Countdown: %lld s";
@@ -461,6 +473,7 @@
 "Drop to add to “%@”" = "Drop to add to “%@”";
 "Drop to attach images" = "Drop to attach images";
 "Duplicate this profile" = "Duplicate this profile";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off.";
 "Echo cancellation" = "Echo cancellation";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
 "Echo cancellation isn't available on this Mac." = "Echo cancellation isn't available on this Mac.";
@@ -551,6 +564,7 @@
 "Free disk space" = "Free disk space";
 "Free on disk: %@ · your models: %@" = "Free on disk: %@ · your models: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay.";
+"From a clip" = "From a clip";
 "From the MCP Registry" = "From the MCP Registry";
 "Full" = "Full";
 "Full duplex" = "Full duplex";
@@ -873,6 +887,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "None of these servers can be updated from here (added by hand or from a file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "None yet. Grants for one chat or one request aren't listed here: they end with it.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Not enough disk space: the voice model needs %1$@, %2$@ is free.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Not enough disk space: the voice needs %1$@, %2$@ is free.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
@@ -1036,7 +1051,9 @@
 "Read It Too" = "Read It Too";
 "Read Past Chats…" = "Read Past Chats…";
 "Read What Wasn't Read" = "Read What Wasn't Read";
+"Read answers aloud" = "Read answers aloud";
 "Read chats" = "Read chats";
+"Read the answer aloud" = "Read the answer aloud";
 "Read web pages" = "Read web pages";
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
@@ -1217,11 +1234,13 @@
 "Sorts messages with" = "Sorts messages with";
 "Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
+"Speak" = "Speak";
 "Speakers work with echo cancellation; headphones are still best." = "Speakers work with echo cancellation; headphones are still best.";
 "Speaking…" = "Speaking…";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
 "Speed" = "Speed";
 "Speeds up %@: fetched where LLMTray loads it from." = "Speeds up %@: fetched where LLMTray loads it from.";
+"Spoken answers" = "Spoken answers";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Stall timeout: %lld s";
 "Start" = "Start";
@@ -1248,6 +1267,8 @@
 "Stop Voice Lab and music generation to update it." = "Stop Voice Lab and music generation to update it.";
 "Stop Voice Lab first." = "Stop Voice Lab first.";
 "Stop generating" = "Stop generating";
+"Stop reading the answer" = "Stop reading the answer";
+"Stop reading the answer first." = "Stop reading the answer first.";
 "Stop recording" = "Stop recording";
 "Stop server (unload model)" = "Stop server (unload model)";
 "Stop the server to change these." = "Stop the server to change these.";
@@ -1273,6 +1294,7 @@
 "System" = "System";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "System and private places (the home folder itself, Library, Applications, keys) are never shared.";
 "System prompt" = "System prompt";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac.";
 "Tab %lld" = "Tab %lld";
 "Talk" = "Talk";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept.";
@@ -1320,6 +1342,8 @@
 "The chat's own model" = "The chat's own model";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.";
 "The chats and models in that folder were here already." = "The chats and models in that folder were here already.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "The clip is %.0f s: 30 s at most -- cut it shorter.";
+"The clip is %.0f s: at least 5 s are needed." = "The clip is %.0f s: at least 5 s are needed.";
 "The command %@ wasn't found." = "The command %@ wasn't found.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.";
 "The day the counts are for." = "The day the counts are for.";
@@ -1371,6 +1395,7 @@
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model that reads them" = "The model that reads them";
 "The model's license, from its card." = "The model's license, from its card.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.";
@@ -1412,11 +1437,16 @@
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "The suggestions for this Mac are already here. Browse Hugging Face for another model.";
 "The tips aren't available right now." = "The tips aren't available right now.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";
+"The voice couldn't open the audio output." = "The voice couldn't open the audio output.";
+"The voice couldn't open the audio output: %@" = "The voice couldn't open the audio output: %@";
+"The voice failed: %@" = "The voice failed: %@";
+"The voice is being downloaded -- try again once it's done." = "The voice is being downloaded -- try again once it's done.";
 "The voice model is being downloaded -- try again once it's done." = "The voice model is being downloaded -- try again once it's done.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "The voice model isn't downloaded -- download it in Settings > Voice.";
 "The voice model's audio format isn't supported." = "The voice model's audio format isn't supported.";
 "The voice runner sent an unreadable ready message." = "The voice runner sent an unreadable ready message.";
 "The voice runner stopped unexpectedly (%@)." = "The voice runner stopped unexpectedly (%@).";
+"The voice stopped: %@" = "The voice stopped: %@";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself.";
 "There's no plan waiting any more." = "There's no plan waiting any more.";
 "These can't be added to a project" = "These can't be added to a project";
@@ -1525,6 +1555,7 @@
 "Use %@" = "Use %@";
 "Use %lld" = "Use %lld";
 "Use Anyway" = "Use Anyway";
+"Use Built-in" = "Use Built-in";
 "Use Default Folder" = "Use Default Folder";
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
@@ -1532,6 +1563,7 @@
 "Use a learned fact at once" = "Use a learned fact at once";
 "Use a learned fact once %lld chats show it" = "Use a learned fact once %lld chats show it";
 "Use headphones: the model hears its own voice from the speakers." = "Use headphones: the model hears its own voice from the speakers.";
+"Use your own voice, or a voice you have permission to use." = "Use your own voice, or a voice you have permission to use.";
 "Used" = "Used";
 "Used by %@." = "Used by %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.";
@@ -1550,6 +1582,7 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab takes about %@ GB of memory while it runs.";
+"Voice clip" = "Voice clip";
 "Voice model" = "Voice model";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Waiting for a model download to finish…" = "Waiting for a model download to finish…";

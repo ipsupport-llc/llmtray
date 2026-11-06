@@ -27,6 +27,13 @@ public struct VoiceFrame: Equatable, Sendable {
         case speech = 0x53  // S
         case error = 0x45   // E
         case log = 0x4C     // L
+        // Spoken answers' runner (runtime/llmtray_tts_runner.py): app ->
+        // runner `P` speak {id, text, lang}, `V` voice {clip}; runner ->
+        // app `B` {id} before a sentence's audio. `C`, `Q`, `R`, `S`, `Z`,
+        // `E`, `L` as above (`Z` {id, rtf}, `E` {id, message} there).
+        case speak = 0x50   // P
+        case voice = 0x56   // V
+        case begin = 0x42   // B
     }
 
     /// The raw type byte: a type this build doesn't know is passed on (and

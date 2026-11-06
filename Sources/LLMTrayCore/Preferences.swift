@@ -121,6 +121,14 @@ public enum Pref {
     public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
 
     // Voice (adr/0016)
+    /// Spoken answers: each new answer is read aloud as it streams (the
+    /// chat's turn actions); Speak on an answer works either way.
+    public static let spokenAnswersAuto = PrefKey("llmtray.spokenAnswers.auto", default: false)
+    /// `SpokenVoiceKind` raw value: "system" (macOS voices) or "chatterbox".
+    public static let spokenAnswersVoice = PrefKey("llmtray.spokenAnswers.voice", default: "system")
+    /// The voice clip Chatterbox imitates, copied into the support folder;
+    /// empty: its built-in voice.
+    public static let spokenAnswersClip = PrefKey("llmtray.spokenAnswers.clip", default: "")
     /// Voice Lab, the experimental speech-to-speech toy: off until turned on
     /// in Settings > Voice; nothing is downloaded or started before.
     public static let voiceLabEnabled = PrefKey("llmtray.voiceLab.enabled", default: false)

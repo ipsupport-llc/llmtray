@@ -37,7 +37,10 @@ final class ChatClient: ObservableObject {
     /// request is current (a tool round sends the next one).
     private var answerStarted = false
     private var streamNumber = 0
-    @Published var isStreaming: Bool = false
+    @Published var isStreaming: Bool = false {
+        // A stream's end: the rest of a spoken answer is read (adr/0016).
+        didSet { if oldValue, !isStreaming { SpokenAnswers.shared.streamEnded(client: ObjectIdentifier(self)) } }
+    }
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
     // True while a generate_image tool call is actually running (mflux
@@ -319,6 +322,8 @@ final class ChatClient: ObservableObject {
         errorText = nil
         lastTokensPerSecond = nil
         toolbox.startTurn()
+        // A new message: the answer being read stops.
+        SpokenAnswers.shared.stop()
         toolRoundsThisTurn = 0
         turnCallResults = [:]
         turnStats = nil
@@ -2149,6 +2154,7 @@ final class ChatClient: ObservableObject {
     private func appendToAssistant(content: String) {
         guard let idx = assistantMessageIndex, idx < messages.count else { return }
         messages[idx].content += content
+        SpokenAnswers.shared.streamed(client: ObjectIdentifier(self), messageID: messages[idx].id, delta: content)
     }
 
     private func appendToAssistant(reasoning: String) {
