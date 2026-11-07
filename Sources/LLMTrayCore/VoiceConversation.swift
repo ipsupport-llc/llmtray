@@ -31,15 +31,28 @@ public enum VoiceConversationText {
     }
 
     /// What the microphone heard is the model's own voice coming back
-    /// past echo cancellation (adr/0031): most of its words are in what was
-    /// just played. One or two words have to all be there.
+    /// past echo cancellation (adr/0031): echo is a stretch of what was
+    /// played, so a heard word counts when it and a neighbour come in the
+    /// same order there. At least 80% of the words have to; a single word
+    /// has to be there itself. Words compare by their first five letters
+    /// (the recognizer gets endings wrong).
     public static func isEcho(_ text: String, of spoken: [String]) -> Bool {
-        let heard = words(text)
+        let heard = words(text).map(stem)
         guard !heard.isEmpty else { return false }
-        let played = Set(spoken.flatMap(words))
-        guard !played.isEmpty else { return false }
-        let found = heard.filter { w in played.contains(w) || played.contains { close($0, w) } }.count
-        return heard.count <= 2 ? found == heard.count : Double(found) >= 0.6 * Double(heard.count)
+        let played = spoken.map { words($0).map(stem) }
+        let singles = Set(played.joined())
+        guard !singles.isEmpty else { return false }
+        if heard.count == 1 { return singles.contains(heard[0]) }
+        var pairs = Set<String>()
+        for line in played where line.count > 1 {
+            for i in 1..<line.count { pairs.insert(line[i - 1] + " " + line[i]) }
+        }
+        var covered = [Bool](repeating: false, count: heard.count)
+        for i in 1..<heard.count where pairs.contains(heard[i - 1] + " " + heard[i]) {
+            covered[i - 1] = true
+            covered[i] = true
+        }
+        return Double(covered.filter { $0 }.count) >= 0.8 * Double(heard.count)
     }
 
     static func words(_ text: String) -> [String] {
@@ -48,12 +61,7 @@ public enum VoiceConversationText {
             .split(whereSeparator: \.isWhitespace).map(String.init)
     }
 
-    /// The recognizer's take on a word it heard through the speakers: the
-    /// same start, at most a letter or two off.
-    private static func close(_ a: String, _ b: String) -> Bool {
-        guard a.count >= 4, b.count >= 4, a.prefix(3) == b.prefix(3) else { return false }
-        return abs(a.count - b.count) <= 2 && a.commonPrefix(with: b).count >= min(a.count, b.count) - 2
-    }
+    private static func stem(_ word: String) -> String { String(word.prefix(5)) }
 
     /// Fillers for a pause (the model is thinking), per language.
     public static func thinking(_ language: String) -> [String] {

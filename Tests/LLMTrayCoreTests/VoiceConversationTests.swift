@@ -23,6 +23,8 @@ final class VoiceConversationTests: XCTestCase {
         XCTAssertFalse(VoiceConversationText.isEcho("  ", of: spoken))
         XCTAssertTrue(VoiceConversationText.isEcho("what do you mean", of: ["Hmm, what do you mean by that?"]))
         XCTAssertFalse(VoiceConversationText.isEcho("what can you help me with", of: ["Hmm, what do you mean by that?"]))
+        XCTAssertFalse(VoiceConversationText.isEcho("Do not delete the file", of: ["I can delete the file."]), "a correction isn't echo")
+        XCTAssertFalse(VoiceConversationText.isEcho("file delete", of: ["I can delete the file."]), "the words, not the order")
     }
 
     func testToolKinds() {
