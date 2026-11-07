@@ -48,9 +48,9 @@ final class SpokenVoiceStore: ObservableObject {
         let fm = FileManager.default
         switch file {
         case .model:
-            // conds.safetensors: the built-in voice.
-            return fm.fileExists(atPath: dir + "/model.safetensors") && fm.fileExists(atPath: dir + "/config.json")
-                && fm.fileExists(atPath: dir + "/conds.safetensors")
+            // What the loader reads; conds.safetensors is the built-in voice.
+            return ["model.safetensors", "config.json", "tokenizer.json", "Cangjie5_TC.json", "conds.safetensors"]
+                .allSatisfy { fm.fileExists(atPath: dir + "/" + $0) }
         case .tokenizer:
             return fm.fileExists(atPath: dir + "/model.safetensors")
         case .russianStress:

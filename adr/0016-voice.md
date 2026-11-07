@@ -157,9 +157,9 @@ Bold is the proposed default of each row.
   plus `mlx-community/S3TokenizerV2` (0.49 GB). The tokenizer is converted
   from FunAudioLLM/CosyVoice2-0.5B, so it is **Apache-2.0**, not MIT.
 - **Built-in voice**: the multilingual MLX repo has no `conds.safetensors`.
-  The built-in voice comes from `mlx-community/chatterbox-fp16`'s (105 KB,
-  MIT), converted from Resemble's own `conds.pt`, which their multilingual
-  model loads too.
+  The built-in voice is `mlx-community/chatterbox-fp16`'s (105 KB, MIT),
+  converted from Resemble's own `conds.pt`, which their multilingual model
+  loads too. It ships inside IPSupport's 8-bit build (below).
 - **8-bit T3** (2026-11-06, the user: "fp32 сразу уезжает в fp8, и
   публикуем модель"). Measured on the base M5, T3 at 8 bits runs 2-3x
   faster than the fp32 conversion with sample-identical audio; bf16 was
