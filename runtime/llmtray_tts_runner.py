@@ -173,6 +173,94 @@ def pcm16(samples):
     return (a * 32767.0).astype("<i2").tobytes()
 
 
+MEANFLOW_FILE = "meanflow/s3gen_meanflow.safetensors"   # a subfolder: mlx-audio loads every top-level *.safetensors
+CHECK_STOP_EVERY = 16
+
+
+def fast_t3_inference(self, t3_cond, text_tokens, initial_speech_tokens=None, max_new_tokens=1024,
+                      temperature=0.8, top_p=0.95, min_p=0.05, repetition_penalty=1.2, cfg_weight=0.5):
+    """mlx-audio's T3.inference without a CPU<->GPU sync per token: sampling,
+    the repetition penalty and the next embedding stay on the GPU, and the
+    stop token is looked for every CHECK_STOP_EVERY tokens. Same tokens for
+    the same seed (checked against T3.inference)."""
+    import mlx.core as mx
+    from mlx_audio.lm.models.cache import make_prompt_cache
+    from mlx_audio.lm.sample_utils import make_sampler
+    if text_tokens.ndim == 1:
+        text_tokens = mx.expand_dims(text_tokens, 0)
+    emb = self._prepare_inference_context(t3_cond=t3_cond, text_tokens=text_tokens, cfg_weight=cfg_weight,
+                                          initial_speech_tokens=initial_speech_tokens)
+    cache = make_prompt_cache(self.tfmr)
+    sampler = make_sampler(temp=temperature, top_p=top_p, min_p=min_p)
+    vocab = self.speech_head.weight.shape[0]
+    ids = mx.arange(vocab)[None]
+    stop = self.hp.stop_speech_token
+    seen = ids == self.hp.start_speech_token
+    hidden = self.tfmr.model(inputs=None, input_embeddings=emb, cache=cache)
+    tokens = []
+    for step in range(max_new_tokens):
+        logits = self.speech_head(hidden[:, -1:, :]).squeeze(1)
+        if cfg_weight > 0.0 and logits.shape[0] > 1:
+            logits = logits[0:1] + cfg_weight * (logits[0:1] - logits[1:2])
+        else:
+            logits = logits[0:1]
+        if repetition_penalty and repetition_penalty != 1.0:
+            penalized = mx.where(logits < 0, logits * repetition_penalty, logits / repetition_penalty)
+            logits = mx.where(seen, penalized, logits)
+        tok = sampler(logits)
+        seen = mx.logical_or(seen, ids == tok[:, None])
+        tokens.append(tok)
+        e = self.speech_emb(tok[:, None]) + self.speech_pos_emb.get_fixed_embedding(step + 1)
+        if cfg_weight > 0.0:
+            e = mx.concatenate([e, e], axis=0)
+        hidden = self.tfmr.model(inputs=None, input_embeddings=e, cache=cache)
+        mx.async_eval(hidden, tok, seen)
+        if (step + 1) % CHECK_STOP_EVERY == 0 and stop in mx.concatenate(tokens[-CHECK_STOP_EVERY:]).tolist():
+            break
+    out = [self.hp.start_speech_token]
+    for t in (mx.concatenate(tokens).tolist() if tokens else []):
+        out.append(t)
+        if t == stop:
+            break
+    return mx.array([out])
+
+
+class MeanflowDecoder:
+    """Turbo's meanflow S3Gen behind the multilingual model's S3Gen
+    interface: speech tokens to audio in 2 steps. Everything else (voice
+    conditioning from a clip: embed_ref) stays with the original."""
+
+    # Computed at construction, not stored in the file.
+    BUFFERS = {"encoder.embed.pos_enc.pe", "encoder.up_embed.pos_enc.pe", "mel2wav.stft_window", "trim_fade"}
+
+    def __init__(self, base, path):
+        import mlx.core as mx
+        from mlx.utils import tree_flatten
+        from mlx_audio.tts.models.chatterbox_turbo.models.s3gen import S3Gen as TurboS3Gen
+        self.base = base
+        self.fast = TurboS3Gen(meanflow=True)
+        weights = mx.load(path)
+        names = set(dict(tree_flatten(self.fast.parameters())))
+        if names - set(weights) != self.BUFFERS or set(weights) - names:
+            raise ValueError("the file doesn't match the decoder (%d missing, %d unknown)"
+                             % (len(names - set(weights) - self.BUFFERS), len(set(weights) - names)))
+        self.fast.load_weights(list(weights.items()), strict=False)
+        mx.eval(self.fast.parameters())
+
+    def __call__(self, speech_tokens=None, ref_dict=None, finalize=True, **kwargs):
+        # The multilingual model calls it only with finalize=True (whole
+        # sentences); nothing else it passes applies to this decoder.
+        out = self.fast.inference(speech_tokens, ref_dict, n_cfm_timesteps=2)
+        return out[0] if isinstance(out, tuple) else out
+
+    def __getattr__(self, name):
+        # Only what __call__ doesn't cover (embed_ref for a voice clip).
+        base = self.__dict__.get("base")
+        if base is None:
+            raise AttributeError(name)
+        return getattr(base, name)
+
+
 class Speaker:
     """The model, the current voice's conditionals, and the stresser."""
 
@@ -199,6 +287,21 @@ class Speaker:
         if not quantized:
             import mlx.nn as nn
             nn.quantize(self.model.t3.tfmr, group_size=64, bits=8)
+        # T3 without a CPU<->GPU sync per token: same tokens, ~12% faster.
+        import types
+        self.model.t3.inference = types.MethodType(fast_t3_inference, self.model.t3)
+        # Chatterbox Turbo's distilled decoder (2 steps, no CFG) in place of
+        # the 10-step one: 4x faster S3Gen, no difference by ear in a blind
+        # test (quant-ternary chatterbox-quant). Used when its file is there.
+        meanflow = os.path.join(model_dir, MEANFLOW_FILE)
+        self.base_decoder = self.model.s3gen
+        self.decoder = "s3gen-10"
+        if os.path.exists(meanflow):
+            try:
+                self.model.s3gen = MeanflowDecoder(self.base_decoder, meanflow)
+                self.decoder = "meanflow-2"
+            except Exception as e:   # a damaged file: the 10-step decoder still works
+                log("fast decoder unusable, using the standard one: %s" % e)
         self.sample_rate = int(self.model.sample_rate)
         self.builtin = getattr(self.model, "_conds", None)
         self.conds = self.builtin
@@ -210,6 +313,24 @@ class Speaker:
                 self.stress = RuStress(stress_dir)
             except Exception as e:
                 log("Russian stress unavailable: %s" % e)
+
+    def warm_up(self):
+        """The first run compiles MLX's kernels (~9 s): done before ready,
+        not on the user's first sentence. Also the check that the voice
+        works: a fast decoder that fails here is dropped for the standard
+        one; anything else that fails is raised (the voice can't speak)."""
+        def once():
+            list(self.model.generate("Hello.", conds=self.conds, lang_code="en",
+                                     exaggeration=self.EXAGGERATION, verbose=False))
+        try:
+            once()
+        except Exception as e:
+            if self.decoder != "meanflow-2":
+                raise
+            log("fast decoder failed, using the standard one: %s" % e)
+            self.model.s3gen = self.base_decoder
+            self.decoder = "s3gen-10"
+            once()
 
     def use_clip(self, clip):
         if not clip:
@@ -307,7 +428,12 @@ def main():
             send("E", {"id": None, "message": "The voice model didn't load: %s" % e, "fatal": True})
             return 1
         name = os.path.basename(os.path.normpath(arg("--model")))
-    send("R", {"sample_rate": speaker.sample_rate, "model": name,
+        try:
+            speaker.warm_up()
+        except Exception as e:
+            send("E", {"id": None, "message": "The voice can't speak: %s" % e, "fatal": True})
+            return 1
+    send("R", {"decoder": getattr(speaker, "decoder", "selftest"), "sample_rate": speaker.sample_rate, "model": name,
                "builtin_voice": getattr(speaker, "builtin", True) is not None,
                "russian_stress": getattr(speaker, "stress", True) is not None})
     threading.Thread(target=reader, args=(sys.stdin.buffer, inbox), daemon=True).start()

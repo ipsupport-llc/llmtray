@@ -169,6 +169,19 @@ Bold is the proposed default of each row.
   an fp32 folder at load. S3Gen stays fp32 and is now the slower half
   (about 1 s of compute per 1 s of speech). Details are in quant-ternary
   `chatterbox-quant/docs/FINDINGS.md`.
+- **Fast decoder and a faster T3 loop** (2026-11-07, the user asked for
+  "максимальное ускорение"; blind test: "разницы не слышу").
+  - Chatterbox Turbo's distilled S3Gen ("meanflow", 2 steps, no CFG)
+    decodes the multilingual T3's speech tokens: 4x faster than the 10-step
+    decoder, with no difference heard in a blind test.
+  - It ships in the same HF repo as `meanflow/s3gen_meanflow.safetensors`,
+    in a subfolder because mlx-audio loads every top-level `*.safetensors`.
+    A model downloaded before it came gets just that file (Settings: "Get
+    Faster Decoder").
+  - The runner also generates T3 without a CPU-GPU sync per token (same
+    tokens, +12%), and warms up before it reports ready.
+  - End to end on the base M5: RTF 0.24–0.31, so the speaking keeps ahead
+    of playback.
 - Chatterbox **Turbo** (350M) and **Nano** (110M) are faster but
   English-only. They're not offered now; Turbo is in the fork if an
   English-only fast voice is wanted later.

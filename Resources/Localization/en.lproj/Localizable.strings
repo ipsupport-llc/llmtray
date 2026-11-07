@@ -299,6 +299,7 @@
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
 "Chatterbox" = "Chatterbox";
 "Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Multilingual V3 (8-bit)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more.";
 "Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox doesn't speak this language (%@): the system voice read the answer.";
 "Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac.";
 "Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox isn't downloaded: the system voice read the answer.";
@@ -458,6 +459,7 @@
 "Downloading %@…" = "Downloading %@…";
 "Downloading %lld files…" = "Downloading %lld files…";
 "Downloading the embedder failed: %@" = "Downloading the embedder failed: %@";
+"Downloading the fast decoder…" = "Downloading the fast decoder…";
 "Downloading…" = "Downloading…";
 "Downloads" = "Downloads";
 "Downloads waiting: %lld" = "Downloads waiting: %lld";
@@ -584,6 +586,7 @@
 "Generating music…" = "Generating music…";
 "Generation" = "Generation";
 "Get" = "Get";
+"Get Faster Decoder" = "Get Faster Decoder";
 "Get Started" = "Get Started";
 "Get a Model…" = "Get a Model…";
 "Get one" = "Get one";
