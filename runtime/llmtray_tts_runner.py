@@ -230,20 +230,35 @@ class MeanflowDecoder:
     interface: speech tokens to audio in 2 steps. Everything else (voice
     conditioning from a clip: embed_ref) stays with the original."""
 
+    # Computed at construction, not stored in the file.
+    BUFFERS = {"encoder.embed.pos_enc.pe", "encoder.up_embed.pos_enc.pe", "mel2wav.stft_window", "trim_fade"}
+
     def __init__(self, base, path):
         import mlx.core as mx
+        from mlx.utils import tree_flatten
         from mlx_audio.tts.models.chatterbox_turbo.models.s3gen import S3Gen as TurboS3Gen
         self.base = base
         self.fast = TurboS3Gen(meanflow=True)
-        self.fast.load_weights(list(mx.load(path).items()), strict=False)
+        weights = mx.load(path)
+        names = set(dict(tree_flatten(self.fast.parameters())))
+        if names - set(weights) != self.BUFFERS or set(weights) - names:
+            raise ValueError("the file doesn't match the decoder (%d missing, %d unknown)"
+                             % (len(names - set(weights) - self.BUFFERS), len(set(weights) - names)))
+        self.fast.load_weights(list(weights.items()), strict=False)
         mx.eval(self.fast.parameters())
 
     def __call__(self, speech_tokens=None, ref_dict=None, finalize=True, **kwargs):
+        # The multilingual model calls it only with finalize=True (whole
+        # sentences); nothing else it passes applies to this decoder.
         out = self.fast.inference(speech_tokens, ref_dict, n_cfm_timesteps=2)
         return out[0] if isinstance(out, tuple) else out
 
     def __getattr__(self, name):
-        return getattr(self.base, name)
+        # Only what __call__ doesn't cover (embed_ref for a voice clip).
+        base = self.__dict__.get("base")
+        if base is None:
+            raise AttributeError(name)
+        return getattr(base, name)
 
 
 class Speaker:
@@ -279,10 +294,14 @@ class Speaker:
         # the 10-step one: 4x faster S3Gen, no difference by ear in a blind
         # test (quant-ternary chatterbox-quant). Used when its file is there.
         meanflow = os.path.join(model_dir, MEANFLOW_FILE)
+        self.base_decoder = self.model.s3gen
         self.decoder = "s3gen-10"
         if os.path.exists(meanflow):
-            self.model.s3gen = MeanflowDecoder(self.model.s3gen, meanflow)
-            self.decoder = "meanflow-2"
+            try:
+                self.model.s3gen = MeanflowDecoder(self.base_decoder, meanflow)
+                self.decoder = "meanflow-2"
+            except Exception as e:   # a damaged file: the 10-step decoder still works
+                log("fast decoder unusable, using the standard one: %s" % e)
         self.sample_rate = int(self.model.sample_rate)
         self.builtin = getattr(self.model, "_conds", None)
         self.conds = self.builtin
@@ -297,9 +316,21 @@ class Speaker:
 
     def warm_up(self):
         """The first run compiles MLX's kernels (~9 s): done before ready,
-        not on the user's first sentence."""
-        list(self.model.generate("Hello.", conds=self.conds, lang_code="en",
-                                 exaggeration=self.EXAGGERATION, verbose=False))
+        not on the user's first sentence. Also the check that the voice
+        works: a fast decoder that fails here is dropped for the standard
+        one; anything else that fails is raised (the voice can't speak)."""
+        def once():
+            list(self.model.generate("Hello.", conds=self.conds, lang_code="en",
+                                     exaggeration=self.EXAGGERATION, verbose=False))
+        try:
+            once()
+        except Exception as e:
+            if self.decoder != "meanflow-2":
+                raise
+            log("fast decoder failed, using the standard one: %s" % e)
+            self.model.s3gen = self.base_decoder
+            self.decoder = "s3gen-10"
+            once()
 
     def use_clip(self, clip):
         if not clip:
@@ -399,8 +430,9 @@ def main():
         name = os.path.basename(os.path.normpath(arg("--model")))
         try:
             speaker.warm_up()
-        except Exception as e:   # the first sentence pays it instead
-            log("warm-up failed: %s" % e)
+        except Exception as e:
+            send("E", {"id": None, "message": "The voice can't speak: %s" % e, "fatal": True})
+            return 1
     send("R", {"decoder": getattr(speaker, "decoder", "selftest"), "sample_rate": speaker.sample_rate, "model": name,
                "builtin_voice": getattr(speaker, "builtin", True) is not None,
                "russian_stress": getattr(speaker, "stress", True) is not None})

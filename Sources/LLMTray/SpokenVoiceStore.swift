@@ -104,12 +104,29 @@ final class SpokenVoiceStore: ObservableObject {
         }
         try MediaModels.checkModelsFolder()
         if Self.lacksFastDecoder {
-            // Just the one file, into the folder in place (resumable).
+            // Just the one file, into the folder in place (resumable;
+            // huggingface_hub writes it under .cache first, then renames).
+            let dir = Self.path(.model)
+            let bytes = SpokenVoiceFile.fastDecoderBytes
+            if let free = DiskUsage.freeSpace(at: dir), free < bytes + (1 << 30) {
+                throw StoreError.diskFull(needed: bytes, free: free)
+            }
             statusText = NSLocalizedString("Downloading the fast decoder…", comment: "spoken answers")
+            progress = 0
+            let watch = Task { @MainActor [weak self] in
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    let cached = await Self.size(dir + "/.cache")
+                    let placed = await Self.size(dir + "/meanflow")
+                    let have = cached + placed
+                    guard !Task.isCancelled, let self, self.isBusy else { return }
+                    self.progress = min(0.99, Double(have) / Double(bytes))
+                }
+            }
+            defer { watch.cancel() }
             try await AudioRuntime.shared.snapshotDownload(repo: SpokenVoiceFile.model.repo,
-                                                           patterns: [SpokenVoiceFile.fastDecoderPath],
-                                                           into: Self.path(.model))
-            try? FileManager.default.removeItem(atPath: Self.path(.model) + "/.cache")
+                                                           patterns: [SpokenVoiceFile.fastDecoderPath], into: dir)
+            try? FileManager.default.removeItem(atPath: dir + "/.cache")
         }
         let missing = SpokenVoiceFile.folders.filter { !Self.isInPlace($0) }
         guard !missing.isEmpty else { return }
