@@ -112,6 +112,10 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         /// from the file as needed, and image and audio towers loaded on
         /// first use: up to ~2 GB less memory, decoding ~10% slower.
         public var lowMemoryWeights: Bool?
+        /// Looped models (Dory): how many times the recurrent block runs per
+        /// token, 1-4; 0 = the model's own (Dory: 2). More, better answers
+        /// and slower.
+        public var recurrentLoops: Int?
         public var extraServerArgs: String?
         // Verbose (DEBUG) server logging is a global diagnostics setting
         // (Settings > Server), not a per-profile one. An older profile file
@@ -230,6 +234,7 @@ extension Profile {
         p.launch.promptCacheMB = 1024
         p.launch.mtpDrafter = true
         p.launch.lowMemoryWeights = false
+        p.launch.recurrentLoops = 0
         p.launch.extraServerArgs = ""
         return p
     }()
@@ -297,6 +302,7 @@ public enum ProfileResolver {
             promptCacheMB: max(0, v(\.launch.promptCacheMB)),
             mtpDrafter: v(\.launch.mtpDrafter),
             lowMemoryWeights: v(\.launch.lowMemoryWeights),
+            recurrentLoops: min(max(v(\.launch.recurrentLoops), 0), 4),
             extraServerArgs: v(\.launch.extraServerArgs)
         )
         resolved.toolLoading = ToolGroups.merged(overlay: overlay?.tools.toolLoading, base: base.tools.toolLoading)
@@ -338,6 +344,8 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var promptCacheMB: Int
     public var mtpDrafter: Bool
     public var lowMemoryWeights: Bool
+    /// 0 = the model's own.
+    public var recurrentLoops: Int
     public var extraServerArgs: String
     /// Per tool group, merged per group (ToolGroups.merged).
     public var toolLoading: [String: ToolLoading] = ToolGroups.builtIn
@@ -394,6 +402,7 @@ extension Profile {
         ProfileField("promptCacheMB", \.launch.promptCacheMB),
         ProfileField("mtpDrafter", \.launch.mtpDrafter),
         ProfileField("lowMemoryWeights", \.launch.lowMemoryWeights),
+        ProfileField("recurrentLoops", \.launch.recurrentLoops),
         ProfileField("extraServerArgs", \.launch.extraServerArgs),
     ]
 }

@@ -278,6 +278,20 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertNotEqual(ServerLaunch.restartKey(on, c), ServerLaunch.restartKey(resolved(), c))
     }
 
+    func testLoopsOnlyForALoopedModel() {
+        let three = resolved { $0.launch.recurrentLoops = 3 }
+        XCTAssertFalse(ServerLaunch.arguments(three, ctx).contains("--recurrent-loops"))
+        var c = ctx
+        c.loopedModel = true
+        XCTAssertFalse(ServerLaunch.arguments(resolved(), c).contains("--recurrent-loops"), "0: the model's own")
+        let args = ServerLaunch.arguments(three, c)
+        XCTAssertEqual(args.firstIndex(of: "--recurrent-loops").map { args[$0 + 1] }, "3")
+        XCTAssertNotEqual(ServerLaunch.restartKey(three, c), ServerLaunch.restartKey(resolved(), c))
+        let own = resolved { $0.launch.recurrentLoops = 3; $0.launch.extraServerArgs = "--recurrent-loops 1" }
+        XCTAssertEqual(ServerLaunch.arguments(own, c).filter { $0 == "--recurrent-loops" }.count, 1)
+        XCTAssertEqual(resolved { $0.launch.recurrentLoops = 9 }.recurrentLoops, 4)
+    }
+
     func testKVSharedModelForcesKVOff() {
         var c = ctx
         c.disallowQuantizedKV = true

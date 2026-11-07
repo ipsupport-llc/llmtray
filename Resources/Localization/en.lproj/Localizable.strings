@@ -562,6 +562,7 @@
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
+"For looped models (NVIDIA Dory): how many times the model runs its middle layers for every word. More loops, better answers, slower; each loop also keeps its own context in memory. Model's own: 2 for Dory. Other models ignore it." = "For looped models (NVIDIA Dory): how many times the model runs its middle layers for every word. More loops, better answers, slower; each loop also keeps its own context in memory. Model's own: 2 for Dory. Other models ignore it.";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
 "Forget" = "Forget";
 "Forget Everything" = "Forget Everything";
@@ -768,6 +769,7 @@
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Long conversations and pinned files come from the cache instead of being read again every turn.";
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Longer chats are easier in the window: projects, files and every chat in a sidebar.";
+"Loops" = "Loops";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: speeds up %@, same answers";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, notes, calendars, files and services. The chat asks you before each call.";
@@ -804,6 +806,7 @@
 "Model actions" = "Model actions";
 "Model card" = "Model card";
 "Model switching" = "Model switching";
+"Model's own" = "Model's own";
 "Model:" = "Model:";
 "Models" = "Models";
 "Models can make mistakes. Check important information." = "Models can make mistakes. Check important information.";

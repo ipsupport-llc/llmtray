@@ -1094,6 +1094,13 @@ struct ProfilesPane: View {
                 row(\.launch.lowMemoryWeights, "Save memory", "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers.") {
                     Toggle("", isOn: b(\.launch.lowMemoryWeights)).labelsHidden()
                 }
+                row(\.launch.recurrentLoops, "Loops", "For looped models (NVIDIA Dory): how many times the model runs its middle layers for every word. More loops, better answers, slower; each loop also keeps its own context in memory. Model's own: 2 for Dory. Other models ignore it.") {
+                    Picker("", selection: b(\.launch.recurrentLoops)) {
+                        Text("Model's own").tag(0)
+                        ForEach(1...4, id: \.self) { Text(verbatim: "\($0)").tag($0) }
+                    }
+                    .labelsHidden().fixedSize()
+                }
             }
             Section("Advanced") {
                 row(\.launch.extraServerArgs, "Extra server arguments", "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.") {

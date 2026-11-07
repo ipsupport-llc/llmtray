@@ -51,12 +51,15 @@ public enum ServerLaunch {
         /// `--experts-on-disk`: the share of routed experts kept in memory
         /// (Settings > Server > Experimental, a MoE model that doesn't fit).
         public var expertsOnDiskShare: Double?
+        /// A looped model (Dory) on a runtime with --recurrent-loops.
+        public var loopedModel: Bool
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
                     memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false,
-                    expertsOnDiskShare: Double? = nil) {
+                    expertsOnDiskShare: Double? = nil, loopedModel: Bool = false) {
             self.expertsOnDiskShare = expertsOnDiskShare
+            self.loopedModel = loopedModel
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -274,6 +277,9 @@ public enum ServerLaunch {
         }
         if let mb = c.bufferCacheMB, !p.extraServerArgs.contains("--buffer-cache-mb") {
             args += ["--buffer-cache-mb", String(mb)]
+        }
+        if c.loopedModel, (1...4).contains(p.recurrentLoops), !extraArgsSet("--recurrent-loops", p) {
+            args += ["--recurrent-loops", String(p.recurrentLoops)]
         }
         if let share = c.expertsOnDiskShare {
             args += ["--experts-on-disk", String(format: "%.2f", share)]

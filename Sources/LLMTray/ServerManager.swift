@@ -706,7 +706,8 @@ final class ServerManager: ObservableObject {
             memoryShares: Self.memoryShares,
             supportsLowMemoryWeights: memory.supportsLowMemoryWeights,
             mtpHead: head && memory.supportsMTPHead && ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
-            expertsOnDiskShare: memory.expertsOnDiskShare
+            expertsOnDiskShare: memory.expertsOnDiskShare,
+            loopedModel: ModelDiscovery.isLooped(modelPath: modelPath) && MLXRuntimeInstaller.serverSupportsFlag("--recurrent-loops")
         )
     }
 
