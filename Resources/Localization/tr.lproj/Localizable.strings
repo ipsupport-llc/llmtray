@@ -43,6 +43,7 @@
 "%@ requests" = "%@ istek";
 "%@ s" = "%@ sn";
 "%@ tok/s" = "%@ tok/sn";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "Şu ana kadar LLMTray ile yerel olarak %@ token işlendi. Abonelik olmadan ücretsizdir; sizin için yararlıysa geliştirilmesini destekleyebilirsiniz.";
 "%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
 "%@ · %@ left" = "%@ · %@ kaldı";
 "%@ · %@ of %@" = "%@ · %@ içinde %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "Sunucudaki %lld araç değişti: kabul etmek için Yapılandırın.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "（Gönderilmedi: bir Sohbet modeli seçin ya da sürmekte olan yanıtı bekleyin.）";
 "(Please attach the report file shown in Finder.)" = "(Lütfen Finder’da gösterilen rapor dosyasını ekleyin.)";
 "(estimate; exact after the first answer)" = "(tahmini; ilk yanıttan sonra kesinleşir)";
 "(measured for this model)" = "(bu model için ölçüldü)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Sohbet, izin verdiğiniz klasörlerde arama yapabilir ve yeni klasörler, taşıma veya yeniden adlandırma önerilerinde bulunabilir. Her değişikliği onaylarsınız ve geri alabilirsiniz.";
 "A chat model" = "Sohbet modeli";
 "A client" = "Bir istemci";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "10 sn’den kısa bir klip işe yarar, ama 10 sn veya daha uzun olanlar sesi daha iyi taklit eder.";
 "A deleted project" = "Silinmiş bir proje";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Bir sohbetten öğrenilen olgu veya gözlem, başka bir sohbet de bunu gösterene kadar (veya siz onaylayana kadar) bekler: tek bir soru kim olduğunuzu belirlemez. İstedikleriniz — tercihler, düzeltmeler — hemen kullanılır.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "Cevap (tüm istekler)";
 "Answer details" = "Cevap ayrıntıları";
 "Answer in Russian, briefly" = "Kısaca Rusça cevap ver";
+"Answers are read aloud -- click to stop" = "Yanıtlar sesli okunuyor — durdurmak için tıklayın";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Diğer mlx_lm.server flag’leri; boşlukla ayrılmış, örn. --draft-model <path>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Ağınızdaki herkes sunucuyu kullanabilir: anahtar, erişimi yalnızca verdiğiniz istemcilerle sınırlar.";
 "Anything else chats should know" = "Sohbetlerin bilmesi gereken başka şeyler";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "ipsupport.us sürümünün sohbetleri, projeleri, profilleri, görsel, müzik, ses ve embedding modellerini ve ayarlarını getirir (önce onu kapatın). Buradaki sohbetler ve modeller kalır; onun ayarları bunların yerini alır. Modeller ekstra disk alanı kullanmaz. Sohbet modelleri modeller klasörünüzde kalır: Settings › Models bölümünden seçin.";
 "Browse Hugging Face…" = "Hugging Face’e Göz At…";
 "Built into macOS · LLMTray's chat only" = "macOS’e yerleşik · Yalnızca LLMTray Sohbet";
+"Built-in" = "Yerleşik";
 "By" = "Göre";
 "Cached" = "Önbellekte";
 "Calculator" = "Hesap Makinesi";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "Projeler dışındaki sohbetler";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Sohbetler, sizin ve işiniz hakkında kısa notlarla başlar: cevapları nasıl istediğiniz, ne üzerinde çalıştığınız, daha önce neleri düzelttiğiniz. Yalnızca bütçeye sığan notlar gider ve yalnızca LLMTray’in kendi sohbetlerinde; API kullanan uygulamalara hiçbir zaman, geçici sohbetlerde hiçbir zaman gönderilmez. Her şey bu bilgisayarda kalır.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "ipsupport.us sürümünün sohbetleri, projeleri, profilleri ve görsel, müzik, ses ve embedding modelleri şimdi burada. Ona izin verdiğiniz klasörler ve sohbet modelleri klasörünüz için tekrar onayınız gerekiyor.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Multilingual V3 (8-bit)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Chatterbox Turbo’nun çözücüsü, duyulabilir bir fark olmadan her cümleyi yaklaşık 4 kat daha hızlı oluşturur: %@ daha fazla.";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox bu dili (%@) konuşmuyor: yanıtı sistem sesi okudu.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox, 5 ile 30 saniyelik bir klipteki sesi taklit eder (en iyisi 10 saniye veya daha uzun): net konuşma, tek konuşmacı, müzik yok. Klip LLMTray klasörüne kopyalanır ve asla Bu Mac dışına çıkmaz.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox indirilmedi: yanıtı sistem sesi okudu.";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
 "Check for Runtime Updates" = "Çalışma Zamanı Güncellemelerini Denetle";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "Güncellemeleri otomatik denetler";
 "Chip" = "Çip";
 "Choose Another Folder…" = "Başka Klasör Seç…";
+"Choose Clip…" = "Klip Seç…";
 "Choose Files…" = "Dosyaları Seç…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "5 ile 30 saniyelik bir klip seçin: kendi sesiniz veya kullanma izniniz olan bir ses.";
 "Choose a folder chats may use." = "Sohbetlerin kullanabileceği bir klasör seçin.";
 "Choose a folder the chat may look in." = "Sohbetin bakabileceği bir klasör seçin.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Sohbetin değişiklik önerebileceği bir klasör seçin. Her değişikliği siz onaylarsınız.";
@@ -332,6 +345,7 @@
 "Close" = "Kapat";
 "Close Tab" = "Sekmeyi Kapat";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Ayarlar › Genel › LLMTray'ı Kur… öğesi yeniden açar.";
+"Code in the chat." = "Sohbet içinde kod var.";
 "Coding agents" = "Kodlama ajanları";
 "Coffee" = "Kahve";
 "Comes with %@" = "%@ ile gelir";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "Sunucuya ulaşılamadı — lütfen daha sonra tekrar deneyin.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Sohbetlerin bazı bölümleri okunamadı; %@ zamanında yeniden denenecek (neden: Ayarlar › Sunucu › Günlük).";
 "Couldn't start the voice runner: %@" = "Ses çalıştırıcısı başlatılamadı: %@";
+"Couldn't start the voice: %@" = "Ses başlatılamadı: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "İstekleri ve token’ları model, istemci ve güne göre sayın; ne kadar hızlı çalıştıklarını da görün. Yalnızca bu Mac’te tutulur, hiçbir yere gönderilmez.";
 "Countdown" = "Geri sayım";
 "Countdown: %lld s" = "Geri sayım: %lld sn";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "Bu Sohbeti Hatırlama…";
 "Don't remember this chat?" = "Bu sohbet hatırlanmasın mı?";
 "Don't show again" = "Bir daha gösterme";
+"Don't show this again" = "Bunu bir daha gösterme";
 "Done" = "Bitti";
 "Done talking: the model answers" = "Konuşma bitti: model yanıt veriyor";
 "Done: %lld changes made." = "Tamamlandı: %lld değişiklik yapıldı.";
 "Download" = "İndir";
+"Download (%@)" = "İndir (%@)";
 "Download LLMTray-Full" = "LLMTray‑Full indir";
 "Download and Enable" = "İndir ve Etkinleştir";
 "Download for %@, into the models folder" = "%@ için indir, models klasörüne";
 "Download into the models folder" = "Modeller klasörüne indir";
 "Download models" = "Modelleri indir";
 "Download models from Hugging Face" = "Hugging Face'ten modelleri indir";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Önce konuşma tanıyıcıyı indirin: Ayarlar > Ses > Sesli konuşma.";
 "Downloaded" = "İndirildi";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Daha eski bir sürüm tarafından, models klasöründen farklı bir diske indirildi: bulunduğu yerde kalır.";
 "Downloading" = "İndiriliyor";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "%@ indiriliyor…";
 "Downloading %lld files…" = "%lld dosya indiriliyor…";
 "Downloading the embedder failed: %@" = "Embedder indirilemedi: %@";
+"Downloading the fast decoder…" = "Hızlı çözücü indiriliyor…";
 "Downloading…" = "İndiriliyor…";
 "Downloads" = "İndirmeler";
 "Downloads waiting: %lld" = "Bekleyen indirmeler: %lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "“%@”'ye eklemek için bırakın";
 "Drop to attach images" = "Resim eklemek için bırakın";
 "Duplicate this profile" = "Bu profili çoğalt";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Her yeni yanıt, yazılırken cümle cümle seslendirilir. Kod, tablolar ve bağlantılar sesli okunmaz. Herhangi bir yanıtın altındaki Konuş, o yanıtı okur; ileti alanının üstündeki hoparlör düğmesi bunu açıp kapatır.";
 "Echo cancellation" = "Gecikme giderme";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Gecikme giderme başlatılamadı: %@ — Kapatmak için Ayarlar > Ses’e gidin.";
 "Echo cancellation isn't available on this Mac." = "Gecikme giderme bu Mac’te kullanılamıyor.";
+"Echo cancellation isn't available: %@" = "Gecikme giderme kullanılamıyor: %@";
 "Echo gate" = "Echo gate";
 "Edit Note" = "Notu Düzenle";
 "Edit Profile…" = "Profili Düzenle…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "Proje dosyalarını açmak istiyor musunuz?";
 "Enable…" = "Aç…";
 "End" = "Bitir";
+"End the conversation" = "Konuşmayı bitir";
+"End the conversation (Esc)" = "Konuşmayı bitir (Esc)";
 "End the conversation (the chat model reloads)" = "Konuşmayı sonlandır (sohbet modeli yeniden yüklenir)";
 "Enjoying LLMTray?" = "LLMTray hoşunuza gidiyor mu?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Ortam, her satıra NAME=value (anahtarlar, token’lar ve parolalar Anahtar Zinciri’ne gider)";
 "Errors" = "Hatalar";
 "Errors: go to the next one (⌘E)" = "Hatalar: sonrakine git (⌘E)";
+"Esc ends the conversation" = "Esc konuşmayı bitirir";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Every day's counts are removed. This can't be undone." = "Her günün sayımları kaldırılır. Bu işlem geri alınamaz.";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Projeye eklediğiniz dosyalar bu Mac'te dizinlenir; böylece sohbetler bunlarda arama yapabilir.";
 "Files · off" = "Dosyalar · kapalı";
 "Files…" = "Dosyalar…";
+"Fillers on pauses" = "Duraklamalarda doldurma sözleri";
 "Finish" = "Bitir";
 "Finish applies what you chose. You can change all of it later in Settings." = "Bitir seçiminizi uygular. Sonra Settings'ten her şeyi değiştirebilirsiniz.";
 "Finish in your browser…" = "Tarayıcınızda bitirin…";
@@ -551,6 +576,7 @@
 "Free disk space" = "Boş disk alanı";
 "Free on disk: %@ · your models: %@" = "Diskte boş: %@ · modelleriniz: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Yüklü bir modelin tuttuğu belleği, bu kadar süre istek gelmezse serbest bırakır. Sonraki istekte, olağan yükleme gecikmesiyle otomatik olarak yeniden yüklenir.";
+"From a clip" = "Bir klipten";
 "From the MCP Registry" = "MCP Kayıt Defteri’nden";
 "Full" = "Tam";
 "Full duplex" = "Tam iki yönlü";
@@ -570,6 +596,7 @@
 "Generating music…" = "Müzik üretiliyor…";
 "Generation" = "Oluşturma";
 "Get" = "Al";
+"Get Faster Decoder" = "Daha Hızlı Çözücüyü Al";
 "Get Started" = "Başlayın";
 "Get a Model…" = "Model Al…";
 "Get one" = "Al";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Başka adları var (hard link): dosyayı korurlar.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Üstbilgiler, her satıra Ad: değer (Authorization üstbilgisi Anahtar Zinciri’ne gider)";
+"Hearing you" = "Sizi duyuyorum";
 "Help" = "Yardım";
 "Help improve LLMTray?" = "LLMTray'in gelişmesine yardımcı olmak ister misiniz?";
 "Hide" = "Gizle";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "LLMTray Kılavuzu";
 "LLMTray events" = "LLMTray olayları";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray bunu hızlandırdığı modelle birlikte alır: o modeli indirin.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray ücretsizdir: abonelik yok, kilitli özellik yok. Sizin için yararlıysa geliştirilmesini destekleyebilirsiniz.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray’ın %@ uygulamasının sekmesini okumasına izin verilmiyor: bunu Sistem Ayarları › Gizlilik ve Güvenlik › Otomasyon’da açın.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray'ın mikrofonu kullanmasına izin verilmiyor.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray’in mikrofonu kullanmasına izin verilmiyor. Sistem Ayarları › Gizlilik ve Güvenlik › Mikrofon’da izin verin.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray’ın mikrofonu kullanmasına izin verilmiyor: Sistem Ayarları > Gizlilik ve Güvenlik > Mikrofon.";
 "LLMTray restarts now to load them." = "LLMTray şimdi bunları yüklemek için yeniden başlıyor.";
 "LLMTray status, indexing project files" = "LLMTray durumu, proje dosyaları dizine alınıyor";
 "LLMTray — Chat" = "LLMTray — Sohbet";
@@ -725,6 +755,7 @@
 "Likes" = "Beğeniler";
 "List my name" = "Adımı listele";
 "List my name in Supporters" = "Adımı Destekçilerde listele";
+"Listening" = "Dinliyor";
 "Listening…" = "Dinleniyor…";
 "Live output of the model process: loading, errors, requests." = "Model işleminin canlı çıktısı: yükleme, hatalar, istekler.";
 "Load %@" = "%@'ı yükle";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "Models klasörü: %@";
 "Models found: %lld" = "Bulunan modeller: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Modeller bu Mac'te çalışır. Sohbetleriniz buradan çıkmaz; yalnızca web araçları açıksa internete erişir.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Sesi duyabilen modeller (Gemma 4 E2B, E4B, 12B), sıranızın metniyle birlikte kaydını da alır; böylece nasıl söylediğinizi de duyar. Her sıra en fazla 30 saniye.";
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "More" = "Daha Fazla";
 "Move %1$@ to %2$@" = "%1$@ öğesini %2$@ konumuna taşı";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "Bu sunucuların hiçbiri buradan güncellenemez (elle veya bir dosyadan eklendi).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Henüz yok. Tek bir sohbet veya tek bir istek için verilen izinler burada listelenmez: onlar işlemle sona erer.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Yetersiz disk alanı: ses modeli %1$@ gerektiriyor, %2$@ boş.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Yeterli disk alanı yok: ses için %1$@ gerekiyor, %2$@ boş alan var.";
 "Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Yeterli boş disk alanı yok: %@ yaklaşık %@ gerektiriyor, %@ boş.";
 "Not identical to %@: not a duplicate." = "%@ ile aynı değil: yinelenen değil.";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "Girişte LLMTray'ı aç";
 "Open Privacy Settings…" = "Gizlilik Ayarlarını Aç…";
 "Open Server Log…" = "Sunucu Günlüğünü Aç…";
+"Open Settings" = "Ayarları Aç";
 "Open Voice Lab…" = "Voice Lab'i Aç…";
 "Open in New Tab" = "Yeni Sekmede Aç";
 "Open in Preview" = "Önizlemede Aç";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Bunun üzerinde, en zayıf notların (en eski, kesinliği en düşük) süresi dolar. Sabitlenen notlar tutulur.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "PDF · %lld pages" = "PDF · %lld sayfa";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: hızlıdır; Rusça dâhil 25 Avrupa dili (2,5 GB). Whisper: 99 dil, daha yavaş (1,6 GB). macOS: indirme gerekmez, ancak yalnızca macOS’in internetsiz olarak Bu Mac’te tanıyabildiği dillerde ve yalnızca Dikte açıkken çalışır. Söylediğiniz hiçbir şey Bu Mac’ten çıkmaz.";
 "Past %lld messages" = "Son %lld mesaj";
 "Paste a Config" = "Yapıştırılacak Konfigürasyon";
 "Paste a Config…" = "Konfigürasyon Yapıştır…";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "Bunu da Oku";
 "Read Past Chats…" = "Geçmiş Sohbetleri Oku…";
 "Read What Wasn't Read" = "Okunmayanları Oku";
+"Read answers aloud" = "Yanıtları sesli oku";
 "Read chats" = "Sohbetleri oku";
+"Read the answer aloud" = "Yanıtı sesli oku";
 "Read web pages" = "Web sayfalarını oku";
 "Reading a chat…" = "Sohbet okunuyor…";
 "Reading a prompt: up to %lld%" = "İsteme okuma: en fazla %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Reads Only" = "Yalnızca Okuma";
 "Reads chats with" = "Sohbetleri şununla okur";
+"Ready" = "Hazır";
 "Ready." = "Hazır.";
 "Ready. This is the Full build: the runtime is included." = "Hazır. Bu Full derlemesidir: runtime dahil.";
 "Reasoning" = "Muhakeme";
@@ -1148,6 +1187,7 @@
 "Selected" = "Seçili";
 "Send" = "Gönder.";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Anonim günlük rapor gönder: uygulama ve macOS sürümü, çip, bellek boyutu, dil, kullandığınız özellikler ve model aileleri (model adları asla gönderilmez). İstekler, içerik, dosyalar veya model adları Mac'inizden hiç çıkmaz. Bunu istediğiniz zaman Ayarlar'dan kapatabilirsiniz.";
+"Send my voice to models that hear" = "Sesimi duyabilen modellere gönder";
 "Sending…" = "Gönderiliyor…";
 "Sends anonymous usage statistics" = "Anonim kullanım istatistikleri gönderir";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Uygulama içindeki her sohbet isteğinde ilk olarak gönderilir. Default, kısa bir başlangıç istemiyle gelir; bunu genişletin veya değiştirin. Harici API istemcilerine uygulanmaz.";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "İletileri şununla sınıflandırır";
 "Source on GitHub" = "Kaynak GitHub'da";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
+"Speak" = "Konuş";
 "Speakers work with echo cancellation; headphones are still best." = "Hoparlörler gecikme giderme ile çalışır; en iyi sonuç için kulaklık önerilir.";
+"Speaking" = "Konuşuyor";
 "Speaking…" = "Konuşuluyor…";
 "Speculative decoding (MTP)" = "Spekülatif kod çözme (MTP)";
+"Speech recognition" = "Konuşma tanıma";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "Konuşma tanımaya izin verilmiyor ya da Siri ve Dikte kapalı: Sistem Ayarları > Klavye > Dikte.";
 "Speed" = "Hız";
 "Speeds up %@: fetched where LLMTray loads it from." = "%@’yi hızlandırır: LLMTray’in onu yüklediği yerden alınır.";
+"Spoken answers" = "Sesli yanıtlar";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Takılma zaman aşımı: %lld sn";
 "Start" = "Başlat";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "Güncellemek için Voice Lab ve müzik üretimini durdurun.";
 "Stop Voice Lab first." = "Önce Voice Lab'i durdurun.";
 "Stop generating" = "Üretmeyi durdurur.";
+"Stop reading the answer" = "Yanıtı okumayı durdur";
+"Stop reading the answer first." = "Önce yanıtı okumayı durdurun.";
 "Stop recording" = "Kaydı durdur";
 "Stop server (unload model)" = "Sunucuyu durdurur (modeli bellekten kaldırır).";
 "Stop the server to change these." = "Bunları değiştirmek için sunucuyu durdurun.";
@@ -1272,10 +1319,12 @@
 "System" = "Sistem";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "Sistem ve özel yerler (ana kullanıcı klasörü, Library, Applications, keys) asla paylaşılmaz.";
 "System prompt" = "Sistem istemi";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "Sistem: yanıtın dili için macOS sesi; indirilecek bir şey yok (daha fazla ses için Sistem Ayarları > Erişilebilirlik > Sesli İçerik). Chatterbox: Rusça dâhil 23 dilde doğal bir sinir ağı sesi; kısa bir klipten sesi taklit edebilir; Bu Mac üzerinde çalışır.";
 "Tab %lld" = "Sekme %lld";
 "Talk" = "Konuş";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Yerel bir konuşmadan konuşmaya modelle, telefon görüşmesi gibi aynı anda dinleyip kendi sesiyle yanıt verin. Deneysel ve yalnızca İngilizce: araç yok, proje yok, hiçbir şey saklanmaz.";
 "Talk with the model in Voice Lab" = "Modelle Voice Lab’de konuşun";
+"Talk with the model: a voice conversation (Esc ends it)" = "Model ile konuşun: sesli konuşma (Esc bitirir)";
 "Talking… press Done when you're finished." = "Konuşuluyor… bitince Bitir'e basın.";
 "Target: %@ · profile %@" = "Hedef: %@ · profil %@";
 "Temperature" = "Sıcaklık";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "Sohbetin kendi modeli";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "Sohbetin kendi modeli: Her sohbet, içinde yanıt veren model tarafından okunur; Gemma ile Rusça yapılan bir sohbet, sonradan yüklediğiniz yalnızca İngilizce bilen bir kodlayıcı tarafından okunmaz. Tek model: Her sohbet onun tarafından okunur, bu yüzden tüm notlar aynı biçimde yazılır. Her iki durumda da sohbet, modeli yüklenip boşta kalana kadar bekler; aşağıda izin vermediğiniz sürece onun için hiçbir şey yüklenmez.";
 "The chats and models in that folder were here already." = "O klasördeki sohbetler ve modeller zaten burada vardı.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "Klip %.0f sn: en fazla 30 sn olabilir — daha kısa kesin.";
+"The clip is %.0f s: at least 5 s are needed." = "Klip %.0f sn: en az 5 sn gerekli.";
 "The command %@ wasn't found." = "%@ komutu bulunamadı.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Projeye eklenen dosyaların kopyaları ve bunların indeksleri bir arada. Bir projenin kendi dosyaları Dosyalar penceresinde gösterilir; bir proje silindiğinde bunlar da silinir.";
 "The day the counts are for." = "Sayımın ait olduğu gün.";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
 "The model that reads them" = "Bunları okuyan model";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "Model, konuşma tokenizer’ı ve Rusça vurgu sözlüğü: modeller klasöründe %@. Chatterbox (Resemble AI) ve ruaccent MIT lisanslıdır; CosyVoice2’den gelen konuşma tokenizer’ı ise Apache-2.0 lisanslıdır.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Models klasörü kullanılamıyor — diski bağlı mı? Ayarlar → Models'den tekrar seçin.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Önceki istemlerin önbelleğinin alabileceği maksimum (profilin İsteme önbelleği boyutu da bir üst sınırdır). Daha fazla uzun sohbetleri ve ajanları hızlandırır; çok fazlası okunan istem için yer bırakmaz.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "Notların bir sohbet isteminde kaplayacağı en fazla alan. Önce Sabitlenen notlar ve belirttiğiniz tercihler, ardından güncelliklerine göre diğerleri gider.";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "Plan, baktığınızdan beri değişti: tekrar gözden geçirin.";
 "The port and network access can change only while the server is stopped." = "Port ve ağ erişimi yalnızca sunucu dururken değiştirilebilir.";
 "The project's files, and Add Files…" = "Projenin dosyaları ve Dosya Ekle…";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "Tanıyıcı ile birlikte Silero VAD (konuşmanın nerede başlayıp bittiği) ve Smart Turn (bir duraklamanın sıranızı bitirip bitirmediği) Modeller klasöründe bulunur. Lisanslar: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Kayıt 30 saniye içinde yanıt vermedi. Birazdan tekrar deneyin.";
 "The reply was cut at its length limit." = "Yanıt, uzunluk sınırında kesildi.";
 "The report" = "Rapor";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "Sunucu %@ indirildikten sonra başlar";
 "The server starts with %@" = "Sunucu %@ ile başlatılıyor";
 "The settings here were kept." = "Buradaki ayarlar korundu.";
+"The speech recognizer stopped: %@" = "Konuşma tanıyıcı durdu: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Bu Mac için öneriler zaten burada. Başka bir model için Hugging Face'e göz atın.";
 "The tips aren't available right now." = "Bahşişler şu anda kullanılamıyor.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "ipsupport.us adresinden indirilen LLMTray sürümü açık. Önce onu kapatın (menü çubuğu simgesi › Quit), sonra bunu yeniden açın: ikisi aynı porta bağlanır ve modeller iki kez yüklenir.";
+"The voice couldn't open the audio output." = "Ses, ses çıkışını açamadı.";
+"The voice couldn't open the audio output: %@" = "Ses, ses çıkışını açamadı: %@";
+"The voice failed: %@" = "Ses başarısız oldu: %@";
+"The voice is being downloaded -- try again once it's done." = "Ses indiriliyor — tamamlandığında tekrar deneyin.";
 "The voice model is being downloaded -- try again once it's done." = "Ses modeli indiriliyor — tamamlandığında tekrar deneyin.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Ses modeli indirilmedi — Ayarlar > Ses'ten indirin.";
 "The voice model's audio format isn't supported." = "Ses modelinin ses formatı desteklenmiyor.";
 "The voice runner sent an unreadable ready message." = "Ses çalıştırıcısı okunamayan bir hazır mesajı gönderdi.";
 "The voice runner stopped unexpectedly (%@)." = "Ses çalıştırıcısı beklenmedik şekilde durdu (%@).";
+"The voice stopped: %@" = "Ses durdu: %@";
+"The voice that answers is the one picked under Spoken answers." = "Yanıtlayan ses, Sesli yanıtlar altında seçilen sestir.";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Sonra model sunucusunu yeniden başlatın. Mac yeniden başlatıldığında sınır varsayılan değere döner. LLMTray bunu kendiliğinden değiştirmez.";
 "There's no plan waiting any more." = "Artık bekleyen bir plan yok.";
 "These can't be added to a project" = "Bunlar bir projeye eklenemez";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Menü çubuğundaki pencerede aynı anda birer birer çalışırlar. Bu arada bu pencereyi kapatabilirsiniz.";
+"Thinking" = "Düşünüyor";
 "Thinking effort: %@" = "Düşünme çabası: %@";
 "Thinking effort: how long the model may think before it answers" = "Düşünme çabası, modelin yanıtlamadan önce ne kadar süre düşünebileceğini belirtir.";
 "Thinking…" = "Düşünüyor…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "%@ Kullan";
 "Use %lld" = "%lld kullan";
 "Use Anyway" = "Yine de Kullan";
+"Use Built-in" = "Yerleşik Olanı Kullan";
 "Use Default Folder" = "Varsayılan Klasörü Kullan";
 "Use Folder" = "Klasörü Kullan";
 "Use LM Studio's folder" = "LM Studio’nun klasörünü kullan";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "Öğrenilen bir olguyu hemen kullan";
 "Use a learned fact once %lld chats show it" = "%lld sohbet gösterdiğinde öğrenilen bir olguyu kullan";
 "Use headphones: the model hears its own voice from the speakers." = "Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
+"Use your own voice, or a voice you have permission to use." = "Kendi sesinizi veya kullanma izniniz olan bir sesi kullanın.";
 "Used" = "Kullanıldı";
 "Used by %@." = "%@ tarafından kullanılır.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Görüntü oluşturma, müzik ve Voice Lab tarafından kullanılır; bunlar tarafından indirilir. Hugging Face adlarıyla models klasöründe saklanırlar.";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab yaklaşık %1$@ GB gerektirir, GPU'nun kullanabileceği %2$@ GB'den fazla: önce GPU bellek sınırını artırın.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab yaklaşık %1$@ GB alır; sohbet modelinin %2$@ GB ile birlikte GPU'nun kullanabileceği %3$@ GB'e sığar. Yine de çalışırken sohbet modeli boşaltılır.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab çalışırken yaklaşık %@ GB bellek kullanır.";
+"Voice clip" = "Ses klibi";
+"Voice conversation" = "Sesli konuşma";
 "Voice model" = "Ses modeli";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
 "Waiting for a model download to finish…" = "Model indirmenin bitmesi bekleniyor…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "Yenilikler…";
 "What's sent" = "Gönderilenler";
 "When a client asks for another model" = "Bir istemci başka bir model istediğinde";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "Bir yanıt bir saniyeden uzun sürdüğünde, sessizlik kopmuş bir arama gibi hissettirmesin diye yanıtların sesinde kısa bir “hmm” ya da “bir bakayım” söylenir. Konuşmanın sessiz anlarında oluşturulur ve ses başına tutulur.";
 "When an app asks for another model" = "Bir uygulama başka bir model istediğinde";
 "When an app asks for another model: %@" = "Bir uygulama başka bir model istediğinde: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "Sohbetler yüklü olmayan bir modeli beklerken, LLMTray bu kadar süre boşta kaldığında (çalışan sohbet, uygulama veya resim yokken) bellek modeli yükleyebilir. Her zamanki modelinize gelen sonraki istek o modeli yeniden yükler; bu biraz zaman alır.";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "Bulunduğunuz yer: şehir veya adres";
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Model konuşurken, mikrofondan daha sessiz olan sesler buna göre sessizlik olarak algılanır: yankı engellemenin bıraktığı kendi sesinin izi dışarıda kalır, üzerine gelen bir ses yine kesintiye uğratır. Model kendini duyuyorsa artırın; sizi kesintiye uğratmayı kaçırıyorsa azaltın. Bir sonraki başlatmada geçerli olur.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Vikipedi";
 "Window" = "Pencere";
 "Windows and pages" = "Pencereler ve sayfalar";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "kullanımda veya indiriliyor";
 "less than a minute left" = "bir dakikadan az kaldı";
 "llmtray in the terminal" = "Terminalde llmtray";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS, %@ dilini Bu Mac’te Mac dışına göndermeden tanıyamıyor. Ayarlar > Ses bölümünden Parakeet’i seçin.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS, modelin kendi sesini mikrofondan çıkarır (Voice Processing, FaceTime’da olduğu gibi), bu yüzden hoparlörlerle çalışır. Ayrıca ses seviyesini dengeler ve arka plan gürültüsünü azaltır. Değişiklik bir sonraki başlatmada geçerli olur.";
 "make %lld folders" = "%lld klasör oluştur";
 "mlx-audio runtime" = "mlx-audio çalışma zamanı";

@@ -43,6 +43,7 @@
 "%@ requests" = "%@ permintaan";
 "%@ s" = "%@ dtk";
 "%@ tok/s" = "%@ tok/s";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "Sejauh ini, %@ token telah dijalankan secara lokal dengan LLMTray. Gratis, tanpa langganan; jika berguna bagi Anda, Anda dapat mendukung pengembangannya.";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
 "%@ · %@ left" = "%@ · %@ tersisa";
 "%@ · %@ of %@" = "%@ · %@ dari %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "%lld alat berubah di server: Konfigurasikan untuk menerimanya.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "(tidak dikirim: pilih Model obrolan, atau tunggu jawaban yang sedang berlangsung.)";
 "(Please attach the report file shown in Finder.)" = "(Harap lampirkan file laporan yang ditampilkan di Finder.)";
 "(estimate; exact after the first answer)" = "(perkiraan; tepat setelah jawaban pertama)";
 "(measured for this model)" = "(diukur untuk model ini)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Percakapan dapat melihat folder yang Anda izinkan dan mengusulkan folder baru, pemindahan, serta penggantian nama. Anda menyetujui setiap perubahan dan dapat membatalkannya.";
 "A chat model" = "Model obrolan";
 "A client" = "Klien";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "Klip di bawah 10 dtk bisa dipakai, tetapi 10 dtk atau lebih menirukan suara dengan lebih baik.";
 "A deleted project" = "Proyek yang dihapus";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Fakta atau pengamatan yang dipelajari dari satu obrolan menunggu hingga obrolan lain menunjukkannya juga (atau Anda menyetujuinya): satu pertanyaan tidak menentukan siapa Anda. Hal yang Anda minta -- preferensi, koreksi -- langsung digunakan.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix yang lebih penuh dan terdengar matang; lirik kurang jelas. Sekitar 20 s untuk 30 s musik.";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "Jawaban (semua permintaan)";
 "Answer details" = "Detail jawaban";
 "Answer in Russian, briefly" = "Jawab dalam bahasa Rusia, singkat";
+"Answers are read aloud -- click to stop" = "Jawaban sedang dibacakan — klik untuk menghentikan";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Flag mlx_lm.server lainnya, dipisahkan spasi, mis. --draft-model <path>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Siapa pun di jaringan Anda dapat menggunakan server; kunci membatasinya hanya ke klien yang Anda beri.";
 "Anything else chats should know" = "Hal lain yang perlu diketahui obrolan";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Mentransfer obrolan, proyek, profil, serta model gambar, musik, suara, dan embedding beserta pengaturan dari versi di ipsupport.us (tutup terlebih dahulu). Obrolan dan model di sini tetap ada; pengaturannya yang akan menggantikan. Model tidak memerlukan ruang disk tambahan. Model obrolan tetap berada di folder model Anda: pilih di Pengaturan › Models.";
 "Browse Hugging Face…" = "Telusuri Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Bawaan macOS · hanya Obrolan LLMTray";
+"Built-in" = "Bawaan";
 "By" = "Menurut";
 "Cached" = "Tersimpan";
 "Calculator" = "Kalkulator";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "Chat di luar proyek";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chat dimulai dengan catatan singkat tentang Anda dan pekerjaan Anda: jawaban seperti apa yang Anda sukai, apa yang sedang Anda kerjakan, apa yang pernah Anda koreksi. Hanya catatan yang muat dalam batas yang dikirim, dan hanya di chat milik LLMTray sendiri -- tidak pernah ke app yang menggunakan API, tidak pernah dalam Chat sementara. Semuanya tetap di komputer ini.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chat, proyek, profil, serta model gambar, musik, suara, dan embedding dari versi di ipsupport.us sekarang ada di sini. Folder yang pernah Anda beri akses, dan folder model chat Anda, memerlukan konfirmasi Anda lagi.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Multilingual V3 (8-bit)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Decoder Chatterbox Turbo membuat setiap kalimat sekitar 4x lebih cepat, tanpa perbedaan yang terdengar: %@ lagi.";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox tidak mendukung bahasa ini (%@): jawaban dibacakan dengan suara sistem.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox menirukan suara dari klip 5 hingga 30 detik (10 detik atau lebih paling baik): ucapan jelas, satu pembicara, tanpa musik. Klip disalin ke folder LLMTray dan tidak pernah meninggalkan Mac Ini.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox belum diunduh: jawaban dibacakan dengan suara sistem.";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
 "Check for Runtime Updates" = "Periksa Pembaruan Runtime";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "Periksa pembaruan secara otomatis";
 "Chip" = "Chip";
 "Choose Another Folder…" = "Pilih Folder Lain…";
+"Choose Clip…" = "Pilih Klip…";
 "Choose Files…" = "Pilih File…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "Pilih klip 5 hingga 30 detik: suara Anda sendiri, atau suara yang Anda miliki izin untuk digunakan.";
 "Choose a folder chats may use." = "Pilih folder yang boleh digunakan chat.";
 "Choose a folder the chat may look in." = "Pilih folder yang boleh dilihat chat.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Pilih folder tempat chat boleh mengusulkan perubahan. Anda menyetujui setiap perubahan.";
@@ -332,6 +345,7 @@
 "Close" = "Tutup";
 "Close Tab" = "Tutup Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Menutup jendela ini. Pengaturan › Umum › Set Up LLMTray… akan membukanya lagi.";
+"Code in the chat." = "Kode di Obrolan.";
 "Coding agents" = "Agen kode";
 "Coffee" = "Kopi";
 "Comes with %@" = "Disertakan dengan %@";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "Tidak dapat menghubungi server — coba lagi nanti.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Tidak dapat membaca beberapa bagian obrolan; akan mencoba lagi pada %@ (alasannya: Pengaturan › Server › Log).";
 "Couldn't start the voice runner: %@" = "Gagal memulai voice runner: %@";
+"Couldn't start the voice: %@" = "Tidak dapat memulai suara: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Hitung permintaan dan token per model, klien, dan hari, serta seberapa cepat dijalankan. Hanya disimpan di Mac Ini, tidak pernah dikirim ke mana pun.";
 "Countdown" = "Hitungan mundur";
 "Countdown: %lld s" = "Hitung mundur: %lld dtk";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "Jangan Ingat Obrolan Ini…";
 "Don't remember this chat?" = "Jangan ingat obrolan ini?";
 "Don't show again" = "Jangan tampilkan lagi";
+"Don't show this again" = "Jangan tampilkan ini lagi.";
 "Done" = "Selesai";
 "Done talking: the model answers" = "Selesai berbicara: model menjawab";
 "Done: %lld changes made." = "Selesai: %lld perubahan dibuat.";
 "Download" = "Unduh";
+"Download (%@)" = "Unduh (%@)";
 "Download LLMTray-Full" = "Unduh LLMTray‑Full";
 "Download and Enable" = "Unduh dan Aktifkan";
 "Download for %@, into the models folder" = "Unduh untuk %@, ke folder models";
 "Download into the models folder" = "Unduh ke folder models";
 "Download models" = "Unduh model";
 "Download models from Hugging Face" = "Unduh model dari Hugging Face";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Unduh pengenal ucapan terlebih dahulu: Pengaturan > Suara > Percakapan suara.";
 "Downloaded" = "Diunduh";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Diunduh oleh versi sebelumnya, pada disk yang berbeda dari folder models: tetap di tempatnya.";
 "Downloading" = "Mengunduh";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "Mengunduh %@…";
 "Downloading %lld files…" = "Mengunduh %lld berkas…";
 "Downloading the embedder failed: %@" = "Gagal mengunduh embedder: %@";
+"Downloading the fast decoder…" = "Mengunduh decoder cepat…";
 "Downloading…" = "Mengunduh…";
 "Downloads" = "Unduhan";
 "Downloads waiting: %lld" = "Unduhan menunggu: %lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "Taruh untuk menambahkan ke “%@”";
 "Drop to attach images" = "Taruh untuk melampirkan gambar";
 "Duplicate this profile" = "Gandakan profil ini.";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Setiap jawaban baru dibacakan kalimat demi kalimat saat sedang ditulis. Kode, tabel, dan tautan tidak dibacakan. Bacakan di bawah jawaban mana pun akan membacakan jawaban itu; tombol speaker di atas bidang pesan menyalakan dan mematikan ini.";
 "Echo cancellation" = "Pembatalan gema";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Pembatalan gema tidak bisa dimulai: %@ — matikan di Pengaturan > Suara.";
 "Echo cancellation isn't available on this Mac." = "Pembatalan gema tidak tersedia di Mac ini.";
+"Echo cancellation isn't available: %@" = "Pembatalan gema tidak tersedia: %@";
 "Echo gate" = "Gerbang gema";
 "Edit Note" = "Edit Catatan";
 "Edit Profile…" = "Edit profil…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "Nyalakan berkas proyek?";
 "Enable…" = "Nyalakan…";
 "End" = "Akhiri";
+"End the conversation" = "Akhiri percakapan";
+"End the conversation (Esc)" = "Akhiri percakapan (Esc)";
 "End the conversation (the chat model reloads)" = "Akhiri percakapan (model chat dimuat ulang)";
 "Enjoying LLMTray?" = "Menikmati LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Environment, NAME=value per baris (kunci, token, dan kata sandi masuk ke Keychain)";
 "Errors" = "Kesalahan";
 "Errors: go to the next one (⌘E)" = "Kesalahan: buka yang berikutnya (⌘E)";
+"Esc ends the conversation" = "Esc mengakhiri percakapan";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Every day's counts are removed. This can't be undone." = "Hitungan setiap hari akan dihapus. Tindakan ini tidak dapat dibatalkan.";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "File yang Anda tambahkan ke proyek diindeks di Mac ini, sehingga obrolannya dapat mencarinya.";
 "Files · off" = "Berkas · mati";
 "Files…" = "Berkas…";
+"Fillers on pauses" = "Sisipan saat jeda";
 "Finish" = "Selesai";
 "Finish applies what you chose. You can change all of it later in Settings." = "Selesai menerapkan pilihan Anda. Anda bisa mengubah semuanya nanti di Pengaturan.";
 "Finish in your browser…" = "Selesaikan di browser Anda…";
@@ -551,6 +576,7 @@
 "Free disk space" = "Ruang disk tersedia";
 "Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
+"From a clip" = "Dari klip";
 "From the MCP Registry" = "Dari MCP Registry";
 "Full" = "Penuh";
 "Full duplex" = "Dupleks penuh";
@@ -570,6 +596,7 @@
 "Generating music…" = "Menghasilkan musik…";
 "Generation" = "Generasi";
 "Get" = "Dapatkan";
+"Get Faster Decoder" = "Dapatkan Decoder Lebih Cepat";
 "Get Started" = "Memulai";
 "Get a Model…" = "Dapatkan Model…";
 "Get one" = "Dapatkan";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Memiliki nama lain (hard link): nama-nama itu mempertahankan berkas.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Header, Nama: nilai per baris (header Authorization masuk ke Keychain)";
+"Hearing you" = "Mendengar Anda";
 "Help" = "Bantuan";
 "Help improve LLMTray?" = "Bantu perbaiki LLMTray?";
 "Hide" = "Sembunyikan";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "Panduan LLMTray";
 "LLMTray events" = "Peristiwa LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray mengambilnya bersama model yang dipercepatnya: unduh model tersebut.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray gratis: tanpa langganan, tanpa fitur yang dikunci. Jika berguna bagi Anda, Anda dapat mendukung pengembangannya.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray tidak diizinkan membaca tab %@: nyalakan di Pengaturan Sistem › Privasi & Keamanan › Otomatisasi.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray tidak diizinkan menggunakan mikrofon.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray tidak diizinkan menggunakan mikrofon. Izinkan di Pengaturan Sistem › Privasi & Keamanan › Mikrofon.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray tidak diizinkan menggunakan mikrofon: Pengaturan Sistem > Privasi & Keamanan > Mikrofon.";
 "LLMTray restarts now to load them." = "LLMTray akan memulai ulang sekarang untuk memuatnya.";
 "LLMTray status, indexing project files" = "Status LLMTray, mengindeks berkas proyek";
 "LLMTray — Chat" = "LLMTray — Obrolan";
@@ -725,6 +755,7 @@
 "Likes" = "Suka";
 "List my name" = "Cantumkan nama saya";
 "List my name in Supporters" = "Cantumkan nama saya di Penyokong";
+"Listening" = "Mendengarkan";
 "Listening…" = "Mendengarkan…";
 "Live output of the model process: loading, errors, requests." = "Output langsung dari proses model: pemuatan, kesalahan, permintaan.";
 "Load %@" = "Muat %@";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "Folder model: %@";
 "Models found: %lld" = "Model ditemukan: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Model dijalankan di Mac ini. Obrolan Anda tidak keluar; hanya alat web, jika diaktifkan, yang mengakses internet.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Model yang mendengar audio (Gemma 4 E2B, E4B, 12B) mendapat rekaman giliran Anda beserta teksnya, jadi model mendengar bagaimana Anda mengucapkannya. Maksimal 30 detik per giliran.";
 "Models: %@ · free: %@" = "Model: %@ · tersisa: %@";
 "More" = "Lainnya";
 "Move %1$@ to %2$@" = "Pindahkan %1$@ ke %2$@";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "Tidak ada server ini yang dapat diperbarui dari sini (ditambahkan secara manual atau dari file).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Belum ada. Izin untuk satu chat atau satu permintaan tidak tercantum di sini: izin berakhir bersamanya.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Ruang disk tidak cukup: model suara membutuhkan %1$@, hanya tersisa %2$@.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Ruang disk tidak cukup: suara memerlukan %1$@, tersedia %2$@.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Ruang disk tidak cukup: %@ memerlukan sekitar %@, tersedia %@.";
 "Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "Buka LLMTray saat Anda masuk";
 "Open Privacy Settings…" = "Buka Pengaturan Privasi…";
 "Open Server Log…" = "Buka Log Server…";
+"Open Settings" = "Buka Pengaturan";
 "Open Voice Lab…" = "Buka Voice Lab…";
 "Open in New Tab" = "Buka di Tab Baru";
 "Open in Preview" = "Buka di Pratinjau";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Jika melebihi ini, catatan terlemah (paling lama, paling tidak pasti) kedaluwarsa. Catatan Tersemat dipertahankan.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
 "PDF · %lld pages" = "PDF · %lld halaman";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: cepat, 25 bahasa Eropa termasuk Rusia (2.5 GB). Whisper: 99 bahasa, lebih lambat (1.6 GB). macOS: tidak perlu unduhan, tetapi hanya bahasa yang dikenali macOS di Mac Ini tanpa internet, dan hanya jika Dikte dinyalakan. Tidak ada yang Anda ucapkan keluar dari Mac Ini.";
 "Past %lld messages" = "%lld pesan terakhir";
 "Paste a Config" = "Tempel Konfigurasi";
 "Paste a Config…" = "Tempel Konfigurasi…";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "Baca Juga";
 "Read Past Chats…" = "Baca Chat terdahulu…";
 "Read What Wasn't Read" = "Baca yang belum dibaca";
+"Read answers aloud" = "Bacakan jawaban";
 "Read chats" = "Baca obrolan";
+"Read the answer aloud" = "Bacakan jawaban";
 "Read web pages" = "Baca halaman web";
 "Reading a chat…" = "Membaca obrolan…";
 "Reading a prompt: up to %lld%" = "Membaca prompt: hingga %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Reads Only" = "Hanya Baca";
 "Reads chats with" = "Membaca obrolan dengan";
+"Ready" = "Siap";
 "Ready." = "Siap.";
 "Ready. This is the Full build: the runtime is included." = "Siap. Ini adalah build Full: runtime sudah disertakan.";
 "Reasoning" = "Penalaran";
@@ -1148,6 +1187,7 @@
 "Selected" = "Dipilih";
 "Send" = "Kirim.";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Kirim laporan harian anonim: versi aplikasi dan macOS, chip, ukuran memori, bahasa, fitur yang Anda gunakan dan keluarga model (tidak pernah nama model). Tidak ada prompt, konten, file atau nama model yang pernah keluar dari Mac Anda. Anda dapat mematikannya kapan saja di Pengaturan.";
+"Send my voice to models that hear" = "Kirim suara saya ke model yang mendengar";
 "Sending…" = "Mengirim…";
 "Sends anonymous usage statistics" = "Kirim statistik penggunaan anonim";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Dikirim lebih dulu di setiap permintaan chat dalam app. Default disertai prompt awal singkat — perpanjang atau ganti. Tidak diterapkan ke klien API eksternal.";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "Mengurutkan pesan dengan";
 "Source on GitHub" = "Sumber di GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
+"Speak" = "Bacakan";
 "Speakers work with echo cancellation; headphones are still best." = "Speaker berfungsi dengan pembatalan gema; tetap disarankan menggunakan headphone.";
+"Speaking" = "Berbicara";
 "Speaking…" = "Berbicara…";
 "Speculative decoding (MTP)" = "Decoding spekulatif (MTP)";
+"Speech recognition" = "Pengenalan ucapan";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "Pengenalan ucapan tidak diizinkan, atau Siri dan Dikte dimatikan: Pengaturan Sistem > Papan Ketik > Dikte.";
 "Speed" = "Kecepatan";
 "Speeds up %@: fetched where LLMTray loads it from." = "Mempercepat %@: diambil dari tempat LLMTray memuatnya.";
+"Spoken answers" = "Jawaban dibacakan";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Waktu tunggu mandek: %lld dtk";
 "Start" = "Mulai";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "Hentikan Voice Lab dan pembuatan musik untuk memperbaruinya.";
 "Stop Voice Lab first." = "Hentikan Voice Lab terlebih dahulu.";
 "Stop generating" = "Hentikan pembuatan.";
+"Stop reading the answer" = "Hentikan pembacaan jawaban";
+"Stop reading the answer first." = "Hentikan pembacaan jawaban terlebih dahulu.";
 "Stop recording" = "Hentikan perekaman";
 "Stop server (unload model)" = "Hentikan server (keluarkan model dari memori).";
 "Stop the server to change these." = "Hentikan server untuk mengubah ini.";
@@ -1272,10 +1319,12 @@
 "System" = "Sistem";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "Tempat sistem dan pribadi (folder home itu sendiri, Library, Applications, keys) tidak pernah dibagikan.";
 "System prompt" = "Prompt sistem";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "Sistem: suara macOS untuk bahasa jawaban, tidak perlu mengunduh apa pun (lebih banyak suara di Pengaturan Sistem > Aksesibilitas > Konten Lisan). Chatterbox: suara neural alami dalam 23 bahasa, termasuk Rusia, yang dapat menirukan suara dari klip pendek; berjalan di Mac Ini.";
 "Tab %lld" = "Tab %lld";
 "Talk" = "Bicara";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Berbicara dengan model speech‑to‑speech lokal yang mendengar dan menjawab dengan suaranya sendiri, bersamaan seperti panggilan telepon. Eksperimental dan hanya Bahasa Inggris: tanpa alat, tanpa proyek, tidak disimpan.";
 "Talk with the model in Voice Lab" = "Bicara dengan model di Voice Lab";
+"Talk with the model: a voice conversation (Esc ends it)" = "Bicara dengan model: percakapan suara (Esc mengakhirinya)";
 "Talking… press Done when you're finished." = "Berbicara… tekan Selesai saat selesai.";
 "Target: %@ · profile %@" = "Target: %@ · profil %@";
 "Temperature" = "Suhu";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "Model obrolan itu sendiri";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "Model obrolan itu sendiri: setiap obrolan dibaca oleh model yang menjawab di dalamnya -- obrolan dalam bahasa Rusia dengan Gemma tidak dibaca oleh pembuat kode khusus bahasa Inggris yang Anda muat nanti. Satu model: setiap obrolan dibaca olehnya, sehingga semua catatan ditulis dengan cara yang sama. Apa pun pilihannya, obrolan menunggu hingga modelnya dimuat dan senggang; tidak ada yang dimuat untuknya kecuali Anda mengizinkannya di bawah.";
 "The chats and models in that folder were here already." = "Obrolan dan model di folder itu sudah ada di sini.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "Klip berdurasi %.0f dtk: maksimal 30 dtk — potong agar lebih pendek.";
+"The clip is %.0f s: at least 5 s are needed." = "Klip berdurasi %.0f dtk: minimal perlu 5 dtk.";
 "The command %@ wasn't found." = "Perintah %@ tidak ditemukan.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Salinan berkas yang ditambahkan ke proyek, beserta indeksnya, bersama-sama. Berkas milik proyek ditampilkan di jendela Files; menghapus proyek akan menghapusnya.";
 "The day the counts are for." = "Hari yang dihitung.";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "Server model tidak lagi online saat dimulai.";
 "The model that reads them" = "Model yang membacanya";
 "The model's license, from its card." = "Lisensi model, dari model card.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "model, speech tokenizer-nya, dan kamus penekanan bahasa Rusia: %@ di Folder model. Chatterbox (Resemble AI) dan ruaccent berlisensi MIT; speech tokenizer, dari CosyVoice2, berlisensi Apache-2.0.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Folder models tidak tersedia — apakah disknya terhubung? Pilih kembali di Pengaturan → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Maksimum yang boleh digunakan cache prompt sebelumnya (ukuran Prompt cache pada profil juga menjadi batas). Lebih besar mempercepat percakapan panjang dan agen; terlalu besar membuat tidak ada ruang untuk prompt yang sedang dibaca.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "Batas maksimum ruang catatan dalam prompt obrolan. Catatan Tersemat dan preferensi yang Anda nyatakan didahulukan, lalu sisanya menurut kebaruan.";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "Rencana berubah sejak Anda melihatnya: tinjau lagi.";
 "The port and network access can change only while the server is stopped." = "Port dan akses jaringan hanya dapat diubah saat server dihentikan.";
 "The project's files, and Add Files…" = "Berkas proyek, dan Tambahkan Berkas…";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "Pengenal ucapan, ditambah Silero VAD (tempat ucapan mulai dan berhenti) dan Smart Turn (apakah jeda mengakhiri giliran Anda), di Folder model. Lisensi: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Registri tidak menjawab dalam 30 detik. Coba lagi sebentar lagi.";
 "The reply was cut at its length limit." = "Balasan terpotong karena batas panjang.";
 "The report" = "Laporannya";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "Server dimulai setelah %@ diunduh";
 "The server starts with %@" = "Server dimulai dengan %@";
 "The settings here were kept." = "Pengaturan di sini dipertahankan.";
+"The speech recognizer stopped: %@" = "Pengenal ucapan berhenti: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Saran untuk Mac ini sudah tersedia. Jelajahi Hugging Face untuk model lain.";
 "The tips aren't available right now." = "Sumbangan tidak tersedia saat ini.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari ipsupport.us sedang terbuka. Keluar dulu (ikon bar menunya › Keluar), lalu buka lagi yang ini: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
+"The voice couldn't open the audio output." = "Suara tidak dapat membuka keluaran audio.";
+"The voice couldn't open the audio output: %@" = "Suara tidak dapat membuka keluaran audio: %@";
+"The voice failed: %@" = "Suara gagal: %@";
+"The voice is being downloaded -- try again once it's done." = "Suara sedang diunduh — coba lagi setelah selesai.";
 "The voice model is being downloaded -- try again once it's done." = "Model suara sedang diunduh — coba lagi setelah selesai.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Model suara belum diunduh — unduh di Pengaturan > Voice.";
 "The voice model's audio format isn't supported." = "Format audio model suara tidak didukung.";
 "The voice runner sent an unreadable ready message." = "Voice runner mengirim pesan siap yang tidak terbaca.";
 "The voice runner stopped unexpectedly (%@)." = "Voice runner berhenti tiba‑tiba (%@).";
+"The voice stopped: %@" = "Suara berhenti: %@";
+"The voice that answers is the one picked under Spoken answers." = "Suara yang menjawab adalah yang dipilih di Jawaban dibacakan.";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Lalu mulai ulang server model. Batas akan kembali ke Default saat Mac dimulai ulang. LLMTray tidak mengubahnya sendiri.";
 "There's no plan waiting any more." = "Tidak ada rencana yang menunggu lagi.";
 "These can't be added to a project" = "Ini tidak dapat ditambahkan ke proyek";
 "These models go back to Default: %@." = "Model berikut kembali ke Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Mereka berjalan satu per satu, ditampilkan di jendela bar menu. Anda dapat menutup jendela ini sementara waktu.";
+"Thinking" = "Berpikir";
 "Thinking effort: %@" = "Upaya berpikir: %@";
 "Thinking effort: how long the model may think before it answers" = "Upaya berpikir: berapa lama model boleh berpikir sebelum menjawab.";
 "Thinking…" = "Berpikir…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "Gunakan %@";
 "Use %lld" = "Gunakan %lld";
 "Use Anyway" = "Tetap Gunakan";
+"Use Built-in" = "Gunakan Bawaan";
 "Use Default Folder" = "Gunakan Folder Default";
 "Use Folder" = "Gunakan Folder";
 "Use LM Studio's folder" = "Gunakan folder LM Studio";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "Gunakan fakta yang dipelajari seketika";
 "Use a learned fact once %lld chats show it" = "Gunakan fakta yang dipelajari setelah ditunjukkan oleh %lld obrolan";
 "Use headphones: the model hears its own voice from the speakers." = "Gunakan headphone: model mendengar suaranya dari speaker.";
+"Use your own voice, or a voice you have permission to use." = "Gunakan suara Anda sendiri, atau suara yang Anda miliki izin untuk digunakan.";
 "Used" = "Digunakan";
 "Used by %@." = "Digunakan oleh %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Digunakan oleh pembuatan gambar, musik, dan Voice Lab, yang mengunduhnya. Mereka juga disimpan di folder models dengan nama Hugging Face mereka.";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab menggunakan sekitar %1$@ GB, lebih dari %2$@ GB yang dapat dipakai GPU: naikkan batas memori GPU terlebih dahulu.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab menggunakan sekitar %1$@ GB; ditambah %2$@ GB model chat, tetap muat dalam %3$@ GB yang dapat dipakai GPU. Namun model chat tetap dibongkar saat berjalan.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab menggunakan sekitar %@ GB memori saat berjalan.";
+"Voice clip" = "Klip suara";
+"Voice conversation" = "Percakapan suara";
 "Voice model" = "Model suara";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
 "Waiting for a model download to finish…" = "Menunggu unduhan model selesai…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "Apa yang Baru…";
 "What's sent" = "Yang dikirim";
 "When a client asks for another model" = "Saat klien meminta model lain";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "Jika jawaban memerlukan lebih dari satu detik, “hmm” singkat atau “coba saya periksa” dengan suara jawaban, agar keheningan tidak terasa seperti panggilan terputus. Dibuat pada saat hening dalam percakapan dan disimpan per suara.";
 "When an app asks for another model" = "Saat sebuah app meminta model lain";
 "When an app asks for another model: %@" = "Saat sebuah app meminta model lain: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "Saat obrolan menunggu model yang belum dimuat, memori dapat memuatnya setelah LLMTray tidak aktif selama ini (tidak ada obrolan, app, atau gambar yang sedang dikerjakan). Permintaan berikutnya untuk model biasa Anda akan memuatnya kembali, yang memerlukan waktu sebentar.";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "Lokasi Anda: kota, atau alamat";
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Saat model berbicara, suara mikrofon yang lebih pelan dari ambang ini diterima sebagai sunyi: jejak suaranya yang tersisa dari pembatalan gema tidak masuk, tetapi suara di atasnya tetap mengganggu. Naikkan jika model mendengar suaranya sendiri, turunkan jika model melewatkan interupsi Anda. Berlaku pada permulaan berikutnya.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "Jendela";
 "Windows and pages" = "Jendela dan halaman";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "sedang digunakan atau mengunduh";
 "less than a minute left" = "kurang dari satu menit tersisa";
 "llmtray in the terminal" = "llmtray di Terminal";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS tidak dapat mengenali %@ di Mac Ini tanpa mengirimkannya keluar dari Mac. Pilih Parakeet di Pengaturan > Suara.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS menghapus suara model sendiri dari mikrofon (Voice Processing, seperti di FaceTime), sehingga berfungsi pada speaker. Fitur ini juga meratakan level dan meredam kebisingan latar. Efektif setelah dimulai ulang.";
 "make %lld folders" = "buat %lld folder";
 "mlx-audio runtime" = "runtime mlx-audio";
