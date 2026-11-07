@@ -26,8 +26,8 @@ public struct SpokenVoiceFile: Hashable, Sendable {
     public static let model = SpokenVoiceFile(
         repo: "roman220220/chatterbox-multilingual-v3-mlx-8bit", name: "Chatterbox Multilingual V3 (8-bit)",
         patterns: ["model.safetensors", "config.json", "tokenizer.json", "Cangjie5_TC.json", "conds.safetensors", "LICENSE",
-                   fastDecoderPath],
-        downloadBytes: 1_316_571_733 + fastDecoderBytes, license: "MIT")
+                   fastDecoderPath, "meanflow/LICENSE-Apache-2.0"],
+        downloadBytes: 1_316_571_733 + fastDecoderBytes + 11_358, license: "MIT")
     /// The fast decoder, inside the model's folder (a subfolder: mlx-audio
     /// loads every top-level *.safetensors). The runner uses it when it's
     /// there; a model downloaded before it came gets it on its own.
