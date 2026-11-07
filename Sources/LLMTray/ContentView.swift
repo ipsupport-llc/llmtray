@@ -257,6 +257,7 @@ struct ContentView: View {
         modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
         composer.thinkingStyle = modelID.map(ModelDiscovery.thinkingStyle(forModelPath:)) ?? .none
+        composer.looped = modelID.flatMap { ModelDiscovery.recurrentLoops(modelPath: $0) } != nil
         let hears = modelID.map(ModelDiscovery.supportsAudio(forModelPath:)) ?? false
         composer.acceptsAudio = hears
         presentation.modelHearsAudio(hears)
