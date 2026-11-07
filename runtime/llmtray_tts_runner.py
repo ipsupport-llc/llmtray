@@ -191,6 +191,14 @@ class Speaker:
         huggingface_hub.snapshot_download = local_snapshot
         from mlx_audio.tts.utils import load_model
         self.model = load_model(model_dir)
+        # T3 at 8 bits: 2-3x faster, same audio (quant-ternary
+        # chatterbox-quant). LLMTray's download already is; an fp32
+        # conversion is quantized here.
+        with open(os.path.join(model_dir, "config.json")) as f:
+            quantized = "quantization" in json.load(f)
+        if not quantized:
+            import mlx.nn as nn
+            nn.quantize(self.model.t3.tfmr, group_size=64, bits=8)
         self.sample_rate = int(self.model.sample_rate)
         self.builtin = getattr(self.model, "_conds", None)
         self.conds = self.builtin

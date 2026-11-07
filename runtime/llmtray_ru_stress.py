@@ -233,7 +233,8 @@ def to_acute(plus_text):
         return "-".join(p.replace("+", "") if sum(ch in VOWELS for ch in p) <= 1 or i < len(parts) - 1 else p
                         for i, p in enumerate(parts))
     marked = re.sub(r"[\w+]+(?:-[\w+]+)*", per_word, marked)
-    return _PLUS_VOWEL.sub(lambda m: m.group(1) + "́", marked).replace("+", "")
+    # ё is always stressed: no mark after it.
+    return _PLUS_VOWEL.sub(lambda m: m.group(1) + ("" if m.group(1) in "ёЁ" else "\u0301"), marked).replace("+", "")
 
 
 class RuStress:
@@ -303,6 +304,7 @@ def selftest():
     assert rule_stress("кот") == "кот"
     assert to_acute("Чем мог+у пом+очь?") == "Чем могу́ помо́чь?"
     assert to_acute("к+ое-как+ой") == "кое-како́й"
+    assert to_acute("ид+ёт календар+ём") == "идёт календарём"
     assert apply_rules("Сл+оман з+амок на дв+ери.") == "Сл+оман зам+ок на дв+ери."
     assert apply_rules("Я пл+ачу за св+ет.") == "Я плач+у за св+ет."
     assert apply_rules("Вы пол+ожите тр+убку?") == "Вы пол+ожите тр+убку?"

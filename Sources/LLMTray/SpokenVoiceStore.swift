@@ -48,9 +48,9 @@ final class SpokenVoiceStore: ObservableObject {
         let fm = FileManager.default
         switch file {
         case .model:
-            // conds.safetensors: the built-in voice, from another repo.
-            return fm.fileExists(atPath: dir + "/model.safetensors") && fm.fileExists(atPath: dir + "/config.json")
-                && fm.fileExists(atPath: dir + "/conds.safetensors")
+            // What the loader reads; conds.safetensors is the built-in voice.
+            return ["model.safetensors", "config.json", "tokenizer.json", "Cangjie5_TC.json", "conds.safetensors"]
+                .allSatisfy { fm.fileExists(atPath: dir + "/" + $0) }
         case .tokenizer:
             return fm.fileExists(atPath: dir + "/model.safetensors")
         case .russianStress:
@@ -101,7 +101,7 @@ final class SpokenVoiceStore: ObservableObject {
         guard !missing.isEmpty else { return }
         finishedBytes = 0
         let fm = FileManager.default
-        let total = missing.reduce(Int64(0)) { $0 + $1.downloadBytes + ($1 == .model ? SpokenVoiceFile.builtInVoice.downloadBytes : 0) }
+        let total = missing.reduce(Int64(0)) { $0 + $1.downloadBytes }
         var have: Int64 = 0
         for file in missing where fm.fileExists(atPath: Self.partialDir(file)) {
             have += await Self.size(Self.partialDir(file))
@@ -130,10 +130,6 @@ final class SpokenVoiceStore: ObservableObject {
             switch file {
             case .russianStress:
                 try await AudioRuntime.shared.buildRussianStress(into: partial)
-            case .model:
-                try await AudioRuntime.shared.snapshotDownload(repo: file.repo, patterns: file.patterns, into: partial)
-                let voice = SpokenVoiceFile.builtInVoice
-                try await AudioRuntime.shared.snapshotDownload(repo: voice.repo, patterns: voice.patterns, into: partial)
             default:
                 try await AudioRuntime.shared.snapshotDownload(repo: file.repo, patterns: file.patterns, into: partial)
             }
@@ -143,7 +139,7 @@ final class SpokenVoiceStore: ObservableObject {
             try MediaModels.clearIncompleteTarget(entry)
             try fm.moveItem(atPath: partial, toPath: MediaModels.downloadPath(entry))
             MediaModels.didDownload()
-            finishedBytes += file.downloadBytes + (file == .model ? SpokenVoiceFile.builtInVoice.downloadBytes : 0)
+            finishedBytes += file.downloadBytes
         }
     }
 
