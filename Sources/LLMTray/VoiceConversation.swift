@@ -68,6 +68,8 @@ final class VoiceConversation: ObservableObject {
     /// The user cut in before any of the answer was heard: their turn goes
     /// together with the one that answer was for.
     private var takeBackOnSubmit = false
+    /// This turn's answer has begun to play.
+    private var answerStarted = false
     /// What the model said lately, and until when the microphone may still
     /// hear it come back: a turn made of those words is its echo.
     private var echoTexts: [String] = []
@@ -155,6 +157,7 @@ final class VoiceConversation: ObservableObject {
         fillerPlaying = false
         fillerOutput = nil
         takeBackOnSubmit = false
+        answerStarted = false
         echoTexts = []
         echoUntil = .distantPast
         level = 0
@@ -300,7 +303,7 @@ final class VoiceConversation: ObservableObject {
 
     /// The model's voice is coming out of the speakers.
     private var modelAudible: Bool {
-        phase == .speaking || SpokenAnswers.shared.speakingMessage != nil || fillerPlaying
+        SpokenAnswers.shared.speakingMessage != nil || fillerPlaying
     }
 
     private func stopFiller() {
@@ -324,8 +327,15 @@ final class VoiceConversation: ObservableObject {
     }
 
     /// Words the microphone may have picked up from the model's voice.
+    /// The answer's sentences count from when they start playing, so the
+    /// reference has the answer's text so far (a superset of what plays).
     private func isEcho(_ text: String) -> Bool {
-        Date() < echoUntil && VoiceConversationText.isEcho(text, of: echoTexts)
+        guard Date() < echoUntil else { return false }
+        var spoken = echoTexts
+        if answerStarted, let answer = chat?.messages.last(where: { $0.role == "assistant" })?.content {
+            spoken.append(String(answer.suffix(600)))
+        }
+        return VoiceConversationText.isEcho(text, of: spoken)
     }
 
     private func speechStarted() {
@@ -406,7 +416,7 @@ final class VoiceConversation: ObservableObject {
         bargeCandidate = false
         io?.speechGain = 1
         stopFiller()
-        guard !heard.isEmpty else {
+        guard !heard.isEmpty || answerStarted else {
             // None of the answer heard yet: it's dropped, and the turn goes
             // with the one before it (submit).
             SpokenAnswers.shared.stop()
@@ -428,16 +438,17 @@ final class VoiceConversation: ObservableObject {
         var text = text
         stopFiller()
         if let chat {
-            let unheard = heard.isEmpty && (chat.isTurnInProgress || takeBackOnSubmit)
+            let unheard = !answerStarted && (chat.isTurnInProgress || takeBackOnSubmit)
             if chat.isTurnInProgress {
                 chat.cancel()
-                if !heard.isEmpty { chat.cutLastAnswer(toSpoken: heard) }
+                if answerStarted || !heard.isEmpty { chat.cutLastAnswer(toSpoken: heard) }
             }
             // The user went on before any of the answer was heard: what they
             // said before and now goes as one turn.
             if unheard, let before = chat.takeBackUnansweredTurn() { text = before + " " + text }
         }
         takeBackOnSubmit = false
+        answerStarted = false
         userText = text
         heard = []
         language = SpeechLanguage.detect(text, fallback: language ?? Locale.current.language.languageCode?.identifier)
@@ -484,6 +495,8 @@ final class VoiceConversation: ObservableObject {
             // A filler playing finishes (half a second at most): resetting
             // its output would drop the answer's audio queued behind it.
             fillerTimer?.invalidate()
+            answerStarted = true
+            echoUntil = .distantFuture
             if phase != .hearing || !bargeCandidate { phase = .speaking }
         } else {
             modelFellSilent()
