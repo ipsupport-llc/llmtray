@@ -2167,6 +2167,26 @@ final class ChatClient: ObservableObject {
     /// Voice conversation barge-in (adr/0031): the last answer keeps only
     /// the sentences the user heard, marked as cut, so the model never
     /// "remembers" saying what nobody heard.
+    /// A voice turn the user went on with before any of the answer was
+    /// heard (adr/0031): the answer so far (no tool calls, no media) and the
+    /// user's message come out, and the message's text comes back to be
+    /// sent again together with what they added. Nil when the last turn
+    /// isn't like that; nothing changes then.
+    func takeBackUnansweredTurn() -> String? {
+        guard !isBusy, var idx = messages.indices.last else { return nil }
+        if messages[idx].role == "assistant" {
+            let a = messages[idx]
+            guard a.toolCalls.isEmpty, !a.hasMedia, idx > 0 else { return nil }
+            idx -= 1
+        }
+        let user = messages[idx]
+        guard user.role == "user", !user.hasMedia, !user.content.isEmpty else { return nil }
+        messages.removeSubrange(idx...)
+        assistantMessageIndex = nil
+        persistCurrentSession()
+        return user.content
+    }
+
     func cutLastAnswer(toSpoken heard: [String]) {
         guard let idx = messages.lastIndex(where: { $0.role == "assistant" && $0.toolCalls.isEmpty }) else { return }
         let kept = heard.joined(separator: " ").trimmingCharacters(in: .whitespaces)

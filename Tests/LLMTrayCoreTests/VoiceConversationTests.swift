@@ -12,6 +12,19 @@ final class VoiceConversationTests: XCTestCase {
         }
     }
 
+    func testEcho() {
+        let spoken = ["Хм, что ты имеешь в виду?", "Готов описать LLMTray, чтобы я написал пост?"]
+        XCTAssertTrue(VoiceConversationText.isEcho("что ты имеешь в виду", of: spoken))
+        XCTAssertTrue(VoiceConversationText.isEcho("Хм.", of: ["Хм…"]))
+        XCTAssertTrue(VoiceConversationText.isEcho("готова описать ллмтрей чтобы я написал", of: spoken), "a word or two misheard")
+        XCTAssertFalse(VoiceConversationText.isEcho("а чем бы ты мог помочь", of: spoken))
+        XCTAssertFalse(VoiceConversationText.isEcho("нет, подожди", of: spoken))
+        XCTAssertFalse(VoiceConversationText.isEcho("что", of: []), "nothing played, nothing echoes")
+        XCTAssertFalse(VoiceConversationText.isEcho("  ", of: spoken))
+        XCTAssertTrue(VoiceConversationText.isEcho("what do you mean", of: ["Hmm, what do you mean by that?"]))
+        XCTAssertFalse(VoiceConversationText.isEcho("what can you help me with", of: ["Hmm, what do you mean by that?"]))
+    }
+
     func testToolKinds() {
         XCTAssertEqual(VoiceConversationText.toolKind("generate_image"), .image)
         XCTAssertEqual(VoiceConversationText.toolKind("search_messages"), .mail)

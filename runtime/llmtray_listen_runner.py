@@ -38,6 +38,9 @@ MAX_PAYLOAD = 16 << 20
 START_FRAMES = 3                # speech this long starts an utterance (~96 ms)
 PREFIX_FRAMES = 10              # kept from before the start (~320 ms)
 SPEECH_P, SILENCE_P = 0.5, 0.35
+# While the model's voice plays, what echo cancellation lets through can
+# look like speech: a start then needs longer, surer speech (~256 ms).
+BARGE_START_FRAMES, BARGE_SPEECH_P = 8, 0.8
 # A pause ends the turn when Smart Turn is sure at ~320 ms, or fairly sure at
 # ~510 ms; 60 test phrases: a 190 ms wait at p >= 0.5 ended 25 turns inside
 # phrases, 500 ms ended 4 (adr/0031). Silence alone ends it at ~1.6 s.
@@ -276,8 +279,9 @@ class Listener:
         p = self.m.speech_probability(frame)
         if not self.started:
             self.prefix.append(frame)
-            self.speech_run = self.speech_run + 1 if p >= SPEECH_P else 0
-            if self.speech_run >= START_FRAMES:
+            need_p, need_frames = (BARGE_SPEECH_P, BARGE_START_FRAMES) if self.speaking_model else (SPEECH_P, START_FRAMES)
+            self.speech_run = self.speech_run + 1 if p >= need_p else 0
+            if self.speech_run >= need_frames:
                 self.started = time.time()
                 self.utterance = list(self.prefix)
                 self.prefix.clear()

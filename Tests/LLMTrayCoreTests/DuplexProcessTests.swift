@@ -250,6 +250,33 @@ final class ListenRunnerTests: XCTestCase {
         XCTAssertTrue((info["text"] as? String ?? "").hasPrefix("speech"))
     }
 
+    /// Over the model's voice a short burst (echo getting through) doesn't
+    /// start a turn; speech as long as a real cut-in does.
+    func testWhileTheModelSpeaksAShortBurstIsNoTurn() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        try child.start(onStdout: { out.append($0) }, onExit: { _ in exited.fulfill() })
+        child.write(VoiceFrame(.mode, payload: try JSONSerialization.data(withJSONObject: ["speaking": true])).encoded)
+        func tone(_ n: Int) -> Data { PCM16.data(from: (0..<n).map { sin(Float($0) * 2 * .pi * 300 / 16000) * 0.3 }) }
+        let gap = PCM16.data(from: [Float](repeating: 0, count: 4000))
+        // 160 ms: past the plain start (96 ms), short of the one over the model.
+        child.write(VoiceFrame(.audio, payload: tone(2560)).encoded)
+        child.write(VoiceFrame(.audio, payload: gap).encoded)
+        child.write(VoiceFrame(.audio, payload: tone(8000)).encoded)
+        child.write(VoiceFrame(.audio, payload: PCM16.data(from: [Float](repeating: 0, count: 32000))).encoded)
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, !out.decoded.contains(where: { $0.type == UInt8(ascii: "Z") }) { Thread.sleep(forTimeInterval: 0.05) }
+        child.closeStdin()
+        wait(for: [exited], timeout: 15)
+        XCTAssertEqual(out.decoded.filter { $0.type == UInt8(ascii: "V") }.count, 1)
+        let z = try XCTUnwrap(out.decoded.first { $0.type == UInt8(ascii: "Z") })
+        let info = try XCTUnwrap(JSONSerialization.jsonObject(with: z.payload) as? [String: Any])
+        // Only the long burst (plus its lead-in) is the turn.
+        let seconds = try XCTUnwrap(info["seconds"] as? Double)
+        XCTAssertLessThan(seconds, 0.9)
+    }
+
     func testWhileTheModelSpeaksTurnsEndOnSilenceOnly() throws {
         let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
         let out = DuplexProcessTests.Collected()
