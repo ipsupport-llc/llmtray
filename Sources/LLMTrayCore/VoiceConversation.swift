@@ -30,6 +30,17 @@ public enum VoiceConversationText {
             || words.allSatisfy { backchannels.contains($0) }
     }
 
+    static let hesitations: Set<String> = [
+        "uh", "uhh", "um", "umm", "uhm", "hmm", "hm", "er", "erm", "ah", "eh", "mm", "mmm",
+        "э", "ээ", "эээ", "эм", "эмм", "мм", "ммм", "хм", "хмм", "а", "ну", "ой",
+    ]
+
+    /// Only a hesitation sound ("uh", "эм"), maybe repeated: nothing said yet.
+    public static func isHesitation(_ text: String) -> Bool {
+        let w = words(text)
+        return !w.isEmpty && w.count <= 3 && w.allSatisfy(hesitations.contains)
+    }
+
     /// What the microphone heard is the model's own voice coming back
     /// past echo cancellation (adr/0031): echo is a stretch of what was
     /// played, so a heard word counts when it and a neighbour come in the

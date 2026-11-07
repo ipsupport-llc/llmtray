@@ -30,8 +30,9 @@ final class VoiceConversation: ObservableObject {
     @Published private(set) var userText = ""
     /// The answer's sentences heard so far, and the one playing.
     @Published private(set) var heard: [String] = []
-    /// The microphone's level, 0...1, for the orb.
-    @Published private(set) var level: Float = 0
+    /// The microphone's level for the orb: its own object, so 15 updates
+    /// a second redraw the orb and not every view watching the phase.
+    let meter = VoiceMeter()
     /// The chat the conversation is in.
     private(set) weak var chat: ChatClient?
 
@@ -156,7 +157,7 @@ final class VoiceConversation: ObservableObject {
         answerStarted = false
         echoTexts = []
         echoUntil = .distantPast
-        level = 0
+        meter.level = 0
         phase = .off
     }
 
@@ -274,7 +275,7 @@ final class VoiceConversation: ObservableObject {
     }
 
     private func micChunk(_ data: Data, rms: Float) {
-        level = PCM16.meterLevel(rms: rms)
+        meter.level = PCM16.meterLevel(rms: rms)
         record(data)
     }
 
@@ -381,6 +382,8 @@ final class VoiceConversation: ObservableObject {
             if let apple { text = await apple.endTurn() }
             guard session == self.session else { return }
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            // "Uh" on its own isn't a turn to answer.
+            if VoiceConversationText.isHesitation(text) { text = "" }
             if isEcho(text) {
                 // The model heard itself: nothing was said.
                 answerEndedDuringTurn = false
@@ -607,6 +610,12 @@ final class VoiceConversation: ObservableObject {
         default: return false
         }
     }
+}
+
+/// The microphone's level, 0...1.
+@MainActor
+final class VoiceMeter: ObservableObject {
+    @Published var level: Float = 0
 }
 
 /// Publishes the mic level ~15 times a second (the I/O queue delivers a

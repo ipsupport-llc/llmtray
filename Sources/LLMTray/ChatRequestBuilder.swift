@@ -28,7 +28,7 @@ enum ChatRequestBuilder {
         // The thinking budget is told with the latest user message only, as
         // the picker is now (Thinking.note): never a stale one from an
         // earlier choice or another model in the history.
-        let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.thinkingEffort).map(Thinking.note(budget:))
+        let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.effectiveThinkingEffort).map(Thinking.note(budget:))
         let latestUser = history.lastIndex { $0.role == "user" && !$0.isToolContext }
         // The server takes eight audio clips a request: the latest messages'
         // recordings go, older ones as "(audio)" (else a ninth recording made
@@ -90,7 +90,7 @@ enum ChatRequestBuilder {
             body["tools"] = tools
         }
         // The composer's thinking effort (adr/0022).
-        body.merge(Thinking.requestFields(style: settings.thinkingStyle, effort: settings.thinkingEffort)) { $1 }
+        body.merge(Thinking.requestFields(style: settings.thinkingStyle, effort: settings.effectiveThinkingEffort)) { $1 }
         return body
     }
 

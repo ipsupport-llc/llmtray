@@ -27,6 +27,11 @@ final class VoiceConversationTests: XCTestCase {
         XCTAssertFalse(VoiceConversationText.isEcho("file delete", of: ["I can delete the file."]), "the words, not the order")
     }
 
+    func testHesitations() {
+        for text in ["Uh.", "um, uh", "Эм…", "ну", "Хм"] { XCTAssertTrue(VoiceConversationText.isHesitation(text), text) }
+        for text in ["", "uh, what", "ну давай", "нет"] { XCTAssertFalse(VoiceConversationText.isHesitation(text), text) }
+    }
+
     func testToolKinds() {
         XCTAssertEqual(VoiceConversationText.toolKind("generate_image"), .image)
         XCTAssertEqual(VoiceConversationText.toolKind("search_messages"), .mail)
