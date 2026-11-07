@@ -53,8 +53,8 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
     /// Speech chunks queued, by the ring position they end at.
     private var pending: [(end: Int, completion: () -> Void)] = []
     /// The speech's volume, applied as it plays (voice conversation ducks
-    /// it while the user may be cutting in, adr/0031). A Float read on the
-    /// render thread, written off it: a torn read is impossible for 32 bits.
+    /// it while the user may be cutting in, adr/0031). Guarded by `lock`:
+    /// the render thread reads it under the try-lock it takes for the ring.
     private let gain: UnsafeMutablePointer<Float>
 
     init(inputSampleRate: Int) throws {
@@ -168,8 +168,8 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
 
     /// 1: full volume; less ducks the speech, queued audio included.
     var speechGain: Float {
-        get { gain.pointee }
-        set { gain.pointee = max(0, min(1, newValue)) }
+        get { withLock { gain.pointee } }
+        set { withLock { gain.pointee = max(0, min(1, newValue)) } }
     }
 
     /// The model's speech at `sampleRate`, played through this unit.
@@ -183,11 +183,12 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
         guard let data, let out = UnsafeMutableAudioBufferListPointer(data).first?.mData?.assumingMemoryBound(to: Float.self)
         else { return noErr }
         var played = 0
+        var g: Float = 1
         if os_unfair_lock_trylock(lock) {
             played = speech.read(into: out, count: frames)
+            g = gain.pointee
             os_unfair_lock_unlock(lock)
         }
-        let g = gain.pointee
         if g < 1 { for i in 0..<played { out[i] *= g } }
         if played < frames { (out + played).update(repeating: 0, count: frames - played) }
         return noErr

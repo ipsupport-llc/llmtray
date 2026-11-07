@@ -3,7 +3,8 @@ import XCTest
 
 final class VoiceConversationTests: XCTestCase {
     func testBackchannels() {
-        for text in ["Угу.", "ага", "Да-да", "мм", "Mm-hmm", "yeah", "OK", "got it", "  "] {
+        XCTAssertFalse(VoiceConversationText.isBackchannel("  "), "nothing heard isn't a backchannel")
+        for text in ["Угу.", "ага", "Да-да", "мм", "Mm-hmm", "yeah", "OK", "got it"] {
             XCTAssertTrue(VoiceConversationText.isBackchannel(text), text)
         }
         for text in ["Подожди, не то", "нет", "Stop, wait a second", "что?", "да, но я про другое"] {

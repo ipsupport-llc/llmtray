@@ -285,24 +285,30 @@ class Listener:
                 send("V", {"at": round(self.utterance_seconds(), 3)})
             return
         self.utterance.append(frame)
-        if p >= SPEECH_P:
+        # Only clear silence counts as a pause: anything above it (soft or
+        # resumed speech) resets the count and the turn checks.
+        if p >= SILENCE_P:
             self.silence = 0
             self.turn_checked_at = -1
-        elif p < SILENCE_P:
+        else:
             self.silence += 1
         seconds = self.utterance_seconds()
         # Each partial re-reads the whole utterance (0.27 s for 12 s of
         # speech): the next one waits twice that, so the recognizer takes at
         # most half the time and the runner never falls behind the mic.
+        if seconds >= MAX_UTTERANCE_S:
+            return self.end("length")
         if seconds - self.last_partial >= max(PARTIAL_EVERY_S, 2 * self.partial_cost) and self.silence == 0:
             self.last_partial = seconds
             t = time.time()
-            text = self.m.transcribe(self.m.concat(self.utterance))
+            try:
+                text = self.m.transcribe(self.m.concat(self.utterance))
+            except Exception as e:   # a caption lost, not the turn
+                log("partial failed: %s" % e)
+                text = ""
             self.partial_cost = time.time() - t
             if text:
                 send("U", {"text": text, "seconds": round(seconds, 2)})
-        if seconds >= MAX_UTTERANCE_S:
-            return self.end("length")
         use_turn = self.m.turn is not None and not self.speaking_model
         if use_turn:
             for step, (frames, need) in enumerate(TURN_STEPS):
@@ -327,6 +333,7 @@ class Listener:
 
     def cancel(self):
         self.reset()
+        self.prefix.clear()
         self.m.reset_vad()
 
 

@@ -25,7 +25,7 @@ public enum VoiceConversationText {
     public static func isBackchannel(_ text: String) -> Bool {
         let words = text.lowercased().replacingOccurrences(of: #"[^\p{L}\s]"#, with: " ", options: .regularExpression)
             .split(whereSeparator: \.isWhitespace).map(String.init)
-        guard !words.isEmpty, words.count <= 3 else { return words.isEmpty }
+        guard !words.isEmpty, words.count <= 3 else { return false }
         return backchannels.contains(words.joined(separator: " "))
             || words.allSatisfy { backchannels.contains($0) }
     }

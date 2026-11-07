@@ -779,11 +779,13 @@ struct ContentView: View {
 
     /// A voice conversation's turn: sent like a typed message, with the
     /// recording for a model that hears.
-    private func voiceSend(_ text: String, _ audio: [Data]) {
-        guard canChat else { return }
+    @discardableResult
+    private func voiceSend(_ text: String, _ audio: [Data]) -> Bool {
+        guard canChat, !chat.isBusy else { return false }
         startModelIfStopped()
         chat.send(prompt: text, audios: composer.acceptsAudio ? audio : [], port: port, modelAlias: requestModelName,
                   settings: chatSettings, server: server)
+        return true
     }
 
     private func send() {

@@ -572,6 +572,10 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         outstanding = []
         texts = [:]
         chunksPlaying = [:]
+        // A filler being made is dropped too: the runner's cancel may never
+        // answer for it.
+        for render in renders.values { render.resume(nil) }
+        renders = [:]
         playing = 0
         current = nil
         ended = false

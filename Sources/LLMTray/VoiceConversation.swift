@@ -35,7 +35,13 @@ final class VoiceConversation: ObservableObject {
     /// The chat the conversation is in.
     private(set) weak var chat: ChatClient?
 
-    private var send: ((String, [Data]) -> Void)?
+    private var send: ((String, [Data]) -> Bool)?
+    /// Bumped by every start and stop: work that resumes after an await
+    /// checks it, so a stopped conversation stays stopped.
+    private var session = 0
+    /// The answer ended while the user was speaking over it: that turn is
+    /// judged as a reply (a backchannel to a finished answer is dropped).
+    private var answerEndedDuringTurn = false
     private var io: VoiceProcessingIO?
     private var runner: DuplexProcess?
     private var apple: AppleRecognizer?
@@ -75,8 +81,10 @@ final class VoiceConversation: ObservableObject {
 
     // MARK: Start / stop
 
-    func start(chat: ChatClient, send: @escaping (String, [Data]) -> Void) {
+    func start(chat: ChatClient, send: @escaping (String, [Data]) -> Bool) {
         if isActive { stop() }
+        session += 1
+        let session = self.session
         self.chat = chat
         self.send = send
         userText = ""
@@ -88,18 +96,29 @@ final class VoiceConversation: ObservableObject {
         }
         phase = .starting(NSLocalizedString("Starting…", comment: "voice conversation"))
         Task {
-            guard await Self.microphoneAllowed() else {
+            let allowed = await Self.microphoneAllowed()
+            guard session == self.session else { return }
+            guard allowed else {
                 return fail(NSLocalizedString("LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone.", comment: "voice conversation"))
             }
             if store.recognizer == .apple {
-                do { apple = try await AppleRecognizer.make() } catch { return fail(error.localizedDescription) }
+                do {
+                    let recognizer = try await AppleRecognizer.make()
+                    guard session == self.session else { return }
+                    apple = recognizer
+                } catch {
+                    guard session == self.session else { return }
+                    return fail(error.localizedDescription)
+                }
             }
             if let error = await AudioRuntime.shared.ensureInstalledOrKeepError() { NSLog("LLMTray: audio runtime: %@", error) }
+            guard session == self.session else { return }
             launchRunner(recognizer: store.recognizer)
         }
     }
 
     func stop() {
+        session += 1
         fillerTimer?.invalidate()
         sleepTimer?.invalidate()
         if let runner {
@@ -121,6 +140,7 @@ final class VoiceConversation: ObservableObject {
         chat = nil
         send = nil
         bargeCandidate = false
+        answerEndedDuringTurn = false
         recordingTurn = false
         level = 0
         phase = .off
@@ -264,6 +284,8 @@ final class VoiceConversation: ObservableObject {
 
     private func speechStarted() {
         resetSleep()
+        fillerTimer?.invalidate()
+        answerEndedDuringTurn = false
         if phase == .speaking || SpokenAnswers.shared.speakingMessage != nil {
             bargeCandidate = true
             io?.speechGain = Self.duckGain
@@ -289,10 +311,22 @@ final class VoiceConversation: ObservableObject {
 
     private func turnEnded(_ runnerText: String) {
         recordingTurn = false
+        let session = self.session
         Task {
             var text = runnerText
             if let apple { text = await apple.endTurn() }
+            guard session == self.session else { return }
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if answerEndedDuringTurn {
+                answerEndedDuringTurn = false
+                // The answer finished while the user spoke: "угу" to it is
+                // nothing to answer; anything more is the next turn.
+                if text.isEmpty || VoiceConversationText.isBackchannel(text) {
+                    if phase == .hearing { phase = .listening }
+                    return
+                }
+                return submit(text)
+            }
             if bargeCandidate {
                 if text.isEmpty || VoiceConversationText.isBackchannel(text) {
                     // "угу": the model goes on.
@@ -313,7 +347,6 @@ final class VoiceConversation: ObservableObject {
     private func interrupt() {
         bargeCandidate = false
         io?.speechGain = 1
-        fillerOutput?.reset()
         let kept = heard
         SpokenAnswers.shared.stop()
         if let chat {
@@ -332,7 +365,12 @@ final class VoiceConversation: ObservableObject {
         fillerPlayedThisTurn = false
         let audio = UserDefaults.standard[Pref.voiceSendAudio] && turnAudio.count > 3200
             ? [WAVFile.pcm16(turnAudio, sampleRate: 16000)] : []
-        send?(text, audio)
+        guard send?(text, audio) == true else {
+            // No model to answer, or the chat is busy: said, not dropped.
+            phase = .listening
+            userText = NSLocalizedString("(Not sent: pick a chat model, or wait for the answer in progress.)", comment: "voice conversation")
+            return
+        }
         tellRunner()
         armFiller()
     }
@@ -362,8 +400,9 @@ final class VoiceConversation: ObservableObject {
     private func speakingChanged(_ speaking: Bool) {
         guard isActive else { return }
         if speaking {
+            // A filler playing finishes (half a second at most): resetting
+            // its output would drop the answer's audio queued behind it.
             fillerTimer?.invalidate()
-            fillerOutput?.reset()
             if phase != .hearing || !bargeCandidate { phase = .speaking }
         } else {
             maybeDone()
@@ -373,9 +412,18 @@ final class VoiceConversation: ObservableObject {
 
     private func maybeDone() {
         guard isActive, SpokenAnswers.shared.speakingMessage == nil, chat?.isBusy != true else { return }
+        fillerTimer?.invalidate()
+        if bargeCandidate {
+            // The user is still speaking: their turn decides what's next.
+            bargeCandidate = false
+            answerEndedDuringTurn = true
+            io?.speechGain = 1
+            phase = .hearing
+            tellRunner()
+            return
+        }
         if phase == .speaking || phase == .thinking {
             phase = .listening
-            bargeCandidate = false
             io?.speechGain = 1
             tellRunner()
             resetSleep()
@@ -407,7 +455,7 @@ final class VoiceConversation: ObservableObject {
     }
 
     private func toolStarted() {
-        guard isActive, fillersOn, SpokenAnswers.shared.speakingMessage == nil else { return }
+        guard phase == .thinking, fillersOn, SpokenAnswers.shared.speakingMessage == nil else { return }
         let name = chat?.messages.last(where: { $0.role == "assistant" })?.toolCalls.last?.name ?? ""
         playFiller([VoiceConversationText.tool(VoiceConversationText.toolKind(name), lang)])
     }
@@ -415,7 +463,7 @@ final class VoiceConversation: ObservableObject {
     /// One of `texts` that's ready, never twice in a turn and never the
     /// last one again.
     private func playFiller(_ texts: [String]) {
-        guard isActive, !fillerPlayedThisTurn, SpokenAnswers.shared.speakingMessage == nil, let io else { return }
+        guard phase == .thinking, !fillerPlayedThisTurn, SpokenAnswers.shared.speakingMessage == nil, let io else { return }
         let key = SpokenAnswers.shared.fillerVoiceKey(language: lang)
         guard let (samples, rate) = fillers.pick(texts, voice: key, language: lang) else { return }
         fillerPlayedThisTurn = true
@@ -542,6 +590,8 @@ final class AppleRecognizer {
     private var task: SFSpeechRecognitionTask?
     private var latest = ""
     private var finished: CheckedContinuation<String, Never>?
+    /// Bumped per turn: a late callback or timeout of an earlier turn is ignored.
+    private var turn = 0
     private let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 16000, channels: 1, interleaved: false)!
 
     private init(_ recognizer: SFSpeechRecognizer) { self.recognizer = recognizer }
@@ -561,11 +611,13 @@ final class AppleRecognizer {
         request.requiresOnDeviceRecognition = true
         request.shouldReportPartialResults = true
         latest = ""
+        turn += 1
+        let turn = self.turn
         task = recognizer.recognitionTask(with: request) { [weak self] result, _ in
             let text = result?.bestTranscription.formattedString
             let final = result?.isFinal ?? true
             DispatchQueue.main.async { MainActor.assumeIsolated {
-                guard let self else { return }
+                guard let self, turn == self.turn else { return }
                 if let text { self.latest = text }
                 if final, let c = self.finished { self.finished = nil; c.resume(returning: self.latest) }
             } }
@@ -587,17 +639,18 @@ final class AppleRecognizer {
         guard let request else { return latest }
         request.endAudio()
         self.request = nil
+        let turn = self.turn
         let text: String = await withCheckedContinuation { c in
             finished = c
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 MainActor.assumeIsolated {
-                    guard let self, let c = self.finished else { return }
+                    guard let self, turn == self.turn, let c = self.finished else { return }
                     self.finished = nil
                     c.resume(returning: self.latest)
                 }
             }
         }
-        task = nil
+        if turn == self.turn { task = nil }
         return text
     }
 

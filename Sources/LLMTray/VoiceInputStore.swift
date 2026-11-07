@@ -24,9 +24,12 @@ final class VoiceInputStore: ObservableObject {
 
     nonisolated static func path(_ file: VoiceInputFile) -> String { MediaModels.path(MediaModels.entry(file)) }
 
+    /// Every file the download fetches is there, not just one of them.
     nonisolated static func isInPlace(_ file: VoiceInputFile) -> Bool {
-        MediaModels.isInstalled(MediaModels.entry(file))
-            && FileManager.default.fileExists(atPath: path(file) + "/" + file.marker)
+        guard MediaModels.isInstalled(MediaModels.entry(file)) else { return false }
+        let dir = path(file)
+        let needed = (file.patterns ?? [file.marker]) + (file.extraPatterns ?? [])
+        return needed.allSatisfy { FileManager.default.fileExists(atPath: dir + "/" + $0) }
     }
 
     /// Everything the picked recognizer needs is on disk.

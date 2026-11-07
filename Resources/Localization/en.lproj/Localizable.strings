@@ -88,6 +88,7 @@
 "%lld tools changed on the server: Configure to accept them." = "%lld tools changed on the server: Configure to accept them.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "(Not sent: pick a chat model, or wait for the answer in progress.)";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
 "(estimate; exact after the first answer)" = "(estimate; exact after the first answer)";
 "(measured for this model)" = "(measured for this model)";

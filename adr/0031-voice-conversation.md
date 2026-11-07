@@ -160,8 +160,9 @@ once the voice and language are known.
   - A filler plays only when more than ~1.2 s passes after the user's turn
     with no sound: the model is thinking, or a tool is running.
   - If the answer starts first, no filler plays.
-  - If the answer is ready while a filler plays, the filler fades out
-    within ~0.1 s: the answer never waits for it.
+  - If the answer is ready while a filler plays, the filler finishes
+    first (it's ~0.5 s). Cutting it would drop the answer's audio queued
+    behind it in the same unit; review of PR #411 found that.
   - At most one filler per turn, and never the same one twice in a row.
 - **Tool calls** (the stream shows them at once).
   - Built-in tools get a phrase by kind: "гляну в почте", "поищу в файлах
@@ -273,8 +274,8 @@ LibriTTS-R):
   - cached under `voice_fillers/<voice>/<language>/`;
   - played after 1.2 s with no sound, or when a tool starts (by tool kind
     for built-ins, general for MCP);
-  - at most once a turn, never the same one twice in a row;
-  - cut off as soon as the answer's voice starts.
+  - at most once a turn, never the same one twice in a row, only while
+    the model is thinking (never after the answer, never over the user).
 - **Sleep**: five minutes of listening with nothing said ends the
   conversation.
 
