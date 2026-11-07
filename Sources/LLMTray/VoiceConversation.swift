@@ -63,6 +63,15 @@ final class VoiceConversation: ObservableObject {
     private var sleepTimer: Timer?
     private var fillers = FillerBank()
     private var makingFiller = false
+    /// A filler is coming out of the speakers.
+    private var fillerPlaying = false
+    /// This turn's answer has begun to play.
+    private var answerStarted = false
+    /// What the model said lately, and until when the microphone may still
+    /// hear it come back: a turn made of those words is its echo.
+    private var echoTexts: [String] = []
+    private var echoUntil = Date.distantPast
+    static let echoTail: TimeInterval = 2.5
 
     static let duckGain: Float = 0.2
     static let fillerDelay: TimeInterval = 1.2
@@ -142,6 +151,11 @@ final class VoiceConversation: ObservableObject {
         bargeCandidate = false
         answerEndedDuringTurn = false
         recordingTurn = false
+        fillerPlaying = false
+        fillerOutput = nil
+        answerStarted = false
+        echoTexts = []
+        echoUntil = .distantPast
         level = 0
         phase = .off
     }
@@ -275,18 +289,59 @@ final class VoiceConversation: ObservableObject {
     }
 
     private func tellRunner() {
-        let speaking = phase == .speaking
+        // A filler is the model's voice too: the runner is as wary of it.
+        let speaking = modelAudible
         let payload = (try? JSONSerialization.data(withJSONObject: ["speaking": speaking, "language": language as Any])) ?? Data()
         _ = runner?.write(VoiceFrame(.mode, payload: payload).encoded)
     }
 
     // MARK: Turns
 
+    /// The model's voice is coming out of the speakers.
+    private var modelAudible: Bool {
+        SpokenAnswers.shared.speakingMessage != nil || fillerPlaying
+    }
+
+    private func stopFiller() {
+        guard fillerPlaying || fillerOutput != nil else { return }
+        // Its reset empties the unit's whole speech queue: only when no
+        // answer is queued behind it (then it plays out, half a second).
+        guard SpokenAnswers.shared.speakingMessage == nil else { return }
+        fillerOutput?.reset()
+        fillerOutput = nil
+        fillerPlaying = false
+        modelFellSilent()
+    }
+
+    private func noteSpoken(_ text: String) {
+        echoTexts.append(text)
+        if echoTexts.count > 4 { echoTexts.removeFirst(echoTexts.count - 4) }
+        echoUntil = .distantFuture
+    }
+
+    private func modelFellSilent() {
+        if !modelAudible, echoUntil == .distantFuture { echoUntil = Date().addingTimeInterval(Self.echoTail) }
+    }
+
+    /// Words the microphone may have picked up from the model's voice.
+    /// The answer's sentences count from when they start playing, so the
+    /// reference has the answer's text so far (a superset of what plays).
+    private func isEcho(_ text: String) -> Bool {
+        guard Date() < echoUntil else { return false }
+        var spoken = echoTexts
+        if answerStarted, let answer = chat?.messages.last(where: { $0.role == "assistant" })?.content {
+            spoken.append(String(answer.suffix(600)))
+        }
+        return VoiceConversationText.isEcho(text, of: spoken)
+    }
+
     private func speechStarted() {
         resetSleep()
         fillerTimer?.invalidate()
         answerEndedDuringTurn = false
-        if phase == .speaking || SpokenAnswers.shared.speakingMessage != nil {
+        if modelAudible || chat?.isTurnInProgress == true {
+            // Over the model's voice, or while it's still working on an
+            // answer: a backchannel lets it go on, more cuts in.
             bargeCandidate = true
             io?.speechGain = Self.duckGain
         } else {
@@ -303,6 +358,15 @@ final class VoiceConversation: ObservableObject {
     private func partial(_ text: String) {
         guard !text.isEmpty else { return }
         if bargeCandidate {
+            // Its own voice coming back isn't the user cutting in.
+            if isEcho(text) { return }
+            // Nothing of the answer plays yet: the turn decides (submit
+            // sends it with the one before); only the filler stops.
+            if !answerStarted {
+                if text.split(whereSeparator: \.isWhitespace).count > 3 { stopFiller() }
+                userText = text
+                return
+            }
             // More than a few words over the model: an interruption.
             if text.split(whereSeparator: \.isWhitespace).count > 3 { interrupt() } else { return }
         }
@@ -317,6 +381,14 @@ final class VoiceConversation: ObservableObject {
             if let apple { text = await apple.endTurn() }
             guard session == self.session else { return }
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if isEcho(text) {
+                // The model heard itself: nothing was said.
+                answerEndedDuringTurn = false
+                bargeCandidate = false
+                io?.speechGain = 1
+                if phase == .hearing { phase = chat?.isBusy == true ? .thinking : .listening }
+                return
+            }
             if answerEndedDuringTurn {
                 answerEndedDuringTurn = false
                 // The answer finished while the user spoke: "угу" to it is
@@ -347,6 +419,13 @@ final class VoiceConversation: ObservableObject {
     private func interrupt() {
         bargeCandidate = false
         io?.speechGain = 1
+        stopFiller()
+        guard answerStarted || !heard.isEmpty else {
+            // None of the answer plays yet: submit sends this turn with
+            // the one before it.
+            phase = .hearing
+            return
+        }
         let kept = heard
         SpokenAnswers.shared.stop()
         if let chat {
@@ -358,6 +437,21 @@ final class VoiceConversation: ObservableObject {
     }
 
     private func submit(_ text: String) {
+        var text = text
+        var takenBack: ChatClient.TakenBack?
+        stopFiller()
+        if let chat, chat.isTurnInProgress {
+            let unheard = !answerStarted && heard.isEmpty
+            chat.cancel()
+            if !unheard { chat.cutLastAnswer(toSpoken: heard) }
+            // The user went on before any of the answer was heard: what they
+            // said before and now goes as one turn.
+            else if let back = chat.takeBackUnansweredTurn() {
+                takenBack = back
+                text = back.text + " " + text
+            }
+        }
+        answerStarted = false
         userText = text
         heard = []
         language = SpeechLanguage.detect(text, fallback: language ?? Locale.current.language.languageCode?.identifier)
@@ -367,6 +461,7 @@ final class VoiceConversation: ObservableObject {
             ? [WAVFile.pcm16(turnAudio, sampleRate: 16000)] : []
         guard send?(text, audio) == true else {
             // No model to answer, or the chat is busy: said, not dropped.
+            if let takenBack { chat?.restore(takenBack) }
             phase = .listening
             userText = NSLocalizedString("(Not sent: pick a chat model, or wait for the answer in progress.)", comment: "voice conversation")
             return
@@ -377,6 +472,7 @@ final class VoiceConversation: ObservableObject {
 
     private func sentencePlayed(_ text: String) {
         heard.append(text)
+        noteSpoken(text)
     }
 
     // MARK: The chat's state
@@ -403,8 +499,11 @@ final class VoiceConversation: ObservableObject {
             // A filler playing finishes (half a second at most): resetting
             // its output would drop the answer's audio queued behind it.
             fillerTimer?.invalidate()
+            answerStarted = true
+            echoUntil = .distantFuture
             if phase != .hearing || !bargeCandidate { phase = .speaking }
         } else {
+            modelFellSilent()
             maybeDone()
         }
         tellRunner()
@@ -467,9 +566,20 @@ final class VoiceConversation: ObservableObject {
         let key = SpokenAnswers.shared.fillerVoiceKey(language: lang)
         guard let (samples, rate) = fillers.pick(texts, voice: key, language: lang) else { return }
         fillerPlayedThisTurn = true
-        let output = io.speechOutput(sampleRate: rate)
+        guard let output = io.speechOutput(sampleRate: rate) else { return }
         fillerOutput = output
-        output?.schedule(samples) {}
+        fillerPlaying = true
+        noteSpoken(fillers.lastText ?? "")
+        tellRunner()
+        let session = self.session
+        output.schedule(samples) { [weak self] in
+            DispatchQueue.main.async { MainActor.assumeIsolated {
+                guard let self, session == self.session, self.fillerOutput === output else { return }
+                self.fillerPlaying = false
+                self.modelFellSilent()
+                self.tellRunner()
+            } }
+        }
     }
 
     /// Made one at a time while the conversation is quiet: the answer
@@ -560,6 +670,8 @@ struct FillerBank {
         try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
         memory[path] = (samples, rate)
     }
+
+    var lastText: String? { last }
 
     mutating func pick(_ texts: [String], voice: String, language: String) -> ([Float], Int)? {
         let ready = texts.filter { $0 != last && FileManager.default.fileExists(atPath: file($0, voice: voice, language: language)) }

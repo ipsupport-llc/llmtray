@@ -283,3 +283,16 @@ LibriTTS-R):
 - Low reasoning effort in voice mode: still open.
 - A model's own reading of its audio clip as the history text: the
   recognizer's text is used.
+
+**After the first live test (2026-11-07).** On the user's MacBook speakers,
+echo cancellation let enough of the model's voice back for it to cut itself
+off and answer its own words; a turn said while it was still thinking was
+refused. Fixed in three layers:
+- While the model's voice plays (fillers count), the runner starts a turn only
+  after ~256 ms of sure speech (p ≥ 0.8), not 96 ms.
+- A partial or turn that is a stretch of what was just played (answer text
+  so far, fillers, 2.5 s after the voice stops; words in the same order, 80%)
+  is echo and dropped.
+- Speaking while the model works on an answer ducks it. If the user goes on
+  before any of the answer plays, the answer is cancelled and both of their
+  turns go as one.

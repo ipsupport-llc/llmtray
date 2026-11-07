@@ -2167,6 +2167,42 @@ final class ChatClient: ObservableObject {
     /// Voice conversation barge-in (adr/0031): the last answer keeps only
     /// the sentences the user heard, marked as cut, so the model never
     /// "remembers" saying what nobody heard.
+    /// What `takeBackUnansweredTurn` took out, to put back if the turn
+    /// it was merged into can't be sent.
+    struct TakenBack {
+        let text: String
+        fileprivate let index: Int
+        fileprivate let removed: [ChatMessage]
+    }
+
+    /// A voice turn the user went on with before any of the answer was
+    /// heard (adr/0031): the answer so far (no tool calls, no media) and the
+    /// user's message come out, and the message's text comes back to be
+    /// sent again together with what they added (a recording of it is
+    /// dropped). Nil when the last turn isn't like that; nothing changes then.
+    func takeBackUnansweredTurn() -> TakenBack? {
+        guard !isBusy, var idx = messages.indices.last else { return nil }
+        if messages[idx].role == "assistant" {
+            let a = messages[idx]
+            guard a.toolCalls.isEmpty, !a.hasMedia, idx > 0 else { return nil }
+            idx -= 1
+        }
+        let user = messages[idx]
+        guard user.role == "user", user.images.isEmpty, user.documents.isEmpty, user.shared.isEmpty,
+              !user.content.isEmpty else { return nil }
+        let removed = Array(messages[idx...])
+        messages.removeSubrange(idx...)
+        assistantMessageIndex = nil
+        persistCurrentSession()
+        return TakenBack(text: user.content, index: idx, removed: removed)
+    }
+
+    func restore(_ back: TakenBack) {
+        guard !isBusy, back.index == messages.count else { return }
+        messages.append(contentsOf: back.removed)
+        persistCurrentSession()
+    }
+
     func cutLastAnswer(toSpoken heard: [String]) {
         guard let idx = messages.lastIndex(where: { $0.role == "assistant" && $0.toolCalls.isEmpty }) else { return }
         let kept = heard.joined(separator: " ").trimmingCharacters(in: .whitespaces)

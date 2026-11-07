@@ -30,6 +30,39 @@ public enum VoiceConversationText {
             || words.allSatisfy { backchannels.contains($0) }
     }
 
+    /// What the microphone heard is the model's own voice coming back
+    /// past echo cancellation (adr/0031): echo is a stretch of what was
+    /// played, so a heard word counts when it and a neighbour come in the
+    /// same order there. At least 80% of the words have to; a single word
+    /// has to be there itself. Words compare by their first five letters
+    /// (the recognizer gets endings wrong).
+    public static func isEcho(_ text: String, of spoken: [String]) -> Bool {
+        let heard = words(text).map(stem)
+        guard !heard.isEmpty else { return false }
+        let played = spoken.map { words($0).map(stem) }
+        let singles = Set(played.joined())
+        guard !singles.isEmpty else { return false }
+        if heard.count == 1 { return singles.contains(heard[0]) }
+        var pairs = Set<String>()
+        for line in played where line.count > 1 {
+            for i in 1..<line.count { pairs.insert(line[i - 1] + " " + line[i]) }
+        }
+        var covered = [Bool](repeating: false, count: heard.count)
+        for i in 1..<heard.count where pairs.contains(heard[i - 1] + " " + heard[i]) {
+            covered[i - 1] = true
+            covered[i] = true
+        }
+        return Double(covered.filter { $0 }.count) >= 0.8 * Double(heard.count)
+    }
+
+    static func words(_ text: String) -> [String] {
+        text.lowercased().replacingOccurrences(of: "ё", with: "е")
+            .replacingOccurrences(of: #"[^\p{L}\p{N}\s]"#, with: " ", options: .regularExpression)
+            .split(whereSeparator: \.isWhitespace).map(String.init)
+    }
+
+    private static func stem(_ word: String) -> String { String(word.prefix(5)) }
+
     /// Fillers for a pause (the model is thinking), per language.
     public static func thinking(_ language: String) -> [String] {
         switch language {
