@@ -160,6 +160,15 @@ Bold is the proposed default of each row.
   The built-in voice comes from `mlx-community/chatterbox-fp16`'s (105 KB,
   MIT), converted from Resemble's own `conds.pt`, which their multilingual
   model loads too.
+- **8-bit T3** (2026-11-06, the user: "fp32 сразу уезжает в fp8, и
+  публикуем модель"). Measured on the base M5, T3 at 8 bits runs 2-3x
+  faster than the fp32 conversion with sample-identical audio; bf16 was
+  slower. LLMTray downloads IPSupport's build,
+  `roman220220/chatterbox-multilingual-v3-mlx-8bit` (1.32 GB, MIT, the
+  built-in voice included), instead of the fp32 repo. The runner quantizes
+  an fp32 folder at load. S3Gen stays fp32 and is now the slower half
+  (about 1 s of compute per 1 s of speech). Details are in quant-ternary
+  `chatterbox-quant/docs/FINDINGS.md`.
 - Chatterbox **Turbo** (350M) and **Nano** (110M) are faster but
   English-only. They're not offered now; Turbo is in the fork if an
   English-only fast voice is wanted later.

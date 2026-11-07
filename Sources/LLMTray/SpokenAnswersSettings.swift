@@ -60,7 +60,7 @@ struct SpokenAnswersSection: View {
                 }
             }
         } label: {
-            SettingLabel(title: "Chatterbox Multilingual V3",
+            SettingLabel(title: "Chatterbox Multilingual V3 (8-bit)",
                          help: LocalizedStringKey(String(format: NSLocalizedString("The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0.", comment: "spoken answers: download size"),
                                        ByteCountFormatter.string(fromByteCount: SpokenVoiceFile.totalDownloadBytes, countStyle: .file))))
         }
