@@ -14,39 +14,83 @@ struct VoiceConversationView: View {
     @ObservedObject var voice: VoiceConversation
     let modelName: String
 
+    @State private var escMonitor: Any?
+    @State private var host = HostWindow.Box()
+
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Label("Voice conversation", systemImage: "waveform.circle.fill").font(.headline)
-                Spacer()
-                Text(verbatim: modelName).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            HStack(spacing: 10) {
+                Label("Voice conversation", systemImage: "waveform.circle.fill").font(.headline).lineLimit(1)
+                Spacer(minLength: 8)
+                Text(verbatim: modelName).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                Button(action: close) {
+                    Image(systemName: "xmark.circle.fill").font(.title3).foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help(Text("End the conversation (Esc)"))
+                .accessibilityLabel(Text("End the conversation"))
             }
-            .padding(.horizontal, 20).padding(.vertical, 12)
+            .padding(.horizontal, 16).padding(.vertical, 10)
             Divider()
             if case .failed(let message) = voice.phase {
                 failure(message)
             } else {
-                Spacer(minLength: 8)
-                VoiceOrb(phase: voice.phase, level: voice.level)
-                Text(stateText).font(.callout.weight(.medium)).foregroundStyle(.secondary).padding(.top, 2)
-                Spacer(minLength: 14)
-                captions.padding(.horizontal, 28).frame(maxWidth: 600)
-                Spacer(minLength: 16)
+                // The popover is short: the orb shrinks so the captions and
+                // the End button always fit.
+                GeometryReader { geo in
+                    // Room left after ~200 pt of captions goes to the orb;
+                    // too little and it's left out (the state line stays).
+                    let scale = min(1, (geo.size.height - 200) / 250)
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 4)
+                        if scale >= 0.3 {
+                            VoiceOrb(phase: voice.phase, meter: voice.meter)
+                                .scaleEffect(scale)
+                                .frame(height: 250 * scale)
+                        }
+                        Text(stateText).font(.callout.weight(.medium)).foregroundStyle(.secondary).padding(.top, 2)
+                        Spacer(minLength: 8)
+                        captions.padding(.horizontal, 20).frame(maxWidth: 600)
+                        Spacer(minLength: 8)
+                    }
+                    .frame(width: geo.size.width, height: geo.size.height)
+                }
+                .clipped()
             }
             HStack(spacing: 14) {
-                Text("Esc ends the conversation").font(.caption).foregroundStyle(.secondary)
+                Text("Esc ends the conversation").font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 Spacer()
-                Button {
-                    if case .failed = voice.phase { voice.dismiss() } else { voice.stop() }
-                } label: {
+                Button(action: close) {
                     Label(isFailed ? "Close" : "End", systemImage: "stop.circle")
                 }
                 .keyboardShortcut(.cancelAction)
             }
-            .padding(.horizontal, 20).padding(.bottom, 14)
+            .padding(.horizontal, 16).padding(.vertical, 10)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(nsColor: .windowBackgroundColor))
+        .background(HostWindow(box: host))
+        .onAppear {
+            // Esc ends it even while the message field has the focus.
+            if let escMonitor { NSEvent.removeMonitor(escMonitor) }
+            escMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                // Only in this view's window, and not while a sheet there
+                // wants its own Esc.
+                guard event.keyCode == 53, voice.phase != .off,
+                      let window = event.window, window === host.window, window.attachedSheet == nil
+                else { return event }
+                MainActor.assumeIsolated { close() }
+                return nil
+            }
+        }
+        .onDisappear {
+            if let escMonitor { NSEvent.removeMonitor(escMonitor) }
+            escMonitor = nil
+        }
+    }
+
+    private func close() {
+        if case .failed = voice.phase { voice.dismiss() } else { voice.stop() }
     }
 
     private var isFailed: Bool {
@@ -69,20 +113,21 @@ struct VoiceConversationView: View {
     private var captions: some View {
         VStack(alignment: .leading, spacing: 14) {
             if !voice.userText.isEmpty {
-                caption(NSLocalizedString("You", comment: "voice conversation caption"), voice.userText, dim: false)
+                caption(NSLocalizedString("You", comment: "voice conversation caption"), voice.userText, lines: 3)
             }
             if !voice.heard.isEmpty {
-                caption("LLMTray", voice.heard.suffix(3).joined(separator: " "), dim: false)
+                caption("LLMTray", voice.heard.suffix(3).joined(separator: " "), lines: 4)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func caption(_ who: String, _ text: String, dim: Bool) -> some View {
+    /// The latest words show: a long caption loses its start.
+    private func caption(_ who: String, _ text: String, lines: Int) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(verbatim: who).font(.caption.weight(.semibold)).foregroundStyle(.secondary).textCase(.uppercase)
-            Text(verbatim: text).font(.title3).foregroundStyle(dim ? .secondary : .primary)
-                .fixedSize(horizontal: false, vertical: true)
+            Text(verbatim: text).font(.title3).foregroundStyle(.primary)
+                .lineLimit(lines).truncationMode(.head)
         }
     }
 
@@ -98,12 +143,29 @@ struct VoiceConversationView: View {
     }
 }
 
+/// Finds the window a view is in (for the Esc monitor).
+struct HostWindow: NSViewRepresentable {
+    final class Box { weak var window: NSWindow? }
+    let box: Box
+
+    func makeNSView(context: Context) -> NSView { Probe(box: box) }
+    func updateNSView(_ view: NSView, context: Context) { box.window = view.window }
+
+    private final class Probe: NSView {
+        let box: Box
+        init(box: Box) { self.box = box; super.init(frame: .zero) }
+        required init?(coder: NSCoder) { nil }
+        override func viewDidMoveToWindow() { box.window = window }
+    }
+}
+
 /// The orb: rings that breathe with the microphone, a glyph per state.
 struct VoiceOrb: View {
     let phase: VoiceConversation.Phase
-    let level: Float
+    @ObservedObject var meter: VoiceMeter
 
     var body: some View {
+        let level = meter.level
         let l = CGFloat(phase == .speaking ? 0.6 : min(1, level * 1.4))
         ZStack {
             ForEach(0..<3) { i in
@@ -209,10 +271,14 @@ struct VoiceConversationButton: View {
         Button {
             NotificationCenter.default.post(name: .startVoiceConversation, object: chat)
         } label: {
-            Image(systemName: "waveform.circle").font(.caption)
+            // The size of the microphone next to it.
+            Image(systemName: "waveform.circle")
+                .font(.title3)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundColor(.secondary)
+        .foregroundStyle(.primary)
         .disabled(voice.isActive(in: chat))
         .help(Text("Talk with the model: a voice conversation (Esc ends it)"))
         .accessibilityLabel(Text("Voice conversation"))

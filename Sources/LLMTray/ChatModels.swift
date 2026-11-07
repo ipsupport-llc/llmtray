@@ -289,6 +289,9 @@ struct ChatSettings {
     /// Voice conversation (adr/0031): the voice-mode prompt joins the
     /// profile's. Set by ChatClient from its own flag on every request.
     var voiceMode = false
+    /// A spoken answer can't keep the user waiting in silence while the
+    /// model thinks (adr/0031): a voice conversation doesn't think.
+    var effectiveThinkingEffort: ThinkingEffort { voiceMode ? .off : thinkingEffort }
 
     /// The chat settings a model's profile resolves to.
     init(profile p: ResolvedProfile, maxTokensCap: Int) {

@@ -394,6 +394,7 @@ struct ChatComposer: View {
                                  done: { composer.recordings.append($0) },
                                  sendNow: { composer.recordings.append($0); send() })
                 }
+                VoiceConversationButton()
                 Spacer(minLength: 8)
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
@@ -573,7 +574,6 @@ struct ChatComposer: View {
             ChatMemoryChip()
             ChatFolderChips()
             Spacer()
-            VoiceConversationButton()
             ReadAloudToggle()
             if let tps = chat.lastTokensPerSecond {
                 Text(String(format: "%.1f tok/s", tps))
