@@ -267,6 +267,14 @@ enum ModelDiscovery {
     /// Real crash observed with LLMTray's default `--quantized-kv-start`.
     /// Detected structurally (config field), not by architecture name, so
     /// it also covers future models with the same sharing pattern.
+    /// A looped model's (NVIDIA Dory's) own loop count from its config, nil
+    /// for any other model (Settings > Profiles > Loops).
+    static func recurrentLoops(modelPath path: String) -> Int? {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        return obj["n_recurrent_loops"] as? Int
+    }
+
     static func disallowsQuantizedKV(forModelPath path: String) -> Bool {
         guard let data = FileManager.default.contents(atPath: path + "/config.json"),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return false }

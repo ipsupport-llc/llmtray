@@ -51,12 +51,16 @@ public enum ServerLaunch {
         /// `--experts-on-disk`: the share of routed experts kept in memory
         /// (Settings > Server > Experimental, a MoE model that doesn't fit).
         public var expertsOnDiskShare: Double?
+        /// A looped model's own loop count (Dory: 2), on a runtime with
+        /// --recurrent-loops; nil otherwise.
+        public var modelLoops: Int?
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
                     memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false,
-                    expertsOnDiskShare: Double? = nil) {
+                    expertsOnDiskShare: Double? = nil, modelLoops: Int? = nil) {
             self.expertsOnDiskShare = expertsOnDiskShare
+            self.modelLoops = modelLoops
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -275,6 +279,11 @@ public enum ServerLaunch {
         if let mb = c.bufferCacheMB, !p.extraServerArgs.contains("--buffer-cache-mb") {
             args += ["--buffer-cache-mb", String(mb)]
         }
+        // The model's own count isn't passed: the same launch as "Model's own".
+        if let own = c.modelLoops, (1...4).contains(p.recurrentLoops), p.recurrentLoops != own,
+           !extraArgsSet("--recurrent-loops", p) {
+            args += ["--recurrent-loops", String(p.recurrentLoops)]
+        }
         if let share = c.expertsOnDiskShare {
             args += ["--experts-on-disk", String(format: "%.2f", share)]
         }
@@ -364,6 +373,7 @@ public enum ServerLaunch {
         var c = c
         let head = c.mtpHead
         if extraArgsSet("--num-draft-tokens", p) || extraArgsSetDrafter(p) { c.mtpHead = false }
+        if extraArgsSet("--recurrent-loops", p) { c.modelLoops = nil }
         // The concurrency flags as the real launch has them (the user's own
         // extra arguments decide them, which `generated` no longer has).
         return withoutConcurrency(withoutSampling(arguments(generated, c))) + concurrencyArguments(p, c)

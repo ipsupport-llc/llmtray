@@ -278,6 +278,27 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertNotEqual(ServerLaunch.restartKey(on, c), ServerLaunch.restartKey(resolved(), c))
     }
 
+    func testLoopsOnlyForALoopedModel() {
+        let three = resolved { $0.launch.recurrentLoops = 3 }
+        XCTAssertFalse(ServerLaunch.arguments(three, ctx).contains("--recurrent-loops"))
+        var c = ctx
+        c.modelLoops = 2
+        XCTAssertFalse(ServerLaunch.arguments(resolved(), c).contains("--recurrent-loops"), "0: the model's own")
+        let args = ServerLaunch.arguments(three, c)
+        XCTAssertEqual(args.firstIndex(of: "--recurrent-loops").map { args[$0 + 1] }, "3")
+        XCTAssertNotEqual(ServerLaunch.restartKey(three, c), ServerLaunch.restartKey(resolved(), c))
+        // The model's own count, picked by number: the same launch, no restart.
+        let two = resolved { $0.launch.recurrentLoops = 2 }
+        XCTAssertFalse(ServerLaunch.arguments(two, c).contains("--recurrent-loops"))
+        XCTAssertEqual(ServerLaunch.restartKey(two, c), ServerLaunch.restartKey(resolved(), c))
+        // The user's own flag wins, and the picker behind it changes nothing.
+        let own = resolved { $0.launch.recurrentLoops = 3; $0.launch.extraServerArgs = "--recurrent-loops 1" }
+        let own4 = resolved { $0.launch.recurrentLoops = 4; $0.launch.extraServerArgs = "--recurrent-loops 1" }
+        XCTAssertEqual(ServerLaunch.arguments(own, c).filter { $0 == "--recurrent-loops" }.count, 1)
+        XCTAssertEqual(ServerLaunch.restartKey(own, c), ServerLaunch.restartKey(own4, c))
+        XCTAssertEqual(resolved { $0.launch.recurrentLoops = 9 }.recurrentLoops, 4)
+    }
+
     func testKVSharedModelForcesKVOff() {
         var c = ctx
         c.disallowQuantizedKV = true
