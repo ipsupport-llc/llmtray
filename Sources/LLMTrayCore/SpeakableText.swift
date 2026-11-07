@@ -76,19 +76,47 @@ public enum SpeakableText {
 public struct SentenceStream: Sendable {
     public let codeBlock: String
     public let maxLength: Int
+    /// Voice conversation (adr/0031): the answer's first piece goes at its
+    /// first comma (after `eagerMinimum` characters), so the voice starts
+    /// sooner; later ones wait for whole sentences.
+    public let eagerFirst: Bool
+    public static let eagerMinimum = 24
     private var pending = ""
+    private var emitted = false
 
-    public init(codeBlock: String, maxLength: Int = 300) {
+    public init(codeBlock: String, maxLength: Int = 300, eagerFirst: Bool = false) {
         self.codeBlock = codeBlock
         self.maxLength = maxLength
+        self.eagerFirst = eagerFirst
     }
 
     public mutating func feed(_ delta: String) -> [String] {
         pending += delta
+        if eagerFirst, !emitted, Self.safeCut(in: pending) == nil, let comma = Self.firstComma(in: pending) {
+            let head = String(pending[..<comma]).trimmingCharacters(in: .whitespaces)
+            pending = String(pending[comma...])
+            let out = sentences(head)
+            emitted = !out.isEmpty
+            return out
+        }
         guard let cut = Self.safeCut(in: pending) else { return [] }
         let ready = String(pending[..<cut])
         pending = String(pending[cut...])
-        return sentences(ready)
+        let out = sentences(ready)
+        if !out.isEmpty { emitted = true }
+        return out
+    }
+
+    /// After the first ", " past `eagerMinimum` characters, outside code.
+    static func firstComma(in text: String) -> String.Index? {
+        guard !text.contains("`"), text.count > eagerMinimum else { return nil }
+        var i = text.index(text.startIndex, offsetBy: eagerMinimum)
+        while i < text.endIndex {
+            let next = text.index(after: i)
+            if text[i] == ",", next < text.endIndex, text[next] == " " { return next }
+            i = next
+        }
+        return nil
     }
 
     public mutating func finish() -> [String] {

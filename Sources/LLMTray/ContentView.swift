@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 /// selected model, the draft (ComposerModel) -- and sends turns to ChatClient
 /// with the selected model's profile.
 struct ContentView: View {
+    @ObservedObject private var voice = VoiceConversation.shared
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
@@ -217,6 +218,16 @@ struct ContentView: View {
                     if chatDropTargeted, let text = chatDropText {
                         ChatDropOverlay(title: text.title, detail: text.detail)
                     }
+                }
+                .overlay {
+                    // A voice conversation takes over the chat area (adr/0031).
+                    if voice.chat === chat, voice.phase != .off {
+                        VoiceConversationView(voice: voice, modelName: requestModelName)
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .startVoiceConversation)) { note in
+                    guard (note.object as AnyObject?) === chat, canChat else { return }
+                    voice.start(chat: chat) { text, audio in voiceSend(text, audio) }
                 }
                 .onDrop(of: [.fileURL, .image], delegate: ChatAreaDrop(
                     targeted: $chatDropTargeted, carriesFiles: $chatDropCarriesFiles, perform: handleChatDrop))
@@ -764,6 +775,15 @@ struct ContentView: View {
             chat.regenerateMedia(messageID: messageID, kind: kind, index: index, settings: chatSettings, server: server,
                                  tweak: action == .tweak)
         }
+    }
+
+    /// A voice conversation's turn: sent like a typed message, with the
+    /// recording for a model that hears.
+    private func voiceSend(_ text: String, _ audio: [Data]) {
+        guard canChat else { return }
+        startModelIfStopped()
+        chat.send(prompt: text, audios: composer.acceptsAudio ? audio : [], port: port, modelAlias: requestModelName,
+                  settings: chatSettings, server: server)
     }
 
     private func send() {

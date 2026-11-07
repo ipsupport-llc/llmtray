@@ -121,6 +121,12 @@ public enum Pref {
     public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
 
     // Voice (adr/0016)
+    /// Voice conversation's recognizer (`VoiceRecognizer` raw value, adr/0031).
+    public static let voiceRecognizer = PrefKey("llmtray.voiceConversation.recognizer", default: "parakeet")
+    /// Voice conversation's fillers ("хм…", "сейчас гляну") on silences.
+    public static let voiceFillers = PrefKey("llmtray.voiceConversation.fillers", default: true)
+    /// Models that hear get the turn's audio too (adr/0031).
+    public static let voiceSendAudio = PrefKey("llmtray.voiceConversation.sendAudio", default: false)
     /// Spoken answers: each new answer is read aloud as it streams (the
     /// chat's turn actions); Speak on an answer works either way.
     public static let spokenAnswersAuto = PrefKey("llmtray.spokenAnswers.auto", default: false)

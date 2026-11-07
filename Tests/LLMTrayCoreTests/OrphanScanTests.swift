@@ -58,6 +58,11 @@ final class OrphanScanTests: XCTestCase {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_SPEECH_RUNNER", with: "LLMTRAY_VOICE_RUNNER")), [])
     }
 
+    func testOrphanedListenRunner() {
+        let line = "  982     1 1200000 \(python) /Applications/LLMTray.app/Contents/Resources/runtime/llmtray_listen_runner.py --vad /m/silero --turn /m/turn --stt parakeet HF_HUB_OFFLINE=1 LLMTRAY_LISTEN_RUNNER=1"
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line).map(\.kind), [.listenRunner])
+    }
+
     func testRunningLLMTraysChildIsKept() {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: server(pid: 4312, ppid: 2592)), [])
     }

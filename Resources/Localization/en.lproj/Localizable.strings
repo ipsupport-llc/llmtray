@@ -446,12 +446,14 @@
 "Done talking: the model answers" = "Done talking: the model answers";
 "Done: %lld changes made." = "Done: %lld changes made.";
 "Download" = "Download";
+"Download (%@)" = "Download (%@)";
 "Download LLMTray-Full" = "Download LLMTray-Full";
 "Download and Enable" = "Download and Enable";
 "Download for %@, into the models folder" = "Download for %@, into the models folder";
 "Download into the models folder" = "Download into the models folder";
 "Download models" = "Download models";
 "Download models from Hugging Face" = "Download models from Hugging Face";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Download the speech recognizer first: Settings > Voice > Voice conversation.";
 "Downloaded" = "Downloaded";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Downloaded by an earlier version, on another disk than the models folder: it stays where it is.";
 "Downloading" = "Downloading";
@@ -479,6 +481,7 @@
 "Echo cancellation" = "Echo cancellation";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
 "Echo cancellation isn't available on this Mac." = "Echo cancellation isn't available on this Mac.";
+"Echo cancellation isn't available: %@" = "Echo cancellation isn't available: %@";
 "Echo gate" = "Echo gate";
 "Edit Note" = "Edit Note";
 "Edit Profile…" = "Edit Profile…";
@@ -504,6 +507,7 @@
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)";
 "Errors" = "Errors";
 "Errors: go to the next one (⌘E)" = "Errors: go to the next one (⌘E)";
+"Esc ends the conversation" = "Esc ends the conversation";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Every day's counts are removed. This can't be undone." = "Every day's counts are removed. This can't be undone.";
@@ -536,6 +540,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Files you add to a project are indexed on this Mac, so its chats can search them.";
 "Files · off" = "Files · off";
 "Files…" = "Files…";
+"Fillers on pauses" = "Fillers on pauses";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
 "Finish in your browser…" = "Finish in your browser…";
@@ -601,6 +606,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Has other names (a hard link): they keep the file.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Headers, Name: value per line (an Authorization header goes to the Keychain)";
+"Hearing you" = "Hearing you";
 "Help" = "Help";
 "Help improve LLMTray?" = "Help improve LLMTray?";
 "Hide" = "Hide";
@@ -711,6 +717,7 @@
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone.";
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";
 "LLMTray — Chat" = "LLMTray — Chat";
@@ -743,6 +750,7 @@
 "Likes" = "Likes";
 "List my name" = "List my name";
 "List my name in Supporters" = "List my name in Supporters";
+"Listening" = "Listening";
 "Listening…" = "Listening…";
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
@@ -800,6 +808,7 @@
 "Models folder: %@" = "Models folder: %@";
 "Models found: %lld" = "Models found: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn.";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "More" = "More";
 "Move %1$@ to %2$@" = "Move %1$@ to %2$@";
@@ -945,6 +954,7 @@
 "Open LLMTray when you log in" = "Open LLMTray when you log in";
 "Open Privacy Settings…" = "Open Privacy Settings…";
 "Open Server Log…" = "Open Server Log…";
+"Open Settings" = "Open Settings";
 "Open Voice Lab…" = "Open Voice Lab…";
 "Open in New Tab" = "Open in New Tab";
 "Open in Preview" = "Open in Preview";
@@ -960,6 +970,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "PDF · %lld pages" = "PDF · %lld pages";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac.";
 "Past %lld messages" = "Past %lld messages";
 "Paste a Config" = "Paste a Config";
 "Paste a Config…" = "Paste a Config…";
@@ -1065,6 +1077,7 @@
 "Reading what's installed…" = "Reading what's installed…";
 "Reads Only" = "Reads Only";
 "Reads chats with" = "Reads chats with";
+"Ready" = "Ready";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
 "Reasoning" = "Reasoning";
@@ -1169,6 +1182,7 @@
 "Selected" = "Selected";
 "Send" = "Send";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.";
+"Send my voice to models that hear" = "Send my voice to models that hear";
 "Sending…" = "Sending…";
 "Sends anonymous usage statistics" = "Sends anonymous usage statistics";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
@@ -1239,8 +1253,11 @@
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
 "Speak" = "Speak";
 "Speakers work with echo cancellation; headphones are still best." = "Speakers work with echo cancellation; headphones are still best.";
+"Speaking" = "Speaking";
 "Speaking…" = "Speaking…";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
+"Speech recognition" = "Speech recognition";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation.";
 "Speed" = "Speed";
 "Speeds up %@: fetched where LLMTray loads it from." = "Speeds up %@: fetched where LLMTray loads it from.";
 "Spoken answers" = "Spoken answers";
@@ -1302,6 +1319,7 @@
 "Talk" = "Talk";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept.";
 "Talk with the model in Voice Lab" = "Talk with the model in Voice Lab";
+"Talk with the model: a voice conversation (Esc ends it)" = "Talk with the model: a voice conversation (Esc ends it)";
 "Talking… press Done when you're finished." = "Talking… press Done when you're finished.";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
@@ -1415,6 +1433,7 @@
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The project's files, and Add Files…" = "The project's files, and Add Files…";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "The registry didn't answer in 30 seconds. Try again in a moment.";
 "The reply was cut at its length limit." = "The reply was cut at its length limit.";
 "The report" = "The report";
@@ -1437,6 +1456,7 @@
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
 "The settings here were kept." = "The settings here were kept.";
+"The speech recognizer stopped: %@" = "The speech recognizer stopped: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "The suggestions for this Mac are already here. Browse Hugging Face for another model.";
 "The tips aren't available right now." = "The tips aren't available right now.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";
@@ -1450,11 +1470,13 @@
 "The voice runner sent an unreadable ready message." = "The voice runner sent an unreadable ready message.";
 "The voice runner stopped unexpectedly (%@)." = "The voice runner stopped unexpectedly (%@).";
 "The voice stopped: %@" = "The voice stopped: %@";
+"The voice that answers is the one picked under Spoken answers." = "The voice that answers is the one picked under Spoken answers.";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself.";
 "There's no plan waiting any more." = "There's no plan waiting any more.";
 "These can't be added to a project" = "These can't be added to a project";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
+"Thinking" = "Thinking";
 "Thinking effort: %@" = "Thinking effort: %@";
 "Thinking effort: how long the model may think before it answers" = "Thinking effort: how long the model may think before it answers";
 "Thinking…" = "Thinking…";
@@ -1586,6 +1608,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab takes about %@ GB of memory while it runs.";
 "Voice clip" = "Voice clip";
+"Voice conversation" = "Voice conversation";
 "Voice model" = "Voice model";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Waiting for a model download to finish…" = "Waiting for a model download to finish…";
@@ -1631,6 +1654,7 @@
 "What's New…" = "What's New…";
 "What's sent" = "What's sent";
 "When a client asks for another model" = "When a client asks for another model";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice.";
 "When an app asks for another model" = "When an app asks for another model";
 "When an app asks for another model: %@" = "When an app asks for another model: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment.";
@@ -1644,6 +1668,7 @@
 "Where you are: a city, or an address" = "Where you are: a city, or an address";
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "Window";
 "Windows and pages" = "Windows and pages";
@@ -1712,6 +1737,8 @@
 "it's in use or downloading" = "it's in use or downloading";
 "less than a minute left" = "less than a minute left";
 "llmtray in the terminal" = "llmtray in the terminal";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
 "make %lld folders" = "make %lld folders";
 "mlx-audio runtime" = "mlx-audio runtime";

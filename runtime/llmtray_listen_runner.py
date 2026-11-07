@@ -4,7 +4,8 @@
 # Smart Turn decides from the audio whether a pause ends the turn. Runs in
 # the audio venv with HF_HUB_OFFLINE=1; every model is a local folder.
 #
-#   python llmtray_listen_runner.py --vad <dir> --turn <dir> --stt parakeet|whisper --stt-model <dir>
+#   python llmtray_listen_runner.py --vad <dir> --turn <dir> --stt parakeet|whisper|none [--stt-model <dir>]
+#   (none: turn-taking only; the app recognizes with macOS's recognizer)
 #   python llmtray_listen_runner.py --selftest      # energy VAD, fake recognizer, no packages
 #
 # Frames as Voice Lab's (VoiceFrame in the app): a type byte, a 4-byte
@@ -164,7 +165,7 @@ class Models:
         self.vad = load_vad(vad_dir)
         self.turn = load_vad(turn_dir) if turn_dir else None
         self.stt_kind = stt_kind
-        self.stt = load_stt(stt_dir)
+        self.stt = load_stt(stt_dir) if stt_kind != "none" else None
         if stt_kind == "parakeet":
             with open(os.path.join(stt_dir, "config.json")) as f:
                 quantized = "quantization" in json.load(f)
@@ -188,6 +189,8 @@ class Models:
         return self.turn.predict_endpoint(audio, sample_rate=RATE).probability
 
     def transcribe(self, audio):
+        if self.stt is None:
+            return ""
         kwargs = {"language": self.language} if self.stt_kind == "whisper" and self.language else {}
         out = self.stt.generate(self.mx.array(audio), **kwargs)
         return (out.text if hasattr(out, "text") else str(out)).strip()

@@ -11,6 +11,7 @@ public struct OrphanProcess: Equatable, Sendable {
         case embedRunner
         case voiceRunner
         case speechRunner
+        case listenRunner
     }
 
     public let kind: Kind
@@ -51,6 +52,8 @@ public enum OrphanScan {
     /// Set on every spoken-answers runner (SpokenAnswers, adr/0016). It
     /// exits at stdin EOF too; this is the backstop.
     public static let speechRunnerMarker = "LLMTRAY_SPEECH_RUNNER"
+    /// Set on every voice-conversation listen runner (VoiceConversation, adr/0031).
+    public static let listenRunnerMarker = "LLMTRAY_LISTEN_RUNNER"
 
     /// The arguments for `/bin/ps` whose output `orphans(inPSOutput:)` reads:
     /// every process, full width, with its environment (-E; only the
@@ -79,6 +82,8 @@ public enum OrphanScan {
             kind = .voiceRunner
         } else if line.contains("llmtray_tts_runner.py"), tokens.contains(speechRunnerMarker + "=1") {
             kind = .speechRunner
+        } else if line.contains("llmtray_listen_runner.py"), tokens.contains(listenRunnerMarker + "=1") {
+            kind = .listenRunner
         } else {
             return nil
         }

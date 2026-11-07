@@ -1,6 +1,6 @@
 # 0031 — Voice conversation
 
-**Status: proposed** (2026-11-07). Discussed with the user and recorded so
+**Status: accepted, first version built** (2026-11-07; see "As built" at the end). Discussed with the user and recorded so
 nothing gets lost. The user's words: "сделать войс ту войс режим...
 полноценный", "максимально как разговор", "сразу все". Steps 3 and 5 of
 [0016](0016-voice.md) become this one feature. Nothing here is built yet;
@@ -205,3 +205,80 @@ exist), the voice prompt, fillers, and the recognizer choice.
 - The exact filler lists, per language and per built-in tool kind.
 - How the orb and captions look: draft them and look at the render before
   building.
+
+## As built (2026-11-07)
+
+The user asked for it carried through ("задача довести до конца").
+
+**Listening: `runtime/llmtray_listen_runner.py`, in the audio venv.**
+- Microphone PCM goes in at 16 kHz.
+- Silero VAD v6 (MIT, 1 MB) finds speech: 1.7 ms per 32 ms frame.
+- The recognizer re-reads the growing utterance for live captions. The
+  next read waits twice the last one's time, so the runner never falls
+  behind the microphone (12 s of speech takes 0.27 s).
+- Smart Turn v3 (BSD-2-Clause, 32 MB) decides on a pause, 5 ms a call:
+  - the turn ends at ~320 ms if it's sure (≥ 0.85), at ~510 ms if it's
+    fairly sure (≥ 0.5), and on silence alone at ~1.6 s;
+  - while the model speaks, turns end on silence only.
+- `--stt none` runs only the turn-taking, for macOS's recognizer.
+- Measured with 60 read phrases fed in real time: the turn ends 0.3–1.0 s
+  after the speech. Details are in quant-ternary `parakeet-quant`.
+
+**Recognizers** (60 read phrases: 30 ru from FLEURS, 30 en from
+LibriTTS-R):
+
+| recognizer | WER ru | WER en | speed |
+|---|---|---|---|
+| Parakeet v3, 8-bit | 4.9% | 2.9% | 1–2% of real time |
+| Whisper turbo | 4.7% | 2.7% | 5–14x slower than Parakeet |
+
+- Parakeet is the default. LLMTray downloads mlx-community's fp32 weights
+  (2.5 GB) and quantizes them to 8 bits at load: 0.96 GB in memory, the
+  same words.
+- An 8-bit repo of our own, a smaller download, waits for the user's OK
+  to publish.
+- macOS: on-device only for en-US on the test Mac, and it needs Dictation
+  on. It is offered with that warning: `AppleRecognizer` feeds
+  `SFSpeechAudioBufferRecognitionRequest` with `requiresOnDeviceRecognition`
+  and refuses languages without on-device support.
+
+**Audio.**
+- One `VoiceProcessingIO` unit, 16 kHz in, carries the microphone and
+  every answer:
+  - Chatterbox through its `speechOutput`;
+  - the system voice rendered with `AVSpeechSynthesizer.write` into
+    buffers played by the same unit.
+  So echo cancellation hears what it has to cancel.
+- The unit has a speech gain: the duck is 20%, at once.
+
+**Turn logic (`VoiceConversation`).**
+- **Speech starts while the model speaks**: the answer ducks.
+  - Over 3 words in a partial, or a final turn that isn't a backchannel
+    (`VoiceConversationText.isBackchannel`): an interruption. Playback
+    stops, the generation is cancelled, and the answer is cut to the
+    sentences that finished playing, plus "…".
+  - Otherwise the volume comes back.
+- **The turn's first syllables**: the last ~0.6 s before the runner's
+  start is kept, for macOS's recognizer and for the clip a model that
+  hears gets.
+- **Voice-mode prompt**: `VoiceConversationText.prompt` joins the
+  profile's on every request while `ChatClient.voiceMode` is on. It also
+  asks for numbers and abbreviations spelled out the way they're said
+  ("Drive", not "Dr").
+- **First words sooner**: `SentenceStream(eagerFirst:)` sends the answer's
+  first piece at its first comma, after 24 characters.
+- **Fillers** (`FillerBank`):
+  - made one at a time while the conversation listens, with the answers'
+    voice (`SpokenAnswers.renderFiller`);
+  - cached under `voice_fillers/<voice>/<language>/`;
+  - played after 1.2 s with no sound, or when a tool starts (by tool kind
+    for built-ins, general for MCP);
+  - at most once a turn, never the same one twice in a row;
+  - cut off as soon as the answer's voice starts.
+- **Sleep**: five minutes of listening with nothing said ends the
+  conversation.
+
+**Not in this version.**
+- Low reasoning effort in voice mode: still open.
+- A model's own reading of its audio clip as the history text: the
+  recognizer's text is used.

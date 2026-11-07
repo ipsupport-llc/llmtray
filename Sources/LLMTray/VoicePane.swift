@@ -22,6 +22,7 @@ struct VoicePane: View {
     var body: some View {
         Form {
             SpokenAnswersSection()
+            VoiceConversationSection()
             Section {
                 Toggle(isOn: $store.isEnabled) {
                     SettingLabel(title: "Voice Lab", help: "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept.")
