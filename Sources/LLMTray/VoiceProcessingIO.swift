@@ -52,6 +52,10 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
     private let mic = FloatRing(capacity: Int(ioRate) * 4)
     /// Speech chunks queued, by the ring position they end at.
     private var pending: [(end: Int, completion: () -> Void)] = []
+    /// The speech's volume, applied as it plays (voice conversation ducks
+    /// it while the user may be cutting in, adr/0031). Guarded by `lock`:
+    /// the render thread reads it under the try-lock it takes for the ring.
+    private let gain: UnsafeMutablePointer<Float>
 
     init(inputSampleRate: Int) throws {
         self.inputSampleRate = Double(inputSampleRate)
@@ -65,6 +69,8 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
         micScratch = .allocate(capacity: Self.maxFrames)
         lock = .allocate(capacity: 1)
         lock.initialize(to: os_unfair_lock())
+        gain = .allocate(capacity: 1)
+        gain.initialize(to: 1)
 
         var desc = AudioComponentDescription(componentType: kAudioUnitType_Output,
                                              componentSubType: kAudioUnitSubType_VoiceProcessingIO,
@@ -119,6 +125,8 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
         micScratch.deallocate()
         lock.deinitialize(count: 1)
         lock.deallocate()
+        gain.deinitialize(count: 1)
+        gain.deallocate()
     }
 
     private static func check(_ call: String, _ status: OSStatus) throws {
@@ -158,6 +166,12 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
         dropSpeech()
     }
 
+    /// 1: full volume; less ducks the speech, queued audio included.
+    var speechGain: Float {
+        get { withLock { gain.pointee } }
+        set { withLock { gain.pointee = max(0, min(1, newValue)) } }
+    }
+
     /// The model's speech at `sampleRate`, played through this unit.
     func speechOutput(sampleRate: Int) -> SpeechOutput? {
         VPIOSpeechOutput(io: self, sampleRate: Double(sampleRate))
@@ -169,10 +183,13 @@ final class VoiceProcessingIO: VoiceMicrophone, @unchecked Sendable {
         guard let data, let out = UnsafeMutableAudioBufferListPointer(data).first?.mData?.assumingMemoryBound(to: Float.self)
         else { return noErr }
         var played = 0
+        var g: Float = 1
         if os_unfair_lock_trylock(lock) {
             played = speech.read(into: out, count: frames)
+            g = gain.pointee
             os_unfair_lock_unlock(lock)
         }
+        if g < 1 { for i in 0..<played { out[i] *= g } }
         if played < frames { (out + played).update(repeating: 0, count: frames - played) }
         return noErr
     }

@@ -27,7 +27,9 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>LLMTray reads this browser's front tab (its title, address and text) when you choose Attach Tab in a chat, or a tool server you added in Settings › Tools works with this app, for example to read your mail. Nothing is read without your click or your OK.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>LLMTray listens only while Voice Lab is on, to talk with the local voice model. Nothing is recorded to disk.</string>
+	<string>LLMTray listens only during a voice conversation, Voice Lab or a voice message, to hear you on this Mac. Nothing leaves your Mac.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Only when you pick macOS's recognizer for voice conversations: your speech is recognized on this Mac, never sent off it.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>SUFeedURL</key>

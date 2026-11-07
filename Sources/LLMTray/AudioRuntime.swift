@@ -139,6 +139,11 @@ final class AudioRuntime: ObservableObject {
         }
     }
 
+    /// ensureInstalledOrKeep, the kept error as text (nil: installed or kept fine).
+    func ensureInstalledOrKeepError() async -> String? {
+        do { return try await ensureInstalledOrKeep().map { $0.localizedDescription } } catch { return error.localizedDescription }
+    }
+
     private static func installedRequirements() -> String? {
         (try? String(contentsOfFile: installStamp, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
     }

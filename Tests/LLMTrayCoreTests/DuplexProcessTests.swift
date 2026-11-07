@@ -210,3 +210,61 @@ final class SpeechRunnerTests: XCTestCase {
         XCTAssertEqual(out.decoded.map(\.kind), [.ready])
     }
 }
+
+/// The voice conversation's listen runner (runtime/llmtray_listen_runner.py,
+/// adr/0031) in --selftest mode: energy VAD, a fake recognizer, any Python 3.
+final class ListenRunnerTests: XCTestCase {
+    private var runner: String {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("runtime/llmtray_listen_runner.py").path
+    }
+
+    private func python() throws -> String {
+        let candidates = ["/usr/bin/python3", "/opt/homebrew/bin/python3", "/usr/local/bin/python3"]
+        guard let python = candidates.first(where: { FileManager.default.isExecutableFile(atPath: $0) }) else { throw XCTSkip("no python3") }
+        return python
+    }
+
+    func testATurnStartsShowsPartialsAndEnds() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"], environment: ["PYTHONDONTWRITEBYTECODE": "1"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        try child.start(onStdout: { out.append($0) }, onExit: { _ in exited.fulfill() })
+        let tone = PCM16.data(from: (0..<16000).map { sin(Float($0) * 2 * .pi * 300 / 16000) * 0.3 })
+        let silence = PCM16.data(from: [Float](repeating: 0, count: 32000))
+        child.write(VoiceFrame(.audio, payload: PCM16.data(from: [Float](repeating: 0, count: 4000))).encoded)
+        child.write(VoiceFrame(.audio, payload: tone).encoded)
+        child.write(VoiceFrame(.audio, payload: silence).encoded)
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, !out.decoded.contains(where: { $0.type == UInt8(ascii: "Z") }) { Thread.sleep(forTimeInterval: 0.05) }
+        child.write(VoiceFrame(.quit).encoded)
+        child.closeStdin()
+        wait(for: [exited], timeout: 15)
+        let kinds = out.decoded.map { Character(UnicodeScalar($0.type)) }
+        XCTAssertEqual(kinds.first, "R")
+        XCTAssertTrue(kinds.contains("V"))
+        XCTAssertTrue(kinds.contains("U"))
+        let z = try XCTUnwrap(out.decoded.first { $0.type == UInt8(ascii: "Z") })
+        let info = try XCTUnwrap(JSONSerialization.jsonObject(with: z.payload) as? [String: Any])
+        XCTAssertEqual(info["reason"] as? String, "turn")
+        XCTAssertTrue((info["text"] as? String ?? "").hasPrefix("speech"))
+    }
+
+    func testWhileTheModelSpeaksTurnsEndOnSilenceOnly() throws {
+        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
+        let out = DuplexProcessTests.Collected()
+        let exited = expectation(description: "exit")
+        try child.start(onStdout: { out.append($0) }, onExit: { _ in exited.fulfill() })
+        child.write(VoiceFrame(.mode, payload: try JSONSerialization.data(withJSONObject: ["speaking": true])).encoded)
+        let tone = PCM16.data(from: (0..<16000).map { sin(Float($0) * 2 * .pi * 300 / 16000) * 0.3 })
+        child.write(VoiceFrame(.audio, payload: tone).encoded)
+        child.write(VoiceFrame(.audio, payload: PCM16.data(from: [Float](repeating: 0, count: 32000))).encoded)
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, !out.decoded.contains(where: { $0.type == UInt8(ascii: "Z") }) { Thread.sleep(forTimeInterval: 0.05) }
+        child.closeStdin()
+        wait(for: [exited], timeout: 15)
+        let z = try XCTUnwrap(out.decoded.first { $0.type == UInt8(ascii: "Z") })
+        let info = try XCTUnwrap(JSONSerialization.jsonObject(with: z.payload) as? [String: Any])
+        XCTAssertEqual(info["reason"] as? String, "silence")
+    }
+}

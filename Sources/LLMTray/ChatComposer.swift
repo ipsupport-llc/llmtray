@@ -573,6 +573,7 @@ struct ChatComposer: View {
             ChatMemoryChip()
             ChatFolderChips()
             Spacer()
+            VoiceConversationButton()
             ReadAloudToggle()
             if let tps = chat.lastTokensPerSecond {
                 Text(String(format: "%.1f tok/s", tps))

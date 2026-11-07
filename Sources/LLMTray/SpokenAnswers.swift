@@ -43,6 +43,23 @@ final class SpokenAnswers: ObservableObject {
     private var silenced: UUID?
     private var answerLanguage: String?
 
+    // Voice conversation (adr/0031)
+    /// Every answer is read as it streams, whatever `readsAloud` says, and
+    /// the voice runner stays warm.
+    var voiceMode = false {
+        didSet { chatterbox?.keepWarm = voiceMode }
+    }
+    /// Where the answers play: the voice-processing unit, so echo
+    /// cancellation hears them. nil: each voice's own output.
+    var audioSink: VoiceProcessingIO? {
+        didSet {
+            system?.audioSink = audioSink
+            chatterbox?.audioSink = audioSink
+        }
+    }
+    /// A sentence finished playing (what the user heard).
+    var onSentencePlayed: ((String) -> Void)?
+
     private init() {
         readsAloud = UserDefaults.standard[Pref.spokenAnswersAuto]
         voiceKind = SpokenVoiceKind(rawValue: UserDefaults.standard[Pref.spokenAnswersVoice]) ?? .system
@@ -70,7 +87,7 @@ final class SpokenAnswers: ObservableObject {
 
     /// A delta of the answer `messageID` streaming in `client`'s chat.
     func streamed(client: ObjectIdentifier, messageID: UUID, delta: String) {
-        guard readsAloud, messageID != silenced else { return }
+        guard readsAloud || voiceMode, messageID != silenced else { return }
         if streamClient != client {
             // Another chat streaming at the same time waits its turn: the
             // answer being streamed and read keeps the voice.
@@ -83,7 +100,7 @@ final class SpokenAnswers: ObservableObject {
             // one's rest is read first, in order.
             finishStream()
             streamMessage = messageID
-            stream = SentenceStream(codeBlock: Self.codeBlockPhrase)
+            stream = SentenceStream(codeBlock: Self.codeBlockPhrase, eagerFirst: voiceMode)
         }
         guard var s = stream else { return }
         let sentences = s.feed(delta)
@@ -203,8 +220,7 @@ final class SpokenAnswers: ObservableObject {
                     guard let self, let c, self.active === c else { return }
                     self.note = message
                     // Never silence: the system voice reads what's left.
-                    let s = self.system ?? SystemSpeaker()
-                    self.system = s
+                    let s = self.makeSystem()
                     s.onIdle = { [weak self] in self?.idle(s) }
                     self.active = s
                     for (text, lang) in unspoken { s.enqueue(text, language: lang) }
@@ -213,8 +229,7 @@ final class SpokenAnswers: ObservableObject {
                 return c
             }
         }
-        let s = system ?? SystemSpeaker()
-        system = s
+        let s = makeSystem()
         s.onIdle = { [weak self] in self?.idle(s) }
         return s
     }
@@ -222,8 +237,40 @@ final class SpokenAnswers: ObservableObject {
     private func makeChatterbox() -> ChatterboxSpeaker {
         let c = ChatterboxSpeaker(clip: clipPath)
         c.onIdle = { [weak self, weak c] in if let c { self?.idle(c) } }
+        c.onPlayed = { [weak self] text in self?.onSentencePlayed?(text) }
+        c.audioSink = audioSink
+        c.keepWarm = voiceMode
         chatterbox = c
         return c
+    }
+
+    private func makeSystem() -> SystemSpeaker {
+        if let system { return system }
+        let s = SystemSpeaker()
+        s.onPlayed = { [weak self] text in self?.onSentencePlayed?(text) }
+        s.audioSink = audioSink
+        system = s
+        return s
+    }
+
+    /// Which voice a filler is made with, for the filler cache's key: the
+    /// same choice `speaker(for:)` makes.
+    func fillerVoiceKey(language: String) -> String {
+        if voiceKind == .chatterbox, SpokenVoiceStore.isReady, SpeechLanguage.chatterbox.contains(language) {
+            let clip = clipPath.map { ($0 as NSString).lastPathComponent } ?? "builtin"
+            return "chatterbox-\(SpokenVoiceFile.model.repo.replacingOccurrences(of: "/", with: "_"))-\(clip)"
+        }
+        return "system-" + (SystemSpeaker.voice(for: language)?.identifier ?? language)
+    }
+
+    /// A filler's audio, made with the answers' voice without playing it
+    /// (adr/0031: made in the silences, cached by the caller).
+    func renderFiller(_ text: String, language: String) async -> (samples: [Float], rate: Int)? {
+        if voiceKind == .chatterbox, SpokenVoiceStore.isReady, SpeechLanguage.chatterbox.contains(language) {
+            let c = chatterbox ?? makeChatterbox()
+            return await c.render(text, language: language)
+        }
+        return await SystemSpeaker.render(text, language: language)
     }
 
     private func idle(_ speaker: SentenceSpeaker) {
@@ -241,6 +288,10 @@ protocol SentenceSpeaker: AnyObject {
     func endOfInput()
     func stop()
     var onIdle: (() -> Void)? { get set }
+    /// A sentence finished playing.
+    var onPlayed: ((String) -> Void)? { get set }
+    /// Plays through this unit when set (voice conversation).
+    var audioSink: VoiceProcessingIO? { get set }
 }
 
 // MARK: - macOS voices
@@ -253,6 +304,24 @@ final class SystemSpeaker: NSObject, SentenceSpeaker, AVSpeechSynthesizerDelegat
     private var queued = 0
     private var ended = false
     var onIdle: (() -> Void)?
+    var onPlayed: ((String) -> Void)?
+    /// Voice conversation: sentences are rendered to buffers
+    /// (AVSpeechSynthesizer.write) and played through this unit, so echo
+    /// cancellation hears them; speak() would bypass it.
+    var audioSink: VoiceProcessingIO? {
+        didSet { if audioSink !== oldValue { outputs = [:] } }
+    }
+    /// What spoke() is saying, in order (the delegate path).
+    private var spoken: [String] = []
+    // The buffered path.
+    private var waiting: [(id: Int, utterance: AVSpeechUtterance, text: String)] = []
+    private var writing = false
+    private var nextID = 0
+    private var chunks: [Int: Int] = [:]
+    private var made: Set<Int> = []
+    private var texts: [Int: String] = [:]
+    private var generation = 0
+    private var outputs: [Double: SpeechOutput] = [:]
 
     override init() {
         super.init()
@@ -264,7 +333,15 @@ final class SystemSpeaker: NSObject, SentenceSpeaker, AVSpeechSynthesizerDelegat
         utterance.voice = Self.voice(for: language)
         queued += 1
         ended = false
-        synth.speak(utterance)
+        if audioSink != nil {
+            nextID += 1
+            texts[nextID] = sentence
+            waiting.append((nextID, utterance, sentence))
+            pump()
+        } else {
+            spoken.append(sentence)
+            synth.speak(utterance)
+        }
     }
 
     func endOfInput() {
@@ -275,7 +352,96 @@ final class SystemSpeaker: NSObject, SentenceSpeaker, AVSpeechSynthesizerDelegat
     func stop() {
         queued = 0
         ended = false
+        generation += 1
+        waiting = []
+        writing = false
+        chunks = [:]
+        made = []
+        texts = [:]
+        spoken = []
         synth.stopSpeaking(at: .immediate)
+        outputs.values.forEach { $0.reset() }
+    }
+
+    // MARK: Buffered (through the voice-processing unit)
+
+    private func pump() {
+        guard !writing, !waiting.isEmpty else { return }
+        let next = waiting.removeFirst()
+        writing = true
+        let gen = generation
+        synth.write(next.utterance) { [weak self] buffer in
+            guard let pcm = buffer as? AVAudioPCMBuffer else { return }
+            let samples = Self.floats(pcm)
+            let rate = pcm.format.sampleRate
+            DispatchQueue.main.async { MainActor.assumeIsolated {
+                guard let self, gen == self.generation else { return }
+                if pcm.frameLength == 0 {
+                    self.made.insert(next.id)
+                    self.writing = false
+                    self.checkPlayed(next.id)
+                    self.pump()
+                } else if let output = self.output(rate) {
+                    self.chunks[next.id, default: 0] += 1
+                    output.schedule(samples) { [weak self] in
+                        DispatchQueue.main.async { MainActor.assumeIsolated { self?.chunkPlayed(next.id, gen) } }
+                    }
+                }
+            } }
+        }
+    }
+
+    private func output(_ rate: Double) -> SpeechOutput? {
+        if let o = outputs[rate] { return o }
+        let o = audioSink?.speechOutput(sampleRate: Int(rate))
+        outputs[rate] = o
+        return o
+    }
+
+    private func chunkPlayed(_ id: Int, _ gen: Int) {
+        guard gen == generation else { return }
+        chunks[id] = max(0, (chunks[id] ?? 1) - 1)
+        checkPlayed(id)
+    }
+
+    private func checkPlayed(_ id: Int) {
+        guard made.contains(id), (chunks[id] ?? 0) == 0 else { return }
+        made.remove(id)
+        chunks[id] = nil
+        if let text = texts.removeValue(forKey: id) { onPlayed?(text) }
+        finished()
+    }
+
+    nonisolated static func floats(_ pcm: AVAudioPCMBuffer) -> [Float] {
+        let n = Int(pcm.frameLength)
+        guard n > 0 else { return [] }
+        if let f = pcm.floatChannelData { return Array(UnsafeBufferPointer(start: f[0], count: n)) }
+        if let i = pcm.int16ChannelData { return UnsafeBufferPointer(start: i[0], count: n).map { Float($0) / 32768 } }
+        if let i = pcm.int32ChannelData { return UnsafeBufferPointer(start: i[0], count: n).map { Float($0) / 2_147_483_648 } }
+        return []
+    }
+
+    /// A sentence's audio without playing it (a filler for the cache).
+    static func render(_ text: String, language: String) async -> (samples: [Float], rate: Int)? {
+        let synth = AVSpeechSynthesizer()
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = voice(for: language)
+        return await withCheckedContinuation { continuation in
+            var samples: [Float] = []
+            var rate = 22050.0
+            var done = false
+            synth.write(utterance) { buffer in
+                guard !done, let pcm = buffer as? AVAudioPCMBuffer else { return }
+                if pcm.frameLength == 0 {
+                    done = true
+                    _ = synth   // kept alive until the end
+                    continuation.resume(returning: samples.isEmpty ? nil : (samples, Int(rate)))
+                } else {
+                    rate = pcm.format.sampleRate
+                    samples += floats(pcm)
+                }
+            }
+        }
     }
 
     static func voice(for language: String) -> AVSpeechSynthesisVoice? {
@@ -289,7 +455,10 @@ final class SystemSpeaker: NSObject, SentenceSpeaker, AVSpeechSynthesizerDelegat
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        MainActor.assumeIsolated { finished() }
+        MainActor.assumeIsolated {
+            if !spoken.isEmpty { onPlayed?(spoken.removeFirst()) }
+            finished()
+        }
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {}
@@ -310,13 +479,30 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     static let idleTimeout: TimeInterval = 300
 
     var onIdle: (() -> Void)?
+    var onPlayed: ((String) -> Void)?
     /// The runner failed: why, for the user, and the sentences it hadn't
     /// played (text, language), in order.
     var onFailure: ((String, [(String, String)]) -> Void)?
+    /// Voice conversation: audio plays through this unit.
+    var audioSink: VoiceProcessingIO? {
+        didSet {
+            guard audioSink !== oldValue else { return }
+            output?.reset()
+            closeAudio()
+        }
+    }
+    /// Voice conversation: no idle quit (a cold start costs a warm-up).
+    var keepWarm = false {
+        didSet { if keepWarm { idleTimer?.invalidate() } else if process != nil { scheduleQuit() } }
+    }
 
     private var process: DuplexProcess?
     private var audio: VoiceAudioEngine?
-    private var output: EngineSpeechOutput?
+    private var output: SpeechOutput?
+    private var engineOutput: EngineSpeechOutput?
+    private var sampleRate = 24000
+    /// Sentences made for a cache, not played: their audio, by id.
+    private var renders: [Int: (samples: [Float], resume: (([Float]?) -> Void))] = [:]
     private var clip: String?
     private var nextID = 0
     /// Sentences sent and not yet played, by id.
@@ -364,11 +550,32 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         checkIdle()
     }
 
+    /// A sentence's audio without playing it (a filler for the cache).
+    func render(_ text: String, language: String) async -> (samples: [Float], rate: Int)? {
+        idleTimer?.invalidate()
+        if process == nil {
+            launch()
+            guard process != nil else { return nil }
+        }
+        nextID += 1
+        let id = nextID
+        let samples: [Float]? = await withCheckedContinuation { continuation in
+            renders[id] = ([], { continuation.resume(returning: $0) })
+            send(VoiceFrame(.speak, payload: Self.json(["id": id, "text": text, "lang": language])))
+        }
+        if outstanding.isEmpty { scheduleQuit() }
+        return samples.map { ($0, sampleRate) }
+    }
+
     func stop() {
         generation += 1
         outstanding = []
         texts = [:]
         chunksPlaying = [:]
+        // A filler being made is dropped too: the runner's cancel may never
+        // answer for it.
+        for render in renders.values { render.resume(nil) }
+        renders = [:]
         playing = 0
         current = nil
         ended = false
@@ -425,13 +632,17 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     private func handle(_ frame: VoiceFrame) {
         switch frame.kind {
         case .ready:
-            let rate = (Self.object(frame.payload)?["sample_rate"] as? Int) ?? 24000
-            startAudio(sampleRate: rate)
+            sampleRate = (Self.object(frame.payload)?["sample_rate"] as? Int) ?? 24000
         case .begin:
             let id = Self.object(frame.payload)?["id"] as? Int
-            current = id.flatMap { outstanding.contains($0) ? $0 : nil }
+            current = id.flatMap { outstanding.contains($0) || renders[$0] != nil ? $0 : nil }
         case .speech:
-            guard let id = current, let output else { return }
+            guard let id = current else { return }
+            if renders[id] != nil {
+                renders[id]?.samples += PCM16.samples(from: frame.payload)
+                return
+            }
+            guard let output = currentOutput() else { return }
             let samples = PCM16.samples(from: frame.payload)
             let scheduled = generation
             playing += 1
@@ -440,6 +651,11 @@ final class ChatterboxSpeaker: SentenceSpeaker {
                 DispatchQueue.main.async { MainActor.assumeIsolated { self?.played(id: id, generation: scheduled) } }
             }
         case .replyDone:
+            if let id = Self.object(frame.payload)?["id"] as? Int, let render = renders.removeValue(forKey: id) {
+                render.resume(render.samples.isEmpty ? nil : render.samples)
+                current = nil
+                return
+            }
             if let id = Self.object(frame.payload)?["id"] as? Int {
                 outstanding.remove(id)
                 if chunksPlaying[id, default: 0] == 0 { texts[id] = nil }   // no audio, or all played
@@ -449,7 +665,9 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         case .error:
             let info = Self.object(frame.payload)
             let message = info?["message"] as? String ?? frame.text
-            if let id = info?["id"] as? Int {
+            if let id = info?["id"] as? Int, let render = renders.removeValue(forKey: id) {
+                render.resume(nil)
+            } else if let id = info?["id"] as? Int {
                 outstanding.remove(id)
                 texts[id] = nil
                 NSLog("LLMTray: spoken answer sentence failed: %@", message)
@@ -467,21 +685,31 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         }
     }
 
-    private func startAudio(sampleRate: Int) {
-        guard output == nil else { return }
+    /// The voice-processing unit's output in a conversation, else an
+    /// engine of its own; made on the first audio.
+    private func currentOutput() -> SpeechOutput? {
+        if let output { return output }
+        if let sink = audioSink {
+            output = sink.speechOutput(sampleRate: sampleRate)
+            return output
+        }
         let audio = VoiceAudioEngine()
-        guard let output = EngineSpeechOutput(audio: audio, sampleRate: sampleRate) else {
-            return fail(NSLocalizedString("The voice couldn't open the audio output.", comment: "spoken answers"))
+        guard let engine = EngineSpeechOutput(audio: audio, sampleRate: sampleRate) else {
+            fail(NSLocalizedString("The voice couldn't open the audio output.", comment: "spoken answers"))
+            return nil
         }
         do {
             try audio.start()
-            output.play()
+            engine.play()
         } catch {
-            return fail(String(format: NSLocalizedString("The voice couldn't open the audio output: %@", comment: "spoken answers"),
-                               error.localizedDescription))
+            fail(String(format: NSLocalizedString("The voice couldn't open the audio output: %@", comment: "spoken answers"),
+                        error.localizedDescription))
+            return nil
         }
         self.audio = audio
-        self.output = output
+        engineOutput = engine
+        output = engine
+        return engine
     }
 
     private func played(id: Int, generation scheduled: Int) {
@@ -490,7 +718,7 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         let left = max(0, chunksPlaying[id, default: 1] - 1)
         chunksPlaying[id] = left == 0 ? nil : left
         // Heard to the end once made and played: no fallback needs it.
-        if left == 0, !outstanding.contains(id) { texts[id] = nil }
+        if left == 0, !outstanding.contains(id), let text = texts.removeValue(forKey: id) { onPlayed?(text.0) }
         checkIdle()
     }
 
@@ -503,13 +731,14 @@ final class ChatterboxSpeaker: SentenceSpeaker {
 
     private func scheduleQuit() {
         idleTimer?.invalidate()
+        guard !keepWarm else { return }
         idleTimer = Timer.scheduledTimer(withTimeInterval: Self.idleTimeout, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated { self?.quit() }
         }
     }
 
     private func quit() {
-        guard outstanding.isEmpty, playing == 0 else { return }
+        guard outstanding.isEmpty, playing == 0, renders.isEmpty, !keepWarm else { return }
         send(VoiceFrame(.quit))
         process?.closeStdin()
         process = nil
@@ -523,6 +752,8 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     private func exited() {
         process = nil
         closeAudio()
+        for render in renders.values { render.resume(nil) }
+        renders = [:]
         if !outstanding.isEmpty {
             let last = stderrTail.split(separator: "\n").last.map(String.init) ?? ""
             fail(String(format: NSLocalizedString("The voice stopped: %@", comment: "spoken answers"), last))
@@ -535,6 +766,8 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         // read again whole).
         let unspoken = texts.keys.sorted().compactMap { texts[$0] }
         texts = [:]
+        for render in renders.values { render.resume(nil) }
+        renders = [:]
         chunksPlaying = [:]
         generation += 1
         outstanding = []
@@ -551,6 +784,7 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         output?.stop()
         audio?.stop()
         output = nil
+        engineOutput = nil
         audio = nil
     }
 

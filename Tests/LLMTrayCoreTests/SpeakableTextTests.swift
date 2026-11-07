@@ -84,6 +84,15 @@ final class SpeakableTextTests: XCTestCase {
         XCTAssertEqual(parts.joined(separator: " ").replacingOccurrences(of: "  ", with: " "), long)
     }
 
+    func testEagerFirstPieceGoesAtTheFirstComma() {
+        var s = SentenceStream(codeBlock: code, eagerFirst: true)
+        XCTAssertEqual(s.feed("Хм, смотри: в два часа созвон с командой, а в пять"), ["Хм, смотри: в два часа созвон с командой,"])
+        XCTAssertEqual(s.feed(" ревью. Потом свободно, совсем"), ["а в пять ревью."])
+        XCTAssertEqual(s.finish(), ["Потом свободно, совсем"])
+        var plain = SentenceStream(codeBlock: code)
+        XCTAssertEqual(plain.feed("Хм, смотри: в два часа созвон с командой, а в пять"), [])
+    }
+
     func testPunctuationAloneIsSkipped() {
         var s = SentenceStream(codeBlock: code)
         XCTAssertEqual(s.feed("---\n...\nOk.\n"), ["Ok."])

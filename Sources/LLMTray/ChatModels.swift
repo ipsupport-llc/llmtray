@@ -286,6 +286,9 @@ struct ChatSettings {
     var mcpChat = false
     /// The profile's name, for an answer's details.
     var profileName: String?
+    /// Voice conversation (adr/0031): the voice-mode prompt joins the
+    /// profile's. Set by ChatClient from its own flag on every request.
+    var voiceMode = false
 
     /// The chat settings a model's profile resolves to.
     init(profile p: ResolvedProfile, maxTokensCap: Int) {

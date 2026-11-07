@@ -67,7 +67,8 @@ enum ChatRequestBuilder {
         }
         // The project's instructions between the profile's prompt and the
         // tool-use rule: the rules about tools come last whatever they say.
-        let systemPrompt = chatSystemPrompt(profile: settings.systemPrompt, memory: settings.memoryBlock, project: settings.project,
+        let profile = settings.voiceMode ? settings.systemPrompt + "\n\n" + VoiceConversationText.prompt : settings.systemPrompt
+        let systemPrompt = chatSystemPrompt(profile: profile, memory: settings.memoryBlock, project: settings.project,
                                             toolUsePolicy: tools.isEmpty ? nil : settings.toolUsePolicy)
         if !systemPrompt.isEmpty {
             payload.insert(["role": "system", "content": systemPrompt], at: 0)

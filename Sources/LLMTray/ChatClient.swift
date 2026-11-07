@@ -42,6 +42,9 @@ final class ChatClient: ObservableObject {
         didSet { if oldValue, !isStreaming { SpokenAnswers.shared.streamEnded(client: ObjectIdentifier(self)) } }
     }
     @Published var lastTokensPerSecond: Double?
+    /// A voice conversation runs in this chat (adr/0031): requests carry
+    /// the voice-mode prompt.
+    var voiceMode = false
     @Published var errorText: String?
     // True while a generate_image tool call is actually running (mflux
     // bootstrap + generation) -- distinct from isStreaming since this
@@ -1378,6 +1381,7 @@ final class ChatClient: ObservableObject {
         messages.append(ChatMessage(role: "assistant"))
         assistantMessageIndex = messages.count - 1
 
+        settings.voiceMode = voiceMode
         let body = ChatRequestBuilder.streamingBody(
             modelAlias: modelAlias, settings: settings,
             history: Array(messages.dropLast(1)),
@@ -2054,6 +2058,8 @@ final class ChatClient: ObservableObject {
     /// rest, at the estimator's conservative ratio.
     private func requestTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int {
         if let counted = countedTokenEstimate(context, settings) { return counted }
+        var settings = settings
+        settings.voiceMode = voiceMode
         let body = ChatRequestBuilder.streamingBody(modelAlias: context.modelAlias, settings: settings, history: messages,
                                                     tools: toolbox.definitions(for: settings), projectTools: toolbox.projectToolNames)
         return tokenEstimator.estimate(ChatRequestBuilder.measure(body))
@@ -2092,6 +2098,8 @@ final class ChatClient: ObservableObject {
     /// prompt as with tools declared (the tool-use rule then joins it).
     private func framing(modelAlias: String, settings: ChatSettings, tools: [[String: Any]]) -> Framing {
         func data(_ value: Any) -> Data { (try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys])) ?? Data() }
+        var settings = settings
+        settings.voiceMode = voiceMode
         var base = ChatRequestBuilder.streamingBody(modelAlias: modelAlias, settings: settings, history: [], tools: tools)
         base["tools"] = nil
         var byName: [String: Data] = [:]
@@ -2154,6 +2162,15 @@ final class ChatClient: ObservableObject {
     /// real usage.completion_tokens (see finalizeTokensPerSecond).
     private static func approxTokens(_ text: String) -> Int {
         max(1, text.split(whereSeparator: { $0.isWhitespace }).count)
+    }
+
+    /// Voice conversation barge-in (adr/0031): the last answer keeps only
+    /// the sentences the user heard, marked as cut, so the model never
+    /// "remembers" saying what nobody heard.
+    func cutLastAnswer(toSpoken heard: [String]) {
+        guard let idx = messages.lastIndex(where: { $0.role == "assistant" && $0.toolCalls.isEmpty }) else { return }
+        let kept = heard.joined(separator: " ").trimmingCharacters(in: .whitespaces)
+        messages[idx].content = kept.isEmpty ? "…" : kept + " …"
     }
 
     private func appendToAssistant(content: String) {
