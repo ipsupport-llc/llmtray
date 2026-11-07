@@ -15,6 +15,7 @@ struct VoiceConversationView: View {
     let modelName: String
 
     @State private var escMonitor: Any?
+    @State private var host = HostWindow.Box()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -68,10 +69,16 @@ struct VoiceConversationView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(nsColor: .windowBackgroundColor))
+        .background(HostWindow(box: host))
         .onAppear {
             // Esc ends it even while the message field has the focus.
+            if let escMonitor { NSEvent.removeMonitor(escMonitor) }
             escMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                guard event.keyCode == 53, voice.phase != .off else { return event }
+                // Only in this view's window, and not while a sheet there
+                // wants its own Esc.
+                guard event.keyCode == 53, voice.phase != .off,
+                      let window = event.window, window === host.window, window.attachedSheet == nil
+                else { return event }
                 MainActor.assumeIsolated { close() }
                 return nil
             }
@@ -133,6 +140,22 @@ struct VoiceConversationView: View {
             Spacer()
         }
         .padding(24)
+    }
+}
+
+/// Finds the window a view is in (for the Esc monitor).
+struct HostWindow: NSViewRepresentable {
+    final class Box { weak var window: NSWindow? }
+    let box: Box
+
+    func makeNSView(context: Context) -> NSView { Probe(box: box) }
+    func updateNSView(_ view: NSView, context: Context) { box.window = view.window }
+
+    private final class Probe: NSView {
+        let box: Box
+        init(box: Box) { self.box = box; super.init(frame: .zero) }
+        required init?(coder: NSCoder) { nil }
+        override func viewDidMoveToWindow() { box.window = window }
     }
 }
 
@@ -248,10 +271,14 @@ struct VoiceConversationButton: View {
         Button {
             NotificationCenter.default.post(name: .startVoiceConversation, object: chat)
         } label: {
-            Image(systemName: "waveform.circle").font(.caption)
+            // The size of the microphone next to it.
+            Image(systemName: "waveform.circle")
+                .font(.title3)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundColor(.secondary)
+        .foregroundStyle(.primary)
         .disabled(voice.isActive(in: chat))
         .help(Text("Talk with the model: a voice conversation (Esc ends it)"))
         .accessibilityLabel(Text("Voice conversation"))
