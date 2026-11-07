@@ -43,6 +43,7 @@
 "%@ requests" = "%@ solicitações";
 "%@ s" = "%@ s";
 "%@ tok/s" = "%@ tok/s";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "%@ tokens já foram executados localmente com o LLMTray até agora. É grátis, sem assinaturas; se for útil para você, você pode apoiar o desenvolvimento dele.";
 "%@ wasn't found on Hugging Face." = "Não foi possível encontrar %@ no Hugging Face.";
 "%@ · %@ left" = "%@ · %@ restantes";
 "%@ · %@ of %@" = "%@ · %@ de %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "%lld ferramentas foram alteradas no servidor: configure para aceitá-las.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bits";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "(não enviado: escolha um modelo de chat ou aguarde a resposta em andamento.)";
 "(Please attach the report file shown in Finder.)" = "(Anexe o arquivo de relatório mostrado no Finder.)";
 "(estimate; exact after the first answer)" = "(estimativa; exato após a primeira resposta)";
 "(measured for this model)" = "(medido para este modelo)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Um bate‑papo pode acessar pastas que você permitir e sugerir novas pastas, movimentações e renomeações. Você aprova cada alteração e pode desfazê‑la.";
 "A chat model" = "Um modelo de chat";
 "A client" = "Um cliente";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "Um clipe com menos de 10 s funciona, mas com 10 s ou mais imita melhor a voz.";
 "A deleted project" = "Um projeto apagado";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Um fato ou observação aprendido em um chat espera até outro chat também mostrar isso (ou até você aprovar): uma pergunta não define quem você é. O que você pedir — preferências, correções — é usado imediatamente.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix mais cheio e com sensação mais finalizada; as letras ficam menos nítidas. Cerca de 20 s para 30 s de música.";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "Resposta (todas as solicitações)";
 "Answer details" = "Detalhes da resposta";
 "Answer in Russian, briefly" = "Responda em russo, brevemente";
+"Answers are read aloud -- click to stop" = "As respostas são lidas em voz alta — clique para parar";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Quaisquer outras flags do mlx_lm.server, separadas por espaços, por exemplo, --draft-model <path>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Qualquer pessoa na sua rede pode usar o servidor: uma chave restringe o acesso aos clientes para os quais você a fornecer.";
 "Anything else chats should know" = "Algo mais que os chats devam saber";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Importa as conversas, projetos, perfis, os modelos de imagem, música, voz e embedding e as configurações da versão de ipsupport.us (feche-a primeiro). As conversas e modelos daqui permanecem; as configurações dela substituem estas. Os modelos não ocupam espaço adicional. Modelos de conversa ficam na sua pasta de modelos: escolha-a em Ajustes › Models.";
 "Browse Hugging Face…" = "Explorar Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Integrado ao macOS · apenas no Chat do LLMTray";
+"Built-in" = "Integrada";
 "By" = "Por";
 "Cached" = "Em cache";
 "Calculator" = "Calculadora";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "Conversas fora de projetos";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "As conversas começam com notas curtas sobre você e seu trabalho: como você prefere as respostas, no que está trabalhando e o que já corrigiu antes. Só vão as notas que cabem no limite, e só nas conversas do próprio LLMTray — nunca em apps que usam a API, nunca em chats temporários. Tudo fica neste computador.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projetos, perfis e os modelos de imagem, música, voz e embedding da versão de ipsupport.us já estão aqui. As pastas às quais você deu acesso, e sua pasta de modelos de chat, precisam da sua permissão novamente.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Multilíngue V3 (8-bit)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "O decodificador do Chatterbox Turbo torna cada frase cerca de 4x mais rápida, sem diferença audível: %@.";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "O Chatterbox não fala este idioma (%@): a voz do sistema leu a resposta.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "O Chatterbox imita a voz a partir de um clipe de 5 a 30 segundos (10 ou mais é melhor): fala clara, um locutor, sem música. O clipe é copiado para a pasta do LLMTray e nunca sai deste Este Mac.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "O Chatterbox não foi baixado: a voz do sistema leu a resposta.";
 "Check Again" = "Verificar novamente";
 "Check Now" = "Verificar agora";
 "Check for Runtime Updates" = "Verificar atualizações do runtime";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "Verifica atualizações automaticamente";
 "Chip" = "Chip";
 "Choose Another Folder…" = "Escolher outra pasta…";
+"Choose Clip…" = "Escolher clipe…";
 "Choose Files…" = "Escolher Arquivos…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "Escolha um clipe de 5 a 30 segundos: sua própria voz ou uma voz que você tenha permissão para usar.";
 "Choose a folder chats may use." = "Escolha uma pasta que os chats possam usar.";
 "Choose a folder the chat may look in." = "Escolha uma pasta que o chat possa examinar.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Escolha uma pasta em que o chat possa propor alterações. Você aprova cada mudança.";
@@ -332,6 +345,7 @@
 "Close" = "Fechar";
 "Close Tab" = "Fechar aba";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Fecha esta janela. Ajustes › Geral › Set Up LLMTray… abre-a novamente.";
+"Code in the chat." = "Código no Chat.";
 "Coding agents" = "Agentes de código";
 "Coffee" = "Café";
 "Comes with %@" = "Vem com %@";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "Não foi possível contatar o servidor — tente novamente mais tarde.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Não foi possível ler algumas partes dos chats; tenta de novo às %@ (motivo: Ajustes › Servidor › Log).";
 "Couldn't start the voice runner: %@" = "Não foi possível iniciar o executor de voz: %@";
+"Couldn't start the voice: %@" = "Não foi possível iniciar a voz: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Conta solicitações e tokens por modelo, cliente e dia, e com que velocidade foram executadas. Mantidas apenas neste Mac, nunca enviadas para lugar nenhum.";
 "Countdown" = "Contagem";
 "Countdown: %lld s" = "Contagem regressiva: %lld s";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "Não lembrar deste Chat…";
 "Don't remember this chat?" = "Não lembrar deste Chat?";
 "Don't show again" = "Não mostrar novamente";
+"Don't show this again" = "Não mostrar isso novamente";
 "Done" = "Concluído";
 "Done talking: the model answers" = "Pronto de falar: o modelo responde";
 "Done: %lld changes made." = "Concluído: %lld alterações feitas.";
 "Download" = "Baixar";
+"Download (%@)" = "Baixar (%@)";
 "Download LLMTray-Full" = "Baixar LLMTray‑Full";
 "Download and Enable" = "Baixar e ativar";
 "Download for %@, into the models folder" = "Baixar para %@, na pasta models";
 "Download into the models folder" = "Baixar para a pasta de modelos";
 "Download models" = "Baixar modelos";
 "Download models from Hugging Face" = "Baixar modelos do Hugging Face";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Baixe primeiro o reconhecedor de fala: Ajustes > Voz > Conversa por voz.";
 "Downloaded" = "Baixado";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Baixado por uma versão anterior, em outro disco diferente da pasta models: permanece onde está.";
 "Downloading" = "Baixando";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "Baixando %@…";
 "Downloading %lld files…" = "Baixando %lld arquivos…";
 "Downloading the embedder failed: %@" = "Falha ao baixar o embedder: %@";
+"Downloading the fast decoder…" = "Baixando o decodificador rápido…";
 "Downloading…" = "Baixando…";
 "Downloads" = "Downloads";
 "Downloads waiting: %lld" = "Downloads na fila: %lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "Solte para adicionar a “%@”";
 "Drop to attach images" = "Solte para anexar imagens";
 "Duplicate this profile" = "Duplica este perfil.";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Cada nova resposta é falada frase por frase enquanto é escrita. Código, tabelas e links não são lidos em voz alta. Falar abaixo de qualquer resposta lê aquela resposta; o botão de alto-falante acima do campo de mensagem ativa e desativa isso.";
 "Echo cancellation" = "Cancelamento de eco";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Não foi possível iniciar o cancelamento de eco: %@ — desligue em Ajustes > Voz.";
 "Echo cancellation isn't available on this Mac." = "Cancelamento de eco não está disponível neste Mac.";
+"Echo cancellation isn't available: %@" = "Cancelamento de eco não está disponível: %@";
 "Echo gate" = "Portão de eco";
 "Edit Note" = "Editar Nota";
 "Edit Profile…" = "Editar perfil…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "Ativar arquivos do projeto?";
 "Enable…" = "Ativar…";
 "End" = "Encerrar";
+"End the conversation" = "Encerrar a conversa";
+"End the conversation (Esc)" = "Encerra a conversa (Esc).";
 "End the conversation (the chat model reloads)" = "Encerrar a conversa (o modelo de chat recarrega)";
 "Enjoying LLMTray?" = "Está gostando do LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Ambiente, NAME=value por linha (chaves, tokens e senhas vão para o Chaves)";
 "Errors" = "Erros";
 "Errors: go to the next one (⌘E)" = "Erros: ir para o próximo (⌘E).";
+"Esc ends the conversation" = "Esc encerra a conversa";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversa deste projeto recebe estas instruções, após o prompt do sistema do perfil do modelo. Uma alteração passa a valer a partir da próxima mensagem.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Todo chat do projeto recebe o texto completo; pesquisa na web e geração de imagem ou música ficam desativadas nesses chats enquanto um arquivo está fixado.";
 "Every day's counts are removed. This can't be undone." = "As contagens de todos os dias são removidas. Não é possível desfazer essa ação.";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Arquivos adicionados a um projeto são indexados neste Mac, para que os chats possam pesquisá‑los.";
 "Files · off" = "Arquivos · desligado";
 "Files…" = "Arquivos…";
+"Fillers on pauses" = "Preenchimentos nas pausas";
 "Finish" = "Finalizar";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finalizar aplica suas escolhas. Você pode alterar tudo depois em Ajustes.";
 "Finish in your browser…" = "Finalize no navegador…";
@@ -551,6 +576,7 @@
 "Free disk space" = "Espaço livre em disco";
 "Free on disk: %@ · your models: %@" = "Livre no disco: %@ · seus modelos: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Libera a memória que um modelo carregado ocupa após este período sem solicitações. Ele é recarregado automaticamente na próxima solicitação, com o atraso de carregamento normal.";
+"From a clip" = "De um clipe";
 "From the MCP Registry" = "Do Registro MCP";
 "Full" = "Completo";
 "Full duplex" = "Duplex completo";
@@ -570,6 +596,7 @@
 "Generating music…" = "Gerando música…";
 "Generation" = "Geração";
 "Get" = "Obter";
+"Get Faster Decoder" = "Obter decodificador mais rápido";
 "Get Started" = "Começar";
 "Get a Model…" = "Obter um Modelo…";
 "Get one" = "Obter um";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Tem outros nomes (hard link): eles mantêm o arquivo.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Cabeçalhos, Nome: valor por linha (um cabeçalho Authorization vai para o Chaves)";
+"Hearing you" = "Ouvindo você";
 "Help" = "Ajuda";
 "Help improve LLMTray?" = "Ajudar a melhorar o LLMTray?";
 "Hide" = "Ocultar";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "Guia do LLMTray";
 "LLMTray events" = "Eventos do LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "O LLMTray o obtém com o modelo que ele acelera: baixe esse modelo.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray é grátis: sem assinaturas, sem recursos bloqueados. Se for útil para você, você pode apoiar o desenvolvimento dele.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "O LLMTray não tem permissão para ler a aba de %@: ative em Ajustes do Sistema › Privacidade e Segurança › Automação.";
 "LLMTray isn't allowed to use the microphone." = "O LLMTray não tem permissão para usar o microfone.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray não tem permissão para usar o microfone. Permita em Ajustes do Sistema › Privacidade e Segurança › Microfone.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "O LLMTray não tem permissão para usar o microfone: Ajustes do Sistema > Privacidade e Segurança > Microfone.";
 "LLMTray restarts now to load them." = "LLMTray será reiniciado agora para carregar os itens.";
 "LLMTray status, indexing project files" = "Status do LLMTray, indexando arquivos do projeto";
 "LLMTray — Chat" = "LLMTray — Conversa";
@@ -725,6 +755,7 @@
 "Likes" = "Curtidas";
 "List my name" = "Listar meu nome";
 "List my name in Supporters" = "Listar meu nome em Patrocinadores";
+"Listening" = "Escutando";
 "Listening…" = "Ouvindo…";
 "Live output of the model process: loading, errors, requests." = "Saída em tempo real do processo do modelo: carregamento, erros e solicitações.";
 "Load %@" = "Carregar %@";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "Pasta de modelos: %@";
 "Models found: %lld" = "Modelos encontrados: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Modelos rodam neste Mac. Seus chats não saem daqui; apenas as ferramentas web, se ativadas, acessam a internet.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Os modelos que ouvem áudio (Gemma 4 E2B, E4B, 12B) recebem a gravação do seu turno junto com o texto, para ouvir como você falou. Até 30 segundos por turno.";
 "Models: %@ · free: %@" = "Modelos: %@ · livre: %@";
 "More" = "Mais";
 "Move %1$@ to %2$@" = "Mover %1$@ para %2$@";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "Nenhum destes servidores pode ser atualizado daqui (adicionado manualmente ou a partir de um arquivo).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Nenhum até agora. Concessões para um chat ou uma solicitação não aparecem aqui: terminam com ele.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Espaço em disco insuficiente: o modelo de voz precisa de %1$@, %2$@ está livre.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Espaço em disco insuficiente: a voz precisa de %1$@, e há %2$@ livres.";
 "Not enough free disk space for this model." = "Espaço livre em disco insuficiente para este modelo.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Espaço em disco insuficiente: %@ precisa de cerca de %@, %@ disponíveis.";
 "Not identical to %@: not a duplicate." = "Não idêntico a %@: não é duplicata.";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "Abrir LLMTray ao entrar";
 "Open Privacy Settings…" = "Abrir Ajustes de Privacidade…";
 "Open Server Log…" = "Abrir Log do Servidor…";
+"Open Settings" = "Abrir Ajustes";
 "Open Voice Lab…" = "Abrir Voice Lab…";
 "Open in New Tab" = "Abrir em nova aba";
 "Open in Preview" = "Abrir no Preview";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Acima disso, as notas mais fracas (mais antigas, menos certas) expiram. Notas fixadas são mantidas.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Substitui o idioma do macOS apenas para o LLMTray. Entra em vigor após reiniciar o LLMTray. Textos não traduzidos aparecem em inglês.";
 "PDF · %lld pages" = "PDF · %lld páginas";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: rápido, 25 idiomas europeus incluindo russo (2,5 GB). Whisper: 99 idiomas, mais lento (1,6 GB). macOS: sem download, mas só para idiomas que o macOS reconhece neste Mac sem internet, e apenas com o Ditado ativado. Nada do que você disser sai deste Mac.";
 "Past %lld messages" = "Últimas %lld mensagens";
 "Paste a Config" = "Colar uma configuração";
 "Paste a Config…" = "Colar uma configuração…";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "Ler isso também";
 "Read Past Chats…" = "Ler Conversas anteriores…";
 "Read What Wasn't Read" = "Ler o que não foi lido";
+"Read answers aloud" = "Ler respostas em voz alta";
 "Read chats" = "Ler Chats";
+"Read the answer aloud" = "Ler a resposta em voz alta";
 "Read web pages" = "Ler páginas da web";
 "Reading a chat…" = "Lendo um chat…";
 "Reading a prompt: up to %lld%" = "Leitura de prompt: até %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "Lendo o que está instalado…";
 "Reads Only" = "Somente leitura";
 "Reads chats with" = "Lê Chats com";
+"Ready" = "Pronto";
 "Ready." = "Pronto.";
 "Ready. This is the Full build: the runtime is included." = "Pronto. Esta é a build Full: o runtime está incluído.";
 "Reasoning" = "Raciocínio";
@@ -1148,6 +1187,7 @@
 "Selected" = "Selecionado";
 "Send" = "Envia a mensagem.";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Enviar um relatório diário anônimo: versão do app e do macOS, chip, tamanho da memória, idioma, recursos usados e famílias dos modelos (nunca os nomes). Nenhum prompt, conteúdo, arquivo ou nome de modelo deixa seu Mac. Você pode desativar a qualquer momento em Ajustes.";
+"Send my voice to models that hear" = "Enviar minha voz para modelos que ouvem";
 "Sending…" = "Enviando…";
 "Sends anonymous usage statistics" = "Envia estatísticas anônimas de uso";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "É enviado primeiro em cada solicitação de chat no app. O Default vem com um prompt inicial curto -- amplie-o ou substitua-o. Não se aplica a clientes de API externos.";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "Classifica mensagens com";
 "Source on GitHub" = "Código-fonte no GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Espaço ocupado pelos modelos nesta pasta e o que ainda está livre no disco.";
+"Speak" = "Falar";
 "Speakers work with echo cancellation; headphones are still best." = "Alto-falantes funcionam com cancelamento de eco; fones ainda são melhores.";
+"Speaking" = "Falando";
 "Speaking…" = "Falando…";
 "Speculative decoding (MTP)" = "Decodificação especulativa (MTP)";
+"Speech recognition" = "Reconhecimento de fala";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "O reconhecimento de fala não tem permissão, ou a Siri e o Ditado estão desativados: Ajustes do Sistema > Teclado > Ditado.";
 "Speed" = "Velocidade";
 "Speeds up %@: fetched where LLMTray loads it from." = "Acelera %@: obtido de onde o LLMTray o carrega.";
+"Spoken answers" = "Respostas em voz alta";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Tempo limite por inatividade: %lld s";
 "Start" = "Iniciar";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "Pare o Voice Lab e a geração de música para atualizá‑lo.";
 "Stop Voice Lab first." = "Pare o Voice Lab primeiro.";
 "Stop generating" = "Interrompe a geração.";
+"Stop reading the answer" = "Parar de ler a resposta";
+"Stop reading the answer first." = "Primeiro, pare de ler a resposta.";
 "Stop recording" = "Parar gravação";
 "Stop server (unload model)" = "Para o servidor (descarrega o modelo).";
 "Stop the server to change these." = "Pare o servidor para alterar isto.";
@@ -1272,10 +1319,12 @@
 "System" = "Sistema";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "Locais do sistema e privados (a própria pasta Início, Library, Applications, chaves) nunca são compartilhados.";
 "System prompt" = "Prompt do sistema";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "Sistema: a voz do macOS para o idioma da resposta, sem nada para baixar (mais vozes em Ajustes do Sistema > Acessibilidade > Conteúdo Falado). Chatterbox: uma voz neural natural em 23 idiomas, incluindo russo, que pode imitar uma voz a partir de um clipe curto; roda neste Este Mac.";
 "Tab %lld" = "Aba %lld";
 "Talk" = "Falar";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Converse com um modelo local speech-to-speech que ouve e responde com sua própria voz, simultaneamente, como numa chamada. Experimental e somente em inglês: sem ferramentas, sem projetos, nada é mantido.";
 "Talk with the model in Voice Lab" = "Converse com o modelo no Voice Lab";
+"Talk with the model: a voice conversation (Esc ends it)" = "Falar com o modelo: uma conversa por voz (Esc encerra)";
 "Talking… press Done when you're finished." = "Falando… pressione Pronto quando terminar.";
 "Target: %@ · profile %@" = "Destino: %@ · perfil %@";
 "Temperature" = "Temperatura";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "O próprio modelo do Chat";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "O próprio modelo do Chat: cada Chat é lido pelo modelo que respondeu nele — um Chat em russo com Gemma não é lido por um codificador só em inglês que você carregou depois. Um modelo: todos os Chats são lidos por ele, então todas as notas são escritas do mesmo jeito. Em qualquer caso, um Chat espera até que seu modelo esteja carregado e livre; nada é carregado para ele, a menos que você permita isso abaixo.";
 "The chats and models in that folder were here already." = "As conversas e modelos nessa pasta já estavam aqui.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "O clipe tem %.0f s: no máximo 30 s — encurte-o.";
+"The clip is %.0f s: at least 5 s are needed." = "O clipe tem %.0f s: são necessários pelo menos 5 s.";
 "The command %@ wasn't found." = "O comando %@ não foi encontrado.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "As cópias dos arquivos adicionados a projetos e seus índices, em conjunto. Os do próprio projeto são mostrados na janela Arquivos; excluir um projeto os apaga.";
 "The day the counts are for." = "O dia a que as contagens se referem.";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "O servidor do modelo não fica mais online ao iniciar.";
 "The model that reads them" = "O modelo que as lê";
 "The model's license, from its card." = "A licença do modelo, conforme o cartão do modelo.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "O modelo, seu tokenizador de fala e o dicionário de acentos do russo: %@ na Pasta de modelos. Chatterbox (Resemble AI) e ruaccent usam a licença MIT; o tokenizador de fala, do CosyVoice2, usa Apache-2.0.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "A pasta models não está disponível — o disco está conectado? Escolha-a novamente em Ajustes → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "O máximo que o cache de prompts anteriores pode ocupar (o tamanho do Cache de prompt do perfil também é um limite). Mais espaço acelera conversas longas e agentes; espaço demais não deixa margem para o prompt que está sendo lido.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "O máximo que as notas ocupam no prompt de um chat. Notas fixadas e suas preferências declaradas vão primeiro; depois, o restante por ordem de recência.";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "O plano mudou desde que você o viu: revise novamente.";
 "The port and network access can change only while the server is stopped." = "A porta e o acesso à rede só podem ser alterados enquanto o servidor estiver parado.";
 "The project's files, and Add Files…" = "Os arquivos do projeto e Adicionar Arquivos…";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "O reconhecedor, mais o Silero VAD (onde a fala começa e termina) e o Smart Turn (se uma pausa encerra seu turno), na Pasta de modelos. Licenças: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "O registro não respondeu em 30 segundos. Tente novamente em instantes.";
 "The reply was cut at its length limit." = "A resposta foi cortada no limite de comprimento.";
 "The report" = "O relatório";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "O servidor inicia quando %@ for baixado";
 "The server starts with %@" = "O servidor inicia com %@";
 "The settings here were kept." = "As configurações daqui foram mantidas.";
+"The speech recognizer stopped: %@" = "O reconhecedor de fala parou: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "As sugestões para este Mac já estão aqui. Navegue no Hugging Face por outro modelo.";
 "The tips aren't available right now." = "As contribuições não estão disponíveis no momento.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "A versão do LLMTray de ipsupport.us está aberta. Encerre-a primeiro (ícone na barra de menus › Encerrar) e abra esta novamente: as duas usariam a mesma porta e carregariam modelos duas vezes.";
+"The voice couldn't open the audio output." = "A voz não conseguiu abrir a saída de áudio.";
+"The voice couldn't open the audio output: %@" = "A voz não conseguiu abrir a saída de áudio: %@";
+"The voice failed: %@" = "A voz falhou: %@";
+"The voice is being downloaded -- try again once it's done." = "A voz está sendo baixada — tente novamente quando terminar.";
 "The voice model is being downloaded -- try again once it's done." = "O modelo de voz está sendo baixado — tente novamente quando terminar.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "O modelo de voz não está baixado — baixe em Ajustes > Voz.";
 "The voice model's audio format isn't supported." = "O formato de áudio do modelo de voz não é suportado.";
 "The voice runner sent an unreadable ready message." = "O executor de voz enviou uma mensagem de pronto ilegível.";
 "The voice runner stopped unexpectedly (%@)." = "O executor de voz parou inesperadamente (%@).";
+"The voice stopped: %@" = "A voz parou: %@";
+"The voice that answers is the one picked under Spoken answers." = "A voz que responde é a escolhida em Respostas em voz alta.";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Em seguida, reinicie o servidor do modelo. O limite volta ao padrão quando o Mac reinicia. O LLMTray nunca altera isso sozinho.";
 "There's no plan waiting any more." = "Não há mais plano aguardando.";
 "These can't be added to a project" = "Estes não podem ser adicionados a um projeto";
 "These models go back to Default: %@." = "Esses modelos voltam para Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Eles rodam um por vez, mostrados na janela da barra de menus. Você pode fechar essa janela enquanto isso.";
+"Thinking" = "Pensando";
 "Thinking effort: %@" = "Esforço de raciocínio: %@";
 "Thinking effort: how long the model may think before it answers" = "Esforço de raciocínio: por quanto tempo o modelo pode pensar antes de responder";
 "Thinking…" = "Pensando…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "Usar %@";
 "Use %lld" = "Usar %lld";
 "Use Anyway" = "Usar mesmo assim";
+"Use Built-in" = "Usar Integrada";
 "Use Default Folder" = "Usar Pasta Padrão";
 "Use Folder" = "Usar pasta";
 "Use LM Studio's folder" = "Usar pasta do LM Studio";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "Usar um fato aprendido imediatamente";
 "Use a learned fact once %lld chats show it" = "Usar um fato aprendido quando %lld chats mostrarem isso";
 "Use headphones: the model hears its own voice from the speakers." = "Use fones: o modelo ouve sua própria voz pelos alto-falantes.";
+"Use your own voice, or a voice you have permission to use." = "Use sua própria voz ou uma voz que você tenha permissão para usar.";
 "Used" = "Usado";
 "Used by %@." = "Usado por %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Usados por geração de imagem, música e Voice Lab, que os baixam. Também são mantidos na pasta models, com seus nomes do Hugging Face.";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "O Voice Lab usa cerca de %1$@ GB, mais do que os %2$@ GB que a GPU pode usar: aumente primeiro o limite de memória da GPU.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "O Voice Lab usa cerca de %1$@ GB; com os %2$@ GB do modelo de chat cabe nos %3$@ GB que a GPU pode usar. Ainda assim, o modelo de chat é descarregado enquanto ele estiver em execução.";
 "Voice Lab takes about %@ GB of memory while it runs." = "O Voice Lab usa cerca de %@ GB de memória enquanto está em execução.";
+"Voice clip" = "Clipe de voz";
+"Voice conversation" = "Conversa por voz";
 "Voice model" = "Modelo de voz";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Aguarde a solicitação ou o benchmark atual terminar — reiniciar interromperia o processo.";
 "Waiting for a model download to finish…" = "Aguardando o término do download do modelo…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "Novidades…";
 "What's sent" = "O que é enviado";
 "When a client asks for another model" = "Quando um cliente pede outro modelo";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "Quando uma resposta demora mais de um segundo, um breve “hmm” ou “deixe-me ver” na voz das respostas, para que o silêncio não pareça uma ligação que caiu. Feitos nos momentos silenciosos da conversa e mantidos por voz.";
 "When an app asks for another model" = "Quando um app pede outro modelo";
 "When an app asks for another model: %@" = "Quando um app pede outro modelo: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "Quando Chats aguardam um modelo que não está carregado, a memória pode carregá-lo depois que o LLMTray ficar inativo por esse tempo (nenhum Chat, app ou imagem em andamento). A próxima solicitação ao seu modelo usual carrega esse modelo de volta, o que leva um momento.";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "Onde você está: uma cidade ou um endereço";
 "Which model generates new images." = "Qual modelo gera novas imagens.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Enquanto o modelo fala, som do microfone mais baixo que este valor chega como silêncio: o resíduo da própria voz que a cancelamento de eco deixa fica de fora, uma voz por cima ainda interrompe. Aumente se o modelo ouvir a si mesmo, diminua se ele deixar de perceber sua interrupção. Entra em vigor no próximo início.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "Janela";
 "Windows and pages" = "Janelas e páginas";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "está em uso ou sendo baixado";
 "less than a minute left" = "menos de um minuto restante";
 "llmtray in the terminal" = "llmtray no terminal";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "O macOS não consegue reconhecer %@ neste Mac sem enviar para fora do Mac. Escolha Parakeet em Ajustes > Voz.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "O macOS remove a própria voz do modelo do microfone (Voice Processing, como no FaceTime), por isso funciona com alto-falantes. Também uniformiza o nível e reduz ruído de fundo. Entra em vigor no próximo início.";
 "make %lld folders" = "criar %lld pastas";
 "mlx-audio runtime" = "Tempo de execução mlx-audio";

@@ -43,6 +43,7 @@
 "%@ requests" = "%@ запитів";
 "%@ s" = "%@ с";
 "%@ tok/s" = "%@ ток/с";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "Наразі %@ токенів оброблено локально в LLMTray. Він безплатний, без підписок; якщо він вам корисний, ви можете підтримати його розвиток.";
 "%@ wasn't found on Hugging Face." = "%@ не знайдено на Hugging Face.";
 "%@ · %@ left" = "%@ · залишилось %@";
 "%@ · %@ of %@" = "%@ · %@ із %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "На сервері змінено %lld інструментів: налаштуйте, щоб прийняти їх.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld біт";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "«Не надіслано»: виберіть «Модель для чату» або дочекайтеся поточної відповіді.";
 "(Please attach the report file shown in Finder.)" = "(Будь ласка, додайте файл звіту, показаний у Finder.)";
 "(estimate; exact after the first answer)" = "(оцінка; точно після першої відповіді)";
 "(measured for this model)" = "(виміряно для цієї моделі)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Чат може переглядати дозволені вами папки та пропонувати нові папки, переміщення й перейменування. Ви підтверджуєте кожну зміну й можете скасувати її.";
 "A chat model" = "Модель для чату";
 "A client" = "Клієнт";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "Запис коротший за 10 с підходить, але 10 с або довше краще імітує голос.";
 "A deleted project" = "Видалений проєкт";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Факт або спостереження, вивчені з одного чату, чекатимуть, доки це з’явиться ще в одному чаті (або доки ви це схвалите): одне запитання — це ще не ви. Те, що ви просите — уподобання, виправлення — використовується одразу.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Більш насичена, завершеніша мікс‑версія; слова менше виділяються. Приблизно 20 с для 30 с музики.";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "Відповідь (усі запити)";
 "Answer details" = "Деталі відповіді";
 "Answer in Russian, briefly" = "Відповідь російською, коротко";
+"Answers are read aloud -- click to stop" = "Відповіді озвучуються — натисніть, щоб зупинити";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Будь-які інші прапорці mlx_lm.server через пробіл, наприклад --draft-model <шлях>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Будь-хто у вашій мережі може користуватися сервером: ключ обмежує доступ клієнтами, яким ви його надасте.";
 "Anything else chats should know" = "Що ще чатам варто знати";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Імпортує чати, проєкти, профілі, моделі для зображень, музики, голосу та ембедингів і налаштування з версії з ipsupport.us (завершіть її спочатку). Чати й моделі тут збережено; її налаштування замінять ці. Моделі не займають додаткового місця на диску. Моделі чатів лишаються в папці моделей: виберіть її в Settings › Models.";
 "Browse Hugging Face…" = "Відкрити Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Вбудовано в macOS · лише для Чату LLMTray";
+"Built-in" = "Вбудований";
 "By" = "За";
 "Cached" = "У кеші";
 "Calculator" = "Калькулятор";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "Чати поза проєктами";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Чати починаються з коротких нотаток про вас і вашу роботу: які відповіді вам подобаються, над чим ви працюєте, що ви виправляли раніше. Надсилаються лише нотатки, що вкладаються в бюджет, і лише у власних чатах LLMTray — ніколи в програми, що використовують API, і ніколи в тимчасові чати. Усе залишається на цьому комп’ютері.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Чати, проєкти, профілі та моделі зображень, музики, голосу й ембедингів із версії з ipsupport.us тепер тут. Папки, яким ви надали доступ цій версії, та ваша папка з моделями чатів потребують повторного підтвердження.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Багатомовний V3 (8-біт)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Декодер Chatterbox Turbo робить кожне речення приблизно в 4 рази швидшим, без чутної різниці: ще %@.";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox не підтримує цю мову (%@): відповідь озвучив системний голос.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox імітує голос із запису тривалістю від 5 до 30 секунд (найкраще — 10 або більше): чітке мовлення, один голос, без музики. Запис копіюється в теку LLMTray і ніколи не залишає цей Цей Mac.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox не завантажено: відповідь озвучив системний голос.";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
 "Check for Runtime Updates" = "Перевірити оновлення рантайму";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "Автоматично перевіряти оновлення";
 "Chip" = "Чіп";
 "Choose Another Folder…" = "Вибрати іншу папку…";
+"Choose Clip…" = "Вибрати запис…";
 "Choose Files…" = "Вибрати файли…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "Виберіть запис тривалістю від 5 до 30 секунд: свій голос або голос, на використання якого у вас є дозвіл.";
 "Choose a folder chats may use." = "Виберіть папку, яку чати можуть використовувати.";
 "Choose a folder the chat may look in." = "Виберіть папку, яку чат може переглянути.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Виберіть папку, в якій чат може пропонувати зміни. Ви затверджуєте кожну зміну.";
@@ -332,6 +345,7 @@
 "Close" = "Закрити";
 "Close Tab" = "Закрити вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закриває це вікно. Налаштування › Основні › Налаштувати LLMTray… відкриває його знову.";
+"Code in the chat." = "Код у Чат.";
 "Coding agents" = "Агенти для кодування";
 "Coffee" = "Кава";
 "Comes with %@" = "Постачається з %@";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "Не вдається зв’язатися із сервером — спробуйте пізніше.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Не вдалося прочитати деякі частини чатів; повторна спроба о %@ (чому: Налаштування › Сервер › Журнал).";
 "Couldn't start the voice runner: %@" = "Не вдалося запустити voice runner: %@";
+"Couldn't start the voice: %@" = "Не вдалося запустити голос: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Підраховує запити й токени за моделлю, клієнтом і днем, а також швидкість їх виконання. Зберігається лише на цьому Mac і нікуди не надсилається.";
 "Countdown" = "Відлік";
 "Countdown: %lld s" = "Зворотний відлік: %lld с";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "Не запам’ятовувати цей чат…";
 "Don't remember this chat?" = "Не запам’ятовувати цей чат?";
 "Don't show again" = "Більше не показувати";
+"Don't show this again" = "Більше не показувати.";
 "Done" = "Готово";
 "Done talking: the model answers" = "Говоріння завершено: модель відповідає";
 "Done: %lld changes made." = "Готово: виконано %lld змін.";
 "Download" = "Завантажити";
+"Download (%@)" = "Завантажити (%@)";
 "Download LLMTray-Full" = "Завантажити LLMTray‑Full";
 "Download and Enable" = "Завантажити й увімкнути";
 "Download for %@, into the models folder" = "Завантажити для %@ у папку models";
 "Download into the models folder" = "Завантажити в папку models";
 "Download models" = "Завантажити моделі";
 "Download models from Hugging Face" = "Завантажити моделі з Hugging Face";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Спершу завантажте розпізнавач мовлення: Налаштування > Голос > Голосова розмова.";
 "Downloaded" = "Завантажено";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Завантажено попередньою версією на іншому диску, не в папці models: файл залишиться на місці.";
 "Downloading" = "Завантаження";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "Завантаження %@…";
 "Downloading %lld files…" = "Завантаження %lld файлів…";
 "Downloading the embedder failed: %@" = "Завантаження embedder не вдалося: %@";
+"Downloading the fast decoder…" = "Завантаження швидкого декодера…";
 "Downloading…" = "Завантаження…";
 "Downloads" = "Завантаження";
 "Downloads waiting: %lld" = "Черга завантажень: %lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "Відпустіть, щоб додати до «%@»";
 "Drop to attach images" = "Відпустіть, щоб приєднати зображення";
 "Duplicate this profile" = "Дублювати профіль";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Кожна нова відповідь озвучується речення за реченням під час написання. Код, таблиці та посилання не читаються. «Озвучити» під будь-якою відповіддю читає саме її; кнопка динаміка над полем повідомлення вмикає та вимикає це.";
 "Echo cancellation" = "Поглинання ехо";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не вдалося ввімкнути поглинання ехо: %@ — вимкніть у Налаштування > Голос.";
 "Echo cancellation isn't available on this Mac." = "Поглинання ехо недоступне на цьому Mac.";
+"Echo cancellation isn't available: %@" = "Поглинання ехо недоступне: %@";
 "Echo gate" = "Шлюз ехо";
 "Edit Note" = "Редагувати нотатку";
 "Edit Profile…" = "Редагувати профіль…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "Увімкнути файли проєкту?";
 "Enable…" = "Увімкнути…";
 "End" = "Завершити";
+"End the conversation" = "Завершити розмову";
+"End the conversation (Esc)" = "Завершити розмову (Esc)";
 "End the conversation (the chat model reloads)" = "Завершити розмову (чат‑модель перезавантажиться)";
 "Enjoying LLMTray?" = "Сподобається LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Середовище, NAME=value в кожному рядку (ключі, токени й паролі зберігаються в Keychain)";
 "Errors" = "Помилки";
 "Errors: go to the next one (⌘E)" = "Помилки: перейти до наступної (⌘E)";
+"Esc ends the conversation" = "Esc завершує розмову";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Кожен чат у цьому проєкті отримує ці інструкції після системного підказу в описі моделі. Зміни діють з наступного повідомлення.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
 "Every day's counts are removed. This can't be undone." = "Підрахунки за всі дні буде видалено. Це не можна скасувати.";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Файли, які ви додаєте до проєкту, індексуються на цьому Mac, тож чати можуть їх шукати.";
 "Files · off" = "Файли · вимк.";
 "Files…" = "Файли…";
+"Fillers on pauses" = "Заповнювачі в паузах";
 "Finish" = "Готово";
 "Finish applies what you chose. You can change all of it later in Settings." = "«Готово» застосовує вибране. Ви зможете змінити все потім у Settings.";
 "Finish in your browser…" = "Завершіть у браузері…";
@@ -551,6 +576,7 @@
 "Free disk space" = "Вільне місце на диску";
 "Free on disk: %@ · your models: %@" = "Вільно на диску: %@ · ваші моделі: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
+"From a clip" = "Із запису";
 "From the MCP Registry" = "З реєстру MCP";
 "Full" = "Повний";
 "Full duplex" = "Повний дуплекс";
@@ -570,6 +596,7 @@
 "Generating music…" = "Генерування музики…";
 "Generation" = "Генерація";
 "Get" = "Отримати";
+"Get Faster Decoder" = "Отримати швидкий декодер";
 "Get Started" = "Почати";
 "Get a Model…" = "Отримати модель…";
 "Get one" = "Отримати";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Має інші імена (жорстке посилання): вони зберігають файл.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Заголовки, Ім'я: value в кожному рядку (заголовок Authorization зберігається в Keychain)";
+"Hearing you" = "Чую вас";
 "Help" = "Довідка";
 "Help improve LLMTray?" = "Допомогти покращити LLMTray?";
 "Hide" = "Сховати";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "Посібник LLMTray";
 "LLMTray events" = "Події LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray завантажує це разом із моделлю, яку воно пришвидшує: завантажте цю модель.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray безплатний: без підписок, без заблокованих функцій. Якщо він вам корисний, ви можете підтримати його розвиток.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray не має дозволу читати вкладку %@: увімкніть це в Системних параметрах › Приватність і безпека › Автоматизація.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray не має дозволу на використання мікрофона.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray не має дозволу використовувати мікрофон. Дозвольте це в Системних налаштуваннях › Приватність і безпека › Мікрофон.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray не має дозволу на використання мікрофона: Системні параметри > Конфіденційність і безпека > Мікрофон.";
 "LLMTray restarts now to load them." = "LLMTray зараз перезапуститься, щоб завантажити їх.";
 "LLMTray status, indexing project files" = "Статус LLMTray: індексація файлів проєкту";
 "LLMTray — Chat" = "LLMTray — Чат";
@@ -725,6 +755,7 @@
 "Likes" = "Лайки";
 "List my name" = "Додати моє ім’я";
 "List my name in Supporters" = "Додати моє ім’я до Supporters";
+"Listening" = "Слухаю";
 "Listening…" = "Прослуховування…";
 "Live output of the model process: loading, errors, requests." = "Живий вивід процесу моделі: завантаження, помилки, запити.";
 "Load %@" = "Завантажити %@";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "Папка з моделями: %@";
 "Models found: %lld" = "Знайдено моделей: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Моделі працюють на цьому Mac. Ваші чати не покидають його; лише веб‑інструменти, якщо ви їх увімкнете, виходять в інтернет.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Моделі, які чують аудіо (Gemma 4 E2B, E4B, 12B), отримують запис вашої репліки разом із її текстом, тож вони чують, як саме ви це сказали. До 30 секунд на репліку.";
 "Models: %@ · free: %@" = "Моделі: %@ · вільно: %@";
 "More" = "Докладніше";
 "Move %1$@ to %2$@" = "Перемістити %1$@ до %2$@";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "Жоден із цих серверів не можна оновити звідси (їх додано вручну або з файлу).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Ще немає. Дозволи для одного чату або одного запиту тут не списуються: вони закінчуються разом із ним.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Недостатньо місця на диску: голосова модель потребує %1$@, вільно %2$@.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Недостатньо місця на диску: для голосу потрібно %1$@, доступно %2$@.";
 "Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостатньо вільного місця на диску: %@ потребує приблизно %@, вільно %@.";
 "Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "Відкривати LLMTray під час входу";
 "Open Privacy Settings…" = "Відкрити налаштування конфіденційності…";
 "Open Server Log…" = "Відкрити лог сервера…";
+"Open Settings" = "Відкрити налаштування";
 "Open Voice Lab…" = "Відкрити Voice Lab…";
 "Open in New Tab" = "Відкрити в новій вкладці";
 "Open in Preview" = "Відкрити в Preview";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Понад це найслабші нотатки (найстаріші, найменш певні) спливають. Закріплені нотатки зберігаються.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "PDF · %lld pages" = "PDF · %lld сторінок";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: швидко, 25 європейських мов, зокрема російська (2.5 GB). Whisper: 99 мов, повільніше (1.6 GB). macOS: без завантаження, але лише мови, які macOS розпізнає на цьому Mac без інтернету, і лише коли ввімкнено Диктування. Нічого з того, що ви говорите, не залишає цей Mac.";
 "Past %lld messages" = "Понад %lld повідомлень";
 "Paste a Config" = "Вставити конфігурацію";
 "Paste a Config…" = "Вставити конфігурацію…";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "Прочитати також";
 "Read Past Chats…" = "Прочитати попередні чати…";
 "Read What Wasn't Read" = "Прочитати непрочитане";
+"Read answers aloud" = "Читати відповіді вголос";
 "Read chats" = "Читати чати";
+"Read the answer aloud" = "Читати відповідь вголос";
 "Read web pages" = "Читати вебсторінки";
 "Reading a chat…" = "Читання чату…";
 "Reading a prompt: up to %lld%" = "Читання підказки: до %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
 "Reads Only" = "Лише читання";
 "Reads chats with" = "Читає чати за допомогою";
+"Ready" = "Готово";
 "Ready." = "Готово.";
 "Ready. This is the Full build: the runtime is included." = "Готово. Це збірка Full: runtime включено.";
 "Reasoning" = "Міркування";
@@ -1148,6 +1187,7 @@
 "Selected" = "Вибрано";
 "Send" = "Надіслати";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Надсилати анонімний щоденний звіт: версія додатка й macOS, чип, обсяг пам’яті, мова, які функції ви використовували та сімейства моделей (ніколи їхні назви). Жодні підказки, вміст, файли чи назви моделей не покидають ваш Mac. Ви можете вимкнути це в Налаштуваннях у будь‑який час.";
+"Send my voice to models that hear" = "Надсилати мій голос моделям, які чують";
 "Sending…" = "Відправлення…";
 "Sends anonymous usage statistics" = "Надсилати анонімну статистику використання";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Надсилається першим у кожному запиті вбудованого чату. У Default уже є короткий стартовий промпт — доповніть його або замініть. До зовнішніх API-клієнтів не застосовується.";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "Сортує повідомлення за допомогою";
 "Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
+"Speak" = "Озвучити";
 "Speakers work with echo cancellation; headphones are still best." = "Динаміки працюють із поглинанням ехо; навушники все ще кращі.";
+"Speaking" = "Говорю";
 "Speaking…" = "Говорить…";
 "Speculative decoding (MTP)" = "Спекулятивне декодування (MTP)";
+"Speech recognition" = "Розпізнавання мовлення";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "Розпізнавання мовлення не дозволено або Siri й Диктування вимкнено: Системні параметри > Клавіатура > Диктування.";
 "Speed" = "Швидкість";
 "Speeds up %@: fetched where LLMTray loads it from." = "Пришвидшує %@: завантажується звідти, звідки його завантажує LLMTray.";
+"Spoken answers" = "Озвучення відповідей";
 "Stable" = "Стабільний";
 "Stall timeout: %lld s" = "Таймаут зависання: %lld с";
 "Start" = "Почати";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "Зупиніть Voice Lab і генерацію музики для оновлення.";
 "Stop Voice Lab first." = "Спочатку зупиніть Voice Lab.";
 "Stop generating" = "Зупинити генерацію";
+"Stop reading the answer" = "Зупинити читання відповіді";
+"Stop reading the answer first." = "Спочатку зупиніть читання відповіді.";
 "Stop recording" = "Зупинити записування";
 "Stop server (unload model)" = "Зупинити сервер (вивантажити модель)";
 "Stop the server to change these." = "Зупиніть сервер, щоб змінити це.";
@@ -1272,10 +1319,12 @@
 "System" = "Системна";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "Системні та приватні місця (сам домашній каталог, Library, Applications, keys) ніколи не передаються.";
 "System prompt" = "Системний промпт";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "Системна: голос macOS для мови відповіді, нічого завантажувати не потрібно (більше голосів — у System Settings > Accessibility > Spoken Content). Chatterbox: природний нейромережевий голос 23 мовами, зокрема російською, який може імітувати голос із короткого запису; працює на цьому Цей Mac.";
 "Tab %lld" = "Вкладка %lld";
 "Talk" = "Говорити";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Спілкуйтеся з локальною моделлю speech‑to‑speech, яка слухає й відповідає власним голосом одночасно, як у телефонній розмові. Експериментально, тільки англійська: без інструментів, без проєктів, нічого не зберігається.";
 "Talk with the model in Voice Lab" = "Поспілкуйтеся з моделлю в Voice Lab";
+"Talk with the model: a voice conversation (Esc ends it)" = "Говорити з моделлю: голосова розмова (Esc завершує її)";
 "Talking… press Done when you're finished." = "Говорю… натисніть \"Done\", коли закінчите.";
 "Target: %@ · profile %@" = "Ціль: %@ · профіль %@";
 "Temperature" = "Температура";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "Власна модель чату";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "Власна модель чату: кожен чат читає модель, яка відповідала в ньому — чат російською з Gemma не читатиме кодер лише англійською, який ви завантажили пізніше. Одна модель: кожен чат читає вона, тож усі нотатки записуються однаково. У будь-якому разі чат чекає, доки його модель буде завантажена й вільна; для нього нічого не завантажується, якщо ви не дозволите це нижче.";
 "The chats and models in that folder were here already." = "Чати та моделі в тій папці вже були тут.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "Тривалість запису — %.0f с: максимум 30 с — вкоротіть його.";
+"The clip is %.0f s: at least 5 s are needed." = "Тривалість запису — %.0f с: потрібно щонайменше 5 с.";
 "The command %@ wasn't found." = "Команду %@ не знайдено.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Копії файлів, доданих до проєктів, та їхні індекси разом. Файли проєкту показуються у вікні Files; видалення проєкту видаляє їх.";
 "The day the counts are for." = "День, за який підрахунок.";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "Сервер моделі більше не виходить в інтернет під час запуску.";
 "The model that reads them" = "Модель, яка їх читає";
 "The model's license, from its card." = "Ліцензія моделі з її картки.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "Модель, її мовний токенізатор і словник російських наголосів: %@ у Теці моделей. Chatterbox (Resemble AI) і ruaccent мають ліцензію MIT; мовний токенізатор із CosyVoice2 — Apache-2.0.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка models недоступна — чи підключено її диск? Виберіть папку заново в Налаштування → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Максимальна пам’ять, яку може займати кеш попередніх підказок (розмір Prompt cache у профілі також встановлює обмеження). Більше пришвидшує довгі розмови та агентів; занадто багато залишає замало місця для підказки, що читається.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "Максимальний обсяг нотаток у запиті чату. Спершу йдуть закріплені нотатки та вказані вами вподобання, потім решта — за новизною.";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "План змінився з моменту вашого перегляду: перевірте його ще раз.";
 "The port and network access can change only while the server is stopped." = "Порт і доступ до мережі можна змінювати лише коли сервер зупинено.";
 "The project's files, and Add Files…" = "Файли проєкту та «Додати файли…»";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "Розпізнавач, а також Silero VAD (де мовлення починається й закінчується) і Smart Turn (чи завершує пауза вашу репліку), — у Теці моделей. Ліцензії: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Реєстр не відповів за 30 секунд. Спробуйте ще раз за мить.";
 "The reply was cut at its length limit." = "Відповідь була обрізана через обмеження довжини.";
 "The report" = "Звіт";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "Сервер запуститься після завантаження %@";
 "The server starts with %@" = "Сервер запускається з %@";
 "The settings here were kept." = "Поточні налаштування збережено.";
+"The speech recognizer stopped: %@" = "Розпізнавач мовлення зупинився: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Пропозиції для цього Mac вже тут. Перегляньте Hugging Face, щоб знайти іншу модель.";
 "The tips aren't available right now." = "Поради наразі недоступні.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Відкрито версію LLMTray з ipsupport.us. Спочатку завершіть її роботу (її іконка в смузі меню › Вихід), а потім знову відкрийте цю: обидві використовуватимуть той самий порт і завантажуватимуть моделі двічі.";
+"The voice couldn't open the audio output." = "Голос не зміг відкрити аудіовихід.";
+"The voice couldn't open the audio output: %@" = "Голос не зміг відкрити аудіовихід: %@";
+"The voice failed: %@" = "Помилка голосу: %@";
+"The voice is being downloaded -- try again once it's done." = "Голос завантажується — спробуйте ще раз, коли завантаження завершиться.";
 "The voice model is being downloaded -- try again once it's done." = "Голосова модель завантажується — спробуйте знову після завершення.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Голосова модель не завантажена — завантажте її в Налаштування > Voice.";
 "The voice model's audio format isn't supported." = "Формат аудіо голосової моделі не підтримується.";
 "The voice runner sent an unreadable ready message." = "Voice runner надіслав нечитаємо повідомлення про готовність.";
 "The voice runner stopped unexpectedly (%@)." = "Voice runner зупинився несподівано (%@).";
+"The voice stopped: %@" = "Голос зупинився: %@";
+"The voice that answers is the one picked under Spoken answers." = "Для відповіді використовується голос, вибраний в «Озвучення відповідей».";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Потім перезапустіть сервер моделі. Ліміт повертається до стандартного після перезавантаження Mac. LLMTray не змінює його автоматично.";
 "There's no plan waiting any more." = "План більше не очікує.";
 "These can't be added to a project" = "Ці файли не можна додати до проєкту";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Вони запускаються по черзі й показуються у вікні рядка меню. Можете тимчасово закрити це вікно.";
+"Thinking" = "Думаю";
 "Thinking effort: %@" = "Зусилля на міркування: %@";
 "Thinking effort: how long the model may think before it answers" = "Зусилля на міркування: як довго модель може міркувати перед відповіддю";
 "Thinking…" = "Думаю…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "Використати %@";
 "Use %lld" = "Використати %lld";
 "Use Anyway" = "Використати все одно";
+"Use Built-in" = "Використати вбудований";
 "Use Default Folder" = "Використовувати папку за замовчуванням";
 "Use Folder" = "Вибрати теку";
 "Use LM Studio's folder" = "Тека LM Studio";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "Використовувати вивчений факт одразу";
 "Use a learned fact once %lld chats show it" = "Використовувати вивчений факт, коли він з’явиться в %lld чатах";
 "Use headphones: the model hears its own voice from the speakers." = "Використовуйте навушники: модель чує власний голос із динаміків.";
+"Use your own voice, or a voice you have permission to use." = "Використовуйте свій голос або голос, на використання якого у вас є дозвіл.";
 "Used" = "Використано";
 "Used by %@." = "Використано %@.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Використовуються для генерації зображень, музики та Voice Lab, які їх завантажують. Також зберігаються в папці models під їхніми іменами на Hugging Face.";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab потребує приблизно %1$@ ГБ, більше ніж %2$@ ГБ, які може використовувати GPU: спочатку підніміть ліміт пам’яті GPU.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab потребує приблизно %1$@ ГБ; разом із %2$@ ГБ чат‑моделі це поміщається в %3$@ ГБ, які може використовувати GPU. Проте чат‑модель все одно розвантажується під час його роботи.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab використовує приблизно %@ ГБ пам’яті під час роботи.";
+"Voice clip" = "Запис голосу";
+"Voice conversation" = "Голосова розмова";
 "Voice model" = "Голосова модель";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
 "Waiting for a model download to finish…" = "Очікування завершення завантаження моделі…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "Що нового…";
 "What's sent" = "Що надсилається";
 "When a client asks for another model" = "Коли клієнт запитує іншу модель";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "Якщо відповідь триває довше секунди, у голосі відповідей звучить коротке «гм» або «дай-но перевірю», щоб тиша не скидалася на обірваний дзвінок. Створюється в тихі моменти розмови й зберігається окремо для кожного голосу.";
 "When an app asks for another model" = "Коли додаток запитує іншу модель";
 "When an app asks for another model: %@" = "Коли додаток запитує іншу модель: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "Коли чати очікують модель, яку не завантажено, пам’ять може завантажити її, щойно LLMTray буде бездіяльним стільки часу (немає чату, програми чи зображення в роботі). Наступний запит до вашої звичної моделі знову завантажить її, а це триває певний час.";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "Де ви перебуваєте: місто або адреса";
 "Which model generates new images." = "Яка модель генерує нові зображення.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Під час мовлення моделі звук з мікрофона тихіший за це сприймається як тиша: слід власного голосу, який лишає придушення ехо, ігнорується, проте інший голос усе одно перериває. Підвищте, якщо модель чує себе, зменшіть, якщо не помічає вашого перебивання. Набирає чинності при наступному запуску.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "Вікно";
 "Windows and pages" = "Вікна й сторінки";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "використовується або завантажується";
 "less than a minute left" = "менше хвилини залишилося";
 "llmtray in the terminal" = "llmtray у терміналі";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS не може розпізнати %@ на цьому Mac, не надсилаючи дані за межі Mac. Виберіть Parakeet у Налаштування > Голос.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS вилучає власний голос моделі з мікрофона (Voice Processing, як у FaceTime), тож це працює з динаміками. Також вирівнює рівень і пригнічує фонований шум. Набуде чинності при наступному запуску.";
 "make %lld folders" = "створити %lld папок";
 "mlx-audio runtime" = "Час виконання mlx-audio";

@@ -43,6 +43,7 @@
 "%@ requests" = "%@ 個請求";
 "%@ s" = "%@ 秒";
 "%@ tok/s" = "%@ tok/s";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "到目前為止，已有 %@ 個 token 在 LLMTray 中於本機執行。它是免費的，沒有訂閱制；如果對你有幫助，你可以支持它的開發。";
 "%@ wasn't found on Hugging Face." = "在 Hugging Face 找不到 %@。";
 "%@ · %@ left" = "%@ · 剩餘 %@";
 "%@ · %@ of %@" = "%@ · %@ 共 %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "伺服器上有 %lld 個工具已變更：請設定以接受它們。";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位元";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "（未傳送：請選擇聊天模型，或等待目前進行中的回答完成。）";
 "(Please attach the report file shown in Finder.)" = "（請在 Finder 中附上報告檔案。）";
 "(estimate; exact after the first answer)" = "(估計值；第一次回應後為準)";
 "(measured for this model)" = "(此模型的實測值)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "對話可查看你允許的資料夾，並建議新增資料夾、移動或重新命名。你須核准每項變更，且可以復原。";
 "A chat model" = "聊天模型";
 "A client" = "用戶端";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "少於 10 秒的片段也可使用，但 10 秒以上能更好地模仿聲音。";
 "A deleted project" = "已刪除的專案";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "從一個聊天學到的事實或觀察，會等到另一個聊天也顯示相同內容（或你核准）後才使用：一個問題不代表你是誰。你提出的要求——偏好、修正——會立即使用。";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "音色更豐滿、聽起來更完成；歌詞較不突出。生成約需 30 秒音樂的 20 秒。";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "回應（所有請求）";
 "Answer details" = "回應詳細資訊";
 "Answer in Russian, briefly" = "以俄文簡短回應";
+"Answers are read aloud -- click to stop" = "回答正在朗讀中——按一下即可停止";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "其他任何 mlx_lm.server 旗標，以空格分隔，例如 --draft-model <path>。";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "你網路上的任何人都可以使用此伺服器：設定金鑰後，只有你提供金鑰的用戶端才能使用。";
 "Anything else chats should know" = "聊天還應該知道的其他事項";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "會從 ipsupport.us 的版本帶入對話、專案、個人檔案、圖片、音樂、語音與 embedding 模型，以及設定（請先將該版本退出）。此處的對話與模型會保留；其設定會取代這裡的設定。這些模型不會佔用額外磁碟空間。聊天模型仍會放在您的 models 資料夾：可於「設定 › Models」中選擇。";
 "Browse Hugging Face…" = "瀏覽 Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "macOS 內建 · 僅限 LLMTray 的聊天";
+"Built-in" = "內建";
 "By" = "依據";
 "Cached" = "快取";
 "Calculator" = "計算機";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "專案外的對話";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "對話開始時會包含關於你和你工作的簡短附註：你偏好的回應方式、正在處理的工作，以及你先前更正過的內容。只有符合預算的附註會送出，而且只會用於 LLMTray 自己的對話——絕不會送到使用 API 的 App，也絕不會用於臨時對話。所有內容都留在這部電腦上。";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "來自 ipsupport.us 版本的聊天、專案、個人檔案以及影像、音樂、語音和嵌入模型已匯入。您曾授權的資料夾與聊天模型資料夾需再次取得您的允許。";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox 多語言 V3（8 位元）";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Chatterbox Turbo 的解碼器可讓每句生成速度提升約 4 倍，聽感上沒有差異：%@ 更多資訊。";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox 不支援這個語言（%@）：已由系統語音朗讀回答。";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox 會模仿 5 到 30 秒音訊片段中的聲音（10 秒以上最佳）：語音清楚、僅一位說話者、無音樂。該片段會複製到 LLMTray 的檔案夾，且絕不會離開這台 Mac。";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox 尚未下載：已由系統語音朗讀回答。";
 "Check Again" = "再次檢查";
 "Check Now" = "立即檢查";
 "Check for Runtime Updates" = "檢查執行階段更新";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "自動檢查更新";
 "Chip" = "晶片";
 "Choose Another Folder…" = "選擇其他資料夾…";
+"Choose Clip…" = "選擇片段⋯";
 "Choose Files…" = "選擇檔案…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "請選擇 5 到 30 秒的片段：你自己的聲音，或你已獲准使用的聲音。";
 "Choose a folder chats may use." = "選擇聊天室可使用的資料夾。";
 "Choose a folder the chat may look in." = "選擇聊天室可檢視的資料夾。";
 "Choose a folder the chat may propose changes in. You approve every change." = "選擇聊天室可提出變更的資料夾。您會核可每項變更。";
@@ -332,6 +345,7 @@
 "Close" = "關閉";
 "Close Tab" = "關閉分頁";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "關閉此視窗。設定 › 一般 › 設定 LLMTray… 可再次開啟。";
+"Code in the chat." = "在聊天中輸入程式碼。";
 "Coding agents" = "程式代理";
 "Coffee" = "咖啡";
 "Comes with %@" = "隨 %@ 提供";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "無法連線至伺服器 — 請稍後再試。";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "無法讀取聊天的某些部分；將於 %@ 再試一次（原因：設定 › 伺服器 › 記錄）。";
 "Couldn't start the voice runner: %@" = "無法啟動語音執行程式：%@";
+"Couldn't start the voice: %@" = "無法啟動語音：%@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "按模型、用戶端和日期統計請求與標記數，並顯示執行速度。資料只保留在這台 Mac 上，不會傳送到任何地方。";
 "Countdown" = "倒數";
 "Countdown: %lld s" = "倒數：%lld 秒";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "不記住此聊天…";
 "Don't remember this chat?" = "不記住這個聊天嗎？";
 "Don't show again" = "不再顯示";
+"Don't show this again" = "不要再顯示此內容。";
 "Done" = "完成";
 "Done talking: the model answers" = "說話結束：模型正在回答";
 "Done: %lld changes made." = "完成：已執行 %lld 項變更。";
 "Download" = "下載";
+"Download (%@)" = "下載（%@）";
 "Download LLMTray-Full" = "下載 LLMTray-Full";
 "Download and Enable" = "下載並啟用";
 "Download for %@, into the models folder" = "為 %@ 下載，放入 models 資料夾";
 "Download into the models folder" = "下載至 models 資料夾";
 "Download models" = "下載模型";
 "Download models from Hugging Face" = "從 Hugging Face 下載模型";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "請先下載語音辨識器：設定 > 語音 > 語音對話。";
 "Downloaded" = "已下載";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "由較早版本下載，位於不同於 models 資料夾的磁碟：會保留在原處。";
 "Downloading" = "下載中";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "正在下載 %@…";
 "Downloading %lld files…" = "正在下載 %lld 個檔案…";
 "Downloading the embedder failed: %@" = "下載 embedder 失敗：%@";
+"Downloading the fast decoder…" = "正在下載快速解碼器⋯";
 "Downloading…" = "正在下載…";
 "Downloads" = "下載項目";
 "Downloads waiting: %lld" = "等待下載：%lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "拖放以加入「%@」";
 "Drop to attach images" = "拖放以附加影像";
 "Duplicate this profile" = "複製此描述檔。";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "每則新回答在輸出時都會逐句朗讀。程式碼、表格和連結不會被朗讀。每則回答下方的「朗讀」會朗讀該則回答；訊息欄上方的揚聲器按鈕可開啟或關閉此功能。";
 "Echo cancellation" = "迴聲消除";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "無法啟動迴聲消除：%@ — 請到「設定」>「語音」關閉。";
 "Echo cancellation isn't available on this Mac." = "此 Mac 無法使用迴聲消除。";
+"Echo cancellation isn't available: %@" = "無法使用迴聲消除：%@";
 "Echo gate" = "回音閘";
 "Edit Note" = "編輯附註";
 "Edit Profile…" = "編輯描述檔…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "要開啟專案檔案嗎？";
 "Enable…" = "開啟…";
 "End" = "結束";
+"End the conversation" = "結束對話";
+"End the conversation (Esc)" = "結束對話（Esc）";
 "End the conversation (the chat model reloads)" = "結束對話（聊天模型將重新載入）";
 "Enjoying LLMTray?" = "滿意 LLMTray 嗎？";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "環境，每行一個 NAME=value（key、token 和密碼會存到鑰匙圈）";
 "Errors" = "錯誤";
 "Errors: go to the next one (⌘E)" = "錯誤：前往下一個（⌘E）。";
+"Esc ends the conversation" = "按 Esc 結束對話";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "每個專案中的對話會在模型設定檔的系統提示之後收到這些指示。變更自下一則訊息起生效。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "專案中的每個對話會取得該檔案的全部文字；檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
 "Every day's counts are removed. This can't be undone." = "每日的統計都會被移除。此動作無法還原。";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "你新增到專案的檔案會在此 Mac 建立索引，讓該專案的聊天可以搜尋。";
 "Files · off" = "檔案 · 關閉";
 "Files…" = "檔案…";
+"Fillers on pauses" = "停頓時的填充語";
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "按「完成」會套用你的選擇。之後可在設定中變更。";
 "Finish in your browser…" = "在瀏覽器中完成…";
@@ -551,6 +576,7 @@
 "Free disk space" = "剩餘磁碟空間";
 "Free on disk: %@ · your models: %@" = "磁碟可用空間：%@ · 您的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "載入的模型在這段時間內沒有要求後，會釋放其占用的記憶體。下次收到要求時會自動重新載入，並有一般的載入延遲。";
+"From a clip" = "來自片段";
 "From the MCP Registry" = "來自 MCP Registry";
 "Full" = "完整";
 "Full duplex" = "全雙工";
@@ -570,6 +596,7 @@
 "Generating music…" = "正在生成音樂…";
 "Generation" = "生成";
 "Get" = "取得";
+"Get Faster Decoder" = "取得更快的解碼器";
 "Get Started" = "開始使用";
 "Get a Model…" = "下載模型…";
 "Get one" = "取得一個";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "有其他名稱（硬連結）：它們會保留該檔案。";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "標頭，每行一個 名稱: value（Authorization 標頭會存到鑰匙圈）";
+"Hearing you" = "正在聽你說話";
 "Help" = "說明";
 "Help improve LLMTray?" = "要協助改進 LLMTray 嗎？";
 "Hide" = "隱藏";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "LLMTray 指南";
 "LLMTray events" = "LLMTray 事件";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray 會隨其加速的模型一併取得它：請下載該模型。";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray 是免費的：沒有訂閱制，也沒有鎖定功能。如果對你有幫助，你可以支持它的開發。";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray 不允許讀取 %@ 的分頁：請在「系統設定」›「隱私權與安全性」›「自動化」中開啟。";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允許使用麥克風。";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray 未獲允許使用麥克風。請在「系統設定」›「隱私權與安全性」›「麥克風」中允許。";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray 未獲准使用麥克風：系統設定 > 隱私權與安全性 > 麥克風。";
 "LLMTray restarts now to load them." = "LLMTray 現在會重新啟動以載入這些項目。";
 "LLMTray status, indexing project files" = "LLMTray 狀態：正在為專案檔案建立索引";
 "LLMTray — Chat" = "LLMTray — 聊天";
@@ -725,6 +755,7 @@
 "Likes" = "按讚數";
 "List my name" = "列出我的名字";
 "List my name in Supporters" = "在贊助者中列出我的名字";
+"Listening" = "聆聽中";
 "Listening…" = "偵聽中…";
 "Live output of the model process: loading, errors, requests." = "模型程序的即時輸出：載入、錯誤、要求。";
 "Load %@" = "載入 %@";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "模型資料夾：%@";
 "Models found: %lld" = "找到的模型：%lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "模型在此 Mac 上執行。聊天不會離開此裝置；只有你啟用的網路工具會連上網際網路。";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "可聽取音訊的模型（Gemma 4 E2B、E4B、12B）會收到你這一輪的錄音和文字，因此能聽出你是怎麼說的。每輪最多 30 秒。";
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "More" = "更多";
 "Move %1$@ to %2$@" = "將 %1$@ 移到 %2$@";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "這些伺服器都無法在此處更新（手動加入或從檔案加入）。";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "尚無。單一聊天室或單次請求的授權不會列在此處：會隨該請求結束。";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "磁碟空間不足：語音模型需要 %1$@，目前可用 %2$@。";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "磁碟空間不足：此語音需要 %1$@，目前可用空間為 %2$@。";
 "Not enough free disk space for this model." = "此模型所需的磁碟空間不足。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁碟空間不足：%@ 大約需要 %@，目前可用 %@。";
 "Not identical to %@: not a duplicate." = "與 %@ 不相同：非重複項。";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "登入時開啟 LLMTray";
 "Open Privacy Settings…" = "開啟隱私設定…";
 "Open Server Log…" = "打開伺服器記錄…";
+"Open Settings" = "開啟設定";
 "Open Voice Lab…" = "開啟 Voice Lab…";
 "Open in New Tab" = "在新分頁中開啟";
 "Open in Preview" = "在「預覽」中開啟";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "超過此數量時，最弱的附註（最舊、最不確定）會過期。已釘選的附註會保留。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "僅覆寫 LLMTray 的 macOS 語言。重新啟動 LLMTray 後生效。未翻譯的文字會以英文顯示。";
 "PDF · %lld pages" = "PDF · %lld 頁";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet：速度快，支援 25 種歐洲語言（含俄語）（2.5 GB）。Whisper：支援 99 種語言，較慢（1.6 GB）。macOS：不需下載，但只支援這台 Mac 在沒有網際網路時 macOS 可辨識的語言，而且必須開啟聽寫。你說的內容都不會離開這台 Mac。";
 "Past %lld messages" = "過去 %lld 則訊息";
 "Paste a Config" = "貼上設定";
 "Paste a Config…" = "貼上設定⋯";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "也讀取它";
 "Read Past Chats…" = "讀取過往對話⋯";
 "Read What Wasn't Read" = "讀取尚未讀取的內容";
+"Read answers aloud" = "朗讀回答";
 "Read chats" = "讀取聊天";
+"Read the answer aloud" = "朗讀回答";
 "Read web pages" = "讀取網頁";
 "Reading a chat…" = "正在讀取聊天…";
 "Reading a prompt: up to %lld%" = "讀取提示：最多 %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "正在讀取已安裝項目…";
 "Reads Only" = "只讀取";
 "Reads chats with" = "使用以下模型讀取聊天";
+"Ready" = "就緒";
 "Ready." = "已就緒。";
 "Ready. This is the Full build: the runtime is included." = "已就緒。這是 Full 版本：已包含執行環境。";
 "Reasoning" = "推理";
@@ -1148,6 +1187,7 @@
 "Selected" = "已選取";
 "Send" = "傳送。";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "傳送匿名每日報告：包含應用程式與 macOS 版本、晶片、記憶體大小、語言、您使用的功能，以及模型家族（絕不包含模型名稱）。提示、內容、檔案或模型名稱絕不會離開您的 Mac。您可隨時於設定中關閉此功能。";
+"Send my voice to models that hear" = "將我的語音傳送給可聽取的模型";
 "Sending…" = "傳送中…";
 "Sends anonymous usage statistics" = "傳送匿名使用統計";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "在每個 App 內聊天請求中最先傳送。Default 隨附簡短的起始提示詞，可延伸或取代。不會套用至外部 API 用戶端。";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "使用以下方式分類訊息";
 "Source on GitHub" = "GitHub 原始碼";
 "Space the models in this folder take, and what's still free on its disk." = "此資料夾中模型佔用的空間，以及磁碟剩餘可用空間。";
+"Speak" = "朗讀";
 "Speakers work with echo cancellation; headphones are still best." = "使用喇叭也能啟用迴聲消除，但耳機仍為最佳。";
+"Speaking" = "說話中";
 "Speaking…" = "說話中…";
 "Speculative decoding (MTP)" = "推測性解碼 (MTP)";
+"Speech recognition" = "語音辨識";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "未獲准使用語音辨識，或 Siri 和聽寫已關閉：系統設定 > 鍵盤 > 聽寫。";
 "Speed" = "速度";
 "Speeds up %@: fetched where LLMTray loads it from." = "加速 %@：會從 LLMTray 載入該模型的來源取得。";
+"Spoken answers" = "回答朗讀";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "停滯逾時：%lld 秒";
 "Start" = "開始";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "請停止 Voice Lab 與音樂生成功能以進行更新。";
 "Stop Voice Lab first." = "請先停止 Voice Lab。";
 "Stop generating" = "停止生成。";
+"Stop reading the answer" = "停止朗讀回答";
+"Stop reading the answer first." = "請先停止朗讀回答。";
 "Stop recording" = "停止錄音";
 "Stop server (unload model)" = "停止伺服器（卸載模型）。";
 "Stop the server to change these." = "請先停止伺服器以更改這些設定。";
@@ -1272,10 +1319,12 @@
 "System" = "系統";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "系統與私人位置（使用者主目錄本身、Library、Applications、keys）不會分享。";
 "System prompt" = "系統提示詞";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "系統：使用對應回答語言的 macOS 語音，無須下載（更多語音可在「系統設定」>「輔助使用」>「口語內容」中取得）。Chatterbox：支援 23 種語言的自然神經語音，包括俄文，能從短片段模仿聲音；在這台 Mac 上執行。";
 "Tab %lld" = "分頁 %lld";
 "Talk" = "說話";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "與本機語音對語音模型通話：模型會以自身聲音同時聽與答，類似電話。實驗性且僅限英文：無工具、無專案、也不會保留任何內容。";
 "Talk with the model in Voice Lab" = "在語音實驗室與模型對話";
+"Talk with the model: a voice conversation (Esc ends it)" = "與該模型說話：語音對話（按 Esc 結束）";
 "Talking… press Done when you're finished." = "正在說話… 完成後請按「完成」。";
 "Target: %@ · profile %@" = "目標：%@ · 設定檔 %@";
 "Temperature" = "溫度";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "聊天自己的模型";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "聊天自己的模型：每個聊天都由曾在其中回答的模型讀取——使用 Gemma 進行的俄文聊天，不會由你稍後載入且只懂英文的編碼模型讀取。單一模型：每個聊天都由該模型讀取，因此所有筆記的寫法一致。不論哪種方式，聊天都會等到其模型已載入且可用；除非你在下方允許，否則不會為它載入任何模型。";
 "The chats and models in that folder were here already." = "該資料夾內的對話與模型已存在於此處。";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "此片段長度為 %.0f 秒：最多只能 30 秒——請裁短。";
+"The clip is %.0f s: at least 5 s are needed." = "此片段長度為 %.0f 秒：至少需要 5 秒。";
 "The command %@ wasn't found." = "找不到指令 %@。";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "加入專案的檔案複本與其索引存放在一起。專案自有的檔案會在其「檔案」視窗顯示；刪除專案會一併刪除這些檔案與索引。";
 "The day the counts are for." = "計數所屬的日期。";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "模型伺服器啟動時不再自動上線。";
 "The model that reads them" = "讀取它們的該模型";
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "該模型、其語音 tokenizer 與俄文重音字典：位於模型檔案夾中的 %@。Chatterbox（Resemble AI）與 ruaccent 採用 MIT 授權；來自 CosyVoice2 的語音 tokenizer 採用 Apache-2.0 授權。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 資料夾目前無法使用 — 磁碟是否已連接？請於「設定 → Models」中重新選擇。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示快取最多可佔的空間（設定檔的「Prompt cache」大小也會作為上限）。快取越大可讓長對話與 agents 更流暢；太大則會留不到空間給正在讀取的提示。";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "附註在聊天提示中最多可使用的量。已釘選的附註和你明確表示的偏好會優先，其他則依最近程度排列。";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "計畫自您檢視後已變更：請再次檢閱。";
 "The port and network access can change only while the server is stopped." = "連接埠與網路存取僅能於伺服器停止時變更。";
 "The project's files, and Add Files…" = "專案的檔案，以及「加入檔案…」";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "辨識器，以及 Silero VAD（判斷語音何時開始與結束）和 Smart Turn（判斷停頓是否結束你這一輪發言），都位於模型檔案夾中。授權：Parakeet CC BY 4.0（NVIDIA）、Whisper MIT、Silero MIT、Smart Turn BSD-2-Clause。";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "registry 在 30 秒內沒有回應。請稍後再試。";
 "The reply was cut at its length limit." = "回覆已達長度上限並被截斷。";
 "The report" = "報告檔案";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "在 %@ 下載完成後伺服器即會啟動";
 "The server starts with %@" = "伺服器以 %@ 啟動";
 "The settings here were kept." = "此處的設定已保留。";
+"The speech recognizer stopped: %@" = "語音辨識器已停止：%@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "此 Mac 的建議已在此處。前往 Hugging Face 瀏覽其他模型。";
 "The tips aren't available right now." = "目前無法提供小費功能。";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "來自 ipsupport.us 的 LLMTray 版本正在執行。請先將它退出（從選單列圖示 › 退出），再重新開啟這個版本：兩者會使用相同埠號並重複載入模型。";
+"The voice couldn't open the audio output." = "此語音無法開啟音訊輸出。";
+"The voice couldn't open the audio output: %@" = "此語音無法開啟音訊輸出：%@";
+"The voice failed: %@" = "此語音失敗：%@";
+"The voice is being downloaded -- try again once it's done." = "此語音正在下載中——完成後請再試一次。";
 "The voice model is being downloaded -- try again once it's done." = "語音模型正在下載中 — 下載完成後再試。";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "語音模型尚未下載 — 請至「設定 > 語音」下載。";
 "The voice model's audio format isn't supported." = "語音模型的音訊格式不受支援。";
 "The voice runner sent an unreadable ready message." = "語音執行程式傳來無法解析的就緒訊息。";
 "The voice runner stopped unexpectedly (%@)." = "語音執行程式意外停止（%@）。";
+"The voice stopped: %@" = "此語音已停止：%@";
+"The voice that answers is the one picked under Spoken answers." = "回答所用的聲音，是在「回答朗讀」中選擇的聲音。";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "接著重新啟動模型伺服器。Mac 重開機後上限會還原為預設值。LLMTray 不會自行變更該設定。";
 "There's no plan waiting any more." = "已無待處理計畫。";
 "These can't be added to a project" = "這些無法加入專案";
 "These models go back to Default: %@." = "這些模型會回復為 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它們會逐一執行，顯示在選單列的視窗中。您可以在此期間關閉該視窗。";
+"Thinking" = "思考中";
 "Thinking effort: %@" = "思考投入：%@";
 "Thinking effort: how long the model may think before it answers" = "思考投入：該模型在回答前可思考多久。";
 "Thinking…" = "思考中…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "使用 %@";
 "Use %lld" = "使用 %lld";
 "Use Anyway" = "仍然使用";
+"Use Built-in" = "使用內建";
 "Use Default Folder" = "使用預設資料夾";
 "Use Folder" = "使用檔案夾";
 "Use LM Studio's folder" = "使用 LM Studio 的檔案夾";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "立即使用已學習的事實";
 "Use a learned fact once %lld chats show it" = "在 %lld 個聊天顯示後使用已學習的事實";
 "Use headphones: the model hears its own voice from the speakers." = "請使用耳機：否則模型會聽到喇叭輸出的聲音。";
+"Use your own voice, or a voice you have permission to use." = "使用你自己的聲音，或你已獲准使用的聲音。";
 "Used" = "已使用";
 "Used by %@." = "供 %@ 使用。";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "供影像生成、音樂與 Voice Lab 使用，這些功能會下載所需檔案。檔案也會保存在 models 資料夾中，使用其 Hugging Face 名稱。";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab 約佔 %1$@ GB，超過 GPU 可用的 %2$@ GB：請先提高 GPU 記憶體限制。";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab 約佔 %1$@ GB；加上聊天模型的 %2$@ GB 後，仍在 GPU 可用的 %3$@ GB 範圍內。但運行時仍會卸載聊天模型。";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab 運行時約佔用 %@ GB 記憶體。";
+"Voice clip" = "語音片段";
+"Voice conversation" = "語音對話";
 "Voice model" = "語音模型";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "請等待目前的請求或基準測試完成，重新啟動會中斷它。";
 "Waiting for a model download to finish…" = "正在等待模型下載完成…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "查看更新…";
 "What's sent" = "傳送內容";
 "When a client asks for another model" = "當用戶端請求不同模型時";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "當回答超過一秒時，會用回答的聲音簡短說出「嗯」或「我看看」，讓沉默聽起來不會像是通話中斷。這些語句會在對話的安靜時刻製作，並依各個聲音分別保留。";
 "When an app asks for another model" = "當應用程式要求其他模型時";
 "When an app asks for another model: %@" = "當應用程式要求其他模型：%@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "當聊天在等待尚未載入的模型時，若 LLMTray 已閒置這麼久（沒有聊天、app 或圖片正在處理），記憶體可能會載入該模型。下次請求你常用的模型時，會再載回該模型，這需要一點時間。";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "你的位置：城市或地址";
 "Which model generates new images." = "用哪個模型來生成新圖片。";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "當模型在講話時，低於此音量的麥克風聲音視為靜音：回音消除留下的自聲痕跡會被排除，但其他語音仍會打斷。若模型聽到自己的聲音請調高；若錯過你打斷請調低。於下次啟動生效。";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "視窗";
 "Windows and pages" = "視窗與網頁";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "正在使用或下載中";
 "less than a minute left" = "剩餘不到一分鐘";
 "llmtray in the terminal" = "終端中的 llmtray";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS 無法在這台 Mac 上辨識 %@，除非將它傳送到 Mac 之外處理。請在「設定 > 語音」中選擇 Parakeet。";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS 會從麥克風中移除模型自身的聲音（語音處理，如 FaceTime），因此在使用喇叭時也能運作。此外會平衡音量並抑制背景噪音。重新啟動後生效。";
 "make %lld folders" = "建立 %lld 個資料夾";
 "mlx-audio runtime" = "mlx-audio 執行環境";

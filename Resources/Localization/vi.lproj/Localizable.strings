@@ -43,6 +43,7 @@
 "%@ requests" = "%@ yêu cầu";
 "%@ s" = "%@ s";
 "%@ tok/s" = "%@ tok/s";
+"%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "Đến nay, %@ token đã được chạy cục bộ bằng LLMTray. Ứng dụng miễn phí, không có gói thuê bao; nếu hữu ích với bạn, bạn có thể ủng hộ việc phát triển ứng dụng.";
 "%@ wasn't found on Hugging Face." = "Không tìm thấy %@ trên Hugging Face.";
 "%@ · %@ left" = "%@ · còn %@";
 "%@ · %@ of %@" = "%@ · %@ trong %@";
@@ -89,6 +90,7 @@
 "%lld tools changed on the server: Configure to accept them." = "%lld công cụ đã thay đổi trên máy chủ: hãy cấu hình để chấp nhận chúng.";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
+"(Not sent: pick a chat model, or wait for the answer in progress.)" = "（Chưa gửi: hãy chọn Mô hình trò chuyện hoặc đợi câu trả lời đang xử lý xong.）";
 "(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
 "(estimate; exact after the first answer)" = "(ước tính; chính xác sau câu trả lời đầu tiên)";
 "(measured for this model)" = "(đã đo cho mô hình này)";
@@ -101,6 +103,7 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Cuộc trò chuyện có thể truy cập các thư mục bạn cho phép và đề xuất thư mục mới, di chuyển hoặc đổi tên. Bạn duyệt mọi thay đổi và có thể hoàn tác.";
 "A chat model" = "Mô hình trò chuyện";
 "A client" = "Một client";
+"A clip under 10 s works, but 10 s or more imitates the voice better." = "Đoạn ghi âm dưới 10 giây vẫn dùng được, nhưng từ 10 giây trở lên sẽ bắt chước giọng tốt hơn.";
 "A deleted project" = "Một dự án đã xóa";
 "A fact or observation learned from one chat waits until another chat shows it too (or you approve it): one question isn't who you are. What you ask for -- preferences, corrections -- is used at once." = "Một sự kiện hoặc quan sát học được từ một Trò chuyện sẽ chờ đến khi một Trò chuyện khác cũng cho thấy điều đó (hoặc bạn phê duyệt): một câu hỏi không nói lên bạn là ai. Những gì bạn yêu cầu -- tùy chọn, chỉnh sửa -- được dùng ngay.";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
@@ -201,6 +204,7 @@
 "Answer (all requests)" = "Trả lời (tất cả yêu cầu)";
 "Answer details" = "Chi tiết trả lời";
 "Answer in Russian, briefly" = "Trả lời bằng tiếng Nga, ngắn gọn";
+"Answers are read aloud -- click to stop" = "Câu trả lời đang được đọc thành tiếng — bấm để dừng";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Bất kỳ cờ mlx_lm.server nào khác, phân tách bằng dấu cách, ví dụ --draft-model <path>.";
 "Anyone on your network can use the server: a key keeps it to the clients you give it to." = "Bất kỳ ai trên mạng của bạn cũng có thể dùng máy chủ: khóa sẽ giới hạn cho những ứng dụng khách mà bạn cấp.";
 "Anything else chats should know" = "Điều gì khác Trò chuyện nên biết";
@@ -258,6 +262,7 @@
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Sao chép cuộc trò chuyện, dự án, hồ sơ, các mô hình ảnh, nhạc, giọng nói và embedding cùng cài đặt từ phiên bản trên ipsupport.us (đóng nó trước). Cuộc trò chuyện và mô hình tại đây được giữ; cài đặt của nó sẽ thay thế. Các mô hình không chiếm thêm dung lượng đĩa. Mô hình chat vẫn nằm trong thư mục models của bạn: chọn nó trong Settings › Models.";
 "Browse Hugging Face…" = "Duyệt Hugging Face…";
 "Built into macOS · LLMTray's chat only" = "Tích hợp sẵn trong macOS · Chỉ trong Trò chuyện của LLMTray";
+"Built-in" = "Tích hợp sẵn";
 "By" = "Theo";
 "Cached" = "Đã lưu trong bộ nhớ đệm";
 "Calculator" = "Máy tính";
@@ -295,6 +300,12 @@
 "Chats outside projects" = "Trò chuyện ngoài Dự án";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Trò chuyện bắt đầu bằng các ghi chú ngắn về bạn và công việc của bạn: cách bạn muốn được trả lời, bạn đang làm gì, những gì bạn đã sửa trước đây. Chỉ các ghi chú nằm trong giới hạn mới được gửi, và chỉ trong Trò chuyện của riêng LLMTray -- không bao giờ gửi đến ứng dụng dùng API, không bao giờ trong Trò chuyện tạm. Mọi thứ vẫn ở trên máy tính này.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Cuộc trò chuyện, dự án, hồ sơ và các mô hình hình ảnh, nhạc, giọng nói và nhúng từ phiên bản trên ipsupport.us đã có ở đây. Những thư mục bạn đã cấp quyền cho nó, và thư mục mô hình chat của bạn, cần sự đồng ý của bạn một lần nữa.";
+"Chatterbox" = "Chatterbox";
+"Chatterbox Multilingual V3 (8-bit)" = "Chatterbox Đa ngôn ngữ V3 (8-bit)";
+"Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more." = "Trình giải mã của Chatterbox Turbo giúp mỗi câu nhanh hơn khoảng 4 lần mà không có khác biệt nghe được: %@ thêm.";
+"Chatterbox doesn't speak this language (%@): the system voice read the answer." = "Chatterbox không nói được ngôn ngữ này (%@): giọng hệ thống đã đọc câu trả lời.";
+"Chatterbox imitates the voice in a clip of 5 to 30 seconds (10 or more is best): clear speech, one speaker, no music. The clip is copied into LLMTray's folder and never leaves this Mac." = "Chatterbox bắt chước giọng trong đoạn ghi âm dài từ 5 đến 30 giây (từ 10 giây trở lên là tốt nhất): giọng nói rõ ràng, một người nói, không có nhạc. Đoạn ghi âm được sao chép vào thư mục của LLMTray và không bao giờ rời khỏi Máy Mac này.";
+"Chatterbox isn't downloaded: the system voice read the answer." = "Chatterbox chưa được tải về: giọng hệ thống đã đọc câu trả lời.";
 "Check Again" = "Kiểm tra lại";
 "Check Now" = "Kiểm tra ngay";
 "Check for Runtime Updates" = "Kiểm tra bản cập nhật môi trường chạy";
@@ -308,7 +319,9 @@
 "Checks for updates automatically" = "Tự động kiểm tra cập nhật";
 "Chip" = "Chip";
 "Choose Another Folder…" = "Chọn Thư mục Khác…";
+"Choose Clip…" = "Chọn đoạn ghi âm…";
 "Choose Files…" = "Chọn Tệp…";
+"Choose a clip of 5 to 30 seconds: your own voice, or one you have permission to use." = "Chọn đoạn ghi âm dài từ 5 đến 30 giây: giọng của bạn hoặc giọng bạn được phép dùng.";
 "Choose a folder chats may use." = "Chọn một thư mục mà cuộc trò chuyện có thể dùng.";
 "Choose a folder the chat may look in." = "Chọn một thư mục mà cuộc trò chuyện có thể xem.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Chọn một thư mục mà cuộc trò chuyện có thể đề xuất thay đổi. Bạn phê duyệt mọi thay đổi.";
@@ -332,6 +345,7 @@
 "Close" = "Đóng";
 "Close Tab" = "Đóng tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Cài đặt › Chung › Set Up LLMTray… sẽ mở lại cửa sổ này.";
+"Code in the chat." = "Mã trong cuộc trò chuyện.";
 "Coding agents" = "Tác nhân lập trình";
 "Coffee" = "Cà phê";
 "Comes with %@" = "Đi kèm với %@";
@@ -373,6 +387,7 @@
 "Couldn't reach the server -- please try again later." = "Không thể kết nối đến máy chủ — vui lòng thử lại sau.";
 "Couldn't read some parts of chats; tries again at %@ (why: Settings › Server › Log)." = "Không thể đọc một số phần của các cuộc trò chuyện; sẽ thử lại lúc %@ (lý do: Cài đặt › Máy chủ › Nhật ký).";
 "Couldn't start the voice runner: %@" = "Không thể khởi động voice runner: %@";
+"Couldn't start the voice: %@" = "Không thể bắt đầu giọng nói: %@";
 "Count requests and tokens per model, client and day, and how fast they ran. Kept only on this Mac, never sent anywhere." = "Đếm số yêu cầu và token theo từng mô hình, trình khách và ngày, cùng tốc độ chạy của chúng. Chỉ được giữ trên Máy Mac này, không bao giờ được gửi đi đâu.";
 "Countdown" = "Đếm ngược";
 "Countdown: %lld s" = "Đếm ngược: %lld s";
@@ -429,16 +444,19 @@
 "Don't Remember This Chat…" = "Không nhớ Trò chuyện này…";
 "Don't remember this chat?" = "Không nhớ Trò chuyện này?";
 "Don't show again" = "Không hiện lại";
+"Don't show this again" = "Đừng hiển thị nội dung này lần nữa.";
 "Done" = "Xong";
 "Done talking: the model answers" = "Hoàn tất nói: mô hình trả lời";
 "Done: %lld changes made." = "Hoàn tất: %lld thay đổi đã thực hiện.";
 "Download" = "Tải về";
+"Download (%@)" = "Tải về (%@)";
 "Download LLMTray-Full" = "Tải LLMTray-Full";
 "Download and Enable" = "Tải về và bật";
 "Download for %@, into the models folder" = "Tải về cho %@, vào thư mục models";
 "Download into the models folder" = "Tải về vào thư mục models";
 "Download models" = "Tải mô hình";
 "Download models from Hugging Face" = "Tải mô hình từ Hugging Face";
+"Download the speech recognizer first: Settings > Voice > Voice conversation." = "Trước tiên, hãy tải về trình nhận dạng giọng nói: Cài đặt > Giọng > Trò chuyện bằng giọng nói.";
 "Downloaded" = "Đã tải về";
 "Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Được tải xuống bởi phiên bản trước, trên một đĩa khác với thư mục models: nó sẽ ở nguyên vị trí.";
 "Downloading" = "Đang tải về";
@@ -446,6 +464,7 @@
 "Downloading %@…" = "Đang tải %@…";
 "Downloading %lld files…" = "Đang tải %lld tệp…";
 "Downloading the embedder failed: %@" = "Tải embedder thất bại: %@";
+"Downloading the fast decoder…" = "Đang tải về bộ giải mã nhanh…";
 "Downloading…" = "Đang tải…";
 "Downloads" = "Tải về";
 "Downloads waiting: %lld" = "Các tải chờ: %lld";
@@ -461,9 +480,11 @@
 "Drop to add to “%@”" = "Thả để thêm vào “%@”";
 "Drop to attach images" = "Thả để đính kèm ảnh";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
+"Each new answer is spoken sentence by sentence while it's written. Code, tables and links aren't read out. Speak under any answer reads that one; the speaker button above the message field turns this on and off." = "Mỗi câu trả lời mới được đọc thành tiếng từng câu khi đang được viết. Mã, bảng và liên kết sẽ không được đọc. Bấm Nói bên dưới câu trả lời nào thì câu trả lời đó sẽ được đọc; nút loa phía trên trường tin nhắn dùng để bật và tắt tính năng này.";
 "Echo cancellation" = "Hủy tiếng vọng";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động Hủy tiếng vọng: %@ -- hãy tắt tính năng này trong Cài đặt > Giọng.";
 "Echo cancellation isn't available on this Mac." = "Hủy tiếng vọng không khả dụng trên Mac này.";
+"Echo cancellation isn't available: %@" = "Hủy tiếng vọng không khả dụng: %@";
 "Echo gate" = "Ngưỡng phản hồi";
 "Edit Note" = "Sửa ghi chú";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
@@ -484,11 +505,14 @@
 "Enable project files?" = "Bật tệp dự án?";
 "Enable…" = "Bật…";
 "End" = "Kết thúc";
+"End the conversation" = "Kết thúc cuộc trò chuyện";
+"End the conversation (Esc)" = "Kết thúc cuộc trò chuyện (Esc)";
 "End the conversation (the chat model reloads)" = "Kết thúc cuộc trò chuyện (mô hình chat nạp lại)";
 "Enjoying LLMTray?" = "Bạn đang thích LLMTray chứ?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Môi trường, NAME=value mỗi dòng một mục (khóa, mã thông báo và mật khẩu được đưa vào Chuỗi khóa)";
 "Errors" = "Lỗi";
 "Errors: go to the next one (⌘E)" = "Lỗi: chuyển đến lỗi tiếp theo (⌘E)";
+"Esc ends the conversation" = "Esc kết thúc cuộc trò chuyện";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ văn bản; tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi một tệp được ghim.";
 "Every day's counts are removed. This can't be undone." = "Số liệu đếm của mọi ngày sẽ bị xóa. Không thể hoàn tác.";
@@ -521,6 +545,7 @@
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Các tệp bạn thêm vào dự án được lập chỉ mục trên Mac này, để các chat có thể tìm kiếm chúng.";
 "Files · off" = "Tệp · tắt";
 "Files…" = "Tệp…";
+"Fillers on pauses" = "Âm đệm khi ngập ngừng";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish áp dụng những gì bạn chọn. Bạn có thể thay đổi sau trong Settings.";
 "Finish in your browser…" = "Hoàn tất trong trình duyệt…";
@@ -551,6 +576,7 @@
 "Free disk space" = "Dung lượng đĩa trống";
 "Free on disk: %@ · your models: %@" = "Còn trống trên ổ: %@ · các mô hình của bạn: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Giải phóng bộ nhớ mà mô hình đã tải đang giữ sau khoảng thời gian không có yêu cầu này. Mô hình sẽ tự động tải lại ở yêu cầu tiếp theo, với độ trễ tải như thường lệ.";
+"From a clip" = "Từ đoạn ghi âm";
 "From the MCP Registry" = "Từ Sổ đăng ký MCP";
 "Full" = "Đầy đủ";
 "Full duplex" = "Full duplex";
@@ -570,6 +596,7 @@
 "Generating music…" = "Đang tạo nhạc…";
 "Generation" = "Tạo";
 "Get" = "Tải";
+"Get Faster Decoder" = "Tải bộ giải mã nhanh";
 "Get Started" = "Bắt đầu";
 "Get a Model…" = "Nhận mô hình…";
 "Get one" = "Lấy token";
@@ -584,6 +611,7 @@
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Có tên khác (hard link): chúng giữ lại tệp.";
 "Headers, Name: value per line (an Authorization header goes to the Keychain)" = "Header, Tên: giá trị mỗi dòng một mục (header Authorization được đưa vào Chuỗi khóa)";
+"Hearing you" = "Đang nghe bạn";
 "Help" = "Trợ giúp";
 "Help improve LLMTray?" = "Giúp cải thiện LLMTray?";
 "Hide" = "Ẩn";
@@ -690,9 +718,11 @@
 "LLMTray Guide" = "Hướng dẫn LLMTray";
 "LLMTray events" = "Sự kiện LLMTray";
 "LLMTray fetches it with the model it speeds up: download that model." = "LLMTray tải mục này cùng với mô hình mà nó tăng tốc: hãy tải mô hình đó.";
+"LLMTray is free: no subscriptions, no locked features. If it's useful to you, you can support its development." = "LLMTray miễn phí: không có gói thuê bao, không có tính năng bị khóa. Nếu hữu ích với bạn, bạn có thể ủng hộ việc phát triển ứng dụng.";
 "LLMTray isn't allowed to read %@'s tab: turn it on in System Settings › Privacy & Security › Automation." = "LLMTray chưa được phép đọc tab của %@: hãy bật trong Cài đặt hệ thống › Quyền riêng tư & Bảo mật › Tự động hóa.";
 "LLMTray isn't allowed to use the microphone." = "LLMTray không được phép dùng micro.";
 "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray không được phép sử dụng micrô. Cho phép trong Cài đặt Hệ thống › Quyền riêng tư & Bảo mật › Micrô.";
+"LLMTray isn't allowed to use the microphone: System Settings > Privacy & Security > Microphone." = "LLMTray không được phép dùng micrô: Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Micrô.";
 "LLMTray restarts now to load them." = "LLMTray sẽ khởi động lại ngay để nạp chúng.";
 "LLMTray status, indexing project files" = "Trạng thái LLMTray, đang lập chỉ mục tệp dự án";
 "LLMTray — Chat" = "LLMTray — Trò chuyện";
@@ -725,6 +755,7 @@
 "Likes" = "Thích";
 "List my name" = "Liệt kê tên tôi";
 "List my name in Supporters" = "Liệt kê tên tôi trong Supporters";
+"Listening" = "Đang lắng nghe";
 "Listening…" = "Đang nghe…";
 "Live output of the model process: loading, errors, requests." = "Đầu ra trực tiếp của tiến trình mô hình: tải, lỗi, yêu cầu.";
 "Load %@" = "Tải %@";
@@ -782,6 +813,7 @@
 "Models folder: %@" = "Thư mục models: %@";
 "Models found: %lld" = "Tìm được mô hình: %lld";
 "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Mô hình chạy trên Mac này. Cuộc trò chuyện của bạn không rời máy; chỉ các công cụ web, nếu bật, mới truy cập internet.";
+"Models that hear audio (Gemma 4 E2B, E4B, 12B) get your turn's recording along with its text, so they hear how you said it. Up to 30 seconds a turn." = "Các mô hình nghe được âm thanh (Gemma 4 E2B, E4B, 12B) sẽ nhận bản ghi âm lượt nói của bạn cùng với văn bản của lượt đó, để chúng nghe được cách bạn nói. Tối đa 30 giây mỗi lượt.";
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "More" = "Thêm";
 "Move %1$@ to %2$@" = "Di chuyển %1$@ tới %2$@";
@@ -872,6 +904,7 @@
 "None of these servers can be updated from here (added by hand or from a file)." = "Không thể cập nhật máy chủ nào trong số này từ đây (được thêm thủ công hoặc từ một tệp).";
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Chưa có. Các quyền cấp cho một cuộc trò chuyện hoặc một yêu cầu không được liệt kê ở đây: chúng kết thúc cùng với nó.";
 "Not enough disk space: the voice model needs %1$@, %2$@ is free." = "Không đủ dung lượng đĩa: mô hình giọng nói cần %1$@, chỉ còn %2$@.";
+"Not enough disk space: the voice needs %1$@, %2$@ is free." = "Không đủ dung lượng đĩa: giọng nói cần %1$@, hiện còn trống %2$@.";
 "Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Không đủ dung lượng đĩa trống: %@ cần khoảng %@, hiện có %@.";
 "Not identical to %@: not a duplicate." = "Không giống %@: không phải bản trùng lặp.";
@@ -926,6 +959,7 @@
 "Open LLMTray when you log in" = "Mở LLMTray khi đăng nhập";
 "Open Privacy Settings…" = "Mở Cài đặt Quyền riêng tư…";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
+"Open Settings" = "Mở Cài đặt";
 "Open Voice Lab…" = "Mở Voice Lab…";
 "Open in New Tab" = "Mở trong tab mới";
 "Open in Preview" = "Mở bằng Preview";
@@ -941,6 +975,8 @@
 "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Vượt quá mức này, các ghi chú yếu nhất (cũ nhất, ít chắc chắn nhất) sẽ hết hạn. Ghi chú Đã ghim được giữ lại.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "PDF · %lld pages" = "PDF · %lld trang";
+"Parakeet" = "Parakeet";
+"Parakeet: fast, 25 European languages including Russian (2.5 GB). Whisper: 99 languages, slower (1.6 GB). macOS: no download, but only languages macOS recognizes on this Mac without the internet, and only with Dictation on. Nothing you say leaves this Mac." = "Parakeet: nhanh, 25 ngôn ngữ châu Âu gồm cả tiếng Nga (2.5 GB). Whisper: 99 ngôn ngữ, chậm hơn (1.6 GB). macOS: không cần tải về, nhưng chỉ dùng được với các ngôn ngữ mà macOS nhận ra trên Máy Mac này khi không có internet, và chỉ khi Đọc chính tả đang bật. Không gì bạn nói rời khỏi Máy Mac này.";
 "Past %lld messages" = "%lld tin nhắn trước đó";
 "Paste a Config" = "Dán cấu hình";
 "Paste a Config…" = "Dán cấu hình…";
@@ -1035,7 +1071,9 @@
 "Read It Too" = "Cũng đọc nội dung đó";
 "Read Past Chats…" = "Đọc Trò chuyện trước đây…";
 "Read What Wasn't Read" = "Đọc nội dung chưa được đọc";
+"Read answers aloud" = "Đọc thành tiếng các câu trả lời";
 "Read chats" = "Đọc các Trò chuyện";
+"Read the answer aloud" = "Đọc thành tiếng câu trả lời";
 "Read web pages" = "Đọc trang web";
 "Reading a chat…" = "Đang đọc Trò chuyện…";
 "Reading a prompt: up to %lld%" = "Đọc prompt: tối đa %lld%";
@@ -1044,6 +1082,7 @@
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Reads Only" = "Chỉ đọc";
 "Reads chats with" = "Đọc trò chuyện bằng";
+"Ready" = "Sẵn sàng";
 "Ready." = "Sẵn sàng.";
 "Ready. This is the Full build: the runtime is included." = "Sẵn sàng. Đây là bản Full: đã bao gồm runtime.";
 "Reasoning" = "Lý luận";
@@ -1148,6 +1187,7 @@
 "Selected" = "Đã chọn";
 "Send" = "Gửi tin nhắn.";
 "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Gửi báo cáo hàng ngày ẩn danh: phiên bản app và macOS, chip, dung lượng bộ nhớ, ngôn ngữ, các tính năng bạn đã dùng và họ mô hình (không bao giờ gửi tên mô hình). Không có lời nhắc, nội dung, tệp hay tên mô hình nào rời khỏi Mac của bạn. Bạn có thể tắt bất kỳ lúc nào trong Cài đặt.";
+"Send my voice to models that hear" = "Gửi giọng nói của tôi đến các mô hình có thể nghe";
 "Sending…" = "Đang gửi…";
 "Sends anonymous usage statistics" = "Gửi thống kê sử dụng ẩn danh";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Được gửi đầu tiên trong mọi yêu cầu trò chuyện trong ứng dụng. Default có sẵn một lời nhắc mở đầu ngắn — hãy mở rộng hoặc thay thế lời nhắc đó. Không áp dụng cho ứng dụng khách API bên ngoài.";
@@ -1216,11 +1256,16 @@
 "Sorts messages with" = "Phân loại tin nhắn bằng";
 "Source on GitHub" = "Mã nguồn trên GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
+"Speak" = "Nói";
 "Speakers work with echo cancellation; headphones are still best." = "Loa hoạt động với hủy tiếng vọng; tai nghe vẫn là lựa chọn tốt nhất.";
+"Speaking" = "Đang nói";
 "Speaking…" = "Đang nói…";
 "Speculative decoding (MTP)" = "Giải mã suy đoán (MTP)";
+"Speech recognition" = "Nhận dạng giọng nói";
+"Speech recognition isn't allowed, or Siri and Dictation are off: System Settings > Keyboard > Dictation." = "Nhận dạng giọng nói không được phép, hoặc Siri và Đọc chính tả đang tắt: Cài đặt hệ thống > Bàn phím > Đọc chính tả.";
 "Speed" = "Tốc độ";
 "Speeds up %@: fetched where LLMTray loads it from." = "Tăng tốc %@: được tải về từ nơi LLMTray tải nó.";
+"Spoken answers" = "Câu trả lời được đọc thành tiếng";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Thời gian chờ khi ngưng phản hồi: %lld giây";
 "Start" = "Bắt đầu";
@@ -1247,6 +1292,8 @@
 "Stop Voice Lab and music generation to update it." = "Dừng Voice Lab và tạo nhạc để cập nhật.";
 "Stop Voice Lab first." = "Tắt Voice Lab trước.";
 "Stop generating" = "Dừng tạo nội dung.";
+"Stop reading the answer" = "Dừng đọc câu trả lời";
+"Stop reading the answer first." = "Trước tiên hãy dừng đọc câu trả lời.";
 "Stop recording" = "Dừng ghi âm";
 "Stop server (unload model)" = "Dừng máy chủ (gỡ mô hình khỏi bộ nhớ).";
 "Stop the server to change these." = "Dừng server để thay đổi những mục này.";
@@ -1272,10 +1319,12 @@
 "System" = "Hệ thống";
 "System and private places (the home folder itself, Library, Applications, keys) are never shared." = "Các nơi hệ thống và riêng tư (chính thư mục người dùng, Library, Applications, keys) không bao giờ được chia sẻ.";
 "System prompt" = "Lời nhắc hệ thống";
+"System: the macOS voice for the answer's language, nothing to download (more voices in System Settings > Accessibility > Spoken Content). Chatterbox: a natural neural voice in 23 languages, Russian among them, that can imitate a voice from a short clip; runs on this Mac." = "Hệ thống: giọng macOS cho ngôn ngữ của câu trả lời, không cần tải gì thêm (có thêm giọng trong Cài đặt hệ thống > Trợ năng > Nội dung được nói). Chatterbox: giọng thần kinh tự nhiên bằng 23 ngôn ngữ, trong đó có tiếng Nga, có thể bắt chước một giọng từ đoạn ghi âm ngắn; chạy trên Máy Mac này.";
 "Tab %lld" = "Tab %lld";
 "Talk" = "Nói";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Trò chuyện với mô hình speech-to-speech cục bộ nghe và trả lời bằng chính giọng nó, cùng lúc như gọi điện. Thử nghiệm và chỉ tiếng Anh: không có công cụ, không có dự án, không lưu trữ.";
 "Talk with the model in Voice Lab" = "Nói chuyện với mô hình trong Voice Lab";
+"Talk with the model: a voice conversation (Esc ends it)" = "Nói với mô hình: trò chuyện bằng giọng nói (Esc để kết thúc)";
 "Talking… press Done when you're finished." = "Đang nói… nhấn Hoàn tất khi xong.";
 "Target: %@ · profile %@" = "Đích: %@ · hồ sơ %@";
 "Temperature" = "Nhiệt độ";
@@ -1319,6 +1368,8 @@
 "The chat's own model" = "Mô hình riêng của trò chuyện";
 "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "Mô hình riêng của trò chuyện: mỗi trò chuyện được đọc bởi mô hình đã trả lời trong đó -- trò chuyện bằng tiếng Nga với Gemma sẽ không bị đọc bởi mô hình viết mã chỉ dùng tiếng Anh mà bạn tải sau đó. Một mô hình: mọi trò chuyện đều được mô hình đó đọc, nên tất cả ghi chú được viết giống nhau. Dù cách nào, trò chuyện cũng chờ cho đến khi mô hình của nó được tải và rảnh; không có gì được tải cho nó trừ khi bạn cho phép bên dưới.";
 "The chats and models in that folder were here already." = "Các cuộc trò chuyện và mô hình trong thư mục đó đã có ở đây trước đó.";
+"The clip is %.0f s: 30 s at most -- cut it shorter." = "Đoạn ghi âm dài %.0f giây: tối đa là 30 giây — hãy cắt ngắn hơn.";
+"The clip is %.0f s: at least 5 s are needed." = "Đoạn ghi âm dài %.0f giây: cần ít nhất 5 giây.";
 "The command %@ wasn't found." = "Không tìm thấy lệnh %@.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Bản sao các tệp thêm vào dự án và các chỉ mục của chúng, cùng nhau. Bản sao của từng dự án được hiển thị trong cửa sổ Files; xóa dự án sẽ xóa chúng.";
 "The day the counts are for." = "Ngày mà các số liệu tương ứng.";
@@ -1370,6 +1421,7 @@
 "The model server no longer goes online when it starts." = "Máy chủ mô hình không còn tự động lên mạng khi khởi động.";
 "The model that reads them" = "Mô hình đọc chúng";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
+"The model, its speech tokenizer and the Russian stress dictionary: %@ in the models folder. Chatterbox (Resemble AI) and ruaccent are MIT-licensed; the speech tokenizer, from CosyVoice2, is Apache-2.0." = "Mô hình, speech tokenizer của nó và từ điển trọng âm tiếng Nga: %@ trong Thư mục mô hình. Chatterbox (Resemble AI) và ruaccent dùng giấy phép MIT; speech tokenizer, từ CosyVoice2, dùng Apache-2.0.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Thư mục models không khả dụng — đĩa của nó đã được kết nối chưa? Chọn lại trong Cài đặt → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Dung lượng tối đa bộ nhớ đệm cho các prompt trước (kích thước Prompt cache của cấu hình cũng là giới hạn). Nhiều hơn làm các cuộc trò chuyện dài và agents nhanh hơn; quá nhiều sẽ không còn chỗ cho prompt đang được đọc.";
 "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "Mức tối đa mà ghi chú chiếm trong prompt của một Trò chuyện. Ghi chú Đã ghim và các tùy chọn bạn đã nêu được ưu tiên trước, sau đó đến các ghi chú còn lại theo độ mới.";
@@ -1386,6 +1438,7 @@
 "The plan changed since you looked at it: review it again." = "Kế hoạch đã thay đổi kể từ khi bạn xem: xem lại lần nữa.";
 "The port and network access can change only while the server is stopped." = "Cổng và quyền truy cập mạng chỉ thay đổi được khi server đang dừng.";
 "The project's files, and Add Files…" = "Tệp của dự án, và Thêm Tệp…";
+"The recognizer, plus Silero VAD (where speech starts and stops) and Smart Turn (whether a pause ends your turn), in the models folder. Licences: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause." = "Trình nhận dạng, cùng với Silero VAD (xác định lúc lời nói bắt đầu và kết thúc) và Smart Turn (xác định liệu một khoảng ngừng có kết thúc lượt nói của bạn hay không), nằm trong thư mục mô hình. Giấy phép: Parakeet CC BY 4.0 (NVIDIA), Whisper MIT, Silero MIT, Smart Turn BSD-2-Clause.";
 "The registry didn't answer in 30 seconds. Try again in a moment." = "Registry không phản hồi trong 30 giây. Hãy thử lại sau ít phút.";
 "The reply was cut at its length limit." = "Phản hồi bị cắt do vượt giới hạn độ dài.";
 "The report" = "Báo cáo";
@@ -1408,19 +1461,27 @@
 "The server starts once %@ is downloaded" = "Server sẽ khởi động khi %@ được tải xong";
 "The server starts with %@" = "Máy chủ khởi động bằng %@";
 "The settings here were kept." = "Các cài đặt ở đây đã được giữ.";
+"The speech recognizer stopped: %@" = "Trình nhận dạng giọng nói đã dừng: %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Các gợi ý cho Mac này đã có sẵn. Duyệt Hugging Face để chọn mô hình khác.";
 "The tips aren't available right now." = "Tùy chọn góp tiền hiện không khả dụng.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray từ ipsupport.us đang mở. Hãy thoát phiên bản đó trước (biểu tượng trên thanh menu › Thoát), rồi mở lại phiên bản này: cả hai sẽ dùng cùng một cổng và tải mô hình hai lần.";
+"The voice couldn't open the audio output." = "Giọng nói không thể mở đầu ra âm thanh.";
+"The voice couldn't open the audio output: %@" = "Giọng nói không thể mở đầu ra âm thanh: %@";
+"The voice failed: %@" = "Giọng nói gặp lỗi: %@";
+"The voice is being downloaded -- try again once it's done." = "Giọng nói đang được tải về — hãy thử lại sau khi hoàn tất.";
 "The voice model is being downloaded -- try again once it's done." = "Mô hình giọng nói đang tải — thử lại khi hoàn tất.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Mô hình giọng nói chưa tải — tải trong Cài đặt > Voice.";
 "The voice model's audio format isn't supported." = "Định dạng âm thanh của mô hình giọng nói không được hỗ trợ.";
 "The voice runner sent an unreadable ready message." = "Voice runner gửi thông báo sẵn sàng không đọc được.";
 "The voice runner stopped unexpectedly (%@)." = "Voice runner dừng bất ngờ (%@).";
+"The voice stopped: %@" = "Giọng nói đã dừng: %@";
+"The voice that answers is the one picked under Spoken answers." = "Giọng nói trả lời là giọng được chọn trong Câu trả lời được đọc thành tiếng.";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Khởi động lại máy chủ mô hình. Giới hạn sẽ trở về mặc định khi Mac khởi động lại. LLMTray không tự thay đổi giá trị này.";
 "There's no plan waiting any more." = "Không còn kế hoạch nào đang chờ.";
 "These can't be added to a project" = "Những mục này không thể thêm vào dự án";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Chúng chạy lần lượt, hiển thị trong cửa sổ thanh menu. Bạn có thể đóng cửa sổ này tạm thời.";
+"Thinking" = "Đang suy nghĩ";
 "Thinking effort: %@" = "Mức suy nghĩ: %@";
 "Thinking effort: how long the model may think before it answers" = "Mức suy nghĩ: mô hình có thể suy nghĩ trong bao lâu trước khi trả lời.";
 "Thinking…" = "Đang suy nghĩ…";
@@ -1524,6 +1585,7 @@
 "Use %@" = "Sử dụng %@";
 "Use %lld" = "Sử dụng %lld";
 "Use Anyway" = "Vẫn sử dụng";
+"Use Built-in" = "Sử dụng Tích hợp sẵn";
 "Use Default Folder" = "Sử dụng Thư mục Mặc định";
 "Use Folder" = "Dùng thư mục";
 "Use LM Studio's folder" = "Dùng thư mục của LM Studio";
@@ -1531,6 +1593,7 @@
 "Use a learned fact at once" = "Sử dụng sự kiện đã học ngay";
 "Use a learned fact once %lld chats show it" = "Sử dụng sự kiện đã học khi %lld Trò chuyện cho thấy điều đó";
 "Use headphones: the model hears its own voice from the speakers." = "Dùng tai nghe: mô hình sẽ nghe tiếng mình từ loa.";
+"Use your own voice, or a voice you have permission to use." = "Sử dụng giọng của bạn hoặc giọng bạn được phép dùng.";
 "Used" = "Đã dùng";
 "Used by %@." = "Được %@ dùng.";
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Được sử dụng cho tạo ảnh, nhạc và Voice Lab, nơi tải chúng về. Chúng cũng được lưu trong thư mục models, theo tên trên Hugging Face.";
@@ -1549,6 +1612,8 @@
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use: raise the GPU memory limit first." = "Voice Lab chiếm khoảng %1$@ GB, nhiều hơn %2$@ GB GPU có thể dùng: tăng giới hạn bộ nhớ GPU trước.";
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab chiếm khoảng %1$@ GB; cùng với %2$@ GB của mô hình chat vẫn vừa trong %3$@ GB GPU có thể dùng. Tuy vậy mô hình chat vẫn được giải nạp khi nó chạy.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab chiếm khoảng %@ GB bộ nhớ khi chạy.";
+"Voice clip" = "Đoạn ghi âm giọng nói";
+"Voice conversation" = "Trò chuyện bằng giọng nói";
 "Voice model" = "Mô hình giọng nói";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
 "Waiting for a model download to finish…" = "Đang chờ mô hình tải xong…";
@@ -1594,6 +1659,7 @@
 "What's New…" = "Có gì mới…";
 "What's sent" = "Những gì được gửi";
 "When a client asks for another model" = "Khi client yêu cầu mô hình khác";
+"When an answer takes more than a second, a short “hmm” or “let me check” in the answers' voice, so the silence doesn't feel like a dropped call. Made in the conversation's quiet moments and kept per voice." = "Khi một câu trả lời mất hơn một giây, sẽ có một tiếng “hmm” hoặc “để tôi xem” ngắn bằng chính giọng của câu trả lời, ताकि sự im lặng không giống như cuộc gọi bị ngắt. Được tạo trong những lúc cuộc trò chuyện im lặng và được lưu riêng theo từng giọng.";
 "When an app asks for another model" = "Khi một ứng dụng yêu cầu mô hình khác";
 "When an app asks for another model: %@" = "Khi một ứng dụng yêu cầu mô hình khác: %@";
 "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "Khi trò chuyện chờ một mô hình chưa được tải, bộ nhớ có thể tải mô hình đó sau khi LLMTray không hoạt động lâu như vậy (không có trò chuyện, ứng dụng hoặc ảnh nào đang chạy). Yêu cầu tiếp theo cho mô hình thường dùng của bạn sẽ tải lại mô hình đó, việc này mất một lúc.";
@@ -1607,6 +1673,7 @@
 "Where you are: a city, or an address" = "Nơi bạn ở: thành phố hoặc địa chỉ";
 "Which model generates new images." = "Mô hình dùng để tạo ảnh mới.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Khi mô hình đang nói, âm thanh từ micro nhỏ hơn mức này sẽ được coi là im lặng: dấu vết giọng nói của chính mô hình do khử vọng vẫn được bỏ, nhưng giọng nói khác vẫn có thể chen vào. Tăng nếu mô hình nghe thấy chính nó, giảm nếu nó bỏ lỡ khi bạn chen ngang. Có hiệu lực ở lần khởi động tiếp theo.";
+"Whisper" = "Whisper";
 "Wikipedia" = "Wikipedia";
 "Window" = "Cửa sổ";
 "Windows and pages" = "Cửa sổ và trang";
@@ -1675,6 +1742,8 @@
 "it's in use or downloading" = "đang được sử dụng hoặc đang tải về";
 "less than a minute left" = "còn dưới một phút";
 "llmtray in the terminal" = "llmtray trong Terminal";
+"macOS" = "macOS";
+"macOS can't recognize %@ on this Mac without sending it off the Mac. Pick Parakeet in Settings > Voice." = "macOS không thể nhận ra %@ trên Máy Mac này nếu không gửi dữ liệu ra khỏi máy. Hãy chọn Parakeet trong Cài đặt > Giọng.";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS loại bỏ chính giọng của mô hình khỏi micro (Xử lý Giọng nói, như FaceTime), nên tính năng hoạt động với loa. Nó cũng cân bằng âm lượng và giảm tiếng ồn nền. Có hiệu lực khi khởi động lại.";
 "make %lld folders" = "tạo %lld thư mục";
 "mlx-audio runtime" = "Thời chạy mlx-audio";
