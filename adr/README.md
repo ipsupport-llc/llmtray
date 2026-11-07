@@ -35,5 +35,6 @@ here; this is where the history lives.
 | [0028](0028-mcp-oauth.md) | Web MCP servers signed in with OAuth (MCP Authorization spec): metadata discovery, client metadata document or DCR, PKCE + loopback redirect, tokens in the Keychain with refresh |
 | [0029](0029-responses-api.md) | The OpenAI Responses API at /v1/responses (Codex CLI): converted to a chat request in the runtime, stateless, function + custom tools |
 | [0030](0030-show-screen-and-tab.md) | Showing the model a window, the screen (system picker, one still; OCR text for models that don't see) or the front browser tab (standalone only); opt-in, outside text |
+| [0031](0031-voice-conversation.md) | Voice conversation with the chat model: recognizer of choice, hands-free turn-taking with barge-in and backchannels, a voice-mode prompt, fillers made in the silences (proposed) |
 
 New ADR: next number, one topic, the decision first, then why.

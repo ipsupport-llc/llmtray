@@ -306,7 +306,8 @@ Bold is the proposed default of each row.
    opt-in) — memory, latency and duplex over the runner's pipes measured.
 3. Push-to-talk STT into the composer.
 4. Spoken answers: system voices and Chatterbox Multilingual V3 (above).
-5. Barge-in and hands-free mode, after step 3.
+5. Barge-in and hands-free mode, after step 3. *Steps 3 and 5 are now one
+   feature: [0031](0031-voice-conversation.md) (voice conversation).*
 
 Each step ships on its own; step 2 alone is the toy that was asked for.
 
