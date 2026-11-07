@@ -65,9 +65,6 @@ final class VoiceConversation: ObservableObject {
     private var makingFiller = false
     /// A filler is coming out of the speakers.
     private var fillerPlaying = false
-    /// The user cut in before any of the answer was heard: their turn goes
-    /// together with the one that answer was for.
-    private var takeBackOnSubmit = false
     /// This turn's answer has begun to play.
     private var answerStarted = false
     /// What the model said lately, and until when the microphone may still
@@ -156,7 +153,6 @@ final class VoiceConversation: ObservableObject {
         recordingTurn = false
         fillerPlaying = false
         fillerOutput = nil
-        takeBackOnSubmit = false
         answerStarted = false
         echoTexts = []
         echoUntil = .distantPast
@@ -309,8 +305,9 @@ final class VoiceConversation: ObservableObject {
     private func stopFiller() {
         guard fillerPlaying || fillerOutput != nil else { return }
         // Its reset empties the unit's whole speech queue: only when no
-        // answer is queued behind it.
-        if SpokenAnswers.shared.speakingMessage == nil { fillerOutput?.reset() }
+        // answer is queued behind it (then it plays out, half a second).
+        guard SpokenAnswers.shared.speakingMessage == nil else { return }
+        fillerOutput?.reset()
         fillerOutput = nil
         fillerPlaying = false
         modelFellSilent()
@@ -363,6 +360,13 @@ final class VoiceConversation: ObservableObject {
         if bargeCandidate {
             // Its own voice coming back isn't the user cutting in.
             if isEcho(text) { return }
+            // Nothing of the answer plays yet: the turn decides (submit
+            // sends it with the one before); only the filler stops.
+            if !answerStarted {
+                if text.split(whereSeparator: \.isWhitespace).count > 3 { stopFiller() }
+                userText = text
+                return
+            }
             // More than a few words over the model: an interruption.
             if text.split(whereSeparator: \.isWhitespace).count > 3 { interrupt() } else { return }
         }
@@ -416,11 +420,9 @@ final class VoiceConversation: ObservableObject {
         bargeCandidate = false
         io?.speechGain = 1
         stopFiller()
-        guard !heard.isEmpty || answerStarted else {
-            // None of the answer heard yet: it's dropped, and the turn goes
-            // with the one before it (submit).
-            SpokenAnswers.shared.stop()
-            takeBackOnSubmit = true
+        guard answerStarted || !heard.isEmpty else {
+            // None of the answer plays yet: submit sends this turn with
+            // the one before it.
             phase = .hearing
             return
         }
@@ -436,18 +438,19 @@ final class VoiceConversation: ObservableObject {
 
     private func submit(_ text: String) {
         var text = text
+        var takenBack: ChatClient.TakenBack?
         stopFiller()
-        if let chat {
-            let unheard = !answerStarted && (chat.isTurnInProgress || takeBackOnSubmit)
-            if chat.isTurnInProgress {
-                chat.cancel()
-                if answerStarted || !heard.isEmpty { chat.cutLastAnswer(toSpoken: heard) }
-            }
+        if let chat, chat.isTurnInProgress {
+            let unheard = !answerStarted && heard.isEmpty
+            chat.cancel()
+            if !unheard { chat.cutLastAnswer(toSpoken: heard) }
             // The user went on before any of the answer was heard: what they
             // said before and now goes as one turn.
-            if unheard, let before = chat.takeBackUnansweredTurn() { text = before + " " + text }
+            else if let back = chat.takeBackUnansweredTurn() {
+                takenBack = back
+                text = back.text + " " + text
+            }
         }
-        takeBackOnSubmit = false
         answerStarted = false
         userText = text
         heard = []
@@ -458,6 +461,7 @@ final class VoiceConversation: ObservableObject {
             ? [WAVFile.pcm16(turnAudio, sampleRate: 16000)] : []
         guard send?(text, audio) == true else {
             // No model to answer, or the chat is busy: said, not dropped.
+            if let takenBack { chat?.restore(takenBack) }
             phase = .listening
             userText = NSLocalizedString("(Not sent: pick a chat model, or wait for the answer in progress.)", comment: "voice conversation")
             return
