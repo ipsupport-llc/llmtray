@@ -63,6 +63,12 @@ final class SpokenVoiceStore: ObservableObject {
     /// Everything Chatterbox needs is on disk.
     nonisolated static var isReady: Bool { SpokenVoiceFile.folders.allSatisfy(isInPlace) }
 
+    /// The model is there but without the fast decoder (downloaded before
+    /// it was published): it works, 4x slower to make each sentence.
+    nonisolated static var lacksFastDecoder: Bool {
+        isInPlace(.model) && !FileManager.default.fileExists(atPath: path(.model) + "/" + SpokenVoiceFile.fastDecoderPath)
+    }
+
     /// Something is on disk (for Remove), complete or not.
     var hasAnything: Bool {
         _ = revision
@@ -97,6 +103,14 @@ final class SpokenVoiceStore: ObservableObject {
             if !text.isEmpty { self?.statusText = text }
         }
         try MediaModels.checkModelsFolder()
+        if Self.lacksFastDecoder {
+            // Just the one file, into the folder in place (resumable).
+            statusText = NSLocalizedString("Downloading the fast decoder…", comment: "spoken answers")
+            try await AudioRuntime.shared.snapshotDownload(repo: SpokenVoiceFile.model.repo,
+                                                           patterns: [SpokenVoiceFile.fastDecoderPath],
+                                                           into: Self.path(.model))
+            try? FileManager.default.removeItem(atPath: Self.path(.model) + "/.cache")
+        }
         let missing = SpokenVoiceFile.folders.filter { !Self.isInPlace($0) }
         guard !missing.isEmpty else { return }
         finishedBytes = 0

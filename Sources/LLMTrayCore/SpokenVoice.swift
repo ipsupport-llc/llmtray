@@ -20,11 +20,19 @@ public struct SpokenVoiceFile: Hashable, Sendable {
 
     /// Chatterbox Multilingual V3 for MLX (MIT, Resemble AI), IPSupport's
     /// build: T3 at 8 bits (2-3x faster than the fp32 conversion, same
-    /// audio), the built-in voice included (quant-ternary chatterbox-quant).
+    /// audio), the built-in voice included, and Chatterbox Turbo's
+    /// distilled decoder (4x faster S3Gen, no difference heard in a blind
+    /// test) in meanflow/ (quant-ternary chatterbox-quant).
     public static let model = SpokenVoiceFile(
         repo: "roman220220/chatterbox-multilingual-v3-mlx-8bit", name: "Chatterbox Multilingual V3 (8-bit)",
-        patterns: ["model.safetensors", "config.json", "tokenizer.json", "Cangjie5_TC.json", "conds.safetensors", "LICENSE"],
-        downloadBytes: 1_316_571_733, license: "MIT")
+        patterns: ["model.safetensors", "config.json", "tokenizer.json", "Cangjie5_TC.json", "conds.safetensors", "LICENSE",
+                   fastDecoderPath],
+        downloadBytes: 1_316_571_733 + fastDecoderBytes, license: "MIT")
+    /// The fast decoder, inside the model's folder (a subfolder: mlx-audio
+    /// loads every top-level *.safetensors). The runner uses it when it's
+    /// there; a model downloaded before it came gets it on its own.
+    public static let fastDecoderPath = "meanflow/s3gen_meanflow.safetensors"
+    public static let fastDecoderBytes: Int64 = 569_810_032
     /// Its speech tokenizer, which mlx-audio otherwise fetches by name
     /// (Apache-2.0: converted from CosyVoice2-0.5B).
     public static let tokenizer = SpokenVoiceFile(

@@ -53,6 +53,11 @@ struct SpokenAnswersSection: View {
                     }
                 } else if ready {
                     Label("Downloaded", systemImage: "checkmark.circle.fill").foregroundStyle(.secondary)
+                    if SpokenVoiceStore.lacksFastDecoder {
+                        Button("Get Faster Decoder") { download() }
+                            .help(Text(String(format: NSLocalizedString("Chatterbox Turbo's decoder makes each sentence about 4x faster, with no audible difference: %@ more.", comment: "spoken answers: size"),
+                                              ByteCountFormatter.string(fromByteCount: SpokenVoiceFile.fastDecoderBytes, countStyle: .file))))
+                    }
                     Button("Remove") { remove() }
                 } else {
                     Button(store.hasPartialDownload ? "Resume Download" : "Download") { download() }
