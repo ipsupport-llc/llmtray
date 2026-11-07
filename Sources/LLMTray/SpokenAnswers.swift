@@ -198,10 +198,17 @@ final class SpokenAnswers: ObservableObject {
             } else {
                 note = nil
                 let c = chatterbox ?? makeChatterbox()
-                c.onFailure = { [weak self] message in
-                    self?.note = message
-                    self?.speakingMessage = nil
-                    self?.active = nil
+                c.onFailure = { [weak self, weak c] message, unspoken in
+                    // After Stop (or another answer) it's no news.
+                    guard let self, let c, self.active === c else { return }
+                    self.note = message
+                    // Never silence: the system voice reads what's left.
+                    let s = self.system ?? SystemSpeaker()
+                    self.system = s
+                    s.onIdle = { [weak self] in self?.idle(s) }
+                    self.active = s
+                    for (text, lang) in unspoken { s.enqueue(text, language: lang) }
+                    if self.stream == nil { s.endOfInput() }
                 }
                 return c
             }
@@ -303,8 +310,9 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     static let idleTimeout: TimeInterval = 300
 
     var onIdle: (() -> Void)?
-    /// The runner failed: why, for the user.
-    var onFailure: ((String) -> Void)?
+    /// The runner failed: why, for the user, and the sentences it hadn't
+    /// played (text, language), in order.
+    var onFailure: ((String, [(String, String)]) -> Void)?
 
     private var process: DuplexProcess?
     private var audio: VoiceAudioEngine?
@@ -313,6 +321,11 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     private var nextID = 0
     /// Sentences sent and not yet played, by id.
     private var outstanding: Set<Int> = []
+    /// Their text and language, for a fallback voice if this one fails:
+    /// kept until the sentence has played, not just been made.
+    private var texts: [Int: (String, String)] = [:]
+    /// Per sentence, its audio chunks scheduled and not yet played.
+    private var chunksPlaying: [Int: Int] = [:]
     /// Audio chunks scheduled and not yet played.
     private var playing = 0
     private var ended = false
@@ -335,9 +348,14 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     func enqueue(_ sentence: String, language: String) {
         idleTimer?.invalidate()
         ended = false
-        if process == nil { launch() }
+        // Recorded first: a launch that fails hands it to the fallback.
         nextID += 1
         outstanding.insert(nextID)
+        texts[nextID] = (sentence, language)
+        if process == nil {
+            launch()
+            guard process != nil else { return }
+        }
         send(VoiceFrame(.speak, payload: Self.json(["id": nextID, "text": sentence, "lang": language])))
     }
 
@@ -349,6 +367,8 @@ final class ChatterboxSpeaker: SentenceSpeaker {
     func stop() {
         generation += 1
         outstanding = []
+        texts = [:]
+        chunksPlaying = [:]
         playing = 0
         current = nil
         ended = false
@@ -411,15 +431,19 @@ final class ChatterboxSpeaker: SentenceSpeaker {
             let id = Self.object(frame.payload)?["id"] as? Int
             current = id.flatMap { outstanding.contains($0) ? $0 : nil }
         case .speech:
-            guard current != nil, let output else { return }
+            guard let id = current, let output else { return }
             let samples = PCM16.samples(from: frame.payload)
             let scheduled = generation
             playing += 1
+            chunksPlaying[id, default: 0] += 1
             output.schedule(samples) { [weak self] in
-                DispatchQueue.main.async { MainActor.assumeIsolated { self?.played(generation: scheduled) } }
+                DispatchQueue.main.async { MainActor.assumeIsolated { self?.played(id: id, generation: scheduled) } }
             }
         case .replyDone:
-            if let id = Self.object(frame.payload)?["id"] as? Int { outstanding.remove(id) }
+            if let id = Self.object(frame.payload)?["id"] as? Int {
+                outstanding.remove(id)
+                if chunksPlaying[id, default: 0] == 0 { texts[id] = nil }   // no audio, or all played
+            }
             current = nil
             checkIdle()
         case .error:
@@ -427,6 +451,7 @@ final class ChatterboxSpeaker: SentenceSpeaker {
             let message = info?["message"] as? String ?? frame.text
             if let id = info?["id"] as? Int {
                 outstanding.remove(id)
+                texts[id] = nil
                 NSLog("LLMTray: spoken answer sentence failed: %@", message)
                 checkIdle()
             } else if info?["fatal"] as? Bool == false {
@@ -459,9 +484,13 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         self.output = output
     }
 
-    private func played(generation scheduled: Int) {
+    private func played(id: Int, generation scheduled: Int) {
         guard scheduled == generation else { return }
         playing = max(0, playing - 1)
+        let left = max(0, chunksPlaying[id, default: 1] - 1)
+        chunksPlaying[id] = left == 0 ? nil : left
+        // Heard to the end once made and played: no fallback needs it.
+        if left == 0, !outstanding.contains(id) { texts[id] = nil }
         checkIdle()
     }
 
@@ -502,6 +531,11 @@ final class ChatterboxSpeaker: SentenceSpeaker {
 
     private func fail(_ message: String) {
         NSLog("LLMTray: %@", message)
+        // Not yet heard to the end: made or not (one cut off mid-way is
+        // read again whole).
+        let unspoken = texts.keys.sorted().compactMap { texts[$0] }
+        texts = [:]
+        chunksPlaying = [:]
         generation += 1
         outstanding = []
         playing = 0
@@ -510,7 +544,7 @@ final class ChatterboxSpeaker: SentenceSpeaker {
         process?.kill()
         process = nil
         closeAudio()
-        onFailure?(message)
+        onFailure?(message, unspoken)
     }
 
     private func closeAudio() {

@@ -104,6 +104,8 @@ cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/llmtray_mflux_runner.py" \
    "$REPO_ROOT/runtime/llmtray_music_runner.py" \
    "$REPO_ROOT/runtime/llmtray_voice_runner.py" \
+   "$REPO_ROOT/runtime/llmtray_tts_runner.py" \
+   "$REPO_ROOT/runtime/llmtray_ru_stress.py" \
    "$REPO_ROOT/runtime/llmtray_embed_runner.py" \
    "$REPO_ROOT/runtime/embedders.json" \
    "$APP/Contents/Resources/runtime/"
