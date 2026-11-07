@@ -503,6 +503,8 @@
 "Enable project files?" = "Enable project files?";
 "Enable…" = "Enable…";
 "End" = "End";
+"End the conversation" = "End the conversation";
+"End the conversation (Esc)" = "End the conversation (Esc)";
 "End the conversation (the chat model reloads)" = "End the conversation (the chat model reloads)";
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
 "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)" = "Environment, NAME=value per line (keys, tokens and passwords go to the Keychain)";
