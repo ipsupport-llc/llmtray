@@ -296,3 +296,10 @@ refused. Fixed in three layers:
 - Speaking while the model works on an answer ducks it. If the user goes on
   before any of the answer plays, the answer is cancelled and both of their
   turns go as one.
+
+**Mute.** A Mute button by End turns the microphone off. The runner then
+gets silence, so its timing goes on: a turn already under way ends and is
+sent as said so far, and no new one starts. Nothing is recorded, the
+model's answer plays to the end, and the conversation doesn't fall asleep
+while muted. The orb shows a crossed-out microphone, the state reads
+Muted, and the button reads Unmute in red.

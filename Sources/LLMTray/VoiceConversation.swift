@@ -30,6 +30,10 @@ final class VoiceConversation: ObservableObject {
     @Published private(set) var userText = ""
     /// The answer's sentences heard so far, and the one playing.
     @Published private(set) var heard: [String] = []
+    /// The microphone is muted: the runner hears silence (no turn starts,
+    /// nothing interrupts the answer) and the conversation doesn't sleep.
+    @Published private(set) var muted = false
+    private let muteBox = MuteBox()
     /// The microphone's level for the orb: its own object, so 15 updates
     /// a second redraw the orb and not every view watching the phase.
     let meter = VoiceMeter()
@@ -99,6 +103,7 @@ final class VoiceConversation: ObservableObject {
         self.send = send
         userText = ""
         heard = []
+        setMuted(false)
         let store = VoiceInputStore.shared
         guard store.isReady else {
             phase = .failed(NSLocalizedString("Download the speech recognizer first: Settings > Voice > Voice conversation.", comment: "voice conversation"))
@@ -157,8 +162,21 @@ final class VoiceConversation: ObservableObject {
         answerStarted = false
         echoTexts = []
         echoUntil = .distantPast
+        setMuted(false)
         meter.level = 0
         phase = .off
+    }
+
+    func toggleMute() {
+        guard isActive else { return }
+        setMuted(!muted)
+        if muted { meter.level = 0 }
+        resetSleep()
+    }
+
+    private func setMuted(_ on: Bool) {
+        muted = on
+        muteBox.set(on)
     }
 
     private func fail(_ message: String) {
@@ -255,8 +273,15 @@ final class VoiceConversation: ObservableObject {
         observeChat()
         let runner = self.runner
         let levelBox = LevelBox()
+        let muteBox = self.muteBox
         do {
             try io.start { [weak self] data, rms in
+                // Muted: the runner hears silence, so its timing goes on and
+                // a turn already started ends; nothing is recorded.
+                if muteBox.isOn {
+                    _ = runner?.write(VoiceFrame(.audio, payload: Data(count: data.count)).encoded)
+                    return
+                }
                 // On the I/O queue: the runner first, then the UI's level.
                 _ = runner?.write(VoiceFrame(.audio, payload: data).encoded)
                 if levelBox.shouldPublish() {
@@ -535,9 +560,11 @@ final class VoiceConversation: ObservableObject {
 
     private func resetSleep() {
         sleepTimer?.invalidate()
+        // Muted, the silence is the user's choice: no sleeping on it.
+        guard !muted else { return }
         sleepTimer = Timer.scheduledTimer(withTimeInterval: Self.sleepAfter, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, self.phase == .listening else { return }
+                guard let self, self.phase == .listening, !self.muted else { return }
                 self.stop()
             }
         }
@@ -616,6 +643,14 @@ final class VoiceConversation: ObservableObject {
 @MainActor
 final class VoiceMeter: ObservableObject {
     @Published var level: Float = 0
+}
+
+/// The mute switch, read on the I/O queue.
+private final class MuteBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var on = false
+    var isOn: Bool { lock.withLock { on } }
+    func set(_ value: Bool) { lock.withLock { on = value } }
 }
 
 /// Publishes the mic level ~15 times a second (the I/O queue delivers a
