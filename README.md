@@ -14,15 +14,15 @@ The models run on your Mac. Only the optional web tools reach the internet.
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/id6817598741"><img src="https://img.shields.io/badge/Mac_App_Store-LLMTray-0d96f6?style=for-the-badge&logo=apple&logoColor=white" alt="LLMTray on the Mac App Store"></a>
-  <br>
   <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"><img src="https://img.shields.io/badge/Download-LLMTray.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray.dmg"></a>
   &nbsp;
   <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"><img src="https://img.shields.io/badge/Download-LLMTray--Full.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray-Full.dmg"></a>
   <br>
   <sub>Light — ~8MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~270MB, self-contained</sub>
   <br><br>
-  <a href="https://ipsupport.us/llmtray/">ipsupport.us/llmtray</a> · <a href="https://apps.apple.com/app/id6817598741">Mac App Store</a>
+  <a href="https://ipsupport.us/llmtray/">ipsupport.us/llmtray</a>
+  <br>
+  <sub>A separate Mac App Store edition is also available: sandboxed, updated through the App Store, no command-line tool. <a href="https://apps.apple.com/app/id6817598741">Mac App Store</a></sub>
 </p>
 
 ## What it does
