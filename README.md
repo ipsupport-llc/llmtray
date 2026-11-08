@@ -18,9 +18,11 @@ The models run on your Mac. Only the optional web tools reach the internet.
   &nbsp;
   <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"><img src="https://img.shields.io/badge/Download-LLMTray--Full.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray-Full.dmg"></a>
   <br>
-  <sub>Light — ~8MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~270MB, self-contained</sub>
+  <sub>Light — ~17MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~320MB, self-contained</sub>
   <br><br>
-  <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
+  <a href="https://ipsupport.us/llmtray/">ipsupport.us/llmtray</a>
+  <br>
+  <sub>A separate Mac App Store edition is also available: sandboxed, updated through the App Store, no command-line tool. <a href="https://apps.apple.com/app/id6817598741">Mac App Store</a></sub>
 </p>
 
 ## What it does
@@ -73,8 +75,8 @@ The wizard and Settings gate image generation, image editing and music by these 
 
 Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtray/releases/latest):
 
-- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~8MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
-- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~270MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
+- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~17MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
+- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~320MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
 
 Or install with [Homebrew](https://github.com/ipsupport-llc/homebrew-tap):
 
