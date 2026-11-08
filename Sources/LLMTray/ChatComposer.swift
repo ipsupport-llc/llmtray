@@ -755,7 +755,7 @@ struct LoopsPicker: View {
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
-        .help("Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. Changing it reads the chat again once. Default: the profile's (Settings > Profiles).")
+        .help("Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. A change applies from the next message, which reads the chat again once. Default: the profile's (Settings > Profiles).")
         .accessibilityLabel(Text(title(loops)))
     }
 }

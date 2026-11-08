@@ -772,7 +772,7 @@
 "Loops" = "Loops";
 "Loops: %d" = "Loops: %d";
 "Loops: default" = "Loops: default";
-"Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. Changing it reads the chat again once. Default: the profile's (Settings > Profiles)." = "Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. Changing it reads the chat again once. Default: the profile's (Settings > Profiles).";
+"Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. A change applies from the next message, which reads the chat again once. Default: the profile's (Settings > Profiles)." = "Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. A change applies from the next message, which reads the chat again once. Default: the profile's (Settings > Profiles).";
 "MTP drafter: speeds up %@, same answers" = "MTP drafter: speeds up %@, same answers";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Mail, notes, calendars, files and services. The chat asks you before each call." = "Mail, notes, calendars, files and services. The chat asks you before each call.";

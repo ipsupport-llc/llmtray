@@ -347,7 +347,7 @@ extension ChatSettings {
         settings.thinkingStyle = thinkingStyle
         settings.modelSupportsAudio = supportsAudio
         settings.thinkingEffort = ThinkingEffort(rawValue: UserDefaults.standard[Pref.thinkingEffort]) ?? .high
-        settings.modelLoops = modelID.flatMap { ModelDiscovery.recurrentLoops(modelPath: $0) }
+        settings.modelLoops = modelID.flatMap { ModelDiscovery.pickableLoops(modelPath: $0) }
         settings.recurrentLoops = UserDefaults.standard[Pref.recurrentLoops]
         settings.modelPath = modelID
         return settings

@@ -146,6 +146,9 @@ final class MLXRuntimeInstaller {
     /// The installed mlx-lm drafts with a model's own MTP head (Qwen 3.5,
     /// model-mtp.safetensors). An older one drops the head's weights on
     /// load, so the file does no harm there, it just isn't used.
+    /// The installed runtime takes recurrent_loops per request (fork #62).
+    static var supportsRequestLoops: Bool { serverSupportsFlag("recurrent_loops") }
+
     static var supportsMTPHead: Bool {
         serverSupportsFlag("--num-draft-tokens") && sitePackageDirs.contains { dir in
             guard let text = try? String(contentsOfFile: "\(dir)/mlx_lm/generate.py", encoding: .utf8) else { return false }
