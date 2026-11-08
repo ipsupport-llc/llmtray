@@ -76,18 +76,24 @@ if [[ "$STATUS" != "Accepted" ]]; then
   echo "error: notarization $STATUS" >&2
   exit 1
 fi
-# Stapling fetches the ticket from Apple's CloudKit, which drops the
-# connection now and then (-1005, three releases in a row on 2026-11-07) or
-# doesn't have a fresh ticket yet: tried again with a growing pause.
-STAPLED=""
-for (( attempt = 1; attempt <= 6; attempt++ )); do
-  if xcrun stapler staple "$DMG"; then STAPLED=1; break; fi
-  (( attempt < 6 )) || break
-  pause=$(( attempt * 20 ))
-  echo "--- stapling failed (attempt $attempt of 6), again in ${pause}s ---"
-  sleep "$pause"
-done
-[[ -n "$STAPLED" ]] || { echo "error: stapling $DMG failed 6 times" >&2; exit 68; }
-xcrun stapler validate "$DMG"
+# Stapling and validating both fetch the ticket from Apple's CloudKit, which
+# drops the connection now and then (-1005: four release runs in a row on
+# 2026-11-07, at staple and at validate) or hasn't got a fresh ticket yet:
+# each is tried again with a growing pause (20 ... 100 s, none after the last).
+cloudkit_retry() {
+  local what="$1" attempt pause
+  shift
+  for (( attempt = 1; attempt <= 6; attempt++ )); do
+    if "$@"; then return 0; fi
+    (( attempt < 6 )) || break
+    pause=$(( attempt * 20 ))
+    echo "--- $what failed (attempt $attempt of 6), again in ${pause}s ---"
+    sleep "$pause"
+  done
+  echo "error: $what of $DMG failed 6 times" >&2
+  return 68
+}
+cloudkit_retry stapling xcrun stapler staple "$DMG" || exit 68
+cloudkit_retry validation xcrun stapler validate "$DMG" || exit 68
 spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
 echo "--- notarized and stapled $DMG ---"
