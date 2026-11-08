@@ -299,7 +299,9 @@ refused. Fixed in three layers:
 
 **Mute.** A Mute button by End turns the microphone off. The runner then
 gets silence, so its timing goes on: a turn already under way ends and is
-sent as said so far, and no new one starts. Nothing is recorded, the
+sent as said so far (except speech over the model's answer: that one is
+dropped, so muting never cuts the answer off), and no new one starts; the
+last 0.6 s kept for a turn's first syllables is cleared. Nothing is recorded, the
 model's answer plays to the end, and the conversation doesn't fall asleep
 while muted. The orb shows a crossed-out microphone, the state reads
 Muted, and the button reads Unmute in red.

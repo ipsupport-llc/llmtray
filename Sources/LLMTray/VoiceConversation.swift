@@ -54,6 +54,9 @@ final class VoiceConversation: ObservableObject {
     /// The user spoke while the model talked: its voice is ducked until the
     /// turn shows whether that was a backchannel.
     private var bargeCandidate = false
+    /// Muted while speaking over the model: the turn the silence ends is
+    /// dropped, so muting never cuts the answer off.
+    private var dropTurnAfterMute = false
     /// The turn's audio (16 kHz PCM16), for a model that hears.
     private var turnAudio = Data()
     private var recordingTurn = false
@@ -162,6 +165,7 @@ final class VoiceConversation: ObservableObject {
         answerStarted = false
         echoTexts = []
         echoUntil = .distantPast
+        dropTurnAfterMute = false
         setMuted(false)
         meter.level = 0
         phase = .off
@@ -170,7 +174,16 @@ final class VoiceConversation: ObservableObject {
     func toggleMute() {
         guard isActive else { return }
         setMuted(!muted)
-        if muted { meter.level = 0 }
+        if muted {
+            meter.level = 0
+            // What came before the mute isn't the start of the next turn.
+            recent.removeAll()
+            if bargeCandidate {
+                bargeCandidate = false
+                io?.speechGain = 1
+                dropTurnAfterMute = true
+            }
+        }
         resetSleep()
     }
 
@@ -407,6 +420,12 @@ final class VoiceConversation: ObservableObject {
             if let apple { text = await apple.endTurn() }
             guard session == self.session else { return }
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if dropTurnAfterMute {
+                dropTurnAfterMute = false
+                answerEndedDuringTurn = false
+                if phase == .hearing { phase = modelAudible ? .speaking : chat?.isBusy == true ? .thinking : .listening }
+                return
+            }
             // "Uh" on its own isn't a turn to answer.
             if VoiceConversationText.isHesitation(text) { text = "" }
             if isEcho(text) {
