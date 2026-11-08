@@ -36,6 +36,8 @@ final class ComposerModel: ObservableObject {
     /// What the model's template offers for thinking: the effort picker
     /// shows for one that thinks.
     @Published var thinkingStyle: ThinkingStyle = .none
+    /// The model is looped (Dory): the loops picker shows.
+    @Published var looped = false
     /// Recordings for a model that hears (WAV, ChatRecorder); switching to
     /// one that doesn't drops them. At most `maxRecordings` a message (the
     /// server takes eight clips a request).
@@ -396,6 +398,9 @@ struct ChatComposer: View {
                 }
                 VoiceConversationButton()
                 Spacer(minLength: 8)
+                if composer.looped {
+                    LoopsPicker()
+                }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
                 }
@@ -721,6 +726,37 @@ struct ThinkingEffortPicker: View {
         .fixedSize()
         .help("Thinking effort: how long the model may think before it answers")
         .accessibilityLabel(Text(String(format: NSLocalizedString("Thinking effort: %@", comment: ""), effort.title)))
+    }
+}
+
+/// The composer's loop count for a looped model (NVIDIA Dory): how many
+/// times it runs its middle layers per word. Profile's default or 1-4, for
+/// every chat, as the thinking effort; switching reads the chat again once.
+struct LoopsPicker: View {
+    @AppStorage(Pref.recurrentLoops.name) private var loops = Pref.recurrentLoops.defaultValue
+
+    private func title(_ n: Int) -> String {
+        n == 0 ? NSLocalizedString("Loops: default", comment: "loops picker")
+            : String(format: NSLocalizedString("Loops: %d", comment: "loops picker"), n)
+    }
+
+    var body: some View {
+        Menu {
+            ForEach(0...4, id: \.self) { n in
+                Button {
+                    loops = n
+                } label: {
+                    if n == loops { Label(title(n), systemImage: "checkmark") } else { Text(title(n)) }
+                }
+            }
+        } label: {
+            Label(title(loops), systemImage: "repeat")
+                .labelStyle(.titleAndIcon)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("Loops: how many times the model runs its middle layers for every word. More: better answers, slower; with 1, Dory often thinks without getting to the answer. A change applies from the next message, which reads the chat again once. Default: the profile's (Settings > Profiles).")
+        .accessibilityLabel(Text(title(loops)))
     }
 }
 

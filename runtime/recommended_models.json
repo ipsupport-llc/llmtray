@@ -116,6 +116,22 @@
       "recommendedFor": []
     },
     {
+      "repo": "roman220220/Dory1.0-4B-gptq-mlx-jang",
+      "title": "NVIDIA Dory 1.0 4B (GPTQ)",
+      "summary": "NVIDIA's looped model, quantized with GPTQ by LLMTray's authors, that runs its middle layers several times for every word (the Loops picker, 2 by default): at High it thinks a minute or two before answering, with thinking Off or Low it answers in seconds; calls tools; text only, English.",
+      "capabilities": [
+        "tools",
+        "reasoning"
+      ],
+      "languages": [
+        "en"
+      ],
+      "license": "openmdw-1.1",
+      "approxBytes": 3748457019,
+      "minMemoryGB": 8,
+      "recommendedFor": []
+    },
+    {
       "repo": "roman220220/Nemotron-3.5-Lightning-30B-A3B-JANG-GPTQ-ipsupport-code-lora",
       "title": "Nemotron 3.5 Lightning 30B-A3B, coding agent",
       "summary": "NVIDIA's mixture-of-experts Nemotron, fine-tuned by LLMTray's authors for tool calling in a terminal coding agent; text only.",

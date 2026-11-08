@@ -47,6 +47,9 @@ public enum Pref {
     /// The composer's thinking effort (ThinkingEffort's raw value), for every
     /// model that thinks: High, as long as it takes, until changed.
     public static let thinkingEffort = PrefKey("llmtray.thinkingEffort", default: ThinkingEffort.high.rawValue)
+    /// The composer's loop count for a looped model (NVIDIA Dory), every
+    /// chat: 0 = the profile's (Settings > Profiles > Loops), else 1-4.
+    public static let recurrentLoops = PrefKey("llmtray.recurrentLoops", default: 0)
     /// Debug: show each tool call (name, arguments) under the answer, with
     /// its result when expanded.
     public static let showToolCalls = PrefKey("llmtray.showToolCalls", default: false)

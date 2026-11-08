@@ -260,6 +260,10 @@ struct ChatSettings {
     /// (the composer's picker): the request's fields (Thinking.requestFields).
     var thinkingStyle: ThinkingStyle = .none
     var thinkingEffort: ThinkingEffort = .high
+    /// A looped model's (Dory's) own loop count, nil for other models; and
+    /// the composer's pick, 0 = the profile's. Sent as recurrent_loops.
+    var modelLoops: Int?
+    var recurrentLoops = 0
     /// Appended to the system prompt whenever tools are offered.
     var toolUsePolicy: String = Profile.defaultToolUsePolicy
     /// Rounds of tool calls per message (the profile's).
@@ -292,6 +296,10 @@ struct ChatSettings {
     /// A spoken answer can't keep the user waiting in silence while the
     /// model thinks (adr/0031): a voice conversation doesn't think.
     var effectiveThinkingEffort: ThinkingEffort { voiceMode ? .off : thinkingEffort }
+    /// The request's recurrent_loops: nil keeps the server's (the profile's).
+    var effectiveRecurrentLoops: Int? {
+        RecurrentLoops.requestValue(modelLoops: modelLoops, picked: recurrentLoops)
+    }
 
     /// The chat settings a model's profile resolves to.
     init(profile p: ResolvedProfile, maxTokensCap: Int) {
@@ -339,6 +347,8 @@ extension ChatSettings {
         settings.thinkingStyle = thinkingStyle
         settings.modelSupportsAudio = supportsAudio
         settings.thinkingEffort = ThinkingEffort(rawValue: UserDefaults.standard[Pref.thinkingEffort]) ?? .high
+        settings.modelLoops = modelID.flatMap { ModelDiscovery.pickableLoops(modelPath: $0) }
+        settings.recurrentLoops = UserDefaults.standard[Pref.recurrentLoops]
         settings.modelPath = modelID
         return settings
     }

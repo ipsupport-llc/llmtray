@@ -1554,6 +1554,8 @@ final class ChatClient: ObservableObject {
         now.modelSupportsAudio = start.modelSupportsAudio
         now.thinkingStyle = start.thinkingStyle
         now.thinkingEffort = start.thinkingEffort
+        now.modelLoops = start.modelLoops
+        now.recurrentLoops = start.recurrentLoops
         now.project = start.project
         // The block the turn started with, through its tool rounds -- not
         // once a note of it was forgotten or memory turned off.

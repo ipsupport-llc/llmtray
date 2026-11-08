@@ -269,6 +269,14 @@ enum ModelDiscovery {
     /// it also covers future models with the same sharing pattern.
     /// A looped model's (NVIDIA Dory's) own loop count from its config, nil
     /// for any other model (Settings > Profiles > Loops).
+    /// The loop count when the chat can pick it: a looped model on a
+    /// runtime that takes recurrent_loops per request.
+    @MainActor
+    static func pickableLoops(modelPath path: String) -> Int? {
+        guard let loops = recurrentLoops(modelPath: path), MLXRuntimeInstaller.supportsRequestLoops else { return nil }
+        return loops
+    }
+
     static func recurrentLoops(modelPath path: String) -> Int? {
         guard let data = FileManager.default.contents(atPath: path + "/config.json"),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
