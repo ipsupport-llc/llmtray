@@ -84,7 +84,6 @@ for (( attempt = 1; attempt <= 6; attempt++ )); do
   if xcrun stapler staple "$DMG"; then STAPLED=1; break; fi
   (( attempt < 6 )) || break
   pause=$(( attempt * 20 ))
-  if (( pause > 120 )); then pause=120; fi
   echo "--- stapling failed (attempt $attempt of 6), again in ${pause}s ---"
   sleep "$pause"
 done
