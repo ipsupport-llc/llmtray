@@ -76,7 +76,18 @@ if [[ "$STATUS" != "Accepted" ]]; then
   echo "error: notarization $STATUS" >&2
   exit 1
 fi
-xcrun stapler staple "$DMG"
+# Stapling fetches the ticket from Apple's CloudKit, which drops the
+# connection now and then (-1005, three releases in a row on 2026-11-07) or
+# doesn't have a fresh ticket yet: tried again with a growing pause.
+STAPLED=""
+for (( attempt = 1; attempt <= 6; attempt++ )); do
+  if xcrun stapler staple "$DMG"; then STAPLED=1; break; fi
+  (( attempt < 6 )) || break
+  pause=$(( attempt * 20 ))
+  echo "--- stapling failed (attempt $attempt of 6), again in ${pause}s ---"
+  sleep "$pause"
+done
+[[ -n "$STAPLED" ]] || { echo "error: stapling $DMG failed 6 times" >&2; exit 68; }
 xcrun stapler validate "$DMG"
 spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
 echo "--- notarized and stapled $DMG ---"
