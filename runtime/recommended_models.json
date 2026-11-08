@@ -118,7 +118,7 @@
     {
       "repo": "roman220220/Dory1.0-4B-gptq-mlx-jang",
       "title": "NVIDIA Dory 1.0 4B (GPTQ)",
-      "summary": "NVIDIA's looped model, quantized with GPTQ by LLMTray's authors: it runs its middle layers several times for every word, and the Loops picker in the chat trades speed for better answers; always thinks, calls tools; text only, English.",
+      "summary": "NVIDIA's looped model, quantized with GPTQ by LLMTray's authors: it runs its middle layers several times for every word (the Loops picker in the chat; 2 by default). At High it thinks a minute or two before answering; with thinking Off or Low it answers in seconds. Calls tools; text only, English.",
       "capabilities": [
         "tools",
         "reasoning"
