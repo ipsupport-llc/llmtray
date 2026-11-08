@@ -44,7 +44,7 @@ struct VoiceConversationView: View {
                     VStack(spacing: 0) {
                         Spacer(minLength: 4)
                         if scale >= 0.3 {
-                            VoiceOrb(phase: voice.phase, meter: voice.meter)
+                            VoiceOrb(phase: voice.phase, meter: voice.meter, muted: voice.muted)
                                 .scaleEffect(scale)
                                 .frame(height: 250 * scale)
                         }
@@ -60,6 +60,11 @@ struct VoiceConversationView: View {
             HStack(spacing: 14) {
                 Text("Esc ends the conversation").font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 Spacer()
+                if !isFailed {
+                    MuteButton(muted: voice.muted, action: voice.toggleMute)
+                    .disabled(voice.phase == .off || isStarting)
+                    .help(voice.muted ? Text("Turn the microphone back on") : Text("Turn the microphone off: the model doesn't hear you and finishes what it's saying"))
+                }
                 Button(action: close) {
                     Label(isFailed ? "Close" : "End", systemImage: "stop.circle")
                 }
@@ -98,9 +103,15 @@ struct VoiceConversationView: View {
         return false
     }
 
+    private var isStarting: Bool {
+        if case .starting = voice.phase { return true }
+        return false
+    }
+
     private var stateText: String {
         switch voice.phase {
         case .starting(let text): return text
+        case .listening where voice.muted: return NSLocalizedString("Muted", comment: "voice conversation state")
         case .listening: return NSLocalizedString("Listening", comment: "voice conversation state")
         case .hearing: return NSLocalizedString("Hearing you", comment: "voice conversation state")
         case .thinking: return NSLocalizedString("Thinking", comment: "voice conversation state")
@@ -143,6 +154,20 @@ struct VoiceConversationView: View {
     }
 }
 
+/// Mute / Unmute: red while the microphone is off.
+private struct MuteButton: View {
+    let muted: Bool
+    let action: () -> Void
+
+    var body: some View {
+        if muted {
+            Button(action: action) { Label("Unmute", systemImage: "mic.slash.fill").foregroundStyle(.red) }
+        } else {
+            Button(action: action) { Label("Mute", systemImage: "mic.fill") }
+        }
+    }
+}
+
 /// Finds the window a view is in (for the Esc monitor).
 struct HostWindow: NSViewRepresentable {
     final class Box { weak var window: NSWindow? }
@@ -163,10 +188,11 @@ struct HostWindow: NSViewRepresentable {
 struct VoiceOrb: View {
     let phase: VoiceConversation.Phase
     @ObservedObject var meter: VoiceMeter
+    var muted = false
 
     var body: some View {
         let level = meter.level
-        let l = CGFloat(phase == .speaking ? 0.6 : min(1, level * 1.4))
+        let l = CGFloat(phase == .speaking ? 0.6 : muted ? 0 : min(1, level * 1.4))
         ZStack {
             ForEach(0..<3) { i in
                 Circle()
@@ -193,7 +219,11 @@ struct VoiceOrb: View {
         case .speaking:
             Image(systemName: "speaker.wave.2.fill").font(.system(size: 34, weight: .medium)).foregroundStyle(.white.opacity(0.92))
         default:
-            Image(systemName: "waveform").font(.system(size: 34, weight: .medium)).foregroundStyle(.white.opacity(0.92))
+            if muted {
+                Image(systemName: "mic.slash.fill").font(.system(size: 34, weight: .medium)).foregroundStyle(.white.opacity(0.92))
+            } else {
+                Image(systemName: "waveform").font(.system(size: 34, weight: .medium)).foregroundStyle(.white.opacity(0.92))
+            }
         }
     }
 }

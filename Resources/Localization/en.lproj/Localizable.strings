@@ -833,6 +833,8 @@
 "Music generation isn't set up -- enable it again in Settings." = "Music generation isn't set up -- enable it again in Settings.";
 "Music model" = "Music model";
 "Music off" = "Music off";
+"Mute" = "Mute";
+"Muted" = "Muted";
 "Name" = "Name";
 "Name new chats automatically" = "Name new chats automatically";
 "Name or how to call you" = "Name or how to call you";
@@ -1548,6 +1550,8 @@
 "Try It Again" = "Try It Again";
 "Turn Off" = "Turn Off";
 "Turn On" = "Turn On";
+"Turn the microphone back on" = "Turn the microphone back on";
+"Turn the microphone off: the model doesn't hear you and finishes what it's saying" = "Turn the microphone off: the model doesn't hear you and finishes what it's saying";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
 "Type a message below and press Return. Try: “What can you do?”" = "Type a message below and press Return. Try: “What can you do?”";
@@ -1566,6 +1570,7 @@
 "Unload chat model during generation" = "Unload chat model during generation";
 "Unload model when idle" = "Unload model when idle";
 "Unloading the chat model…" = "Unloading the chat model…";
+"Unmute" = "Unmute";
 "Unpin" = "Unpin";
 "Unpin %@" = "Unpin %@";
 "Unpin: the project's chats search this file again instead of getting all of it" = "Unpin: the project's chats search this file again instead of getting all of it";
