@@ -36,5 +36,6 @@ here; this is where the history lives.
 | [0029](0029-responses-api.md) | The OpenAI Responses API at /v1/responses (Codex CLI): converted to a chat request in the runtime, stateless, function + custom tools |
 | [0030](0030-show-screen-and-tab.md) | Showing the model a window, the screen (system picker, one still; OCR text for models that don't see) or the front browser tab (standalone only); opt-in, outside text |
 | [0031](0031-voice-conversation.md) | Voice conversation with the chat model: recognizer of choice, hands-free turn-taking with barge-in and backchannels, a voice-mode prompt, fillers made in the silences (proposed) |
+| [0032](0032-kaggle-models.md) | Kaggle as a second model source: the browser searches it (MLX variations), and our mirror stands in for Hugging Face when Settings says so or it can't be reached (chat, image, music, voice models, drafters); public models need no account |
 
 New ADR: next number, one topic, the decision first, then why.

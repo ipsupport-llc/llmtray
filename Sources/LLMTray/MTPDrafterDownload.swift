@@ -25,6 +25,9 @@ enum MTPDrafterDownload {
 
     private static func run(_ repo: String) async -> String? {
         if HFHubCache.localSnapshot(repo: repo) != nil { return nil }
+        // Our Kaggle mirror's copy (adr/0032), put where huggingface_hub
+        // would: snapshots/<revision> and refs/main naming it.
+        if let handle = await ModelSource.kaggleCopy(of: repo) { return await fetchFromKaggle(handle, repo: repo) }
         guard FileManager.default.isExecutableFile(atPath: MLXRuntimeInstaller.venvPython) else {
             return NSLocalizedString("the model runtime isn't installed yet", comment: "MTP drafter download")
         }
@@ -49,6 +52,30 @@ enum MTPDrafterDownload {
         } catch let failure as ProcessRunner.Failure {
             return failure.outputTail.split(separator: "\n").last.map(String.init) ?? failure.localizedDescription
         } catch {
+            return error.localizedDescription
+        }
+        return HFHubCache.localSnapshot(repo: repo) == nil
+            ? NSLocalizedString("the download finished incomplete", comment: "MTP drafter download") : nil
+    }
+
+    /// The drafter from Kaggle into the hub cache's layout for `repo`.
+    private static func fetchFromKaggle(_ handle: Kaggle.Handle, repo: String) async -> String? {
+        let parts = repo.split(separator: "/").map(String.init)
+        guard parts.count == 2 else { return nil }
+        let root = HFHubCache.directory() + "/models--" + parts[0] + "--" + parts[1]
+        let temp = root + "/snapshots/.kaggle-\(UUID().uuidString)"
+        let fm = FileManager.default
+        do {
+            try fm.createDirectory(atPath: temp, withIntermediateDirectories: true)
+            let version = try await KaggleFetch.download(handle, into: temp)
+            let revision = "kaggle-v\(version)"
+            let snapshot = root + "/snapshots/" + revision
+            try? fm.removeItem(atPath: snapshot)
+            try fm.moveItem(atPath: temp, toPath: snapshot)
+            try fm.createDirectory(atPath: root + "/refs", withIntermediateDirectories: true)
+            try revision.write(toFile: root + "/refs/main", atomically: true, encoding: .utf8)
+        } catch {
+            try? fm.removeItem(atPath: temp)
             return error.localizedDescription
         }
         return HFHubCache.localSnapshot(repo: repo) == nil

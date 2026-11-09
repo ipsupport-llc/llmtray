@@ -74,6 +74,10 @@ public enum Pref {
     /// wizard chose that is still to download or failed, kept across a
     /// relaunch.
     public static let downloadQueue = PrefKey<String?>("llmtray.downloadQueue", default: nil)
+    /// Where model downloads come from (ModelDownloadSource's raw value):
+    /// Hugging Face with our Kaggle mirror when it can't be reached, or
+    /// Kaggle first (adr/0032).
+    public static let modelDownloadSource = PrefKey("llmtray.modelDownloadSource", default: ModelDownloadSource.automatic.rawValue)
 
     // First-run wizard (adr/0013)
     /// The SetupWizard.version finished, skipped or closed; unset on a

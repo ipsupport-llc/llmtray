@@ -34,7 +34,7 @@ The models run on your Mac. Only the optional web tools reach the internet.
 - **Chat** with tabs, projects and their instructions, and tools (web search, news, Wikipedia, weather, calculator, …).
 
 - **Start/stop `mlx_lm.server`** from the menu bar, against any model in your models folder (`~/.llmtray/models` by default, configurable in Settings — point it at `~/.lmstudio/models` to share models already downloaded via LM Studio).
-- **Browse and download models from Hugging Face** right from the app — search, see file sizes, download with a real progress bar (speed, ETA, pause/resume), and a size check on every file so a truncated download doesn't quietly pass as "done."
+- **Browse and download models from Hugging Face or Kaggle** right from the app — search, see file sizes, download with a real progress bar (speed, ETA, pause/resume), and a size check on every file so a truncated download doesn't quietly pass as "done." Our own models also have copies on Kaggle, used automatically on networks that block Hugging Face ([adr/0032](adr/0032-kaggle-models.md)).
 - **Chat** against the running server (OpenAI-compatible `/v1/chat/completions`), with streamed `<think>` reasoning shown separately from the final answer, tok/s, and per-chat sampling settings (temperature/top-p/max tokens).
 - **Menu bar icon reflects real state**: green + pulsing while anything is generating (this app's own chat *or* an external tool hitting the server directly), orange/red on real thermal pressure (`ProcessInfo.thermalState`), pulled independently so one signal never hides the other.
 - **Live server log** in its own window, and a quick right-click menu (start/stop, quit) for when you don't need the full chat window.

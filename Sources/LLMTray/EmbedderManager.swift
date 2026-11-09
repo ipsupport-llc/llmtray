@@ -137,7 +137,8 @@ final class EmbedderManager: ObservableObject {
                         entry.source.repo, entry.source.revision, temp.path,
                     ] + files)
                 } catch let failure as ProcessRunner.Failure {
-                    throw EmbedderError.processFailed(failure.outputTail)
+                    // Not mirrored on Kaggle: a blocked Hugging Face said so.
+                    throw await ModelSource.explain(EmbedderError.processFailed(failure.outputTail), repo: entry.source.repo)
                 }
                 try? fm.removeItem(at: temp.appendingPathComponent(".cache"))   // huggingface_hub's own bookkeeping
                 statusText = NSLocalizedString("Checking the download…", comment: "")

@@ -7,8 +7,21 @@ struct HFBrowserView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Picker("", selection: $browser.source) {
+                ForEach(BrowseSource.allCases) { Text(verbatim: $0.label).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .padding(.top, 12)
+            .help(Text("Where to search. Kaggle also has copies of LLMTray's own models, for networks that block Hugging Face."))
+            .onChange(of: browser.source) {
+                browser.results = []
+                browser.searchError = nil
+                if !browser.query.trimmingCharacters(in: .whitespaces).isEmpty { browser.search() }
+            }
             HStack {
-                TextField("Search Hugging Face (mlx models)…", text: $browser.query)
+                TextField(browser.source == .kaggle ? "Search Kaggle (MLX models)…" : "Search Hugging Face (mlx models)…", text: $browser.query)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { browser.search() }
                 Button("Search") {
@@ -20,14 +33,23 @@ struct HFBrowserView: View {
 
             HStack(spacing: 6) {
                 Text("Sort by").font(.subheadline).foregroundColor(.secondary)
-                Picker("", selection: $browser.sortOption) {
-                    ForEach(HFSortOption.allCases) { option in
-                        Text(option.label).tag(option)
+                if browser.source == .kaggle {
+                    Picker("", selection: $browser.kaggleSort) {
+                        ForEach(Kaggle.Sort.allCases, id: \.self) { Text(Self.label($0)).tag($0) }
                     }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .onChange(of: browser.kaggleSort) { browser.search() }
+                } else {
+                    Picker("", selection: $browser.sortOption) {
+                        ForEach(HFSortOption.allCases) { option in
+                            Text(option.label).tag(option)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .onChange(of: browser.sortOption) { browser.search() }
                 }
-                .pickerStyle(.menu)
-                .labelsHidden()
-                .onChange(of: browser.sortOption) { browser.search() }
                 Spacer()
                 fitLegend
             }
@@ -71,7 +93,7 @@ struct HFBrowserView: View {
                             if let size = browser.sizesByID[model.id] {
                                 fitDot(for: size)
                             }
-                            Text(model.id)
+                            Text(verbatim: browser.kaggleByID[model.id].map { Self.kaggleName($0) } ?? model.id)
                                 .font(.callout.weight(.medium))
                             if case .gated(let manual)? = browser.infoByID[model.id]?.access {
                                 Image(systemName: "lock.fill")
@@ -90,6 +112,9 @@ struct HFBrowserView: View {
                                 .font(.caption)
                                 .foregroundColor(.accentColor)
                         }
+                        if let result = browser.kaggleByID[model.id] {
+                            kaggleDetails(result, id: model.id)
+                        } else {
                         HStack(spacing: 4) {
                             if let downloads = model.downloads {
                                 Text("\(downloads) downloads")
@@ -111,6 +136,7 @@ struct HFBrowserView: View {
                         }
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        }
                     }
                     Spacer()
                     downloadControl(for: model)
@@ -131,6 +157,43 @@ struct HFBrowserView: View {
             set: { if !$0 { browser.dismissModelCard() } }
         )) {
             ModelCardView(browser: browser)
+        }
+    }
+
+    /// A Kaggle row's name: the variation of the model, and -- our mirror --
+    /// the Hugging Face repo it copies.
+    private static func kaggleName(_ result: Kaggle.Result) -> String {
+        "\(result.handle.owner)/\(result.handle.model) · \(result.handle.variation)"
+    }
+
+    private func kaggleDetails(_ result: Kaggle.Result, id: String) -> some View {
+        HStack(spacing: 4) {
+            if let hub = Kaggle.Mirror.hubRepo(for: result.handle) {
+                Text(String(format: NSLocalizedString("Same files as %@", comment: "Kaggle row: our mirror of a Hugging Face repo"), hub))
+                Text("·")
+            }
+            if let size = browser.sizesByID[id] {
+                Text(Self.byteFormatter.string(fromByteCount: size))
+            }
+            if let license = result.license, !license.isEmpty {
+                Text("·")
+                Text(verbatim: license)
+            }
+            if let page = result.handle.pageURL {
+                Text("·")
+                Link("Kaggle page", destination: page)
+            }
+        }
+        .font(.caption)
+        .foregroundColor(.secondary)
+    }
+
+    private static func label(_ sort: Kaggle.Sort) -> String {
+        switch sort {
+        case .hotness: return NSLocalizedString("Trending", comment: "Kaggle sort")
+        case .downloadCount: return NSLocalizedString("Downloads", comment: "")
+        case .voteCount: return NSLocalizedString("Votes", comment: "Kaggle sort")
+        case .publishTime: return NSLocalizedString("Recently published", comment: "Kaggle sort")
         }
     }
 

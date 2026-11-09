@@ -948,7 +948,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "LLMTray — Browse Hugging Face Models"
+            window.title = "LLMTray — Browse Models"
             window.isReleasedWhenClosed = false
             window.contentView = NSHostingView(rootView: HFBrowserView(browser: hfBrowser))
             window.center()

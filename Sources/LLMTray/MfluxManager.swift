@@ -282,13 +282,22 @@ final class MfluxManager: ObservableObject {
         // would wrongly treat as "already done."
         let tempDir = target + ".partial-\(UUID().uuidString)"
         do {
-            try await runProcess(venvPython, [
-                "-c",
-                """
-                from huggingface_hub import snapshot_download
-                snapshot_download("\(model.hfRepo)", local_dir="\(tempDir)")
-                """,
-            ], cancellable: true)   // Cancel in the download queue: the temp folder goes
+            if let handle = await ModelSource.kaggleCopy(of: model.hfRepo) {
+                // Our Kaggle mirror (adr/0032); a cancel stops it too.
+                try await KaggleFetch.download(handle, into: tempDir)
+            } else {
+                do {
+                    try await runProcess(venvPython, [
+                        "-c",
+                        """
+                        from huggingface_hub import snapshot_download
+                        snapshot_download("\(model.hfRepo)", local_dir="\(tempDir)")
+                        """,
+                    ], cancellable: true)   // Cancel in the download queue: the temp folder goes
+                } catch {
+                    throw await ModelSource.explain(error, repo: model.hfRepo)
+                }
+            }
             try MediaModels.clearIncompleteTarget(MediaModels.entry(model))
             try FileManager.default.moveItem(atPath: tempDir, toPath: target)
             MediaModels.didDownload()
