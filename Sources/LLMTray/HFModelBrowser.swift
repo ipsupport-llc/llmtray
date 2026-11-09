@@ -205,6 +205,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// The Kaggle variation and version this download's files come from,
     /// instead of Hugging Face (adr/0032).
     private var currentKaggle: (handle: Kaggle.Handle, version: Int)?
+    /// Bumped by every search: an earlier one's answer, landing late, is
+    /// not shown over it.
+    private var searchGeneration = 0
     /// Set on the delegate queue the moment a file comes back as an HTTP
     /// error: later completions of the same download are ignored (none may
     /// declare it done), until the next download() resets it.
@@ -266,9 +269,15 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         searchError = nil
         sizesByID.removeAll()
         infoByID.removeAll()
+        // The rows go with their sources: a Kaggle row never stays on
+        // screen without the Kaggle variation it downloads.
+        results = []
         kaggleByID.removeAll()
-        if source == .kaggle { return searchKaggle(q) }
+        searchGeneration += 1
+        let generation = searchGeneration
+        if source == .kaggle { return searchKaggle(q, generation: generation) }
         Task {
+            defer { if generation == searchGeneration { isSearching = false } }
             do {
                 var comps = URLComponents(string: "https://huggingface.co/api/models")!
                 comps.queryItems = [
@@ -282,36 +291,36 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     URLQueryItem(name: "limit", value: "30"),
                 ]
                 let (data, _) = try await URLSession.shared.data(from: comps.url!)
+                guard generation == searchGeneration else { return }
                 let fetched = try JSONDecoder().decode([HFModelSummary].self, from: data)
                 results = fetched
                 fetchSizes(for: fetched)
             } catch {
+                guard generation == searchGeneration else { return }
                 searchError = error.localizedDescription
             }
-            isSearching = false
         }
     }
 
     /// Kaggle's models matching `q`, as rows: each MLX variation one row
     /// (Kaggle.mlxResults), its size and license from the search itself.
-    private func searchKaggle(_ q: String) {
+    private func searchKaggle(_ q: String, generation: Int) {
         let sort = kaggleSort
         Task {
-            defer { isSearching = false }
+            defer { if generation == searchGeneration { isSearching = false } }
             do {
                 guard let url = Kaggle.searchURL(q, sort: sort) else { return }
                 KaggleToken.refresh()
                 var request = URLRequest(url: url, timeoutInterval: 30)
                 KaggleToken.authorize(&request)
                 let (data, response) = try await URLSession.shared.data(for: request)
+                // Another search started meanwhile: not this one's to show.
+                guard generation == searchGeneration else { return }
                 let status = (response as? HTTPURLResponse)?.statusCode ?? 0
                 guard (200..<300).contains(status) else {
                     searchError = String(format: NSLocalizedString("Kaggle answered HTTP %d to the search.", comment: ""), status)
-                    results = []
                     return
                 }
-                // Another search started meanwhile: not this one's to show.
-                guard source == .kaggle, query.trimmingCharacters(in: .whitespacesAndNewlines) == q else { return }
                 var seen = Set<String>()
                 let found = Kaggle.mlxResults(try JSONDecoder().decode(Kaggle.ModelPage.self, from: data))
                     .filter { seen.insert($0.handle.folderID).inserted }
@@ -319,8 +328,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 for result in found { if let bytes = result.bytes { sizesByID[result.handle.folderID] = bytes } }
                 results = found.map { HFModelSummary(modelId: $0.handle.folderID, downloads: nil, likes: nil, lastModified: nil) }
             } catch {
+                guard generation == searchGeneration else { return }
                 searchError = error.localizedDescription
-                results = []
             }
         }
     }
@@ -340,7 +349,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             Task {
                 guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)?blobs=true") else { return }
                 guard let (data, _) = try? await URLSession.shared.data(from: url),
-                      let info = HubModelInfo.parse(data) else { return }
+                      let info = HubModelInfo.parse(data), results.contains(model) else { return }
                 infoByID[model.id] = info
                 if let size = HubModelInfo.filesSize(data) ?? info.sizeBytes { sizesByID[model.id] = size }
             }
@@ -358,11 +367,14 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         KaggleToken.refresh()
         let kaggleRow = kaggleByID[model.id]?.handle
         // A gated model's files answer 401 without a token (seen live: the
-        // listing is open, the files aren't).
-        if kaggleRow == nil, case .gated = infoByID[model.id]?.access, HFToken.value == nil {
-            downloadError = String(format: NSLocalizedString(
-                "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.",
-                comment: "gated model, no token"), model.id, model.id)
+        // listing is open, the files aren't) -- unless it comes from Kaggle.
+        let gatedMessage = String(format: NSLocalizedString(
+            "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.",
+            comment: "gated model, no token"), model.id, model.id)
+        let gatedWithoutToken: Bool
+        if kaggleRow == nil, case .gated = infoByID[model.id]?.access, HFToken.value == nil { gatedWithoutToken = true } else { gatedWithoutToken = false }
+        if gatedWithoutToken, Kaggle.Mirror.handle(forHubRepo: model.id) == nil {
+            downloadError = gatedMessage
             return
         }
         downloadGeneration += 1
@@ -407,6 +419,11 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                         HFTreeEntry(type: "file", path: $0.name, size: $0.size.map { Int($0) }, oid: "kaggle-v\(listing.version)", lfs: nil)
                     }
                 } else {
+                    if gatedWithoutToken {
+                        downloadError = gatedMessage
+                        downloadingID = nil
+                        return
+                    }
                     commit = await Self.repoCommit(model.id)
                     guard generation == downloadGeneration else { return }
                 }
@@ -423,7 +440,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     guard generation == downloadGeneration else { return }   // cancelled meanwhile
                     let http = response as? HTTPURLResponse
                     if let status = http?.statusCode, !(200..<300).contains(status) {
-                        downloadError = await ModelSource.hubReachable() ? Self.accessMessage(status: status, repo: model.id)
+                        let reachable = await ModelSource.hubReachable()
+                        guard generation == downloadGeneration else { return }
+                        downloadError = reachable ? Self.accessMessage(status: status, repo: model.id)
                             : ModelSource.Unreachable(repo: model.id).localizedDescription
                         downloadingID = nil
                         return

@@ -43,7 +43,13 @@ enum ModelSource {
     struct Unreachable: LocalizedError {
         let repo: String
         var errorDescription: String? {
-            String(format: NSLocalizedString(
+            guard Kaggle.Mirror.handle(forHubRepo: repo) == nil else {
+                // Reachable when it started, not now: a retry comes from Kaggle.
+                return String(format: NSLocalizedString(
+                    "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: try again and it comes from there (or choose Kaggle first in Settings → Models).",
+                    comment: "download: HF lost mid-download, Kaggle mirror exists; repo"), repo)
+            }
+            return String(format: NSLocalizedString(
                 "Hugging Face can't be reached from this network, and %@ has no copy on Kaggle to download instead.",
                 comment: "download: HF blocked, no Kaggle mirror; repo"), repo)
         }
@@ -145,6 +151,13 @@ enum KaggleFetch {
         let files = Kaggle.select(listing.files, patterns: patterns)
         guard !files.isEmpty else { throw KaggleDownloadError.noFiles(handle) }
         let root = URL(fileURLWithPath: dir)
+        // Files already there are kept only if an earlier attempt of this
+        // very version left them (its stamp): never a mix of two versions.
+        let stamp = root.appendingPathComponent(".llmtray-kaggle-version")
+        let identity = "\(handle.path)@\(listing.version)"
+        let reuse = (try? String(contentsOf: stamp, encoding: .utf8)) == identity
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try identity.write(to: stamp, atomically: true, encoding: .utf8)
         let total = files.reduce(Int64(0)) { $0 + ($1.size ?? 0) }
         var done: Int64 = 0
         let bigFiles = files.filter { DownloadParts.ranges(size: $0.size ?? 0) != nil }.count
@@ -157,7 +170,7 @@ enum KaggleFetch {
             let destination = root.appendingPathComponent(file.name)
             let size = file.size ?? 0
             let onDisk = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? NSNumber)?.int64Value
-            if size > 0, onDisk == size {
+            if reuse, size > 0, onDisk == size {
                 done += size
                 continue
             }
@@ -177,6 +190,7 @@ enum KaggleFetch {
             }
             done += size
         }
+        try? FileManager.default.removeItem(at: stamp)
         return listing.version
     }
 
@@ -194,6 +208,10 @@ enum KaggleFetch {
                 guard (200..<300).contains(status) else {
                     let body = try? Data(contentsOf: temp)
                     try? FileManager.default.removeItem(at: temp)
+                    // Busy or a server hiccup: worth another try.
+                    if status == 429 || status >= 500 {
+                        throw KaggleDownloadError.failed(file: file, reason: "HTTP \(status)")
+                    }
                     throw KaggleDownloadError.refused(status: status, message: body.flatMap { try? JSONDecoder().decode(Kaggle.APIError.self, from: $0).message }, handle: handle)
                 }
                 try? FileManager.default.removeItem(at: destination)
@@ -224,6 +242,9 @@ enum KaggleFetch {
                                      connections: Int, handle: Kaggle.Handle, progress: @escaping (Int64) -> Void) async throws {
         HFModelBrowser.removePartials(of: destination)
         let partial = destination.appendingPathExtension(UUID().uuidString + ".llmtray-partial")
+        // Whatever way this ends, no partial stays (moved into place first
+        // when it's done).
+        defer { try? FileManager.default.removeItem(at: partial) }
         KaggleToken.refresh()
         let authorization = KaggleToken.value.map { (host: Kaggle.host, header: KaggleToken.header($0)) }
         let fetcher = PartFetcher(url: url, authorization: authorization, partial: partial, size: size, ranges: ranges,
