@@ -128,8 +128,13 @@ in the chat and can be saved or shared.
 
 ## Voice
 
-Voice Lab (Settings › Voice) lets you talk with a voice model in real time.
-It uses the microphone only while you use it; the audio stays on your Mac.
+Settings › Voice has two things. Spoken answers read the model's answers
+aloud, in a macOS voice or a neural one. The voice conversation lets you
+talk with the chat model hands free: press the waveform button next to the
+message box, speak, and it answers aloud; you can cut in while it talks.
+Speech recognition runs on your Mac (Parakeet, Whisper or macOS's own). The
+microphone is used only during a conversation or a voice message, and the
+audio stays on your Mac.
 
 ## Connect your coding agents and apps
 

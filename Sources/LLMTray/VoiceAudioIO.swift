@@ -2,8 +2,8 @@ import AVFoundation
 import Foundation
 import LLMTrayCore
 
-/// Voice Lab's audio without echo cancellation: one AVAudioEngine for the
-/// microphone and the model's speech.
+/// Audio without echo cancellation: one AVAudioEngine for the microphone
+/// and the model's speech.
 final class VoiceAudioEngine {
     let engine = AVAudioEngine()
 
@@ -18,8 +18,8 @@ final class VoiceAudioEngine {
     }
 }
 
-/// Where Voice Lab's microphone frames come from: `onFrame` gets int16 PCM
-/// at the runner's rate, mono, and the chunk's RMS.
+/// Where microphone frames come from: `onFrame` gets int16 PCM at the
+/// runner's rate, mono, and the chunk's RMS.
 protocol VoiceMicrophone: AnyObject {
     func start(onFrame: @escaping (Data, Float) -> Void) throws
     func stop()
@@ -34,7 +34,7 @@ protocol SpeechOutput: AnyObject {
     func stop()
 }
 
-/// The microphone for Voice Lab (adr/0016): an AVAudioEngine input tap,
+/// The microphone without echo cancellation: an AVAudioEngine input tap,
 /// converted to 16 kHz mono float32 and handed on as int16 PCM. Nothing is
 /// written to disk. `onFrame` runs on the audio thread -- it must not block
 /// (DuplexProcess.write doesn't).
@@ -90,119 +90,6 @@ final class MicrophoneCapture: VoiceMicrophone {
 
     func stop() {
         engine.inputNode.removeTap(onBus: 0)
-    }
-}
-
-/// Plays the model's speech as it streams in (adr/0016: in the app, so a
-/// stop cuts it at once), through a small jitter buffer (JitterBuffer,
-/// 160 ms). `enqueue` may be called from any thread.
-final class SpeechPlayer: @unchecked Sendable {
-    private let output: SpeechOutput
-    private let sampleRate: Int
-    private let lock = NSLock()
-    private var jitter: JitterBuffer
-    private var activity = SpeechActivity()
-    private var stopped = false
-    /// Bumped by a cancel: a completion from before it doesn't count
-    /// against the reply after it.
-    private var generation = 0
-    /// Held across a chunk's generation check and its hand-off to the
-    /// output, and across a cancel's bump and the output's reset, so the
-    /// two can't interleave. Completions take only `lock`.
-    private let scheduling = NSLock()
-    private let clockStart = DispatchTime.now().uptimeNanoseconds
-
-    init(output: SpeechOutput, sampleRate: Int, prebufferMilliseconds: Int = 160) {
-        self.output = output
-        self.sampleRate = sampleRate
-        jitter = JitterBuffer(sampleRate: sampleRate, milliseconds: prebufferMilliseconds)
-    }
-
-    private var now: TimeInterval { Double(DispatchTime.now().uptimeNanoseconds - clockStart) / 1e9 }
-
-    /// The model is audibly speaking now (or was within the last 0.4 s).
-    var isSpeaking: Bool {
-        lock.lock(); defer { lock.unlock() }
-        return activity.isSpeaking(at: now)
-    }
-
-    var underruns: Int {
-        lock.lock(); defer { lock.unlock() }
-        return jitter.underruns
-    }
-
-    func enqueue(_ samples: [Float]) {
-        lock.lock()
-        guard !stopped else { lock.unlock(); return }
-        let chunks = jitter.push(samples)
-        let current = generation
-        lock.unlock()
-        for chunk in chunks { schedule(chunk, generation: current) }
-    }
-
-    /// `scheduled`: the generation the chunk left the jitter buffer in; a
-    /// cancel since drops it instead of playing it.
-    private func schedule(_ samples: [Float], generation scheduled: Int) {
-        let rms = PCM16.rms(samples)
-        let count = samples.count
-        scheduling.lock()
-        defer { scheduling.unlock() }
-        lock.lock()
-        let stale = generation != scheduled
-        lock.unlock()
-        if stale { return }
-        output.schedule(samples) { [weak self] in
-            guard let self else { return }
-            self.lock.lock()
-            if self.generation == scheduled {
-                self.jitter.played(count)
-                self.activity.observe(rms: rms, at: self.now)
-            }
-            self.lock.unlock()
-        }
-    }
-
-    /// How much is held before playing starts (or starts again after an underrun).
-    func setPrebuffer(milliseconds: Int) {
-        lock.lock()
-        jitter.prebufferSamples = sampleRate * milliseconds / 1000
-        lock.unlock()
-    }
-
-    /// Starts what's held even below the prebuffer: a complete reply.
-    func flush() {
-        lock.lock()
-        guard !stopped else { lock.unlock(); return }
-        let chunks = jitter.flush()
-        let current = generation
-        lock.unlock()
-        for chunk in chunks { schedule(chunk, generation: current) }
-    }
-
-    /// Drops whatever is queued or playing (the user talks over it); the
-    /// player stays ready for the next.
-    func cancelPlayback() {
-        scheduling.lock()
-        defer { scheduling.unlock() }
-        lock.lock()
-        guard !stopped else { lock.unlock(); return }
-        jitter.reset()
-        activity.reset()
-        generation += 1
-        lock.unlock()
-        output.reset()
-    }
-
-    func stop() {
-        scheduling.lock()
-        defer { scheduling.unlock() }
-        lock.lock()
-        stopped = true
-        generation += 1
-        jitter.reset()
-        activity.reset()
-        lock.unlock()
-        output.stop()
     }
 }
 

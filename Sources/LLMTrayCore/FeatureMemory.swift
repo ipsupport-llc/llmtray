@@ -73,7 +73,6 @@ public struct FeatureMemory: Equatable, Sendable {
     public static func image(_ model: String) -> String { "image." + model }
     public static func imageEdit(_ model: String) -> String { "imageEdit." + model }
     public static func music(_ model: String) -> String { "music." + model }
-    public static func voice(_ model: String) -> String { "voice." + model }
 }
 
 /// Whether a feature's measured peak fits this Mac. It runs alone (the
@@ -91,7 +90,7 @@ public struct FeatureFit: Equatable, Sendable {
         case fits, tight, doesNotFit
     }
 
-    /// Kept for macOS beside a raised GPU limit (GPUFit, VoiceMemoryFit).
+    /// Kept for macOS beside a raised GPU limit (GPUFit).
     public static let macOSReserveBytes: Int64 = 4 << 30
 
     public var level: Level

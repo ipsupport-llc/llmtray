@@ -243,12 +243,6 @@ final class FeatureSetup {
         featureMemory.fit(FeatureMemory.music(model.rawValue), on: hardware)
     }
 
-    /// Voice Lab's memory: the measured peak, else the model's published
-    /// footprint (VoiceMemoryFit sets it against the GPU limit).
-    func voiceBytes(_ model: VoiceLabModel) -> Int64 {
-        featureMemory.peakBytes(FeatureMemory.voice(model.id)) ?? model.footprintBytes
-    }
-
     // MARK: - Recommended chat models
 
     /// The curated list (runtime/recommended_models.json) filtered for this

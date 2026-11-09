@@ -386,12 +386,12 @@ public enum ControlStartPlan: Equatable, Sendable {
     case wait
     case refuse(String)
 
-    /// `suspendedForMedia`: unloaded for an image, a song or Voice Lab --
+    /// `suspendedForMedia`: unloaded for an image or a song --
     /// it comes back by itself, and a start now would load it next to them.
     public static func decide(_ availability: OperationAvailability, suspendedForMedia: Bool,
                               loaded: String?, target: String) -> ControlStartPlan {
         if suspendedForMedia {
-            return .refuse("the model is unloaded while an image, music or Voice Lab runs -- it comes back when that's done")
+            return .refuse("the model is unloaded while an image or music runs -- it comes back when that's done")
         }
         switch availability.snapshot.server {
         case .starting: return .wait

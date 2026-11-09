@@ -4,7 +4,7 @@ import Foundation
 import LLMTrayCore
 import os
 
-/// Voice Lab's audio with echo cancellation: Apple's voice-processing I/O
+/// Audio with echo cancellation: Apple's voice-processing I/O
 /// unit (what FaceTime uses) plays the model's speech and records the
 /// microphone, and takes what it played out of what it records -- the
 /// model doesn't hear itself from the speakers. Other apps' audio isn't

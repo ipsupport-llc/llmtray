@@ -2,7 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Voice Lab's microphone under the hardened runtime. -->
+	<!-- The microphone under the hardened runtime: the voice conversation
+	     and voice messages. -->
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
 	<!-- MCP servers the user adds that control other apps (Mail, Notes)

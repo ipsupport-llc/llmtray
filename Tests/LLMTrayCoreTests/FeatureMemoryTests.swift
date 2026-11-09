@@ -81,9 +81,6 @@ final class FeatureMemoryTests: XCTestCase {
         for feature in features {
             XCTAssertNotNil(table.peakBytes(feature), feature)
         }
-        for model in [VoiceLabModel.voiceChat11BGPTQ3, .voiceChat11BMixed] {
-            XCTAssertNotNil(table.peakBytes(FeatureMemory.voice(model.id)), model.id)
-        }
         for c in table.cases where c.estimatedFrom == nil {
             XCTAssertNotEqual(table.fit(c.feature, on: m5)?.level, .doesNotFit, c.name)
         }

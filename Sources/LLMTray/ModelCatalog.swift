@@ -145,8 +145,8 @@ final class ModelCatalog: ObservableObject {
         switch entry.kind {
         case .image: busy = ChatTabs.shared.mflux.isBusy
         case .music: busy = ChatTabs.shared.music.isBusy
-        case .voice: busy = VoiceModelStore.shared.isBusy || VoiceLabSession.shared.isActive
-            || (SpokenVoiceFile.folders.contains { $0.repo == entry.repo } && SpokenAnswers.shared.isRunnerActive)
+        case .voice: busy = (SpokenVoiceFile.folders.contains { $0.repo == entry.repo } && SpokenAnswers.shared.isRunnerActive)
+            || (VoiceInputFile.all.contains { $0.repo == entry.repo } && (VoiceConversation.shared.isActive || VoiceInputStore.shared.isBusy))
         }
         guard !busy else { throw ModelRemoval.Refusal.inUse }
         let path = MediaModels.path(entry)

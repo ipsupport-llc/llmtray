@@ -101,7 +101,7 @@ enum GettingStarted {
             let profiles = ProfileManager.shared
             return profiles.value(\.tools.enableImageGeneration, for: selectedModelID)
                 || profiles.value(\.tools.enableMusicGeneration, for: selectedModelID)
-                || VoiceModelStore.shared.isEnabled
+                || VoiceInputStore.shared.isReady
         }
     }
 

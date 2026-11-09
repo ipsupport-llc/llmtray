@@ -28,6 +28,10 @@ enum MediaModels {
         let legacy: String
         /// What makes a folder of it complete.
         let check: Check
+        /// No longer used (Voice Lab's models): listed so a copy left on
+        /// disk shows in Settings → Models, where it can go, and isn't
+        /// taken for a chat model; never offered for download.
+        var retired = false
     }
 
     enum Check: Hashable {
@@ -51,8 +55,8 @@ enum MediaModels {
             Entry(repo: $0.hfRepo, kind: .music, name: $0.displayName, legacy: app + "/music_models/" + $0.folderName, check: .folder)
         } + [Entry(repo: musicPlannerFolder, kind: .music, name: "ACE-Step 1.5 LM 1.7B (planner)",
                    legacy: app + "/music_models/ace-step-1.5-lm-1.7B", check: .folder)]
-        let voice = VoiceLabModel.all.map {
-            Entry(repo: $0.repo, kind: .voice, name: $0.displayName, legacy: app + "/voice_models/" + $0.folderName, check: .configAndIndex)
+        let voice = retiredVoiceLab.map {
+            Entry(repo: $0.repo, kind: .voice, name: $0.name, legacy: app + "/voice_models/" + $0.folder, check: .configAndIndex, retired: true)
         }
         // Spoken answers' Chatterbox voice (adr/0016): never in an older
         // place, so the legacy path is only a name nobody uses.
@@ -66,6 +70,15 @@ enum MediaModels {
         }
         return image + music + voice + speech + listen
     }()
+
+    /// Voice Lab's speech-to-speech models (NVIDIA NemotronLabs VoiceChat,
+    /// adr/0016): the feature is gone (the voice conversation, adr/0031,
+    /// took its place), the downloads people made are theirs to remove.
+    static let retiredVoiceLab: [(repo: String, name: String, folder: String)] = [
+        ("roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-mixed", "NVIDIA NemotronLabs VoiceChat 11B (GPTQ 3-bit + 8-bit speech)", "nemotron-voicechat-11b-mixed"),
+        ("roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit", "NVIDIA NemotronLabs VoiceChat 11B (GPTQ 3-bit)", "nemotron-voicechat-11b-gptq3"),
+        ("mlx-community/NemotronLabs-VoiceChat-11B-4bit", "NVIDIA NemotronLabs VoiceChat 11B (4-bit)", "nemotron-voicechat-11b-4bit"),
+    ]
 
     static var repos: [String] { all.map(\.repo) }
 
@@ -205,7 +218,6 @@ enum MediaModels {
 
     static func entry(_ model: ImageGenModel) -> Entry { entry(repo: model.hfRepo)! }
     static func entry(_ model: MusicModel) -> Entry { entry(repo: model.hfRepo)! }
-    static func entry(_ model: VoiceLabModel) -> Entry { entry(repo: model.repo)! }
     static func entry(_ file: SpokenVoiceFile) -> Entry { entry(repo: file.repo)! }
     static func entry(_ file: VoiceInputFile) -> Entry { entry(repo: file.repo)! }
     static var musicPlanner: Entry { entry(repo: musicPlannerFolder)! }
@@ -233,9 +245,17 @@ enum MediaModels {
                 NSLog("LLMTray: couldn't move %@ into the models folder: %@", from, error.localizedDescription)
             }
         }
+        // A retired model's download stopped part way has nothing to go
+        // on with: it goes, wherever it was left.
+        for entry in all where entry.retired {
+            for partial in [entry.legacy, MediaModelLocation.preferred(repo: entry.repo, root: root)].map({ $0 + ".partial" })
+            where fm.fileExists(atPath: partial) {
+                try? fm.removeItem(atPath: partial)
+            }
+        }
         // A voice download stopped part way in the app's folder goes on
         // from the models folder.
-        for entry in all where entry.kind == .voice {
+        for entry in all where entry.kind == .voice && !entry.retired {
             let old = entry.legacy + ".partial", new = MediaModelLocation.preferred(repo: entry.repo, root: root) + ".partial"
             guard fm.fileExists(atPath: old), !MediaModelLocation.exists(new), MediaModelLocation.canRename(old, into: root) else { continue }
             try? fm.createDirectory(atPath: (new as NSString).deletingLastPathComponent, withIntermediateDirectories: true)

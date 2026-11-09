@@ -42,7 +42,7 @@ public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
         // Qwen"), and is the distiller's.
         if has("gpt-oss", "gpt_oss", "gptoss") { return .gptOSS }
         if has("deepseek") { return .deepseek }
-        // Nemotron-based ("Llama-3.1-Nemotron", our NemotronLabs VoiceChat).
+        // Nemotron-based ("Llama-3.1-Nemotron", Nemotron 3 Nano).
         if has("nemotron") { return .nemotron }
         if has("z-image", "z_image", "zimage") { return .zImage }
         if has("ace-step", "ace_step", "acestep") { return .aceStep }

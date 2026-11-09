@@ -138,22 +138,6 @@ public enum Pref {
     /// The voice clip Chatterbox imitates, copied into the support folder;
     /// empty: its built-in voice.
     public static let spokenAnswersClip = PrefKey("llmtray.spokenAnswers.clip", default: "")
-    /// Voice Lab, the experimental speech-to-speech toy: off until turned on
-    /// in Settings > Voice; nothing is downloaded or started before.
-    public static let voiceLabEnabled = PrefKey("llmtray.voiceLab.enabled", default: false)
-    /// `VoiceLabMode` raw value: full duplex, walkie-talkie, or picked by speed.
-    public static let voiceLabMode = PrefKey("llmtray.voiceLab.mode", default: VoiceLabMode.auto.rawValue)
-    /// `VoiceLabModel.id` picked in Settings > Voice; empty: not picked yet
-    /// (`VoiceLabModel.resolve` then keeps a model already on disk).
-    public static let voiceLabModel = PrefKey("llmtray.voiceLab.model", default: "")
-    /// Voice Processing I/O on Voice Lab's audio: macOS takes the model's
-    /// own voice out of the microphone, so speakers work without headphones.
-    public static let voiceLabEchoCancellation = PrefKey("llmtray.voiceLab.echoCancellation", default: true)
-    /// While the model's speech plays, a microphone chunk below this RMS
-    /// goes to the model as silence: what echo cancellation leaves of the
-    /// model's own voice (~0.001) stays out, a voice over it (0.03+) still
-    /// interrupts. 0: off.
-    public static let voiceLabEchoGateRMS = PrefKey("llmtray.voiceLab.echoGateRMS", default: 0.01)
 
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.

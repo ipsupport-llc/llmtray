@@ -69,66 +69,6 @@ final class DuplexProcessTests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.2)
         XCTAssertFalse(child.write(Data(repeating: 1, count: 1)))
     }
-
-    // MARK: The real runner, --selftest (no model, any Python 3)
-
-    private var runner: String {
-        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-            .appendingPathComponent("runtime/llmtray_voice_runner.py").path
-    }
-
-    private func python() throws -> String {
-        let candidates = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
-        guard let python = candidates.first(where: { FileManager.default.isExecutableFile(atPath: $0) }) else {
-            throw XCTSkip("no python3")
-        }
-        return python
-    }
-
-    func testRunnerSelftestEchoesFrames() throws {
-        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"],
-                                  environment: ["PYTHONDONTWRITEBYTECODE": "1"])
-        let out = Collected()
-        let exited = expectation(description: "exit")
-        let exit = ExitBox()
-        try child.start(onStdout: { out.append($0) }, onExit: { exit.value = $0; exited.fulfill() })
-        let pcm = PCM16.data(from: (0..<1280).map { sin(Float($0) / 10) * 0.5 })
-        // Split mid-header and mid-payload, and two frames in one write.
-        let a = VoiceFrame(.audio, payload: pcm).encoded
-        child.write(a.prefix(3))
-        child.write(a.dropFirst(3).prefix(1000))
-        child.write(a.dropFirst(1003) + VoiceFrame(.audio, payload: Data([0x10, 0x00])).encoded)
-        child.write(VoiceFrame(type: 0x58).encoded)
-        child.write(VoiceFrame(.endOfTurn, text: "4").encoded)   // walkie-talkie: a reply, then Z
-        child.write(VoiceFrame(.quit).encoded)
-        child.closeStdin()
-        wait(exited)
-        XCTAssertEqual(exit.value?.status, 0)
-        let frames = out.decoded
-        XCTAssertEqual(frames.first?.kind, .ready)
-        let ready = try XCTUnwrap(VoiceRunnerReady(payload: frames[0].payload))
-        XCTAssertEqual(ready.inputSampleRate, 16_000)
-        XCTAssertEqual(ready.rtf, 0.5)
-        XCTAssertEqual(frames.filter { $0.kind == .speech }.count, 4)
-        XCTAssertEqual(frames.filter { $0.kind == .speech }.prefix(2).map(\.payload), [pcm, Data([0x10, 0x00])])
-        XCTAssertEqual(frames.last { $0.kind == .replyDone }.flatMap { VoiceReplyDone(payload: $0.payload) },
-                       VoiceReplyDone(reason: .done, turn: 4, seconds: 0))
-        XCTAssertEqual(frames.last?.kind, .replyDone)
-        XCTAssertEqual(frames.filter { $0.kind == .log }.count, 2)
-        XCTAssertTrue(frames.contains { $0.kind == .error && $0.text.contains("unknown frame type") })
-    }
-
-    func testRunnerExitsAtEOF() throws {
-        let child = DuplexProcess(executable: try python(), arguments: [runner, "--selftest"])
-        let out = Collected()
-        let exited = expectation(description: "exit")
-        let exit = ExitBox()
-        try child.start(onStdout: { out.append($0) }, onExit: { exit.value = $0; exited.fulfill() })
-        child.closeStdin()
-        wait(exited)
-        XCTAssertEqual(exit.value?.status, 0)
-        XCTAssertEqual(out.decoded.map(\.kind), [.ready])
-    }
 }
 
 /// Spoken answers' runner (runtime/llmtray_tts_runner.py, adr/0016) in its
