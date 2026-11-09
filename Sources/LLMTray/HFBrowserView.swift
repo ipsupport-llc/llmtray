@@ -275,13 +275,14 @@ private struct MediaDownloadControl: View {
                     Text(status.isEmpty ? NSLocalizedString("Downloading…", comment: "") : status)
                         .font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
+            } else if entry.retired {
+                // Installed or not: remove a copy in Settings › Models.
+                Text("No longer used by LLMTray")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             } else if MediaModels.isReady(entry) {
                 Label(String(format: NSLocalizedString("Installed · %@", comment: "HF browser: a media model installed, its kind"), entry.kind.title),
                       systemImage: "checkmark.circle.fill")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            } else if entry.retired {
-                Text("No longer used by LLMTray")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             } else {

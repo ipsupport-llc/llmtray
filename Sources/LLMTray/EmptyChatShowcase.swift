@@ -10,8 +10,9 @@ struct EmptyChatIntro: View {
     let port: Int
     /// Puts a sample prompt in the composer (not sent).
     let insertPrompt: (String) -> Void
-    /// Starts a voice conversation in this chat (adr/0031).
-    let startVoice: () -> Void
+    /// Starts a voice conversation in this chat (adr/0031); nil while the
+    /// chat can't take a message (no model to talk to).
+    let startVoice: (() -> Void)?
     /// Something is dragged over the chat: the drop zone lights up (the
     /// chat takes the drop -- a vision model's images to the message,
     /// other files to the project).
@@ -59,7 +60,7 @@ private struct EmptyChatShowcase: View {
     let selectedModelID: String?
     let port: Int
     let insertPrompt: (String) -> Void
-    let startVoice: () -> Void
+    let startVoice: (() -> Void)?
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var voice = VoiceInputStore.shared
@@ -116,13 +117,16 @@ private struct EmptyChatShowcase: View {
     }
 
     private var voiceTile: some View {
-        // On once the picked recognizer's models are here (Settings > Voice).
-        let on = voice.isReady
+        // On once the picked recognizer's models are here (Settings > Voice)
+        // and there's a model to talk to.
+        let ready = voice.isReady
+        let on = ready && startVoice != nil
         return ShowcaseTile(symbol: "waveform", title: Text("Voice"),
-                            detail: on ? Text("Talk with the model, hands free") : offDetail, isOn: on) {
-            if on {
+                            detail: on ? Text("Talk with the model, hands free")
+                                : ready ? Text("Pick a chat model first") : offDetail, isOn: on) {
+            if let startVoice, ready {
                 startVoice()
-            } else {
+            } else if !ready {
                 NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.voice.rawValue])
             }
         }

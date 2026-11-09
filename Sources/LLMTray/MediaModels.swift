@@ -248,7 +248,7 @@ enum MediaModels {
         // A retired model's download stopped part way has nothing to go
         // on with: it goes, wherever it was left.
         for entry in all where entry.retired {
-            for partial in [entry.legacy, MediaModelLocation.preferred(repo: entry.repo, root: root)].map({ $0 + ".partial" })
+            for partial in ([MediaModelLocation.preferred(repo: entry.repo, root: root)] + oldPlaces(entry)).map({ $0 + ".partial" })
             where fm.fileExists(atPath: partial) {
                 try? fm.removeItem(atPath: partial)
             }

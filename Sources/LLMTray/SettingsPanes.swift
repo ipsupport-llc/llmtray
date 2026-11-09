@@ -413,6 +413,7 @@ struct ModelsPane: View {
                 HStack(spacing: 6) {
                     Text(e.kind.title)
                     if let size = catalog.mediaSizes[e.repo] { Text(ModelCatalog.format(size)).monospacedDigit() }
+                    if e.retired { Text("No longer used by LLMTray -- safe to remove") }
                     if let added = ModelRemoval.addedDate(modelPath: MediaModels.path(e)) {
                         Text(String(format: NSLocalizedString("Added %@", comment: "model list: when the model arrived"),
                                     added.formatted(date: .abbreviated, time: .omitted)))

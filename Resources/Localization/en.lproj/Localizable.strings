@@ -860,6 +860,7 @@
 "No files yet" = "No files yet";
 "No folder changes yet." = "No folder changes yet.";
 "No longer used by LLMTray" = "No longer used by LLMTray";
+"No longer used by LLMTray -- safe to remove" = "No longer used by LLMTray -- safe to remove";
 "No messages yet" = "No messages yet";
 "No microphone is available." = "No microphone is available.";
 "No model uses it." = "No model uses it.";
@@ -969,6 +970,7 @@
 "Paused at %1$lld of %2$lld files" = "Paused at %1$lld of %2$lld files";
 "Paused while an image or song is made -- the model reloads after" = "Paused while an image or song is made -- the model reloads after";
 "Performance" = "Performance";
+"Pick a chat model first" = "Pick a chat model first";
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
 "Picks a model that fits your Mac and enables only what you choose." = "Picks a model that fits your Mac and enables only what you choose.";
