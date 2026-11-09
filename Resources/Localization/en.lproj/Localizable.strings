@@ -43,6 +43,7 @@
 "%@ tok/s" = "%@ tok/s";
 "%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development." = "%@ tokens run locally with LLMTray so far. It's free, with no subscriptions; if it's useful to you, you can support its development.";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
+"%@ wasn't found on Kaggle." = "%@ wasn't found on Kaggle.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ · %@ of %@" = "%@ · %@ of %@";
 "%@ — in project %@" = "%@ — in project %@";
@@ -254,6 +255,7 @@
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Bigger than the recommended one: better answers, but slower, with less memory left for other apps.";
 "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
+"Browse Models…" = "Browse Models…";
 "Built into macOS · LLMTray's chat only" = "Built into macOS · LLMTray's chat only";
 "Built-in" = "Built-in";
 "By" = "By";
@@ -442,6 +444,7 @@
 "Download LLMTray-Full" = "Download LLMTray-Full";
 "Download and Enable" = "Download and Enable";
 "Download for %@, into the models folder" = "Download for %@, into the models folder";
+"Download from" = "Download from";
 "Download into the models folder" = "Download into the models folder";
 "Download models" = "Download models";
 "Download models from Hugging Face" = "Download models from Hugging Face";
@@ -451,7 +454,9 @@
 "Downloading" = "Downloading";
 "Downloading %@" = "Downloading %@";
 "Downloading %@…" = "Downloading %@…";
+"Downloading %lld files from Kaggle…" = "Downloading %lld files from Kaggle…";
 "Downloading %lld files…" = "Downloading %lld files…";
+"Downloading from Kaggle… %lld%%" = "Downloading from Kaggle… %lld%%";
 "Downloading the embedder failed: %@" = "Downloading the embedder failed: %@";
 "Downloading the fast decoder…" = "Downloading the fast decoder…";
 "Downloading…" = "Downloading…";
@@ -621,8 +626,11 @@
 "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read." = "How you seem right now (angry at a failing build, tired, in a hurry), read from your last messages: new chats get it for this long, then it's gone. It's never a note. 0: not read.";
 "How?" = "How?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
+"Hugging Face can't be reached from this network, and %@ has no copy on Kaggle to download instead." = "Hugging Face can't be reached from this network, and %@ has no copy on Kaggle to download instead.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
+"Hugging Face stopped answering during the download. %@ has a copy on Kaggle: choose Kaggle first in Settings → Models to take it from there." = "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: choose Kaggle first in Settings → Models to take it from there.";
 "Hugging Face token" = "Hugging Face token";
+"Hugging Face, Kaggle if it can't be reached" = "Hugging Face, Kaggle if it can't be reached";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";
 "Image" = "Image";
 "Image editing" = "Image editing";
@@ -677,8 +685,15 @@
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Its settings came too; a Hugging Face token has to be entered again in Settings › Models.";
 "Its settings were the same as these already." = "Its settings were the same as these already.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Its settings weren't imported: that isn't %@ in ~/Library/Preferences.";
+"KGAT_… / username:key" = "KGAT_… / username:key";
 "KV cache" = "KV cache";
 "KV group size" = "KV group size";
+"Kaggle answered HTTP %d for %@." = "Kaggle answered HTTP %d for %@.";
+"Kaggle answered HTTP %d to the search." = "Kaggle answered HTTP %d to the search.";
+"Kaggle first" = "Kaggle first";
+"Kaggle has no version of %@ to download." = "Kaggle has no version of %@ to download.";
+"Kaggle refused %@ (HTTP %d)%@: it's gated or private. Accept its terms on its Kaggle page, then add a Kaggle token in Settings → Models." = "Kaggle refused %@ (HTTP %d)%@: it's gated or private. Accept its terms on its Kaggle page, then add a Kaggle token in Settings → Models.";
+"Kaggle token" = "Kaggle token";
 "Keep" = "Keep";
 "Keep %@ loaded" = "Keep %@ loaded";
 "Keep What It Taught" = "Keep What It Taught";
@@ -706,6 +721,7 @@
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";
 "LLMTray — Chat" = "LLMTray — Chat";
+"LLMTray's own models have copies on Kaggle with the same files. When Hugging Face can't be reached (a network that blocks it), they come from Kaggle; “Kaggle first” always takes them from there. Other models come from where you found them." = "LLMTray's own models have copies on Kaggle with the same files. When Hugging Face can't be reached (a network that blocks it), they come from Kaggle; “Kaggle first” always takes them from there. Other models come from where you found them.";
 "LLMTray's version." = "LLMTray's version.";
 "Language" = "Language";
 "Larger than this Mac's RAM -- unlikely to load" = "Larger than this Mac's RAM -- unlikely to load";
@@ -857,6 +873,7 @@
 "No chats found" = "No chats found";
 "No details for this answer." = "No details for this answer.";
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.";
+"No files found in %@ on Kaggle." = "No files found in %@ on Kaggle.";
 "No files yet" = "No files yet";
 "No folder changes yet." = "No folder changes yet.";
 "No longer used by LLMTray" = "No longer used by LLMTray";
@@ -868,6 +885,7 @@
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
 "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No open tab in %@." = "No open tab in %@.";
+"No overview for this model on Kaggle." = "No overview for this model on Kaggle.";
 "No requests yet in this period." = "No requests yet in this period.";
 "No requests yet today." = "No requests yet today.";
 "No requests yet." = "No requests yet.";
@@ -928,6 +946,7 @@
 "Only From Now On" = "Only From Now On";
 "Only for connections from other devices" = "Only for connections from other devices";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
+"Only for gated or private Kaggle models: accept the model's terms on its Kaggle page, then paste an API token (or username:key from kaggle.json) here. Public models, LLMTray's own among them, need none. Kept in your Keychain, sent only to kaggle.com." = "Only for gated or private Kaggle models: accept the model's terms on its Kaggle page, then paste an API token (or username:key from kaggle.json) here. Public models, LLMTray's own among them, need none. Kept in your Keychain, sent only to kaggle.com.";
 "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
 "Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
 "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@." = "Only the tab's title and address: for its text, turn on View › Developer › Allow JavaScript from Apple Events in %@.";
@@ -1063,6 +1082,7 @@
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
 "Reasoning" = "Reasoning";
 "Recent changes" = "Recent changes";
+"Recently published" = "Recently published";
 "Recently updated" = "Recently updated";
 "Recommended" = "Recommended";
 "Record" = "Record";
@@ -1132,6 +1152,7 @@
 "Runs" = "Runs";
 "Runtime data" = "Runtime data";
 "Same as LLMTray" = "Same as LLMTray";
+"Same files as %@" = "Same files as %@";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64.";
 "Sampling" = "Sampling";
@@ -1147,6 +1168,7 @@
 "Screen" = "Screen";
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
+"Search Kaggle (MLX models)…" = "Search Kaggle (MLX models)…";
 "Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
@@ -1490,6 +1512,7 @@
 "Top-p" = "Top-p";
 "Topic" = "Topic";
 "Total time" = "Total time";
+"Trending" = "Trending";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.";
 "Try Again" = "Try Again";
 "Try It Again" = "Try It Again";
@@ -1558,6 +1581,7 @@
 "Voice" = "Voice";
 "Voice clip" = "Voice clip";
 "Voice conversation" = "Voice conversation";
+"Votes" = "Votes";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Waiting for a model download to finish…" = "Waiting for a model download to finish…";
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
@@ -1610,6 +1634,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
+"Where to search. Kaggle also has copies of LLMTray's own models, for networks that block Hugging Face." = "Where to search. Kaggle also has copies of LLMTray's own models, for networks that block Hugging Face.";
 "Where you are: a city, or an address" = "Where you are: a city, or an address";
 "Which model generates new images." = "Which model generates new images.";
 "Whisper" = "Whisper";
@@ -1672,6 +1697,7 @@
 "for this chat" = "for this chat";
 "generation %.1f tok/s" = "generation %.1f tok/s";
 "hears audio" = "hears audio";
+"hf_…" = "hf_…";
 "in LLMTray's own folder" = "in LLMTray's own folder";
 "in an earlier models folder" = "in an earlier models folder";
 "installing %d packages" = "installing %d packages";

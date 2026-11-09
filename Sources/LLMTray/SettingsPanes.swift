@@ -226,6 +226,11 @@ struct ModelsPane: View {
     @State private var hfTokenSaved = HFToken.value != nil
 
     @State private var hfTokenError: String?
+    /// The same for Kaggle's token (KaggleToken).
+    @State private var kaggleToken = ""
+    @State private var kaggleTokenSaved = KaggleToken.value != nil
+    @State private var kaggleTokenError: String?
+    @AppStorage(Pref.modelDownloadSource.name) private var downloadSource = Pref.modelDownloadSource.defaultValue
     /// The model the Delete confirmation is for, and why the last removal failed.
     @State private var toRemove: LocalModel?
     @State private var mediaToRemove: MediaModels.Entry?
@@ -243,6 +248,18 @@ struct ModelsPane: View {
         hfTokenError = nil
         hfTokenSaved = HFToken.value != nil
         hfToken = ""
+    }
+
+    private func saveKaggleToken() {
+        let token = kaggleToken.trimmingCharacters(in: .whitespaces)
+        guard !token.isEmpty else { return }
+        guard KaggleToken.set(token) else {
+            kaggleTokenError = NSLocalizedString("The Keychain refused to save the token.", comment: "")
+            return
+        }
+        kaggleTokenError = nil
+        kaggleTokenSaved = KaggleToken.value != nil
+        kaggleToken = ""
     }
 
     var body: some View {
@@ -275,7 +292,8 @@ struct ModelsPane: View {
                                 hfTokenSaved = HFToken.value != nil
                             }
                         } else {
-                            SecureField("hf_…", text: $hfToken)
+                            SecureField("Hugging Face token", text: $hfToken, prompt: Text(verbatim: "hf_…"))
+                                .labelsHidden()
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 220)
                                 .onSubmit(saveToken)
@@ -290,6 +308,41 @@ struct ModelsPane: View {
                 } label: {
                     SettingLabel(title: "Hugging Face token", help: "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.")
                 }
+                LabeledContent {
+                    Picker("", selection: $downloadSource) {
+                        Text("Hugging Face, Kaggle if it can't be reached").tag(ModelDownloadSource.automatic.rawValue)
+                        Text("Kaggle first").tag(ModelDownloadSource.kaggle.rawValue)
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                } label: {
+                    SettingLabel(title: "Download from", help: "LLMTray's own models have copies on Kaggle with the same files. When Hugging Face can't be reached (a network that blocks it), they come from Kaggle; \u{201C}Kaggle first\u{201D} always takes them from there. Other models come from where you found them.")
+                }
+                LabeledContent {
+                    HStack {
+                        if kaggleTokenSaved {
+                            Text("Saved in your Keychain").foregroundStyle(.secondary)
+                            Button("Remove") {
+                                kaggleTokenError = KaggleToken.set(nil) ? nil : NSLocalizedString("The Keychain refused to remove the token.", comment: "")
+                                kaggleTokenSaved = KaggleToken.value != nil
+                            }
+                        } else {
+                            SecureField("Kaggle token", text: $kaggleToken, prompt: Text(verbatim: "KGAT_… / username:key"))
+                                .labelsHidden()
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 220)
+                                .onSubmit(saveKaggleToken)
+                            Button("Save", action: saveKaggleToken)
+                                .disabled(kaggleToken.trimmingCharacters(in: .whitespaces).isEmpty)
+                            Link(destination: URL(string: "https://www.kaggle.com/settings/api")!) { Text("Get one") }
+                        }
+                        if let kaggleTokenError {
+                            Text(kaggleTokenError).font(.caption).foregroundStyle(.red)
+                        }
+                    }
+                } label: {
+                    SettingLabel(title: "Kaggle token", help: "Only for gated or private Kaggle models: accept the model's terms on its Kaggle page, then paste an API token (or username:key from kaggle.json) here. Public models, LLMTray's own among them, need none. Kept in your Keychain, sent only to kaggle.com.")
+                }
                 HStack {
                     #if !APP_STORE
                     // A toggle: one click back from LM Studio's folder to ours.
@@ -302,7 +355,7 @@ struct ModelsPane: View {
                     #endif
                     Button("Rescan", action: rescan)
                     Spacer()
-                    Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
+                    Button("Browse Models…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
                 }
             }
             Section {

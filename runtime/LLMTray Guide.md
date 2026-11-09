@@ -44,9 +44,16 @@ model through the API (below); the chat takes images.
 
 ### Downloading and removing models
 
-- **Download:** Settings › Models › Browse Hugging Face… (in the version
-  from our website also from the terminal: `llmtray pull org/name`). Models
-  are MLX models (one folder per model, `org/name`).
+- **Download:** Settings › Models › Browse Models…, from Hugging Face or
+  Kaggle (in the version from our website also from the terminal:
+  `llmtray pull org/name`). Models are MLX models (one folder per model,
+  `org/name`).
+- **When Hugging Face is blocked** (some company networks): LLMTray's own
+  models also live on Kaggle with the same files. If Hugging Face can't be
+  reached, they come from Kaggle by themselves; Settings › Models › Download
+  from › Kaggle first always takes them from there. Public Kaggle models need
+  no account; a gated one needs its terms accepted on kaggle.com and a Kaggle
+  token in Settings › Models.
 - **Remove:** the trash button next to a model in Settings › Models. It goes
   to the Trash, so you can still restore it.
 - **Models folder:** Settings › Models › Models folder. Image, music and voice

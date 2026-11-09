@@ -297,6 +297,20 @@ final class AudioRuntime: ObservableObject {
     /// `cancellable`: cancelling the caller's task stops it -- for a caller
     /// that removes `dir` on failure (music); voice keeps its partial download.
     func snapshotDownload(repo: String, patterns: [String]? = nil, into dir: String, cancellable: Bool = false) async throws {
+        // Our Kaggle mirror instead, when Settings or the network says so
+        // (adr/0032): the same files, fetched by the app.
+        if let handle = await ModelSource.kaggleCopy(of: repo) {
+            try await KaggleFetch.download(handle, patterns: patterns, into: dir)
+            return
+        }
+        do {
+            try await snapshotDownloadFromHub(repo: repo, patterns: patterns, into: dir, cancellable: cancellable)
+        } catch {
+            throw await ModelSource.explain(error, repo: repo)
+        }
+    }
+
+    private func snapshotDownloadFromHub(repo: String, patterns: [String]?, into dir: String, cancellable: Bool) async throws {
         let allow = patterns.map { "allow_patterns=[" + $0.map { "\"\($0)\"" }.joined(separator: ",") + "], " } ?? ""
         try await run(Self.venvPython, failure: RuntimeError.downloadFailed, cancellable: cancellable, [
             "-c",

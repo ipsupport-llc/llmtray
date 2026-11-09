@@ -38,7 +38,9 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
 
     let partial: URL
     private let url: URL
-    private let token: String?
+    /// The Authorization header, sent only to `authorization.host` (the
+    /// API), never to the storage it redirects to.
+    private let authorization: (host: String, header: String)?
     private let size: Int64
     private let queue = OperationQueue()
     private var session: URLSession!
@@ -54,9 +56,9 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     /// Attempts per part (connection drops, 429, 5xx), with a growing wait.
     private static let maxAttempts = 8
 
-    init(url: URL, token: String?, partial: URL, size: Int64, ranges: [ClosedRange<Int64>], connections: Int) {
+    init(url: URL, authorization: (host: String, header: String)?, partial: URL, size: Int64, ranges: [ClosedRange<Int64>], connections: Int) {
         self.url = url
-        self.token = token
+        self.authorization = authorization
         self.partial = partial
         self.size = size
         self.parts = ranges.map { Part(range: $0) }
@@ -151,7 +153,7 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     private func startPart(_ i: Int) {
         guard !finished, !paused, !isCancelled, !parts[i].isDone, parts[i].task == nil else { return }
         var request = URLRequest(url: url)
-        if let token, url.host == "huggingface.co" { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+        if let authorization, url.host == authorization.host { request.setValue(authorization.header, forHTTPHeaderField: "Authorization") }
         request.setValue(DownloadParts.header(parts[i].next), forHTTPHeaderField: "Range")
         let task = session.dataTask(with: request)
         task.taskDescription = String(i)
@@ -264,13 +266,13 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         retry(i, error?.localizedDescription ?? "a range ended early")
     }
 
-    /// The token is for huggingface.co: a redirect to the file CDN (signed
+    /// The token is for the API's host: a redirect to the file CDN (signed
     /// URLs) must not carry it; the Range header goes along.
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                     newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         var request = request
-        if request.url?.host == "huggingface.co", request.url?.scheme == "https", let token {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let authorization, request.url?.host == authorization.host, request.url?.scheme == "https" {
+            request.setValue(authorization.header, forHTTPHeaderField: "Authorization")
         } else {
             request.setValue(nil, forHTTPHeaderField: "Authorization")
         }
