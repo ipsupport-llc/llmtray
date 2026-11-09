@@ -10,6 +10,9 @@ struct EmptyChatIntro: View {
     let port: Int
     /// Puts a sample prompt in the composer (not sent).
     let insertPrompt: (String) -> Void
+    /// Starts a voice conversation in this chat (adr/0031); nil while the
+    /// chat can't take a message (no model to talk to).
+    let startVoice: (() -> Void)?
     /// Something is dragged over the chat: the drop zone lights up (the
     /// chat takes the drop -- a vision model's images to the message,
     /// other files to the project).
@@ -22,7 +25,7 @@ struct EmptyChatIntro: View {
     // steps): watched here, where it's shown or not.
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var profiles = ProfileManager.shared
-    @ObservedObject private var voice = VoiceModelStore.shared
+    @ObservedObject private var voice = VoiceInputStore.shared
     @AppStorage(Pref.gettingStartedHidden.name) private var gettingStartedHidden = false
     @AppStorage(Pref.gettingStartedWrote.name) private var gettingStartedWrote = false
 
@@ -44,7 +47,7 @@ struct EmptyChatIntro: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt)
+            EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt, startVoice: startVoice)
         }
     }
 }
@@ -57,9 +60,10 @@ private struct EmptyChatShowcase: View {
     let selectedModelID: String?
     let port: Int
     let insertPrompt: (String) -> Void
+    let startVoice: (() -> Void)?
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var indexer = ProjectIndexer.shared
-    @ObservedObject private var voice = VoiceModelStore.shared
+    @ObservedObject private var voice = VoiceInputStore.shared
     @State private var copied = false
     @State private var copiedReset: Task<Void, Never>?
 
@@ -113,13 +117,16 @@ private struct EmptyChatShowcase: View {
     }
 
     private var voiceTile: some View {
-        // Voice Lab is in the menu only once it's on and its model is here.
-        let on = voice.isEnabled && voice.isDownloaded(voice.selected)
+        // On once the picked recognizer's models are here (Settings > Voice)
+        // and there's a model to talk to.
+        let ready = voice.isReady
+        let on = ready && startVoice != nil
         return ShowcaseTile(symbol: "waveform", title: Text("Voice"),
-                            detail: on ? Text("Talk with the model in Voice Lab") : offDetail, isOn: on) {
-            if on {
-                NotificationCenter.default.post(name: .showVoiceLab, object: nil)
-            } else {
+                            detail: on ? Text("Talk with the model, hands free")
+                                : ready ? Text("Pick a chat model first") : offDetail, isOn: on) {
+            if let startVoice, ready {
+                startVoice()
+            } else if !ready {
                 NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.voice.rawValue])
             }
         }
@@ -188,7 +195,7 @@ struct GettingStartedCard: View {
     let insertPrompt: (String) -> Void
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var profiles = ProfileManager.shared
-    @ObservedObject private var voice = VoiceModelStore.shared
+    @ObservedObject private var voice = VoiceInputStore.shared
     // Read again when they change (the steps' state).
     @AppStorage(Pref.gettingStartedWrote.name) private var wrote = false
     @AppStorage(Pref.gettingStartedHidden.name) private var hidden = false

@@ -397,7 +397,9 @@ struct ContentView: View {
                     // until its first turn: where it will be.
                     if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
                     EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
-                                   insertPrompt: insertPrompt, dropTargeted: chatDropTargeted,
+                                   insertPrompt: insertPrompt,
+                                   startVoice: canChat ? { NotificationCenter.default.post(name: .startVoiceConversation, object: chat) } : nil,
+                                   dropTargeted: chatDropTargeted,
                                    compact: !presentation.isDetached)
                 }
             } else {

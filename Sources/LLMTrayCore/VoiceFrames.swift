@@ -1,17 +1,12 @@
 import Foundation
 
-/// One message between the app and the Voice Lab runner
-/// (runtime/llmtray_voice_runner.py, adr/0016): a type byte, a 4-byte
-/// big-endian payload length, the payload. Binary rather than the embed
-/// runner's JSON lines, which would base64 every 80 ms of audio.
-///
-/// App -> runner: `A` int16 PCM, 16 kHz mono; `M` the mode ("duplex" or
-/// "walkie"); `D` the user's turn ended (walkie-talkie: payload = the turn's
-/// number, UTF-8); `C` cancel the reply in progress; `Q` quit.
-/// Runner -> app: `R` ready (JSON), `T` the model's text delta, `U` the
-/// user's transcript delta (UTF-8), `S` speech (int16 PCM at the ready
-/// JSON's `sample_rate`), `Z` the reply to a `D` is complete (JSON), `N` a
-/// note for the user, `E` error, `L` a log line (UTF-8).
+/// One message between the app and an audio runner (spoken answers'
+/// runtime/llmtray_tts_runner.py, the voice conversation's
+/// runtime/llmtray_listen_runner.py): a type byte, a 4-byte big-endian
+/// payload length, the payload. Binary rather than the embed runner's JSON
+/// lines, which would base64 every 80 ms of audio. Each runner's header
+/// says which types it sends and takes; the letters were first Voice Lab's
+/// (adr/0016, removed).
 public struct VoiceFrame: Equatable, Sendable {
     public enum Kind: UInt8, Sendable {
         case audio = 0x41   // A
@@ -29,8 +24,9 @@ public struct VoiceFrame: Equatable, Sendable {
         case log = 0x4C     // L
         // Spoken answers' runner (runtime/llmtray_tts_runner.py): app ->
         // runner `P` speak {id, text, lang}, `V` voice {clip}; runner ->
-        // app `B` {id} before a sentence's audio. `C`, `Q`, `R`, `S`, `Z`,
-        // `E`, `L` as above (`Z` {id, rtf}, `E` {id, message} there).
+        // app `B` {id} before a sentence's audio; `C` cancel, `Q` quit,
+        // `R` ready, `S` speech, `Z` {id, rtf} done, `E` {id, message},
+        // `L` a log line.
         case speak = 0x50   // P
         case voice = 0x56   // V
         case begin = 0x42   // B
@@ -67,107 +63,6 @@ public struct VoiceFrame: Equatable, Sendable {
         out.append(contentsOf: [UInt8(n >> 24), UInt8((n >> 16) & 0xFF), UInt8((n >> 8) & 0xFF), UInt8(n & 0xFF)])
         out.append(payload)
         return out
-    }
-}
-
-/// The runner's `R` payload.
-public struct VoiceRunnerReady: Equatable, Sendable, Decodable {
-    /// Of the `S` frames' PCM (22 050 Hz for VoiceChat).
-    public var sampleRate: Int
-    /// What the runner expects in `A` frames (16 000 Hz).
-    public var inputSampleRate: Int
-    /// Samples per model step (1280 = 80 ms at 16 kHz), informational.
-    public var frameSamples: Int?
-    public var model: String?
-    /// Real-time factor measured at warmup: compute time per second of
-    /// audio (above 1: slower than real time, full duplex falls behind).
-    public var rtf: Double?
-
-    enum CodingKeys: String, CodingKey {
-        case sampleRate = "sample_rate"
-        case inputSampleRate = "input_sample_rate"
-        case frameSamples = "frame_samples"
-        case model
-        case rtf
-    }
-
-    public init(sampleRate: Int, inputSampleRate: Int, frameSamples: Int? = nil, model: String? = nil, rtf: Double? = nil) {
-        self.sampleRate = sampleRate
-        self.inputSampleRate = inputSampleRate
-        self.frameSamples = frameSamples
-        self.model = model
-        self.rtf = rtf
-    }
-
-    public init?(payload: Data) {
-        guard let ready = try? JSONDecoder().decode(Self.self, from: payload),
-              (8_000...192_000).contains(ready.sampleRate), (8_000...192_000).contains(ready.inputSampleRate) else { return nil }
-        self = ready
-    }
-}
-
-/// The runner's `Z` payload: a walkie-talkie reply is complete.
-public struct VoiceReplyDone: Equatable, Sendable, Decodable {
-    public enum Reason: String, Sendable, Decodable {
-        /// The model spoke and fell quiet.
-        case done
-        /// It didn't start speaking within the runner's wait.
-        case noReply = "no_reply"
-        /// The runner's length cap.
-        case limit
-        /// The user started talking again, cancelled it, or quit first.
-        case interrupted
-        /// The context limit: the runner started a new conversation.
-        case reset
-    }
-
-    public var reason: Reason
-    /// The `D` it answers.
-    public var turn: Int?
-    /// Of speech sent.
-    public var seconds: Double?
-
-    public init(reason: Reason, turn: Int? = nil, seconds: Double? = nil) {
-        self.reason = reason
-        self.turn = turn
-        self.seconds = seconds
-    }
-
-    public init?(payload: Data) {
-        guard let done = try? JSONDecoder().decode(Self.self, from: payload) else { return nil }
-        self = done
-    }
-}
-
-/// Full duplex (the model hears you while it talks, both in real time) or
-/// walkie-talkie (you talk, then it answers: the model steps through its
-/// reply as fast as it can and the app plays it once it's complete) --
-/// for a Mac that runs the model slower than real time. `auto` picks by
-/// the runner's measured real-time factor.
-public enum VoiceLabMode: String, CaseIterable, Sendable {
-    case auto
-    case duplex
-    case walkieTalkie
-
-    /// Above this measured RTF, `auto` is walkie-talkie.
-    public static let realTimeLimit = 1.0
-
-    /// Walkie-talkie for this mode and measured RTF (nil: not measured,
-    /// taken as fast enough).
-    public func usesWalkieTalkie(rtf: Double?) -> Bool {
-        switch self {
-        case .duplex: return false
-        case .walkieTalkie: return true
-        case .auto: return (rtf ?? 0) > Self.realTimeLimit
-        }
-    }
-
-    /// The `M` frame's payload for the runner.
-    public static func runnerMode(walkieTalkie: Bool) -> String { walkieTalkie ? "walkie" : "duplex" }
-
-    /// The speed for the "~0.5× real time" notice: 1 / RTF, one decimal.
-    public static func speedText(rtf: Double) -> String {
-        String(format: "%.1f", rtf > 0 ? 1 / rtf : 0)
     }
 }
 

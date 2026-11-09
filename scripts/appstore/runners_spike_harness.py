@@ -1,4 +1,5 @@
-# adr/0018: the App Store build's image, music and voice runners, run the
+# adr/0018: the App Store build's image and music runners (Voice Lab's,
+# also checked here then, is gone), run the
 # way the app runs them, inside the sandbox (started by runners_spike.swift,
 # a sandboxed app with the App Store build's Python and packages). Models are
 # read from the standalone LLMTray's folders (the spike's read-only
@@ -45,33 +46,3 @@ lines_run("music turbo 10 s",
            "--lm", os.path.join(music, "ace-step-1.5-lm-1.7B")],
           json.dumps({"caption": "calm acoustic guitar", "lyrics": "", "duration": 10,
                       "language": "en", "mode": "turbo", "seed": 1}).encode(), b"AUDIO")
-
-# Voice: load, warm up, "R" (ready, with the measured rtf), then stdin EOF.
-voice = os.path.join(MODELS, "voice_models", "nemotron-voicechat-11b-gptq3")
-t = time.time()
-# stderr to a file: a pipe nobody reads fills up and hangs the runner.
-errlog = tempfile.TemporaryFile()
-p = subprocess.Popen([PY, os.path.join(RUNTIME, "llmtray_voice_runner.py"), "--model", voice],
-                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=errlog, env=ENV)
-ready, error = None, None
-while True:
-    head = p.stdout.read(5)
-    if len(head) < 5:
-        break
-    kind, size = chr(head[0]), struct.unpack(">I", head[1:])[0]
-    payload = p.stdout.read(size)
-    if kind == "R":
-        ready = json.loads(payload)
-        break
-    if kind == "E":
-        error = payload.decode(errors="replace")
-        break
-p.stdin.close()
-try:
-    p.wait(timeout=60)
-except subprocess.TimeoutExpired:
-    p.kill()
-errlog.seek(0)
-err = [error] if error else errlog.read().decode(errors="replace").strip().splitlines()
-report(ready is not None, "voice gptq3 load + warmup",
-       f"rtf={ready.get('rtf') if ready else None} {time.time() - t:.0f}s" + ("" if ready else " | " + (err[-1] if err else "")))

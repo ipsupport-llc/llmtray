@@ -375,7 +375,7 @@ final class MemoryReflector: ObservableObject {
             let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
             return minutes > 0 && server.activeRequestCount == own && Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60
                 && !ChatTabs.shared.tabs.contains(where: \.isBusy) && !GenerationQueue.shared.hasInteractiveDemand
-                && !server.suspendedForImageGeneration && !server.suspendedForVoice
+                && !server.suspendedForImageGeneration
                 && (server.isIdleUnloaded || { if case .running = server.state { return true } else { return false } }())
         }
         guard minutes > 0, let server, idle(server), let model = ModelCatalog.shared.model(id: path) else { return }

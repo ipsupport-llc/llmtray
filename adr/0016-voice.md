@@ -1,6 +1,14 @@
 # 0016 — Voice
 
 **Status: accepted** (2026-09-27, by the user). Steps 1–2 (the base, Voice Lab with VoiceChat 11B) are built.
+**Voice Lab removed** 2026-11-08 (the user: "пора потерять voice2voice от
+нвидии"): the voice conversation with the chat model
+([0031](0031-voice-conversation.md)) took its place. The window, the
+session, the runner and the model downloads are gone; VoiceChat folders
+already on disk show in Settings › Models to be removed, and the audio
+plumbing it started (DuplexProcess, the frame format, echo cancellation)
+stays for spoken answers and the conversation. The VoiceChat quants stay
+published on Hugging Face.
 **Amended** 2026-11-06 (the user: "да, вноси в ADR и поехали"): the neural
 voice is Chatterbox Multilingual V3, not Qwen3-TTS; spoken answers and the
 neural voice ship together as step 4 — see "Spoken answers with

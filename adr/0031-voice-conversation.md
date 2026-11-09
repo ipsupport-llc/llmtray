@@ -18,8 +18,9 @@ What's missing is talking to the chat model the way people talk to each
 other: you speak, it answers aloud, you can cut in, and there are no
 buttons in between.
 
-It is not Voice Lab. Voice Lab stays as it is: a separate,
-experimental speech-to-speech model, English only, with no tools. Here the
+It is not Voice Lab, which was a separate, experimental
+speech-to-speech model, English only, with no tools (removed 2026-11-08,
+see [0016](0016-voice.md)). Here the
 model is the one you already chat with, with the chat's profile, tools,
 project files and memory, in Russian as well as English.
 

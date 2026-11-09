@@ -3,8 +3,8 @@ import Foundation
 import LLMTrayCore
 
 /// The composer's microphone (adr/0023): a spoken message for a model that
-/// hears. Voice Lab's capture (16 kHz mono, in memory, through voice
-/// processing where it starts), collected until Stop and handed back as a
+/// hears. The microphone at 16 kHz mono, in memory, through voice
+/// processing where it starts, collected until Stop and handed back as a
 /// WAV -- nothing written to disk, a temporary chat included. At most
 /// `maxSeconds`; it stops itself there.
 @MainActor

@@ -21,7 +21,7 @@ here; this is where the history lives.
 | [0013](0013-first-run-wizard.md) | The first-run wizard |
 | [0014](0014-folder-tools.md) | Folder tools: listing, file info, moving and deleting in folders the user grants |
 | [0015](0015-telemetry.md) | Usage telemetry, on for new installs (never turned on by an update): one anonymous report a day, what's counted and what never is |
-| [0016](0016-voice.md) | Voice: a speech-to-speech Voice Lab first, then voice chat (push to talk, spoken answers) on the chat model |
+| [0016](0016-voice.md) | Voice: a speech-to-speech Voice Lab first (removed 2026-11-08), then voice chat (push to talk, spoken answers) on the chat model |
 | [0017](0017-supporters.md) | Support LLMTray: optional tips (StoreKit IAP in the App Store build, GitHub Sponsors otherwise), opt-in supporters list moderated and signed by ipsupport-api; nothing locked |
 | [0018](0018-app-store-build.md) | A Mac App Store build beside the Developer ID one: every runtime bundled and signed, sandboxed, no Sparkle, StoreKit tips |
 | [0019](0019-command-line.md) | The `llmtray` command-line tool: an owner-only control socket, the tray's own actions, a symlink in ~/.local/bin; not in the App Store build |

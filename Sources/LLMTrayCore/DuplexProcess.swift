@@ -1,9 +1,10 @@
 import Darwin
 import Foundation
 
-/// A long-running child spoken to over binary pipes both ways -- the Voice
-/// Lab runner (adr/0016): audio frames stream in on stdin while the
-/// model's frames stream out on stdout, for as long as the session lasts.
+/// A long-running child spoken to over binary pipes both ways -- the audio
+/// runners (spoken answers, the voice conversation's listener): frames
+/// stream in on stdin while the runner's frames stream out on stdout, for
+/// as long as the session lasts.
 /// ProcessRunner's helpers write stdin once and read lines; this keeps
 /// stdin open, writes from any thread without blocking it, and hands
 /// stdout over in raw chunks (VoiceFrameDecoder reassembles them).

@@ -328,7 +328,7 @@ struct ModelsPane: View {
                 } header: {
                     HStack(spacing: 4) {
                         Text("Image, music and voice models")
-                        SettingHelp(text: "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.")
+                        SettingHelp(text: "Used by image generation, music and voice, which download them. They're kept in the models folder too, under their Hugging Face names.")
                     }
                 }
             }
@@ -413,6 +413,7 @@ struct ModelsPane: View {
                 HStack(spacing: 6) {
                     Text(e.kind.title)
                     if let size = catalog.mediaSizes[e.repo] { Text(ModelCatalog.format(size)).monospacedDigit() }
+                    if e.retired { Text("No longer used by LLMTray -- safe to remove") }
                     if let added = ModelRemoval.addedDate(modelPath: MediaModels.path(e)) {
                         Text(String(format: NSLocalizedString("Added %@", comment: "model list: when the model arrived"),
                                     added.formatted(date: .abbreviated, time: .omitted)))
@@ -1659,10 +1660,10 @@ struct UpdatesPane: View {
     @AppStorage(Pref.automaticUpdateChecks) private var autoCheck
     @AppStorage(Pref.checkUpdatesAtLaunch) private var checkAtLaunch
     @AppStorage(Pref.betaUpdates) private var beta
-    @AppStorage(Pref.voiceLabEnabled) private var voiceLab
     @ObservedObject private var audioRuntime = AudioRuntime.shared
-    @ObservedObject private var voiceSession = VoiceLabSession.shared
-    @ObservedObject private var voiceStore = VoiceModelStore.shared
+    @ObservedObject private var voiceConversation = VoiceConversation.shared
+    @ObservedObject private var voiceInput = VoiceInputStore.shared
+    @ObservedObject private var spokenVoice = SpokenVoiceStore.shared
 
     /// Anything that could start the model process mid-update: running,
     /// starting, or idle-unloaded (the next request reloads it).
@@ -1715,16 +1716,16 @@ struct UpdatesPane: View {
                     Text("Stop the server to update the runtime.").font(.caption).foregroundStyle(.secondary)
                 }
             }
-            if voiceLab || audioRuntime.hasVenv {
+            if audioRuntime.hasVenv {
                 Section("mlx-audio runtime") {
                     LabeledContent {
                         Text(shortRef(AudioRuntime.mlxAudioCommit)).font(.system(.body, design: .monospaced))
                     } label: {
-                        SettingLabel(title: "Pinned", help: "The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working.")
+                        SettingLabel(title: "Pinned", help: "The mlx-audio version (a commit of LLMTray's own fork) that runs music generation, spoken answers and the voice conversation. Installed at the next voice or music start when it changes; offline, the installed one keeps working.")
                     }
                     audioRuntimeStatus
                     if audioBusy {
-                        Text("Stop Voice Lab and music generation to update it.").font(.caption).foregroundStyle(.secondary)
+                        Text("End the voice conversation and stop music generation to update it.").font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -1763,7 +1764,7 @@ struct UpdatesPane: View {
 
     /// Something running on the audio venv (or installing into it).
     private var audioBusy: Bool {
-        voiceSession.isActive || chatTabs.music.isBusy || audioRuntime.isInstalling || voiceStore.isBusy
+        voiceConversation.isActive || chatTabs.music.isBusy || audioRuntime.isInstalling || voiceInput.isBusy || spokenVoice.isBusy
     }
 
     @ViewBuilder

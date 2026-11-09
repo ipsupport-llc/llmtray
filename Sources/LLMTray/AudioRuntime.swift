@@ -2,8 +2,8 @@ import Foundation
 import LLMTrayCore
 
 /// The one audio runtime (adr/0016): a venv with mlx-audio from our fork,
-/// shared by the music generator (ACE-Step, adr/0010) and Voice Lab
-/// (VoiceChat). It's still called music_venv on disk: the name predates
+/// shared by the music generator (ACE-Step, adr/0010), spoken answers and
+/// the voice conversation (adr/0031). It's still called music_venv on disk: the name predates
 /// voice, and renaming it would reinstall every existing setup.
 ///
 /// One install at a time, whoever asks: a second caller waits for the
@@ -72,7 +72,8 @@ final class AudioRuntime: ObservableObject {
         [
             "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/\(mlxAudioCommit).tar.gz",
             "mlx==0.32.2", "mlx-lm==0.31.1", "transformers==5.17.0", "pyyaml", "huggingface_hub",
-            // sts extras (VoiceChat's tokenizers)
+            // sts extras (first for Voice Lab's VoiceChat, removed; kept so
+            // existing installs aren't redone)
             "sentencepiece>=0.2.0",
             // Spoken answers' Russian stress (adr/0016): ruaccent's ONNX
             // models and its sentence splitter. ruaccent itself is

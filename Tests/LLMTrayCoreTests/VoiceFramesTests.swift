@@ -75,39 +75,9 @@ final class VoiceFramesTests: XCTestCase {
         XCTAssertThrowsError(try decoder.append(Data("hello world".utf8)))
     }
 
-    func testReadyPayload() {
-        let json = #"{"sample_rate": 22050, "input_sample_rate": 16000, "frame_samples": 1280, "model": "m"}"#
-        XCTAssertEqual(VoiceRunnerReady(payload: Data(json.utf8)),
-                       VoiceRunnerReady(sampleRate: 22_050, inputSampleRate: 16_000, frameSamples: 1280, model: "m"))
-        XCTAssertNil(VoiceRunnerReady(payload: Data(#"{"sample_rate": 0, "input_sample_rate": 16000}"#.utf8)))
-        XCTAssertNil(VoiceRunnerReady(payload: Data("nope".utf8)))
-        XCTAssertEqual(VoiceRunnerReady(payload: Data(#"{"sample_rate": 24000, "input_sample_rate": 16000}"#.utf8))?.frameSamples, nil)
-        XCTAssertEqual(VoiceRunnerReady(payload: Data(#"{"sample_rate": 22050, "input_sample_rate": 16000, "rtf": 2.04}"#.utf8))?.rtf, 2.04)
-    }
-
-    func testReplyDonePayload() {
-        XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "done", "turn": 3, "seconds": 2.4}"#.utf8)),
-                       VoiceReplyDone(reason: .done, turn: 3, seconds: 2.4))
-        XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "no_reply"}"#.utf8))?.reason, .noReply)
-        XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "interrupted", "turn": 1}"#.utf8))?.reason, .interrupted)
-        XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "reset", "turn": 2}"#.utf8))?.reason, .reset)
-        XCTAssertNil(VoiceReplyDone(payload: Data(#"{"reason": "bored"}"#.utf8)))
+    func testKinds() {
         XCTAssertEqual([VoiceFrame.Kind.mode, .cancelReply, .userText, .note].map(\.rawValue), [UInt8]("MCUN".utf8))
-        XCTAssertEqual(VoiceLabMode.runnerMode(walkieTalkie: true), "walkie")
-        XCTAssertEqual(VoiceLabMode.runnerMode(walkieTalkie: false), "duplex")
         XCTAssertEqual(VoiceFrame(.endOfTurn, text: "7").encoded.first, UInt8(ascii: "D"))
         XCTAssertEqual(VoiceFrame(.replyDone).kind, .replyDone)
-    }
-
-    func testModeByMeasuredSpeed() {
-        XCTAssertFalse(VoiceLabMode.auto.usesWalkieTalkie(rtf: 0.93))   // M5 Pro, published
-        XCTAssertTrue(VoiceLabMode.auto.usesWalkieTalkie(rtf: 2.0))     // base M5, measured
-        XCTAssertFalse(VoiceLabMode.auto.usesWalkieTalkie(rtf: nil))
-        XCTAssertFalse(VoiceLabMode.auto.usesWalkieTalkie(rtf: 1.0))
-        XCTAssertFalse(VoiceLabMode.duplex.usesWalkieTalkie(rtf: 3))
-        XCTAssertTrue(VoiceLabMode.walkieTalkie.usesWalkieTalkie(rtf: 0.5))
-        XCTAssertEqual(VoiceLabMode.speedText(rtf: 2.0), "0.5")
-        XCTAssertEqual(VoiceLabMode.speedText(rtf: 1.6), "0.6")
-        XCTAssertEqual(VoiceLabMode.speedText(rtf: 0), "0.0")
     }
 }

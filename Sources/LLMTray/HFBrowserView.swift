@@ -247,7 +247,7 @@ private struct MediaDownloadControl: View {
     let entry: MediaModels.Entry
     @ObservedObject private var mflux = ChatTabs.shared.mflux
     @ObservedObject private var music = ChatTabs.shared.music
-    @ObservedObject private var voice = VoiceModelStore.shared
+    @ObservedObject private var spoken = SpokenVoiceStore.shared
     @State private var running = false
     @State private var error: String?
 
@@ -255,7 +255,7 @@ private struct MediaDownloadControl: View {
         switch entry.kind {
         case .image: return mflux.isBusy
         case .music: return music.isBusy
-        case .voice: return voice.isBusy || SpokenVoiceStore.shared.isBusy
+        case .voice: return spoken.isBusy
         }
     }
 
@@ -263,7 +263,7 @@ private struct MediaDownloadControl: View {
         switch entry.kind {
         case .image: return mflux.statusText
         case .music: return music.statusText
-        case .voice: return voice.statusText
+        case .voice: return spoken.statusText
         }
     }
 
@@ -275,6 +275,11 @@ private struct MediaDownloadControl: View {
                     Text(status.isEmpty ? NSLocalizedString("Downloading…", comment: "") : status)
                         .font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
+            } else if entry.retired {
+                // Installed or not: remove a copy in Settings › Models.
+                Text("No longer used by LLMTray")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             } else if MediaModels.isReady(entry) {
                 Label(String(format: NSLocalizedString("Installed · %@", comment: "HF browser: a media model installed, its kind"), entry.kind.title),
                       systemImage: "checkmark.circle.fill")
@@ -306,13 +311,10 @@ private struct MediaDownloadControl: View {
                     guard let m = MusicModel.allCases.first(where: { MediaModels.entry($0) == entry }) else { return }
                     try await music.download(m)
                 case .voice:
-                    if SpokenVoiceFile.folders.contains(where: { $0.repo == entry.repo }) {
-                        // Chatterbox's parts come together (adr/0016).
-                        try await SpokenVoiceStore.shared.download()
-                        return
-                    }
-                    guard let m = VoiceLabModel.all.first(where: { MediaModels.entry($0) == entry }) else { return }
-                    try await voice.download(m)
+                    // Chatterbox's parts come together (adr/0016); the
+                    // voice conversation's models from Settings > Voice.
+                    guard SpokenVoiceFile.folders.contains(where: { $0.repo == entry.repo }) else { return }
+                    try await spoken.download()
                 }
             } catch {
                 self.error = error.localizedDescription

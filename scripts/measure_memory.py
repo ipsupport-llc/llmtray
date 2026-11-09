@@ -57,7 +57,7 @@ def run_case(argv, stdin_bytes, env_extra, timeout) -> dict:
         return [pid] + [q for k in kids for q in tree(int(k))]
 
     def sample():
-        # The whole process tree: the voice wrapper's runner is a child.
+        # The whole process tree: a wrapper's runner is a child.
         while not stop.is_set():
             total = sum(mb for q in tree(p.pid) if (mb := footprint_mb(q)))
             peak[0] = max(peak[0], total)
@@ -113,35 +113,6 @@ def music(dit: str, mode: str, seconds: int, planner: bool):
     return build
 
 
-VOICE_SCRIPT = r'''
-import subprocess, sys, struct, json, time
-# The runner, fed silence for 20 s after it's ready (a listening session).
-p = subprocess.Popen([sys.executable, sys.argv[1], "--model", sys.argv[2]], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-while True:
-    head = p.stdout.read(5)
-    if len(head) < 5: sys.exit(1)
-    kind, size = chr(head[0]), struct.unpack(">I", head[1:])[0]
-    payload = p.stdout.read(size)
-    if kind == "R":
-        rate = json.loads(payload).get("input_sample_rate", 16000)
-        break
-frame = b"\x00\x00" * (rate // 10)            # 100 ms of 16-bit silence
-end = time.time() + 20
-while time.time() < end:
-    p.stdin.write(b"A" + struct.pack(">I", len(frame)) + frame); p.stdin.flush()
-    time.sleep(0.1)
-p.stdin.close()
-try:
-    p.wait(timeout=30)
-except subprocess.TimeoutExpired:
-    p.kill()
-'''
-
-
-def voice(model: str):
-    return lambda ctx: ([AUDIO_PY, "-c", VOICE_SCRIPT, f"{RUNTIME}/llmtray_voice_runner.py", f"{APP}/voice_models/{model}"], None, {})
-
-
 CASES = {
     "chat-e2b-4k": chat("roman220220/gemma-4-E2B-it-qat-mlx", 4096),
     "chat-e2b-16k": chat("roman220220/gemma-4-E2B-it-qat-mlx", 16384),
@@ -157,8 +128,6 @@ CASES = {
     "music-turbo-30s": music("ace-step-1.5-4bit", "turbo", 30, True),
     "music-turbo-120s": music("ace-step-1.5-4bit", "turbo", 120, True),
     "music-sft-30s": music("ace-step-1.5-sft-gptq-4bit", "sft", 30, False),
-    "voice-gptq3": voice("nemotron-voicechat-11b-gptq3"),
-    "voice-mixed": voice("nemotron-voicechat-11b-mixed"),
 }
 
 

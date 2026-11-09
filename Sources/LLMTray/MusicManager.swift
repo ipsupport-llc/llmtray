@@ -137,7 +137,7 @@ final class MusicManager: ObservableObject {
         isDownloaded(model) && AudioRuntime.shared.hasVenv
     }
 
-    /// The shared audio runtime, installed (or waited for, when Voice Lab's
+    /// The shared audio runtime, installed (or waited for, when a voice
     /// download is installing it).
     private func ensurePackagesInstalled() async throws {
         try await AudioRuntime.shared.ensureInstalled { [weak self] text in self?.statusText = text }
