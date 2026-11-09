@@ -18,7 +18,9 @@ struct HFBrowserView: View {
             .onChange(of: browser.source) {
                 browser.results = []
                 browser.searchError = nil
-                if !browser.query.trimmingCharacters(in: .whitespaces).isEmpty { browser.search() }
+                // An empty query searches nothing, but still drops a search
+                // in flight from the other source.
+                browser.search()
             }
             HStack {
                 TextField(browser.source == .kaggle ? "Search Kaggle (MLX models)…" : "Search Hugging Face (mlx models)…", text: $browser.query)

@@ -264,7 +264,13 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     func search() {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !q.isEmpty else { return }
+        // Any search in flight is stale from here, this one or none.
+        searchGeneration += 1
+        let generation = searchGeneration
+        guard !q.isEmpty else {
+            isSearching = false
+            return
+        }
         isSearching = true
         searchError = nil
         sizesByID.removeAll()
@@ -273,8 +279,6 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         // screen without the Kaggle variation it downloads.
         results = []
         kaggleByID.removeAll()
-        searchGeneration += 1
-        let generation = searchGeneration
         if source == .kaggle { return searchKaggle(q, generation: generation) }
         Task {
             defer { if generation == searchGeneration { isSearching = false } }
@@ -294,7 +298,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 guard generation == searchGeneration else { return }
                 let fetched = try JSONDecoder().decode([HFModelSummary].self, from: data)
                 results = fetched
-                fetchSizes(for: fetched)
+                fetchSizes(for: fetched, generation: generation)
             } catch {
                 guard generation == searchGeneration else { return }
                 searchError = error.localizedDescription
@@ -344,12 +348,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// sizesByID independently as it lands, rather than waiting for all
     /// ~30 to finish before showing any -- this is a one-time burst per
     /// search, not sustained load, so no throttling.
-    private func fetchSizes(for models: [HFModelSummary]) {
+    private func fetchSizes(for models: [HFModelSummary], generation: Int) {
         for model in models {
             Task {
                 guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)?blobs=true") else { return }
                 guard let (data, _) = try? await URLSession.shared.data(from: url),
-                      let info = HubModelInfo.parse(data), results.contains(model) else { return }
+                      let info = HubModelInfo.parse(data), generation == searchGeneration else { return }
                 infoByID[model.id] = info
                 if let size = HubModelInfo.filesSize(data) ?? info.sizeBytes { sizesByID[model.id] = size }
             }
@@ -794,7 +798,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             let status = http.statusCode
             // The file CDN (not huggingface.co) refusing a resumed download:
             // its signed link expired during a pause. Once, from scratch.
-            if let host = http.url?.host, host != "huggingface.co", host != Kaggle.host, !file.restarted {
+            // Or busy (429) / a server hiccup (5xx) anywhere: also once.
+            if let host = http.url?.host, host != "huggingface.co" && host != Kaggle.host || status == 429 || status >= 500,
+               !file.restarted {
                 files[path]?.restarted = true
                 files[path]?.resumeData = nil
                 files[path]?.writtenBytes = 0

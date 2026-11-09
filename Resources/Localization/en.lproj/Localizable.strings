@@ -628,7 +628,7 @@
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
 "Hugging Face can't be reached from this network, and %@ has no copy on Kaggle to download instead." = "Hugging Face can't be reached from this network, and %@ has no copy on Kaggle to download instead.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
-"Hugging Face stopped answering during the download. %@ has a copy on Kaggle: try again and it comes from there (or choose Kaggle first in Settings → Models)." = "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: try again and it comes from there (or choose Kaggle first in Settings → Models).";
+"Hugging Face stopped answering during the download. %@ has a copy on Kaggle: choose Kaggle first in Settings → Models to take it from there." = "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: choose Kaggle first in Settings → Models to take it from there.";
 "Hugging Face token" = "Hugging Face token";
 "Hugging Face, Kaggle if it can't be reached" = "Hugging Face, Kaggle if it can't be reached";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";

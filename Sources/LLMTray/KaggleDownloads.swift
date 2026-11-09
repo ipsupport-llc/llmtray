@@ -46,7 +46,7 @@ enum ModelSource {
             guard Kaggle.Mirror.handle(forHubRepo: repo) == nil else {
                 // Reachable when it started, not now: a retry comes from Kaggle.
                 return String(format: NSLocalizedString(
-                    "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: try again and it comes from there (or choose Kaggle first in Settings → Models).",
+                    "Hugging Face stopped answering during the download. %@ has a copy on Kaggle: choose Kaggle first in Settings → Models to take it from there.",
                     comment: "download: HF lost mid-download, Kaggle mirror exists; repo"), repo)
             }
             return String(format: NSLocalizedString(
@@ -151,12 +151,22 @@ enum KaggleFetch {
         let files = Kaggle.select(listing.files, patterns: patterns)
         guard !files.isEmpty else { throw KaggleDownloadError.noFiles(handle) }
         let root = URL(fileURLWithPath: dir)
-        // Files already there are kept only if an earlier attempt of this
-        // very version left them (its stamp): never a mix of two versions.
-        let stamp = root.appendingPathComponent(".llmtray-kaggle-version")
+        // `dir` is the caller's staging folder (another repo's files may
+        // share it). A file of this listing already there is kept only if
+        // an earlier attempt of this very version left it (its stamp, one
+        // per variation); otherwise every one of them goes before the stamp
+        // is written, so a retry never mixes two versions.
+        let stamp = root.appendingPathComponent(".llmtray-kaggle-\(handle.model)-\(handle.variation)")
         let identity = "\(handle.path)@\(listing.version)"
         let reuse = (try? String(contentsOf: stamp, encoding: .utf8)) == identity
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let fm = FileManager.default
+        if !reuse {
+            for file in files {
+                let url = root.appendingPathComponent(file.name)
+                if fm.fileExists(atPath: url.path) { try fm.removeItem(at: url) }
+            }
+        }
+        try fm.createDirectory(at: root, withIntermediateDirectories: true)
         try identity.write(to: stamp, atomically: true, encoding: .utf8)
         let total = files.reduce(Int64(0)) { $0 + ($1.size ?? 0) }
         var done: Int64 = 0
