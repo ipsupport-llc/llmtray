@@ -107,9 +107,10 @@ BSD-3-Clause and its card says the BSD-2-Clause terms apply.
 
 These are found only through the features that use them: the browser
 leaves the page out (`Mirror.isComponent`). ruaccent's script fetches its
-files by URL, so the app fetches the Kaggle copy into the folder first and
-the script only builds (Kaggle unpacks `.gz` files on upload, so the script
-gzips the dictionaries back first); the embedder's files are checked against their
+files by URL, so the app first asks it which files are still missing
+(`missing`), fetches those from the Kaggle copy into the folder, and the
+script only builds. Kaggle unpacks `.gz` files on upload, so the script
+gzips the dictionaries back, after checking that each one parses; the embedder's files are checked against their
 sha256 whichever source they came from.
 
 ### Keeping the mirror current

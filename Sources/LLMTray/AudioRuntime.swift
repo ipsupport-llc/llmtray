@@ -329,7 +329,17 @@ final class AudioRuntime: ObservableObject {
     func buildRussianStress(into dir: String) async throws {
         let repo = SpokenVoiceFile.russianStress.repo
         if let handle = await ModelSource.kaggleCopy(of: repo) {
-            try await KaggleFetch.download(handle, patterns: nil, into: dir)
+            // Only what's still missing: after a failed build the rest is
+            // there (KaggleFetch would otherwise start the folder over).
+            let list = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-ru-missing-\(UUID().uuidString).json")
+            defer { try? FileManager.default.removeItem(at: list) }
+            try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
+                RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "missing", dir, list.path,
+            ])
+            let names = try JSONDecoder().decode([String].self, from: Data(contentsOf: list))
+            if !names.isEmpty {
+                try await KaggleFetch.download(handle, patterns: names, into: dir)
+            }
         }
         do {
             try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
@@ -349,3 +359,4 @@ final class AudioRuntime: ObservableObject {
         }
     }
 }
+
