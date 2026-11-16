@@ -1,0 +1,38 @@
+LLMTray chạy các mô hình AI ngay trên phần cứng của bạn. Trò chuyện, vẽ tranh, sáng tác bài hát và cung cấp cho ứng dụng của bạn một API tương thích OpenAI, tất cả trên Apple silicon, không cần tài khoản, không cần đám mây.
+
+BỚT TRUNG TÂM DỮ LIỆU. THÊM PHẦN CỨNG CỦA CHÍNH BẠN.
+Phần cứng của bạn vốn đã là một cỗ máy AI mạnh mẽ. LLMTray đưa nó vào việc: mô hình chạy ngay tại đây, nên câu lệnh, tệp và kết quả của bạn không bao giờ rời khỏi máy, và không gì phải xếp hàng chờ máy chủ.
+
+TRÒ CHUYỆN VỚI MÔ HÌNH MỞ
+• Chọn mô hình phù hợp với phần cứng của bạn: trình thiết lập có hướng dẫn sẽ gợi ý kích cỡ phù hợp với bộ nhớ của bạn.
+• Tải thêm mô hình MLX từ Hugging Face trong Cài đặt.
+• Mô hình biết nhìn sẽ đọc hình ảnh của bạn; mô hình biết suy luận sẽ hiển thị quá trình suy nghĩ.
+• Thẻ, lịch sử, tìm kiếm, trò chuyện tạm và tự động thu gọn các cuộc trò chuyện dài.
+
+TỆP CỦA BẠN, KÈM NGUỒN
+• Dự án gom các cuộc trò chuyện cùng hướng dẫn và tài liệu riêng.
+• Thả tệp PDF, Word, Markdown và văn bản vào dự án: mô hình tìm trong đó và trích dẫn những trang đã dùng.
+• Ghim một ghi chú tham khảo ngắn để mọi câu trả lời trong dự án đều thấy.
+
+HÌNH ẢNH VÀ BÀI HÁT, TẠO NGAY TRÊN PHẦN CỨNG CỦA BẠN
+• Yêu cầu một bức tranh ngay trong cuộc trò chuyện: tranh được vẽ ngay trên phần cứng của bạn.
+• Chỉnh sửa hình ảnh bằng cách đính kèm và nói rõ cần thay đổi gì.
+• Tạo bài hát có giọng hát và lời, hoặc nhạc không lời, từ một mô tả ngắn.
+• Chế độ Người tạo cho phép bạn điều chỉnh câu lệnh, kích cỡ và mô hình trước khi tạo bất cứ thứ gì.
+
+CÔNG CỤ LUÔN TRONG TẦM KIỂM SOÁT CỦA BẠN
+• Công cụ tích hợp cho ngày giờ, máy tính và, chỉ khi bạn bật, tìm web, tin tức, Wikipedia, thời tiết và nhiều hơn nữa.
+• Để cuộc trò chuyện dọn dẹp thư mục bạn cho phép: nó đề xuất thư mục mới, di chuyển và đổi tên, và không gì thay đổi cho đến khi bạn phê duyệt. Hoàn tác sẽ đưa mọi thứ về như cũ.
+
+KẾT NỐI TÁC NHÂN LẬP TRÌNH VÀ ỨNG DỤNG CỦA BẠN
+• LLMTray cung cấp API tương thích OpenAI trên phần cứng của bạn (localhost). Trỏ bất kỳ ứng dụng hay tác nhân lập trình nào dùng được API này vào đó.
+• Mỗi mô hình có một bí danh ngắn; ứng dụng có thể chuyển mô hình theo tên.
+• Quyền truy cập mạng cho thiết bị khác luôn tắt trừ khi bạn bật.
+
+LÀM RA ĐỂ CHẠY NHANH
+• Hồ sơ riêng cho từng mô hình: lấy mẫu, lượng tử hóa KV cache và giải mã suy đoán.
+• Công cụ đo hiệu năng tích hợp đo phần cứng của bạn và có thể tinh chỉnh máy chủ cho phù hợp.
+
+KHÔNG CÓ GÌ BẠN KHÔNG YÊU CẦU
+• Mọi tính năng nặng đều tắt cho đến khi bạn bật, và không gì được tải về trước khi bạn chọn.
+• Không tài khoản, không quảng cáo, không theo dõi. Thống kê sử dụng ẩn danh là tùy chọn và có thể tắt trong Cài đặt.

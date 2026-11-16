@@ -1,0 +1,38 @@
+LLMTray, yapay zeka modellerini kendi donanımınızda çalıştırır. Sohbet edin, resim çizdirin, şarkı yapın ve uygulamalarınıza OpenAI uyumlu bir API sunun; hepsi Apple silicon üzerinde, hesap ve bulut olmadan.
+
+DAHA AZ VERİ MERKEZİ. DAHA ÇOK KENDİ DONANIMINIZ.
+Donanımınız zaten yetenekli bir yapay zeka makinesi. LLMTray onu işe koşar: modeller tam burada çalışır, bu yüzden istemleriniz, dosyalarınız ve sonuçlarınız onu asla terk etmez ve hiçbir şey sunucu kuyruğunda beklemez.
+
+AÇIK MODELLERLE SOHBET
+• Donanımınıza uygun bir model seçin: adım adım kurulum, belleğinize göre doğru boyutu önerir.
+• Ayarlar'dan Hugging Face'teki başka MLX modellerini indirin.
+• Görebilen modeller görsellerinizi okur; akıl yürüten modeller düşünme sürecini gösterir.
+• Sekmeler, geçmiş, arama, geçici sohbetler ve uzun sohbetlerin otomatik sıkıştırılması.
+
+DOSYALARINIZ, KAYNAKLARIYLA
+• Projeler, sohbetleri kendi talimatları ve belgeleriyle bir araya getirir.
+• PDF, Word, Markdown ve metin dosyalarını bir projeye bırakın: model bunlarda arama yapar ve kullandığı sayfaları kaynak gösterir.
+• Kısa bir başvuru notu sabitleyin; projedeki her yanıt onu görsün.
+
+DONANIMINIZDA ÜRETİLEN GÖRSELLER VE ŞARKILAR
+• Sohbette bir resim isteyin: doğrudan donanımınızda çizilir.
+• Bir görseli ekleyip neyin değişeceğini söyleyerek düzenleyin.
+• Kısa bir açıklamadan vokalli ve sözlü bir şarkı ya da enstrümantal bir parça yapın.
+• Oluşturan modu, bir şey üretilmeden önce istemi, boyutu ve modeli ayarlamanıza olanak tanır.
+
+KONTROLÜNÜZDE KALAN ARAÇLAR
+• Tarih ve saat ile hesap makinesi için yerleşik araçlar; yalnızca siz açarsanız web araması, haberler, Wikipedia, hava durumu ve daha fazlası.
+• Bir sohbetin, izin verdiğiniz bir klasörü toparlamasına olanak tanıyın: yeni klasörler, taşımalar ve yeniden adlandırmalar önerir; siz onaylayana kadar hiçbir şey değişmez. Geri Al her şeyi eski haline döndürür.
+
+KODLAMA AJANLARINIZI VE UYGULAMALARINIZI BAĞLAYIN
+• LLMTray, donanımınızda (localhost) OpenAI uyumlu bir API sunar. Bu API'yi konuşan herhangi bir uygulamayı veya kodlama ajanını ona yönlendirin.
+• Her modelin kısa bir takma adı olur; uygulamalar modeller arasında adla geçiş yapabilir.
+• Diğer cihazlar için ağ erişimi, siz açmadıkça kapalıdır.
+
+HIZ İÇİN YAPILDI
+• Örnekleme, KV cache nicemlemesi ve spekülatif kod çözme için modele özel profiller.
+• Yerleşik karşılaştırma testi donanımınızı ölçer ve sunucuyu ona göre ayarlayabilir.
+
+İSTEMEDİĞİNİZ HİÇBİR ŞEY YOK
+• Her ağır özellik siz açana kadar kapalıdır ve siz seçmeden hiçbir şey indirilmez.
+• Hesap yok, reklam yok, izleme yok. Anonim kullanım istatistikleri isteğe bağlıdır ve Ayarlar'dan kapatılabilir.

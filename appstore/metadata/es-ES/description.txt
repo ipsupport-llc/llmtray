@@ -1,0 +1,38 @@
+LLMTray ejecuta modelos de IA en tu propio hardware. Chatea, dibuja imágenes, crea canciones y da a tus apps una API compatible con OpenAI, todo en Apple silicon, sin cuenta y sin nube.
+
+MENOS CENTRO DE DATOS. MÁS TU PROPIO HARDWARE.
+Tu hardware ya es una máquina de IA muy capaz. LLMTray lo pone a trabajar: los modelos se ejecutan aquí mismo, así que tus prompts, archivos y resultados nunca salen de él, y nada espera en la cola de un servidor.
+
+CHATEA CON MODELOS ABIERTOS
+• Elige un modelo que encaje con tu hardware: una configuración guiada sugiere el tamaño adecuado para tu memoria.
+• Descarga más modelos MLX de Hugging Face en Ajustes.
+• Los modelos que ven leen tus imágenes; los que razonan muestran su proceso de pensamiento.
+• Pestañas, historial, búsqueda, chats temporales y compactación automática de los chats largos.
+
+TUS ARCHIVOS, CON FUENTES
+• Los proyectos agrupan chats con sus propias instrucciones y documentos.
+• Arrastra archivos PDF, Word, Markdown y de texto a un proyecto: el modelo busca en ellos y cita las páginas que ha usado.
+• Fija una referencia breve para que todas las respuestas del proyecto la tengan en cuenta.
+
+IMÁGENES Y CANCIONES, CREADAS EN TU HARDWARE
+• Pide una imagen en el chat: se dibuja directamente en tu hardware.
+• Edita una imagen adjuntándola y diciendo qué cambiar.
+• Crea una canción con voz y letra, o un instrumental, a partir de una descripción breve.
+• El Modo creador te permite ajustar el prompt, el tamaño y el modelo antes de crear nada.
+
+HERRAMIENTAS QUE SIGUEN BAJO TU CONTROL
+• Herramientas integradas de fecha y hora, una calculadora y, solo si las activas, búsqueda web, noticias, Wikipedia, el tiempo y más.
+• Deja que un chat ordene una carpeta que tú autorices: propone carpetas nuevas, movimientos y cambios de nombre, y nada cambia hasta que lo apruebas. Deshacer lo revierte.
+
+CONECTA TUS AGENTES DE CÓDIGO Y TUS APPS
+• LLMTray sirve una API compatible con OpenAI en tu hardware (localhost). Apunta hacia ella cualquier app o agente de código que hable la API de programación.
+• Cada modelo recibe un alias corto; las apps pueden cambiar de modelo por su nombre.
+• El acceso de red para otros dispositivos está desactivado salvo que lo actives.
+
+HECHO PARA IR RÁPIDO
+• Perfiles por modelo para el muestreo, la cuantización de la caché KV y la decodificación especulativa.
+• Una prueba de rendimiento integrada mide tu hardware y puede ajustar el servidor a él.
+
+NADA QUE NO HAYAS PEDIDO
+• Todas las funciones pesadas están desactivadas hasta que las activas, y no se descarga nada antes de que lo elijas.
+• Sin cuenta, sin anuncios, sin rastreo. Las estadísticas de uso anónimas son opcionales y se pueden desactivar en Ajustes.

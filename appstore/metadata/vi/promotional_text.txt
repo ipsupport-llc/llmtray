@@ -1,0 +1,1 @@
+Chạy mô hình AI ngay trên máy tính: trò chuyện, vẽ tranh, tạo bài hát, đọc trang web và cho xem màn hình. API tương thích OpenAI cho ứng dụng của bạn. Riêng tư, offline!

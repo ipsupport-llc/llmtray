@@ -1,0 +1,1 @@
+LLMTray: 本機 AI 與 LLM 聊天

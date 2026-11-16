@@ -1,0 +1,38 @@
+LLMTray esegue i modelli di IA sul tuo hardware. Chatta, disegna immagini, crea canzoni e offri alle tue app un’API compatibile con OpenAI, tutto su Apple silicon, senza account e senza cloud.
+
+MENO DATA CENTER. PIÙ HARDWARE TUO.
+Il tuo hardware è già una macchina per l’IA di tutto rispetto. LLMTray lo mette al lavoro: i modelli girano proprio qui, quindi prompt, file e risultati non lo lasciano mai, e niente resta in coda su un server.
+
+CHATTA CON MODELLI APERTI
+• Scegli un modello adatto al tuo hardware: una configurazione guidata suggerisce la dimensione giusta per la tua memoria.
+• Scarica altri modelli MLX da Hugging Face nelle Impostazioni.
+• I modelli che vedono leggono le tue immagini; quelli che ragionano mostrano il loro ragionamento.
+• Schede, cronologia, ricerca, chat temporanee e compattazione automatica delle chat lunghe.
+
+I TUOI FILE, CON LE FONTI
+• I progetti raggruppano le chat con istruzioni e documenti propri.
+• Trascina file PDF, Word, Markdown e di testo in un progetto: il modello li consulta e cita le pagine che ha usato.
+• Fissa un breve riferimento perché ogni risposta del progetto lo tenga presente.
+
+IMMAGINI E CANZONI, CREATE SUL TUO HARDWARE
+• Chiedi un’immagine nella chat: viene disegnata direttamente sul tuo hardware.
+• Modifica un’immagine allegandola e dicendo cosa cambiare.
+• Crea una canzone con voce e testo, o un brano strumentale, da una breve descrizione.
+• La Modalità creatore ti permette di regolare prompt, dimensioni e modello prima che venga creato qualcosa.
+
+STRUMENTI CHE RESTANO SOTTO IL TUO CONTROLLO
+• Strumenti integrati per data e ora, una calcolatrice e, solo se li attivi, ricerca web, notizie, Wikipedia, meteo e altro.
+• Lascia che una chat riordini una cartella che autorizzi: propone nuove cartelle, spostamenti e rinomine, e non cambia nulla finché non approvi. Annulla riporta tutto com’era.
+
+COLLEGA I TUOI AGENT DI CODING E LE TUE APP
+• LLMTray offre un’API compatibile con OpenAI sul tuo hardware (localhost). Puntaci qualsiasi app o agent di coding che parli l’API di coding.
+• Ogni modello riceve un alias breve; le app possono cambiare modello per nome.
+• L’accesso di rete per altri dispositivi è disattivato finché non lo attivi.
+
+FATTO PER ESSERE VELOCE
+• Profili per modello per campionamento, quantizzazione della cache KV e decodifica speculativa.
+• Un benchmark integrato misura il tuo hardware e può ottimizzare il server di conseguenza.
+
+NIENTE CHE TU NON ABBIA CHIESTO
+• Ogni funzione pesante è disattivata finché non la attivi, e niente viene scaricato prima che tu lo scelga.
+• Nessun account, nessuna pubblicità, nessun tracciamento. Le statistiche d’uso anonime sono facoltative e si possono disattivare nelle Impostazioni.
