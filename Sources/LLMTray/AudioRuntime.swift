@@ -331,14 +331,15 @@ final class AudioRuntime: ObservableObject {
         if let handle = await ModelSource.kaggleCopy(of: repo) {
             // Only what's still missing: after a failed build the rest is
             // there (KaggleFetch would otherwise start the folder over).
-            let list = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-ru-missing-\(UUID().uuidString).json")
-            defer { try? FileManager.default.removeItem(at: list) }
-            try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
-                RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "missing", dir, list.path,
-            ])
-            let names = try JSONDecoder().decode([String].self, from: Data(contentsOf: list))
+            var names = try await missingRussianStressFiles(in: dir)
             if !names.isEmpty {
                 try await KaggleFetch.download(handle, patterns: names, into: dir)
+                // A file the copy doesn't have would send the script to
+                // Hugging Face, which is why we're here: say so instead.
+                names = try await missingRussianStressFiles(in: dir)
+                if !names.isEmpty {
+                    throw KaggleDownloadError.failed(file: names[0], reason: "not in the Kaggle copy")
+                }
             }
         }
         do {
@@ -348,6 +349,17 @@ final class AudioRuntime: ObservableObject {
         } catch {
             throw await ModelSource.explain(error, repo: repo)
         }
+    }
+
+    /// What a ruaccent build still needs, by the Kaggle copy's names
+    /// (llmtray_ru_stress.py missing).
+    private func missingRussianStressFiles(in dir: String) async throws -> [String] {
+        let list = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-ru-missing-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: list) }
+        try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
+            RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "missing", dir, list.path,
+        ])
+        return try JSONDecoder().decode([String].self, from: Data(contentsOf: list))
     }
 
     private func run(_ executable: String, failure: (String) -> RuntimeError = RuntimeError.installFailed,
