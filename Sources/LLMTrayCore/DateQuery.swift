@@ -22,12 +22,6 @@ public enum DateQuery {
         public var iso: String { String(format: "%04d-%02d-%02d", year, month, day) }
     }
 
-    /// Calendar arithmetic on days only: no zone, no daylight saving.
-    private static let gregorian: Calendar = {
-        var c = Calendar(identifier: .gregorian)
-        c.timeZone = TimeZone(identifier: "UTC")!
-        return c
-    }()
 
     /// The day `text` names, nil when it can't be read. `today` is the
     /// user's day (the year when none is given, and the relative words);
@@ -37,10 +31,12 @@ public enum DateQuery {
         guard !s.isEmpty else { return nil }
         if let offset = relative[s] { return shift(today, by: offset) }
 
-        // ISO first: "2024-04-10", "2024-04-10T12:00:00Z".
-        if let m = s.range(of: #"^\d{4}-\d{1,2}-\d{1,2}"#, options: .regularExpression) {
-            let n = s[m].split(separator: "-").compactMap { Int($0) }
-            return valid(n[0], n[1], n[2])
+        // ISO first: "2024-04-10", "2024-04-10T12:00:00Z" -- the whole
+        // of it, so "2024-04-100" isn't read as the 10th.
+        if s.range(of: #"^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}([t ][0-9]{1,2}:[0-9]{2}(:[0-9]{2}(\.[0-9]+)?)?(z|[+-][0-9]{2}:?[0-9]{2})?)?$"#,
+                   options: .regularExpression) != nil {
+            let n = s.prefix(while: { $0 != "t" && $0 != " " }).split(separator: "-").compactMap { Int($0) }
+            return n.count == 3 ? valid(n[0], n[1], n[2]) : nil
         }
 
         // Words and numbers; ordinals ("10th") and a weekday dropped.
@@ -62,7 +58,10 @@ public enum DateQuery {
                 words.append(token)
             }
         }
-        let months = words.compactMap(month(named:))
+        // A weekday's short form may also be a month's ("mar." is Tuesday
+        // in French): with two months named, the weekday ones are dropped.
+        var months = words.compactMap(month(named:))
+        if months.count > 1 { months = words.filter { !isWeekday($0) }.compactMap(month(named:)) }
         let others = words.filter { month(named: $0) == nil && !isWeekday($0) && !fillers.contains($0) }
         guard others.isEmpty, months.count <= 1 else { return nil }
 
@@ -73,9 +72,11 @@ public enum DateQuery {
                 guard numbers[0].digits <= 2 else { return nil }
                 return valid(today.year, month, numbers[0].value)
             case 2:
+                // The year last ("Apr 10, 2024", "10-Apr-24") or first
+                // with four digits ("2024 Apr 10").
                 let (a, b) = (numbers[0], numbers[1])
-                if b.digits == 4 || (a.digits <= 2 && b.value > 31) { return valid(year(b), month, a.value) }
-                if a.digits == 4 || a.value > 31 { return valid(year(a), month, b.value) }
+                if a.digits <= 2, b.digits == 4 || b.digits == 2 { return valid(year(b, today), month, a.value) }
+                if a.digits == 4, b.digits <= 2 { return valid(a.value, month, b.value) }
                 return nil
             default:
                 return nil
@@ -87,10 +88,10 @@ public enum DateQuery {
         // 2024/04/10, 2024.04.10.
         if a.digits == 4 { return valid(a.value, b.value, c.value) }
         guard a.digits <= 2, b.digits <= 2, c.digits == 4 || c.digits == 2 else { return nil }
-        let y = year(c)
-        // Dots and dashes are day-first (10.04.2024); a slash fits both
+        let y = year(c, today)
+        // Dots are day-first (10.04.2024); a slash or a dash fits both
         // orders: a number over 12 settles it, else the user's order.
-        if separators.contains("/") {
+        if !separators.contains(".") {
             if a.value > 12 { return valid(y, b.value, a.value) }
             if b.value > 12 { return valid(y, a.value, b.value) }
             guard let day = monthFirst ? valid(y, a.value, b.value) : valid(y, b.value, a.value) else { return nil }
@@ -110,14 +111,12 @@ public enum DateQuery {
         return out
     }
 
-    public static func days(from a: Day, to b: Day) -> Int {
-        guard let da = date(a), let db = date(b) else { return 0 }
-        return gregorian.dateComponents([.day], from: da, to: db).day ?? 0
-    }
+    public static func days(from a: Day, to b: Day) -> Int { dayNumber(b) - dayNumber(a) }
 
     public static func weekday(_ day: Day) -> String {
-        guard let d = date(day) else { return "" }
-        return englishFormatter.weekdaySymbols[gregorian.component(.weekday, from: d) - 1]
+        // Day 0 (1970-01-01) was a Thursday; weekdaySymbols start on Sunday.
+        let index = ((dayNumber(day) + 4) % 7 + 7) % 7
+        return englishFormatter.weekdaySymbols[index]
     }
 
     /// The user's today in `zone`.
@@ -137,25 +136,52 @@ public enum DateQuery {
 
     // MARK: - Parts
 
-    private static func date(_ day: Day) -> Date? {
-        gregorian.date(from: DateComponents(year: day.year, month: day.month, day: day.day))
+    // The calendar in whole days, proleptic Gregorian (no switch from the
+    // Julian in 1582 as Foundation's has, no zones): days since 1970-01-01.
+
+    private static func dayNumber(_ d: Day) -> Int {
+        let y = d.month <= 2 ? d.year - 1 : d.year
+        let era = (y >= 0 ? y : y - 399) / 400
+        let yoe = y - era * 400
+        let doy = (153 * (d.month + (d.month > 2 ? -3 : 9)) + 2) / 5 + d.day - 1
+        let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy
+        return era * 146_097 + doe - 719_468
+    }
+
+    private static func fromDayNumber(_ n: Int) -> Day {
+        let z = n + 719_468
+        let era = (z >= 0 ? z : z - 146_096) / 146_097
+        let doe = z - era * 146_097
+        let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146_096) / 365
+        let doy = doe - (365 * yoe + yoe / 4 - yoe / 100)
+        let mp = (5 * doy + 2) / 153
+        let day = doy - (153 * mp + 2) / 5 + 1
+        let month = mp < 10 ? mp + 3 : mp - 9
+        return Day(year: yoe + era * 400 + (month <= 2 ? 1 : 0), month: month, day: day)
+    }
+
+    private static func daysIn(_ m: Int, _ y: Int) -> Int {
+        switch m {
+        case 2: return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0) ? 29 : 28
+        case 4, 6, 9, 11: return 30
+        default: return 31
+        }
     }
 
     private static func valid(_ y: Int, _ m: Int, _ d: Int) -> Day? {
-        guard (1...9999).contains(y), (1...12).contains(m), d >= 1,
-              let start = gregorian.date(from: DateComponents(year: y, month: m, day: 1)),
-              let range = gregorian.range(of: .day, in: .month, for: start), range.contains(d) else { return nil }
+        guard (1...9999).contains(y), (1...12).contains(m), (1...daysIn(m, y)).contains(d) else { return nil }
         return Day(year: y, month: m, day: d)
     }
 
-    /// Two digits are this century ("10.04.24").
-    private static func year(_ n: (value: Int, digits: Int)) -> Int { n.digits == 2 ? 2000 + n.value : n.value }
-
-    private static func shift(_ day: Day, by offset: Int) -> Day? {
-        guard let d = date(day), let moved = gregorian.date(byAdding: .day, value: offset, to: d) else { return nil }
-        let p = gregorian.dateComponents([.year, .month, .day], from: moved)
-        return Day(year: p.year!, month: p.month!, day: p.day!)
+    /// Two digits: the century that puts it at most 20 years ahead of
+    /// today ("10.04.24" is 2024, "Apr 10, 99" 1999).
+    private static func year(_ n: (value: Int, digits: Int), _ today: Day) -> Int {
+        guard n.digits == 2 else { return n.value }
+        let century = today.year / 100 * 100
+        return century + n.value > today.year + 20 ? century - 100 + n.value : century + n.value
     }
+
+    private static func shift(_ day: Day, by offset: Int) -> Day? { fromDayNumber(dayNumber(day) + offset) }
 
     private static func tokens(_ s: String) -> [String] {
         var out: [String] = []
@@ -180,7 +206,8 @@ public enum DateQuery {
 
     /// Words that may stand around a date ("on", "of", "year", "г.", the
     /// ending of "10-го").
-    private static let fillers: Set<String> = ["on", "of", "the", "year", "г", "года", "год", "року", "рік", "р", "го", "е"]
+    private static let fillers: Set<String> = ["on", "of", "the", "year", "г", "года", "год", "року", "рік", "р", "го", "е",
+                                               "de", "del", "le", "am", "den"]
 
     private static let englishFormatter: DateFormatter = {
         let f = DateFormatter()
