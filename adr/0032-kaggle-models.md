@@ -28,8 +28,9 @@ LLMTray downloads models from Kaggle Models as well as Hugging Face.
 
    This applies everywhere a model is fetched:
    - the browser and the first-run wizard's queue (chat models);
-   - image models (mflux), music sft, and Chatterbox's weights (through
-     `AudioRuntime.snapshotDownload`);
+   - image models (mflux), music, spoken answers and the voice
+     conversation's models (through `AudioRuntime.snapshotDownload`), the
+     Russian stress files and the project-files embedder (see below);
    - an MTP drafter. That one goes into the Hugging Face cache's own layout
      (`snapshots/kaggle-v<N>`, `refs/main`), where the runtime looks for it.
 3. **A mirrored model is the same model.** It is saved under its Hugging
@@ -86,26 +87,38 @@ the answer for 5 minutes, or 1 minute after a failure. That one request
 decides every download in that window. A failed Hugging Face download is
 checked the same way afterwards, to explain itself.
 
-### Not mirrored yet
+### The models our features use
 
-Some repos we use but don't publish have no Kaggle copy, so on a network
-that blocks Hugging Face these still can't be installed, and the error
-says so:
-- **Music turbo:** `mlx-community/ACE-Step1.5-MLX-4bit` and ACE-Step's
-  planner.
-- **Spoken answers:** `mlx-community/S3TokenizerV2` and `ruaccent`.
-- **The voice conversation's recognizers and helpers:** Parakeet, Whisper,
-  silero-vad, smart-turn.
-- **The project-files embedder:** bge-m3.
+The third-party models LLMTray's features download have copies too, on one
+Kaggle page, `romanromenskyi/llmtray-components` (`Kaggle.Mirror.components`):
+- music turbo: `mlx-community/ACE-Step1.5-MLX-4bit`, and ACE-Step's 1.7B
+  planner (only the `acestep-5Hz-lm-1.7B` folder of `ACE-Step/Ace-Step1.5`);
+- spoken answers: `mlx-community/S3TokenizerV2` and `ruaccent/accentuator`;
+- voice conversation: Parakeet, Whisper (its weights and, as a variation of
+  its own, `openai/whisper-large-v3-turbo`'s tokenizer files), silero-vad,
+  smart-turn;
+- project search: bge-m3.
 
-Mirroring them is a publishing step: check each license, upload,
-then add each to `Kaggle.Mirror.table`. The table maps any Hub repo, not
-only ours.
+Each copy is unchanged and holds only the files the app takes, at the
+revision it pins where it pins one (ruaccent, bge-m3). The variation's card
+names the upstream repo, the revision and files, the authors and the
+license. Kaggle's license list has no BSD-2-Clause, so smart-turn is tagged
+BSD-3-Clause and its card says the BSD-2-Clause terms apply.
+
+These are found only through the features that use them: the browser
+leaves the page out (`Mirror.isComponent`). ruaccent's script fetches its
+files by URL, so the app first asks it which files are still missing
+(`missing`), fetches those from the Kaggle copy into the folder, and the
+script only builds. Kaggle unpacks `.gz` files on upload, so the script
+gzips the dictionaries back, after checking that each one parses; the embedder's files are checked against their
+sha256 whichever source they came from.
 
 ### Keeping the mirror current
 
-The mirror is uploaded by quant-ternary's `tools/kaggle/` (releases.json).
-A new release is added there and to `Kaggle.Mirror.table` together. A
+The mirror is uploaded by quant-ternary's `tools/kaggle/` (releases.json;
+components.json for the components). A new release is added there and to
+`Kaggle.Mirror.table` together; a new component, or a new pinned revision of
+one, to components.json and `Kaggle.Mirror.components`. A
 Hugging Face repo updated after its copy was made (a card, a template) is
 behind on Kaggle until the copy is refreshed. The weights are what matter
 for a download, and those don't change after release.

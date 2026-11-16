@@ -50,7 +50,8 @@ model through the API (below); the chat takes images.
   `org/name`).
 - **When Hugging Face is blocked** (some company networks): LLMTray's own
   models also live on Kaggle with the same files. If Hugging Face can't be
-  reached, they come from Kaggle by themselves; Settings › Models › Download
+  reached, they come from Kaggle by themselves, and so do the models voice
+  conversation, spoken answers, music and project search use; Settings › Models › Download
   from › Kaggle first always takes them from there. Public Kaggle models need
   no account; a gated one needs its terms accepted on kaggle.com and a Kaggle
   token in Settings › Models.

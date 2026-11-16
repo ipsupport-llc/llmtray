@@ -6,6 +6,7 @@
 # blocks its import).
 #
 #   python llmtray_ru_stress.py build <dir>     # fetch the pinned files, build the dictionary
+#   python llmtray_ru_stress.py missing <dir> <out.json>  # files a build still needs (Kaggle names)
 #   python llmtray_ru_stress.py mark <dir> "Чем могу помочь?"
 #   python llmtray_ru_stress.py --selftest      # no files: the rules and the hash dictionary
 #
@@ -26,7 +27,10 @@ import sys
 import urllib.request
 
 REPO = "ruaccent/accentuator"
-REV = "b78ae5ea1e62beaf138bed1865cd8c3b0b5ca855"   # MIT, checked 2026-11-06
+# MIT, checked 2026-11-06. The Kaggle mirror (romanromenskyi/llmtray-components/
+# other/ruaccent-accentuator, Kaggle.Mirror.components) holds these files at
+# this revision: a new REV needs a new upload there.
+REV = "b78ae5ea1e62beaf138bed1865cd8c3b0b5ca855"
 DICTIONARIES = ["dictionary/accents.json.gz", "dictionary/omographs.json.gz",
                 "dictionary/yo_words.json.gz", "dictionary/yo_homographs.json.gz"]
 MODELS = {
@@ -60,7 +64,46 @@ def is_complete(folder):
 
 # MARK: build
 
+def regzip(folder):
+    """Kaggle unpacks .gz files on upload, so its copy (fetched here by the
+    app) has dictionary/*.json: put each back as the .json.gz it was. A
+    plain file is the newer download, so it wins over a .gz already there;
+    one that isn't JSON (a broken download) is removed, to be fetched again."""
+    for name in DICTIONARIES:
+        dst = os.path.join(folder, name)
+        plain = dst[:-len(".gz")]
+        if not os.path.exists(plain):
+            continue
+        try:
+            with open(plain, "rb") as src:
+                json.load(src)
+        except ValueError:
+            os.remove(plain)
+            raise SystemExit("not JSON: " + name[:-len(".gz")])
+        with open(plain, "rb") as src, gzip.open(dst + ".part", "wb") as out:
+            shutil.copyfileobj(src, out, 1 << 22)
+        os.replace(dst + ".part", dst)
+        os.remove(plain)
+
+
+def missing(folder):
+    """The files a build still needs, by their names in the Kaggle copy
+    (dictionaries as .json): what the app fetches from there, so a retry
+    after a failed build doesn't fetch the rest again."""
+    out = []
+    for name in files():
+        if name == "dictionary/accents.json.gz" and os.path.exists(os.path.join(folder, "accents.npz")):
+            continue
+        path = os.path.join(folder, name)
+        plain = path[:-len(".gz")] if name.endswith(".gz") else None
+        if os.path.exists(path) or (plain and os.path.exists(plain)):
+            continue
+        out.append(name[:-len(".gz")] if plain else name)
+    return out
+
+
 def fetch(folder, progress=None):
+    regzip(folder)
     names = [f for f in files() if not (f == "dictionary/accents.json.gz" and os.path.exists(os.path.join(folder, "accents.npz")))]
     for i, name in enumerate(names):
         dst = os.path.join(folder, name)
@@ -326,10 +369,13 @@ def main(argv):
         fetch(folder, progress=lambda i, n: print("@@LLMTRAY STEP %d %d" % (i, n), flush=True))
         build(folder)
         print("@@LLMTRAY DONE", flush=True)
+    elif argv[1:2] == ["missing"] and len(argv) == 4:
+        with open(argv[3], "w") as f:
+            json.dump(missing(argv[2]), f)
     elif argv[1:2] == ["mark"] and len(argv) == 4:
         print(RuStress(argv[2]).mark(argv[3]))
     else:
-        print(__doc__ or "usage: build <dir> | mark <dir> <text> | --selftest", file=sys.stderr)
+        print(__doc__ or "usage: build <dir> | missing <dir> <out.json> | mark <dir> <text> | --selftest", file=sys.stderr)
         return 2
     return 0
 

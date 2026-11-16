@@ -153,7 +153,8 @@ public enum Kaggle {
             guard ref.count == 2 else { return [] }
             return (model.instances ?? []).compactMap { instance in
                 let handle = Handle(owner: ref[0], model: ref[1], framework: instance.framework, variation: instance.slug)
-                guard isSlug(handle.owner), isSlug(handle.model), isSlug(handle.framework), isSlug(handle.variation) else { return nil }
+                guard isSlug(handle.owner), isSlug(handle.model), isSlug(handle.framework), isSlug(handle.variation),
+                      !Mirror.isComponent(handle) else { return nil }
                 let mirrored = Mirror.hubRepo(for: handle) != nil
                 let saysMLX = [instance.slug, model.ref, model.title ?? ""].contains { $0.localizedCaseInsensitiveContains("mlx") }
                 guard mirrored || (["other", "transformers"].contains(instance.framework) && saysMLX) else { return nil }
@@ -214,16 +215,45 @@ public enum Kaggle {
             ("roman220220/Nemotron-3.5-Bolt-E4B-gptq-mlx-jang", "nemotron-3-5-bolt-e4b-ipsupport", "mlx-gptq-jang"),
         ]
 
+        /// The third-party models LLMTray's own features download (voice
+        /// conversation, spoken answers, music, project search), copied
+        /// unchanged, with their licenses, to one Kaggle page. Each copy holds
+        /// only the files the app takes, at the revision it pins where it pins
+        /// one. Not chat models: the model browser leaves them out.
+        static let componentsModel = "llmtray-components"
+        static let components: [(hub: String, variation: String)] = [
+            ("mlx-community/silero-vad-v6", "silero-vad-v6-mlx"),
+            ("mlx-community/smart-turn-v3", "smart-turn-v3-mlx"),
+            ("mlx-community/parakeet-tdt-0.6b-v3", "parakeet-tdt-0-6b-v3-mlx"),
+            ("mlx-community/whisper-large-v3-turbo", "whisper-large-v3-turbo-mlx"),
+            ("openai/whisper-large-v3-turbo", "whisper-large-v3-turbo-tokenizer"),
+            ("mlx-community/S3TokenizerV2", "s3tokenizer-v2-mlx"),
+            ("ruaccent/accentuator", "ruaccent-accentuator"),
+            ("mlx-community/ACE-Step1.5-MLX-4bit", "ace-step-1-5-turbo-mlx-4bit"),
+            ("ACE-Step/Ace-Step1.5", "ace-step-1-5-lm-1-7b"),
+            ("mlx-community/bge-m3-mlx-fp16", "bge-m3-mlx-fp16"),
+        ]
+
+        /// Every copy: our releases, then the components.
+        static var all: [(hub: String, model: String, variation: String)] {
+            table + components.map { ($0.hub, componentsModel, $0.variation) }
+        }
+
+        /// Whether a handle is one of the components (not for the browser).
+        public static func isComponent(_ handle: Handle) -> Bool {
+            handle.owner == owner && handle.model == componentsModel
+        }
+
         /// The Kaggle copy of a Hugging Face repo (case as the Hub ignores it).
         public static func handle(forHubRepo repo: String) -> Handle? {
-            table.first { $0.hub.caseInsensitiveCompare(repo) == .orderedSame }
+            all.first { $0.hub.caseInsensitiveCompare(repo) == .orderedSame }
                 .map { Handle(owner: owner, model: $0.model, framework: "other", variation: $0.variation) }
         }
 
         /// The Hugging Face repo a Kaggle variation copies.
         public static func hubRepo(for handle: Handle) -> String? {
             guard handle.owner == owner, handle.framework == "other" else { return nil }
-            return table.first { $0.model == handle.model && $0.variation == handle.variation }?.hub
+            return all.first { $0.model == handle.model && $0.variation == handle.variation }?.hub
         }
     }
 }
