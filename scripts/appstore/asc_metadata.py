@@ -21,11 +21,11 @@ Folder names are App Store Connect locale codes (en-US, de-DE, ru, zh-Hans).
 arrive with the next version.
 
 Name and subtitle belong to the app and are shared by its platforms; they
-are pushed only with --app-info. The other texts go to the version of
+are pushed only with --app-info, from the one folder that has them. The other texts go to the version of
 --platform that is still editable (Prepare for Submission, rejected, ...).
 With no editable version only promotional text can change (--promo).
 
-A locale new to a version that updates a released one needs "What's New":
+Every locale of a version that updates a released one needs "What's New":
 release_notes.txt of that locale, else of en-US, else the text the version
 already has for en-US.
 
@@ -100,13 +100,19 @@ def words(text):
     return {w for w in re.split(r"[\s,;:.!?&/()«»\"'、，。・-]+", text.lower()) if w}
 
 
+def has_app_info(locales):
+    """The folder carries the name and subtitle (one folder per app does)."""
+    return any(s in t for t in locales.values() for s in INFO_FIELDS)
+
+
 def check(locales):
     """Problems as (locale, message); errors start with 'error'."""
     problems = []
     if "en-US" not in locales:
         problems.append(("-", "error: no en-US folder"))
+    required = REQUIRED if has_app_info(locales) else [s for s in REQUIRED if s not in INFO_FIELDS]
     for locale, texts in locales.items():
-        for stem in REQUIRED:
+        for stem in required:
             if not texts.get(stem):
                 problems.append((locale, f"error: {stem}.txt is missing or empty"))
         for stem, (_, limit) in {**INFO_FIELDS, **VERSION_FIELDS}.items():
@@ -289,7 +295,9 @@ def push(args, locales):
     urls = read_urls(args.dir)
     failed = 0
 
-    if args.app_info:
+    if args.app_info and not has_app_info(locales):
+        print("Name and subtitle: not in this folder, left as they are.")
+    elif args.app_info:
         if not info:
             print("Name and subtitle: no editable app info (they change with a new version).")
         else:
@@ -320,8 +328,10 @@ def push(args, locales):
                 values = {k: v for k, v in values.items() if k == "promotionalText"}
             else:
                 values.update(urls)
-                if "whatsNew" not in values and loc not in existing and notes and not first:
-                    values["whatsNew"] = notes
+                # Every locale of an update needs it: English where a
+                # locale has no notes of its own.
+                if notes and not first:
+                    values.setdefault("whatsNew", notes)
                 if first:
                     values.pop("whatsNew", None)
             wanted[loc] = values

@@ -1,0 +1,54 @@
+name: App Store submit
+
+# Sends a delivered version to App Review (ADR 0033), by hand: Actions >
+# App Store submit > Run workflow. The version must be in "Prepare for
+# Submission" with its build attached, which is where "App Store pkg" with
+# "deliver" leaves it. The job waits for the owner's approval in the
+# "app-store-submit" environment; releasing an approved version stays a
+# person's step in App Store Connect.
+#
+# The environment's secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (as in
+# appstore.yml).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to submit (e.g. 0.9.3)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appstore-submit
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    environment: app-store-submit
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            scripts/appstore
+            appstore/metadata
+      - name: Submit
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "error: $VERSION isn't X.Y.Z" >&2; exit 1; }
+          [[ -n "$ASC_KEY_ID" && -n "$ASC_ISSUER_ID" && -n "$ASC_KEY_P8" ]] || { echo "error: the app-store-submit environment has no ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_P8" >&2; exit 1; }
+          umask 077
+          mkdir -p "$RUNNER_TEMP/asc"
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$ASC_KEY_PATH"
+          python3 scripts/appstore/asc_release.py submit --apply --version "$VERSION"
+      - name: Remove the key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"

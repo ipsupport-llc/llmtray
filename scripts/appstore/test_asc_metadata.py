@@ -43,6 +43,9 @@ expect("keyword from the name", "already in the name" in messages(keywords="chat
 expect("device name", "names an Apple device" in messages(subtitle="For your Mac"))
 expect("missing file", "description.txt is missing" in messages(description=""))
 
+version_only = {k: v for k, v in good.items() if k not in ("name", "subtitle")}
+expect("a folder without name and subtitle passes", not am.check({"en-US": version_only}))
+
 # Only what differs is sent; a new locale is created.
 existing = {"en-US": {"id": "1", "attributes": {"keywords": "old", "description": "same"}}}
 wanted = {"en-US": {"keywords": "new", "description": "same"}, "ru": {"keywords": "ключ"}}
