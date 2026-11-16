@@ -78,10 +78,20 @@ def wait_processed(api, app, platform, version, build, minutes, sleep=time.sleep
         sleep(30)
 
 
+def same_version(a, b):
+    """1.0 and 1.0.0 are one version to the App Store."""
+    def parts(v):
+        numbers = [int(x) if x.isdigit() else x for x in v.split(".")]
+        while numbers and numbers[-1] == 0:
+            numbers.pop()
+        return numbers
+    return parts(a) == parts(b)
+
+
 def find_version(api, app, platform, version):
     """(version or None, problem or None): a version that can still be edited."""
-    found = api.all(f"/v1/apps/{app}/appStoreVersions?filter[platform]={platform}"
-                    f"&filter[versionString]={version}&limit=10")
+    listed = api.all(f"/v1/apps/{app}/appStoreVersions?filter[platform]={platform}&limit=200")
+    found = [v for v in listed if same_version(v["attributes"].get("versionString", ""), version)]
     if not found:
         return None, None
     state = am.state_of(found[0])

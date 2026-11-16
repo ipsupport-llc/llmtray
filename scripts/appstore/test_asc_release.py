@@ -58,6 +58,11 @@ expect("editable version", found["id"] == "v1" and problem is None)
 found, problem = ar.find_version(Fake({"appStoreVersions": [version("READY_FOR_SALE")]}), "app", "MAC_OS", "1.2.3")
 expect("released version is refused", "can't be changed" in problem)
 
+found, _ = ar.find_version(Fake({"appStoreVersions": [version("PREPARE_FOR_SUBMISSION")]}), "app", "MAC_OS", "1.2.3.0")
+expect("1.2.3.0 is 1.2.3", found is not None)
+found, _ = ar.find_version(Fake({"appStoreVersions": [version("PREPARE_FOR_SUBMISSION")]}), "app", "MAC_OS", "1.2.30")
+expect("1.2.30 is not 1.2.3", found is None)
+
 # Waiting: listed late, processing, then valid.
 polls = Fake({"/v1/builds": [[], [build("PROCESSING")], [build("VALID")]]})
 done = ar.wait_processed(polls, "app", "MAC_OS", "1.2.3", "7", 5, sleep=lambda s: None)
