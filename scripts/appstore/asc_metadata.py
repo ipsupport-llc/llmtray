@@ -17,6 +17,9 @@ Folder names are App Store Connect locale codes (en-US, de-DE, ru, zh-Hans).
     asc_metadata.py push --apply           # write it
     asc_metadata.py push --apply --promo   # promotional text only, live version
 
+--promo changes only the locales the live version already has; new locales
+arrive with the next version.
+
 Name and subtitle belong to the app and are shared by its platforms; they
 are pushed only with --app-info. The other texts go to the version of
 --platform that is still editable (Prepare for Submission, rejected, ...).
@@ -223,6 +226,7 @@ def targets(api, app, platform):
     """(editable app info, editable version, live version); each may be None."""
     infos = api.all(f"/v1/apps/{app}/appInfos")
     versions = api.all(f"/v1/apps/{app}/appStoreVersions?filter[platform]={platform}&limit=50")
+    versions.sort(key=lambda v: v["attributes"].get("createdDate") or "", reverse=True)
     return pick(infos, EDITABLE), pick(versions, EDITABLE), pick(versions, LIVE)
 
 
@@ -310,6 +314,9 @@ def push(args, locales):
         for loc, t in locales.items():
             values = {VERSION_FIELDS[s][0]: t[s] for s in VERSION_FIELDS if s in t}
             if args.promo:
+                # A released version takes no new locales.
+                if loc not in existing:
+                    continue
                 values = {k: v for k, v in values.items() if k == "promotionalText"}
             else:
                 values.update(urls)
