@@ -125,6 +125,14 @@ final class EmbedderManager: ObservableObject {
                 // nothing starts one until the new folder is in place.
                 holding = true
                 await runners.hold(entry.id)
+                // Our Kaggle mirror instead, when Settings or the network
+                // says so (adr/0032): the pinned revision's files, checked
+                // against their sha256 below like any download.
+                if let handle = await ModelSource.kaggleCopy(of: entry.source.repo) {
+                    try await KaggleFetch.download(handle, patterns: files, into: temp.path)
+                    statusText = NSLocalizedString("Checking the download…", comment: "")
+                    return
+                }
                 // Values go in as arguments, not into the code.
                 do {
                     try await ProcessRunner.run(MLXRuntimeInstaller.venvPython, [

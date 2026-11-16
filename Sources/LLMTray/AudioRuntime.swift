@@ -323,11 +323,21 @@ final class AudioRuntime: ObservableObject {
 
     /// Fetches ruaccent's pinned files into `dir` and builds the stress
     /// dictionary there (runtime/llmtray_ru_stress.py build). Resumable:
-    /// files already there are kept.
+    /// files already there are kept. From our Kaggle mirror when Settings or
+    /// the network says so (adr/0032): the same files at the same revision,
+    /// fetched first, so the script finds them and only builds.
     func buildRussianStress(into dir: String) async throws {
-        try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
-            RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "build", dir,
-        ])
+        let repo = SpokenVoiceFile.russianStress.repo
+        if let handle = await ModelSource.kaggleCopy(of: repo) {
+            try await KaggleFetch.download(handle, patterns: nil, into: dir)
+        }
+        do {
+            try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
+                RuntimePaths.runtimeDir + "/llmtray_ru_stress.py", "build", dir,
+            ])
+        } catch {
+            throw await ModelSource.explain(error, repo: repo)
+        }
     }
 
     private func run(_ executable: String, failure: (String) -> RuntimeError = RuntimeError.installFailed,

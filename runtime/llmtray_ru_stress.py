@@ -26,7 +26,10 @@ import sys
 import urllib.request
 
 REPO = "ruaccent/accentuator"
-REV = "b78ae5ea1e62beaf138bed1865cd8c3b0b5ca855"   # MIT, checked 2026-11-06
+# MIT, checked 2026-11-06. The Kaggle mirror (romanromenskyi/llmtray-components/
+# other/ruaccent-accentuator, Kaggle.Mirror.components) holds these files at
+# this revision: a new REV needs a new upload there.
+REV = "b78ae5ea1e62beaf138bed1865cd8c3b0b5ca855"
 DICTIONARIES = ["dictionary/accents.json.gz", "dictionary/omographs.json.gz",
                 "dictionary/yo_words.json.gz", "dictionary/yo_homographs.json.gz"]
 MODELS = {
@@ -60,7 +63,22 @@ def is_complete(folder):
 
 # MARK: build
 
+def regzip(folder):
+    """Kaggle unpacks .gz files on upload, so its copy (fetched here by the
+    app) has dictionary/*.json: put each back as the .json.gz it was."""
+    for name in DICTIONARIES:
+        dst = os.path.join(folder, name)
+        plain = dst[:-len(".gz")]
+        if os.path.exists(plain) and not os.path.exists(dst):
+            with open(plain, "rb") as src, gzip.open(dst + ".part", "wb") as out:
+                shutil.copyfileobj(src, out, 1 << 22)
+            os.replace(dst + ".part", dst)
+        if os.path.exists(plain) and os.path.exists(dst):
+            os.remove(plain)
+
+
 def fetch(folder, progress=None):
+    regzip(folder)
     names = [f for f in files() if not (f == "dictionary/accents.json.gz" and os.path.exists(os.path.join(folder, "accents.npz")))]
     for i, name in enumerate(names):
         dst = os.path.join(folder, name)

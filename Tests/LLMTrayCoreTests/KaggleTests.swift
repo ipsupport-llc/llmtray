@@ -27,12 +27,12 @@ final class KaggleTests: XCTestCase {
                        "romanromenskyi/flux-2-klein-4b-ipsupport/other/mlx-gptq-mixed")
         XCTAssertNil(Kaggle.Mirror.handle(forHubRepo: "mlx-community/Qwen3-4B-4bit"))
         // Every row round-trips, and no repo or variation appears twice.
-        for row in Kaggle.Mirror.table {
+        for row in Kaggle.Mirror.all {
             let handle = Kaggle.Mirror.handle(forHubRepo: row.hub)
             XCTAssertEqual(handle.flatMap(Kaggle.Mirror.hubRepo(for:)), row.hub)
         }
-        XCTAssertEqual(Set(Kaggle.Mirror.table.map { $0.hub.lowercased() }).count, Kaggle.Mirror.table.count)
-        XCTAssertEqual(Set(Kaggle.Mirror.table.map { $0.model + "/" + $0.variation }).count, Kaggle.Mirror.table.count)
+        XCTAssertEqual(Set(Kaggle.Mirror.all.map { $0.hub.lowercased() }).count, Kaggle.Mirror.all.count)
+        XCTAssertEqual(Set(Kaggle.Mirror.all.map { $0.model + "/" + $0.variation }).count, Kaggle.Mirror.all.count)
     }
 
     func testURLs() {
@@ -61,6 +61,8 @@ final class KaggleTests: XCTestCase {
           {"ref":"romanromenskyi/gemma-4-e2b-it-ipsupport","title":"Gemma 4 E2B","instances":[
             {"slug":"mlx-qat","framework":"other","versionNumber":1},
             {"slug":"qat-phone","framework":"gguf","versionNumber":1}]},
+          {"ref":"romanromenskyi/llmtray-components","title":"LLMTray components (mirror)","instances":[
+            {"slug":"whisper-large-v3-turbo-mlx","framework":"other","versionNumber":1}]},
           {"ref":"bad/../x","instances":[{"slug":"mlx","framework":"other"}]}
         ],"nextPageToken":""}
         """
@@ -68,6 +70,9 @@ final class KaggleTests: XCTestCase {
         let results = Kaggle.mlxResults(page)
         XCTAssertEqual(results.map(\.handle.path), ["someone/qwen-mlx/other/4bit", "romanromenskyi/gemma-4-e2b-it-ipsupport/other/mlx-qat"])
         XCTAssertEqual(results.first?.version, 2)
+        // Components are found by the features that use them, not browsed.
+        XCTAssertEqual(Kaggle.Mirror.handle(forHubRepo: "openai/whisper-large-v3-turbo")?.path,
+                       "romanromenskyi/llmtray-components/other/whisper-large-v3-turbo-tokenizer")
         XCTAssertEqual(results.first?.bytes, 2000)
         XCTAssertEqual(results.first?.license, "Apache 2.0")
         XCTAssertEqual(results.last?.handle.folderID, "roman220220/gemma-4-E2B-it-qat-mlx")
