@@ -25,7 +25,7 @@ are pushed only with --app-info. The other texts go to the version of
 --platform that is still editable (Prepare for Submission, rejected, ...).
 With no editable version only promotional text can change (--promo).
 
-A locale new to a version that updates a released one needs "What's New":
+Every locale of a version that updates a released one needs "What's New":
 release_notes.txt of that locale, else of en-US, else the text the version
 already has for en-US.
 
@@ -320,8 +320,10 @@ def push(args, locales):
                 values = {k: v for k, v in values.items() if k == "promotionalText"}
             else:
                 values.update(urls)
-                if "whatsNew" not in values and loc not in existing and notes and not first:
-                    values["whatsNew"] = notes
+                # Every locale of an update needs it: English where a
+                # locale has no notes of its own.
+                if notes and not first:
+                    values.setdefault("whatsNew", notes)
                 if first:
                     values.pop("whatsNew", None)
             wanted[loc] = values

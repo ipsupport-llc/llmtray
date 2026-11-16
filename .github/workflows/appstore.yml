@@ -3,14 +3,20 @@ name: App Store pkg
 # Builds the Mac App Store installer package for a release tag, by hand
 # (Actions > App Store pkg > Run workflow): not on every push or tag -- it
 # takes a while and is needed only when a version goes to the App Store.
-# The .pkg is a workflow artifact; nothing is uploaded to App Store
-# Connect from here (that stays a person's step, in Transporter).
+# The .pkg is a workflow artifact. With "deliver" it also goes to App Store
+# Connect (ADR 0033): the deliver job waits for the owner's approval in the
+# "app-store" environment, then uploads the build, finds or creates the
+# version, pushes the listing texts for every language and attaches the
+# build. The version stays in "Prepare for Submission"; sending it to
+# review is the "App Store submit" workflow.
 #
 # Secrets: APPSTORE_P12_BASE64 + APPSTORE_P12_PASSWORD -- one .p12 with both
 # identities, "Apple Distribution" and "3rd Party Mac Developer Installer"
 # (Keychain Access: select both, Export 2 items); APPSTORE_PROFILE_BASE64 --
 # the "LLMTray App Store" provisioning profile for us.ipsupport.llmtray.appstore.
 # They live only in a throwaway keychain and temp files, removed at the end.
+# The "app-store" environment's own: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8
+# -- an App Store Connect team key, role App Manager (the .p8 file's text).
 on:
   workflow_dispatch:
     inputs:
@@ -21,6 +27,10 @@ on:
         description: "Build number, for another upload of the same version: higher than the last one, 1-3 numbers (e.g. 0.8.601); empty: the version"
         required: false
         default: ""
+      deliver:
+        description: "Deliver to App Store Connect after the build (needs approval; needs appstore/metadata/en-US/release_notes.txt on main)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -32,8 +42,13 @@ concurrency:
 jobs:
   pkg:
     runs-on: macos-15
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      build: ${{ steps.check.outputs.build }}
+      pkg: ${{ steps.name.outputs.pkg }}
     steps:
       - name: Check the tag
+        id: check
         env:
           TAG: ${{ inputs.tag }}
           BUILD_NUMBER: ${{ inputs.build_number }}
@@ -47,6 +62,8 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=${BUILD_NUMBER:-$VERSION}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ inputs.tag }}
@@ -109,6 +126,7 @@ jobs:
       - name: Build the App Store pkg
         run: ./scripts/build_appstore.sh
       - name: Check the pkg
+        id: name
         run: |
           APP=.build/appstore/LLMTray.app
           PKG=.build/appstore/LLMTray.pkg
@@ -146,6 +164,7 @@ jobs:
           mv "$PKG" ".build/appstore/LLMTray-$SHORT-AppStore.pkg"
           echo "PKG_NAME=LLMTray-$SHORT-AppStore${BUILD_NUMBER:+-$BUILD_NUMBER}" >> "$GITHUB_ENV"
           if [[ -n "$BUILD_NUMBER" ]]; then mv ".build/appstore/LLMTray-$SHORT-AppStore.pkg" ".build/appstore/LLMTray-$SHORT-AppStore-$BUILD_NUMBER.pkg"; fi
+          echo "pkg=LLMTray-$SHORT-AppStore${BUILD_NUMBER:+-$BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PKG_NAME }}
@@ -157,3 +176,41 @@ jobs:
         run: |
           [[ -n "${SIGNING_KEYCHAIN:-}" ]] && security delete-keychain "$SIGNING_KEYCHAIN" || true
           rm -f "$RUNNER_TEMP/appstore.p12" "$RUNNER_TEMP/appstore.provisionprofile"
+
+  # To App Store Connect, after the owner approves the run. The scripts and
+  # the listing texts come from main: the listing is tuned between releases.
+  deliver:
+    needs: pkg
+    if: ${{ inputs.deliver }}
+    runs-on: macos-15
+    environment: app-store
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            scripts/appstore
+            appstore/metadata
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.pkg.outputs.pkg }}
+          path: pkg
+      - name: Deliver
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          VERSION: ${{ needs.pkg.outputs.version }}
+          BUILD: ${{ needs.pkg.outputs.build }}
+          PKG: pkg/${{ needs.pkg.outputs.pkg }}.pkg
+        run: |
+          [[ -n "$ASC_KEY_ID" && -n "$ASC_ISSUER_ID" && -n "$ASC_KEY_P8" ]] || { echo "error: the app-store environment has no ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_P8" >&2; exit 1; }
+          umask 077
+          mkdir -p "$RUNNER_TEMP/asc"
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$ASC_KEY_PATH"
+          python3 scripts/appstore/asc_release.py deliver --apply --file "$PKG" --version "$VERSION" --build "$BUILD"
+      - name: Remove the key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
