@@ -54,13 +54,21 @@ public enum Thinking {
     }
 
     /// The request's fields for an effort. Off is the template's switch and,
-    /// for a template that thinks regardless, a budget of nothing.
-    public static func requestFields(style: ThinkingStyle, effort: ThinkingEffort) -> [String: Any] {
+    /// for a template that thinks regardless, a budget of nothing -- but not
+    /// when the request goes on after a tool's result: a template may leave
+    /// the thought channel open there (Gemma 4 does), the model opens a
+    /// thought anyway, and a budget of 0 closes it at once, so the model
+    /// goes on reasoning in the answer. Unclosed, its thought stays in the
+    /// reasoning, out of the answer.
+    public static func requestFields(style: ThinkingStyle, effort: ThinkingEffort,
+                                     afterToolResult: Bool = false) -> [String: Any] {
         switch (style, effort) {
         case (.none, _), (.budget, .high):
             return [:]
         case (.budget, .off):
-            return ["chat_template_kwargs": ["enable_thinking": false], "thinking_budget": 0]
+            var fields: [String: Any] = ["chat_template_kwargs": ["enable_thinking": false]]
+            if !afterToolResult { fields["thinking_budget"] = 0 }
+            return fields
         case (.budget, let e):
             return budgets[e].map { ["thinking_budget": $0] } ?? [:]
         case (.levels, let e):

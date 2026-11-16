@@ -18,7 +18,11 @@ before. A model that doesn't think shows no picker.
   - `enable_thinking`, `<think>`, `<|channel>` or `<|think` (Qwen 3.5,
     Gemma 4, Nemotron, LFM2.5 Thinking): a **budget** -- Off is
     `enable_thinking: false` and `thinking_budget: 0` (a template that
-    thinks regardless is closed at once); Low and Medium are
+    thinks regardless is closed at once), but without the budget when
+    the request goes on after a tool's result: Gemma 4's template leaves
+    the thought channel open there, the model opens a thought anyway,
+    and a budget of 0 closed it at once, so the model went on reasoning
+    in the answer; unclosed, the thought stays in the reasoning. Low and Medium are
     `thinking_budget` 512 and 2048 tokens; High sends nothing.
   - Anything else: none.
 - **The budget is the server's** (fork ipsupport-llc/mlx-lm#39): the
