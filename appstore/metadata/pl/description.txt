@@ -1,0 +1,38 @@
+LLMTray uruchamia modele AI na Twoim sprzęcie. Czatuj, rysuj obrazy, twórz piosenki i udostępnij swoim aplikacjom API zgodne z OpenAI – wszystko na Apple silicon, bez konta i bez chmury.
+
+MNIEJ CENTRUM DANYCH. WIĘCEJ WŁASNEGO SPRZĘTU.
+Twój sprzęt to już teraz sprawna maszyna do AI. LLMTray zaprzęga go do pracy: modele działają właśnie tutaj, więc Twoje prompty, pliki i wyniki nigdy go nie opuszczają, a nic nie czeka w kolejce na serwerze.
+
+CZATUJ Z OTWARTYMI MODELAMI
+• Wybierz model dopasowany do Twojego sprzętu: konfiguracja krok po kroku podpowie rozmiar odpowiedni dla Twojej pamięci.
+• Pobieraj kolejne modele MLX z Hugging Face w Ustawieniach.
+• Modele, które widzą, czytają Twoje obrazy; modele, które rozumują, pokazują tok myślenia.
+• Karty, historia, wyszukiwanie, czaty tymczasowe i automatyczna kompakcja długich czatów.
+
+TWOJE PLIKI, ZE ŹRÓDŁAMI
+• Projekty grupują czaty z własnymi instrukcjami i dokumentami.
+• Przeciągnij do projektu pliki PDF, Word, Markdown i tekstowe: model je przeszukuje i podaje strony, z których skorzystał.
+• Przypnij krótką notatkę referencyjną, aby widziała ją każda odpowiedź w projekcie.
+
+OBRAZY I PIOSENKI, TWORZONE NA TWOIM SPRZĘCIE
+• Poproś w czacie o obraz: powstaje bezpośrednio na Twoim sprzęcie.
+• Edytuj obraz: załącz go i napisz, co zmienić.
+• Stwórz piosenkę z wokalem i tekstem albo utwór instrumentalny na podstawie krótkiego opisu.
+• Tryb twórcy pozwala dostosować prompt, rozmiar i model, zanim cokolwiek powstanie.
+
+NARZĘDZIA, KTÓRE ZOSTAJĄ POD TWOJĄ KONTROLĄ
+• Wbudowane narzędzia: data i godzina, kalkulator oraz – tylko jeśli je włączysz – wyszukiwanie w sieci, wiadomości, Wikipedia, pogoda i inne.
+• Pozwól czatowi uporządkować folder, na który wyrazisz zgodę: proponuje nowe foldery, przeniesienia i zmiany nazw, a nic się nie zmienia, dopóki nie zatwierdzisz. Cofnij przywraca poprzedni stan.
+
+PODŁĄCZ SWOICH AGENTÓW DO KODOWANIA I APLIKACJE
+• LLMTray udostępnia API zgodne z OpenAI na Twoim sprzęcie (localhost). Skieruj na nie dowolną aplikację lub agenta do kodowania, który obsługuje API do kodowania.
+• Każdy model dostaje krótki alias; aplikacje mogą przełączać modele po nazwie.
+• Dostęp sieciowy dla innych urządzeń jest wyłączony, dopóki go nie włączysz.
+
+STWORZONE DLA SZYBKOŚCI
+• Profile dla poszczególnych modeli: próbkowanie, kwantyzacja pamięci podręcznej KV i dekodowanie spekulatywne.
+• Wbudowany test wydajności mierzy Twój sprzęt i może dostroić do niego serwer.
+
+NIC, O CO NIE PROSISZ
+• Każda ciężka funkcja jest wyłączona, dopóki jej nie włączysz, i nic nie jest pobierane, zanim tego nie wybierzesz.
+• Bez konta, bez reklam, bez śledzenia. Anonimowe statystyki użycia są opcjonalne i można je wyłączyć w Ustawieniach.

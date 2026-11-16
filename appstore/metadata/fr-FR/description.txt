@@ -1,0 +1,38 @@
+LLMTray fait tourner des modèles d’IA sur votre matériel. Discutez, dessinez des images, créez des chansons et offrez à vos apps une API compatible OpenAI, le tout sur Apple silicon, sans compte et sans cloud.
+
+MOINS DE CENTRE DE DONNÉES. PLUS DE VOTRE PROPRE MATÉRIEL.
+Votre matériel est déjà une machine d’IA performante. LLMTray le met au travail : les modèles tournent ici même, vos prompts, fichiers et résultats ne le quittent donc jamais, et rien n’attend dans la file d’un serveur.
+
+DISCUTEZ AVEC DES MODÈLES OUVERTS
+• Choisissez un modèle adapté à votre matériel : une configuration guidée suggère la bonne taille pour votre mémoire.
+• Téléchargez d’autres modèles MLX depuis Hugging Face dans les Réglages.
+• Les modèles qui voient lisent vos images ; ceux qui raisonnent montrent leur réflexion.
+• Onglets, historique, recherche, conversations temporaires et compactage automatique des longues conversations.
+
+VOS FICHIERS, AVEC LES SOURCES
+• Les projets regroupent des conversations avec leurs propres instructions et documents.
+• Déposez des fichiers PDF, Word, Markdown et texte dans un projet : le modèle y cherche et cite les pages utilisées.
+• Épinglez une courte référence pour que chaque réponse du projet la voie.
+
+IMAGES ET CHANSONS, CRÉÉES SUR VOTRE MATÉRIEL
+• Demandez une image dans la conversation : elle est dessinée directement sur votre matériel.
+• Modifiez une image en la joignant et en disant quoi changer.
+• Créez une chanson avec voix et paroles, ou un instrumental, à partir d’une courte description.
+• Le mode Créateur vous permet d’ajuster le prompt, la taille et le modèle avant toute création.
+
+DES OUTILS QUI RESTENT SOUS VOTRE CONTRÔLE
+• Des outils intégrés pour la date et l’heure, une calculatrice et, seulement si vous les activez, la recherche web, les actualités, Wikipedia, la météo et plus encore.
+• Laissez une conversation ranger un dossier que vous autorisez : elle propose de nouveaux dossiers, des déplacements et des renommages, et rien ne change sans votre accord. Annuler rétablit tout.
+
+CONNECTEZ VOS AGENTS DE CODAGE ET VOS APPS
+• LLMTray sert une API compatible OpenAI sur votre matériel (localhost). Pointez-y n’importe quelle app ou agent de codage qui parle l’API de codage.
+• Chaque modèle reçoit un alias court ; les apps peuvent changer de modèle par son nom.
+• L’accès réseau pour les autres appareils est désactivé tant que vous ne l’activez pas.
+
+CONÇU POUR LA VITESSE
+• Des profils par modèle pour l’échantillonnage, la quantification du cache KV et le décodage spéculatif.
+• Un benchmark intégré mesure votre matériel et peut régler le serveur en conséquence.
+
+RIEN QUE VOUS N’AYEZ DEMANDÉ
+• Chaque fonction lourde est désactivée tant que vous ne l’activez pas, et rien n’est téléchargé avant que vous ne le choisissiez.
+• Pas de compte, pas de publicité, pas de suivi. Les statistiques d’utilisation anonymes sont facultatives et se désactivent dans les Réglages.

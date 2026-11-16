@@ -1,0 +1,38 @@
+O LLMTray roda modelos de IA no seu hardware. Converse, desenhe imagens, crie músicas e dê aos seus apps uma API compatível com OpenAI, tudo em Apple silicon, sem conta e sem nuvem.
+
+MENOS DATA CENTER. MAIS DO SEU PRÓPRIO HARDWARE.
+Seu hardware já é uma máquina de IA capaz. O LLMTray o coloca para trabalhar: os modelos rodam aqui mesmo, então seus prompts, arquivos e resultados nunca saem dele, e nada espera na fila de um servidor.
+
+CONVERSE COM MODELOS ABERTOS
+• Escolha um modelo que caiba no seu hardware: uma configuração guiada sugere o tamanho certo para a sua memória.
+• Baixe mais modelos MLX do Hugging Face nos Ajustes.
+• Modelos que enxergam leem suas imagens; modelos que raciocinam mostram a linha de raciocínio.
+• Abas, histórico, busca, chats temporários e compactação automática de conversas longas.
+
+SEUS ARQUIVOS, COM FONTES
+• Projetos agrupam conversas com instruções e documentos próprios.
+• Arraste arquivos PDF, Word, Markdown e de texto para um projeto: o modelo pesquisa neles e cita as páginas que usou.
+• Fixe uma referência curta para que toda resposta do projeto a leve em conta.
+
+IMAGENS E MÚSICAS, FEITAS NO SEU HARDWARE
+• Peça uma imagem no chat: ela é desenhada direto no seu hardware.
+• Edite uma imagem anexando-a e dizendo o que mudar.
+• Crie uma música com vocal e letra, ou um instrumental, a partir de uma descrição curta.
+• O Modo Criador permite ajustar o prompt, o tamanho e o modelo antes de qualquer coisa ser criada.
+
+FERRAMENTAS QUE FICAM SOB O SEU CONTROLE
+• Ferramentas integradas de data e hora, uma calculadora e, só se você ativar, busca na web, notícias, Wikipedia, clima e mais.
+• Deixe um chat organizar uma pasta que você permitir: ele propõe novas pastas, movimentações e renomeações, e nada muda até você aprovar. Desfazer reverte tudo.
+
+CONECTE SEUS AGENTES DE CÓDIGO E APPS
+• O LLMTray serve uma API compatível com OpenAI no seu hardware (localhost). Aponte para ela qualquer app ou agente de código que fale a API de programação.
+• Cada modelo recebe um alias curto; os apps podem trocar de modelo pelo nome.
+• O acesso pela rede para outros dispositivos fica desativado, a menos que você o ative.
+
+FEITO PARA SER RÁPIDO
+• Perfis por modelo para amostragem, quantização do cache KV e decodificação especulativa.
+• Um teste de desempenho integrado mede o seu hardware e pode ajustar o servidor para ele.
+
+NADA QUE VOCÊ NÃO PEDIU
+• Todo recurso pesado fica desativado até você ativar, e nada é baixado antes de você escolher.
+• Sem conta, sem anúncios, sem rastreamento. As estatísticas de uso anônimas são opcionais e podem ser desativadas nos Ajustes.

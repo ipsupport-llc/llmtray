@@ -1,0 +1,38 @@
+LLMTray menjalankan model AI di perangkat keras Anda sendiri. Chat, menggambar, membuat lagu, dan memberi aplikasi Anda API yang kompatibel dengan OpenAI, semuanya di Apple silicon, tanpa akun dan tanpa cloud.
+
+LEBIH SEDIKIT PUSAT DATA. LEBIH BANYAK PERANGKAT KERAS ANDA SENDIRI.
+Perangkat keras Anda sudah menjadi mesin AI yang mumpuni. LLMTray membuatnya bekerja: model berjalan langsung di sini, sehingga prompt, file, dan hasil Anda tidak pernah meninggalkannya, dan tidak ada yang menunggu di antrean server.
+
+CHAT DENGAN MODEL TERBUKA
+• Pilih model yang cocok dengan perangkat keras Anda: penyiapan terpandu menyarankan ukuran yang tepat untuk memori Anda.
+• Unduh lebih banyak model MLX dari Hugging Face di Pengaturan.
+• Model yang bisa melihat membaca gambar Anda; model yang bernalar menampilkan proses berpikirnya.
+• Tab, riwayat, pencarian, chat sementara, dan pemadatan otomatis untuk chat yang panjang.
+
+FILE ANDA, LENGKAP DENGAN SUMBER
+• Proyek mengelompokkan chat dengan instruksi dan dokumennya sendiri.
+• Taruh file PDF, Word, Markdown, dan teks ke dalam proyek: model menelusurinya dan mengutip halaman yang digunakannya.
+• Sematkan referensi singkat agar setiap jawaban di proyek melihatnya.
+
+GAMBAR DAN LAGU, DIBUAT DI PERANGKAT KERAS ANDA
+• Minta gambar di chat: gambar dibuat langsung di perangkat keras Anda.
+• Edit gambar dengan melampirkannya dan mengatakan apa yang perlu diubah.
+• Buat lagu dengan vokal dan lirik, atau instrumental, dari deskripsi singkat.
+• Mode Kreator memungkinkan Anda mengatur prompt, ukuran, dan model sebelum apa pun dibuat.
+
+ALAT YANG TETAP DALAM KENDALI ANDA
+• Alat bawaan untuk tanggal dan waktu, kalkulator, dan, hanya jika Anda mengaktifkannya, pencarian web, berita, Wikipedia, cuaca, dan lainnya.
+• Biarkan chat merapikan folder yang Anda izinkan: chat mengusulkan folder baru, pemindahan, dan penggantian nama, dan tidak ada yang berubah sampai Anda menyetujuinya. Urungkan mengembalikan semuanya.
+
+HUBUNGKAN AGEN KODE DAN APLIKASI ANDA
+• LLMTray menyediakan API yang kompatibel dengan OpenAI di perangkat keras Anda (localhost). Arahkan aplikasi atau agen kode apa pun yang mendukung API ini ke sana.
+• Setiap model mendapat alias singkat; aplikasi dapat berganti model berdasarkan nama.
+• Akses jaringan untuk perangkat lain nonaktif kecuali Anda mengaktifkannya.
+
+DIBUAT CEPAT
+• Profil per model untuk pengambilan sampel, kuantisasi KV cache, dan decoding spekulatif.
+• Tolok ukur bawaan mengukur perangkat keras Anda dan dapat menyetel server untuknya.
+
+TIDAK ADA YANG TIDAK ANDA MINTA
+• Setiap fitur berat nonaktif sampai Anda mengaktifkannya, dan tidak ada yang diunduh sebelum Anda memilihnya.
+• Tanpa akun, tanpa iklan, tanpa pelacakan. Statistik penggunaan anonim bersifat opsional dan dapat dimatikan di Pengaturan.

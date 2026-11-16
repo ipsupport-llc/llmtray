@@ -1,0 +1,1 @@
+Modelli di IA sul tuo computer: chatta, disegna, crea canzoni, leggi pagine web e mostra lo schermo. Un’API compatibile con OpenAI per le tue app. Privato, anche offline!

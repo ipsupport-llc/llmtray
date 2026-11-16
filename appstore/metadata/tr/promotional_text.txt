@@ -1,0 +1,1 @@
+Yapay zeka modellerini bilgisayarınızda çalıştırın: sohbet, çizim, şarkı, web sayfası okuma, ekranı gösterme. Uygulamalarınıza OpenAI uyumlu API. Özel ve çevrimdışı!

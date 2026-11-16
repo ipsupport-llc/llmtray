@@ -1,0 +1,1 @@
+Jalankan model AI di komputer Anda: chat, gambar, lagu, baca halaman web, dan tunjukkan layar. API kompatibel OpenAI untuk aplikasi Anda. Privat, siap offline!
