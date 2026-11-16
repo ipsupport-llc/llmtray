@@ -43,7 +43,9 @@ public enum DateQuery {
         var words: [String] = []
         var numbers: [(value: Int, digits: Int)] = []
         var separators = Set<Character>()
+        var afterNumber = false
         for token in tokens(s) {
+            defer { afterNumber = token.first?.isNumber == true }
             if let n = Int(token) {
                 numbers.append((n, token.count))
             } else if let first = token.first, first.isNumber {
@@ -53,15 +55,16 @@ public enum DateQuery {
                     numbers.append((n, digits.count))
                 } else { return nil }
             } else if token.count == 1, let c = token.first, "./-".contains(c) {
-                separators.insert(c)
+                // Between numbers only: "Wed." has a dot of its own.
+                if afterNumber { separators.insert(c) }
             } else if token != "," {
                 words.append(token)
             }
         }
         // A weekday's short form may also be a month's ("mar." is Tuesday
         // in French): with two months named, the weekday ones are dropped.
-        var months = words.compactMap(month(named:))
-        if months.count > 1 { months = words.filter { !isWeekday($0) }.compactMap(month(named:)) }
+        var months = Set(words.compactMap(month(named:)))
+        if months.count > 1 { months = Set(words.filter { !isWeekday($0) }.compactMap(month(named:))) }
         let others = words.filter { month(named: $0) == nil && !isWeekday($0) && !fillers.contains($0) }
         guard others.isEmpty, months.count <= 1 else { return nil }
 
@@ -177,8 +180,9 @@ public enum DateQuery {
     /// today ("10.04.24" is 2024, "Apr 10, 99" 1999).
     private static func year(_ n: (value: Int, digits: Int), _ today: Day) -> Int {
         guard n.digits == 2 else { return n.value }
-        let century = today.year / 100 * 100
-        return century + n.value > today.year + 20 ? century - 100 + n.value : century + n.value
+        var y = today.year / 100 * 100 + n.value
+        if y > today.year + 20 { y -= 100 } else if y + 100 <= today.year + 20 { y += 100 }
+        return y
     }
 
     private static func shift(_ day: Day, by offset: Int) -> Day? { fromDayNumber(dayNumber(day) + offset) }
