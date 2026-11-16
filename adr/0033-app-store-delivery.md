@@ -1,7 +1,7 @@
 # 0033 — App Store delivery from CI
 
-**Status: proposed** (2026-11-15, the user: "так мы можем это все сделать
-через cicd?", "работай"). No code before the user has read this.
+**Status: accepted** (2026-11-15, the user: "так мы можем это все сделать
+через cicd?", "работай", then on reading it: "да на всё, мержи 424 и делай").
 
 ## Why
 
