@@ -90,7 +90,8 @@ enum ChatRequestBuilder {
             body["tools"] = tools
         }
         // The composer's thinking effort (adr/0022).
-        body.merge(Thinking.requestFields(style: settings.thinkingStyle, effort: settings.effectiveThinkingEffort)) { $1 }
+        body.merge(Thinking.requestFields(style: settings.thinkingStyle, effort: settings.effectiveThinkingEffort,
+                                          afterToolResult: payload.last?["role"] as? String == "tool")) { $1 }
         // A looped model's loop count (the composer's pick).
         if let loops = settings.effectiveRecurrentLoops { body["recurrent_loops"] = loops }
         return body

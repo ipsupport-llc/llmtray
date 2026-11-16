@@ -26,7 +26,7 @@
   stay per data source, but one tool serves several as modes
   (`SelectableTool.entries`), and only the modes switched on are
   declared, each with only its own fields:
-  `get_current_time(city?)` (date/time here — local — or in a city),
+  `get_current_time(city?, date?)` (date/time here — local — or in a city; with a date, that day's weekday and days from today),
   `calculate`, `web_search(query, source: web|news|wikipedia|hackernews,
   lang?)`, `get_country_info(country, about: facts|holidays, year?)`,
   `convert_currency(amount, from, to)`, `get_weather(city?, kind:

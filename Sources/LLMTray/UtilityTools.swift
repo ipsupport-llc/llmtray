@@ -113,14 +113,21 @@ final class CurrentTimeTool: SelectableTool {
 
     init() { super.init(name: "get_current_time", entries: [Self.localEntry, Self.cityEntry]) }
 
+    /// A day the model asks about ("what weekday was Apr 10, 2024"):
+    /// models pass one on their own, so the tool reads it.
+    static let dateParam = ToolSchema.Param("date", .string, "Any date (2024-04-10, Apr 10, 2024): its weekday and days from today. Omit for now.",
+                                            aliases: ["day", "target_date", "for_date", "on", "when"])
+
     override func schema(offering entries: [String]) -> ToolSchema {
         var params: [ToolSchema.Param] = []
-        if entries.contains(Self.cityEntry) {
-            var city = PlaceParams.city
-            city.aliases += ["timezone", "tz", "zone", "time_zone"]
-            params = [city, PlaceParams.countryCode]
+        let city = entries.contains(Self.cityEntry)
+        if city {
+            var cityParam = PlaceParams.city
+            cityParam.aliases += ["timezone", "tz", "zone", "time_zone"]
+            params = [cityParam, PlaceParams.countryCode]
         }
-        return ToolSchema(name, "Current date, weekday and time\(params.isEmpty ? "" : ", here or in a city"). "
+        params.append(Self.dateParam)
+        return ToolSchema(name, "Current date, weekday and time\(city ? ", here or in a city" : ""), or the weekday of any date. "
                           + "Call it for today, tomorrow, a weekday or now: you don't know the date otherwise.", params)
     }
 
@@ -138,15 +145,27 @@ final class CurrentTimeTool: SelectableTool {
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let city = arguments["city"] as? String, !city.isEmpty else { return Self.json(Self.describe(Date(), in: .current)) }
+        let asked = (arguments["date"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let now = Date()
+        // The answer in a zone: now, or the asked day against today there.
+        func answer(in zone: TimeZone) -> [String: Any]? {
+            guard !asked.isEmpty else { return Self.describe(now, in: zone) }
+            let today = DateQuery.today(in: zone, now: now)
+            guard let day = DateQuery.parse(asked, today: today, monthFirst: DateQuery.isMonthFirst(.current)) else { return nil }
+            var out = DateQuery.describe(day, today: today)
+            out["timezone"] = zone.identifier
+            return out
+        }
+        let unreadable = Self.error("couldn't read the date \"\(asked)\": send it as YYYY-MM-DD")
+        guard let city = arguments["city"] as? String, !city.isEmpty else { return answer(in: .current).map(Self.json) ?? unreadable }
         // An IANA zone ("UTC", "Europe/Kyiv"), as the former date tool took.
-        if let zone = TimeZone(identifier: city) { return Self.json(Self.describe(Date(), in: zone)) }
+        if let zone = TimeZone(identifier: city) { return answer(in: zone).map(Self.json) ?? unreadable }
         do {
             guard let place = try await Geocoder.find(city, countryCode: arguments["country_code"] as? String),
                   let zone = TimeZone(identifier: place.timezone) else {
                 return Self.error("no city called \(city) found")
             }
-            var result = Self.describe(Date(), in: zone)
+            guard var result = answer(in: zone) else { return unreadable }
             result["city"] = place.name
             result["country"] = place.country
             // Open-Meteo's data is CC BY 4.0 (shown under the answer).
