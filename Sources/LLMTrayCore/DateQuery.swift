@@ -64,10 +64,9 @@ public enum DateQuery {
                     addNumber(n, digits: digits.count)
                 } else { return nil }
             } else if token.count == 1, let c = token.first, "./-,".contains(c) {
-                if afterNumber {
-                    if pending != nil { return nil }
-                    pending = c
-                }
+                // Two in a row ("10..04") make no date of the numbers
+                // around them; after the last number they don't matter.
+                if afterNumber { pending = pending == nil ? c : "x" }
             } else {
                 words.append(token)
                 afterNumber = false
@@ -153,7 +152,12 @@ public enum DateQuery {
         let f = DateFormatter()
         f.locale = locale
         f.dateStyle = .short
-        let pattern = f.dateFormat ?? ""
+        var pattern = f.dateFormat ?? ""
+        // A year-first short date (y-MM-dd) is ISO, not the order a
+        // day-and-month date is read in there: the template's then.
+        if pattern.trimmingCharacters(in: .whitespaces).hasPrefix("y") {
+            pattern = DateFormatter.dateFormat(fromTemplate: "yMd", options: 0, locale: locale) ?? pattern
+        }
         guard let m = pattern.firstIndex(of: "M"), let d = pattern.firstIndex(of: "d") else { return false }
         return m < d
     }
@@ -214,17 +218,31 @@ public enum DateQuery {
         var out: [String] = []
         var current = ""
         let chars = Array(s)
+        // A hyphenated word that isn't a known name ("10th-apr",
+        // "wednesday-april") goes back to its parts.
+        func flush() {
+            guard !current.isEmpty else { return }
+            if current.contains("-"), month(named: current) == nil, !isWeekday(current) {
+                for (k, part) in current.split(separator: "-", omittingEmptySubsequences: false).enumerated() {
+                    if k > 0 { out.append("-") }
+                    if !part.isEmpty { out.append(String(part)) }
+                }
+            } else {
+                out.append(current)
+            }
+            current = ""
+        }
         for (i, ch) in chars.enumerated() {
             if ch.isLetter || ch.isNumber {
                 current.append(ch)
             } else if ch == "-" || ch == "'", current.last?.isLetter == true, i + 1 < chars.count, chars[i + 1].isLetter {
                 current.append(ch)
             } else {
-                if !current.isEmpty { out.append(current); current = "" }
+                flush()
                 if !ch.isWhitespace { out.append(String(ch)) }
             }
         }
-        if !current.isEmpty { out.append(current) }
+        flush()
         return out
     }
 
