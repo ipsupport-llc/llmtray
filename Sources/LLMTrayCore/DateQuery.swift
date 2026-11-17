@@ -97,17 +97,18 @@ public enum DateQuery {
                 // with four digits ("2024 Apr 10").
                 let (a, b) = (numbers[0], numbers[1])
                 if a.digits <= 2, b.digits == 4 || b.digits == 2, !ordinals.contains(1) { return valid(year(b, today), month, a.value) }
-                if a.digits == 4, b.digits <= 2 { return valid(a.value, month, b.value) }
+                if a.digits == 4, b.digits <= 2, !ordinals.contains(0) { return valid(a.value, month, b.value) }
                 return nil
             default:
                 return nil
             }
         }
 
-        guard numeric, ordinals.isEmpty else { return nil }
+        guard numeric else { return nil }
         let (a, b, c) = (numbers[0], numbers[1], numbers[2])
         // 2024/04/10, 2024.04.10.
-        if a.digits == 4 { return valid(a.value, b.value, c.value) }
+        if a.digits == 4 { return ordinals.contains(0) ? nil : valid(a.value, b.value, c.value) }
+        guard !ordinals.contains(2) else { return nil }
         guard a.digits <= 2, b.digits <= 2, c.digits == 4 || c.digits == 2 else { return nil }
         let y = year(c, today)
         // Dots are day-first (10.04.2024); a slash or a dash fits both
