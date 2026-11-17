@@ -27,7 +27,7 @@ public enum DateQuery {
     /// user's day (the year when none is given, and the relative words);
     /// `monthFirst` orders an all-numbers slash form that fits both ways.
     public static func parse(_ text: String, today: Day, monthFirst: Bool) -> Day? {
-        let s = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let s = apostrophes(text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
         guard !s.isEmpty else { return nil }
         if let offset = relative[s] { return shift(today, by: offset) }
 
@@ -42,29 +42,45 @@ public enum DateQuery {
         // Words and numbers; ordinals ("10th") and a weekday dropped.
         var words: [String] = []
         var numbers: [(value: Int, digits: Int)] = []
-        var separators = Set<Character>()
+        // What stands between consecutive numbers: a separator (". / -"),
+        // a comma, or nothing but space (" "). One after the last number
+        // ("04/05/2024.") or after a word ("Wed.") doesn't count.
+        var between: [Character] = []
+        var pending: Character?
         var afterNumber = false
+        func addNumber(_ n: Int, digits: Int) {
+            if !numbers.isEmpty { between.append(afterNumber ? (pending ?? " ") : "w") }
+            numbers.append((n, digits))
+            pending = nil
+            afterNumber = true
+        }
         for token in tokens(s) {
-            defer { afterNumber = token.first?.isNumber == true }
             if let n = Int(token) {
-                numbers.append((n, token.count))
+                addNumber(n, digits: token.count)
             } else if let first = token.first, first.isNumber {
                 let digits = token.prefix(while: \.isNumber)
                 if ["st", "nd", "rd", "th"].contains(String(token.dropFirst(digits.count))),
                    let n = Int(digits) {
-                    numbers.append((n, digits.count))
+                    addNumber(n, digits: digits.count)
                 } else { return nil }
-            } else if token.count == 1, let c = token.first, "./-".contains(c) {
-                // Between numbers only: "Wed." has a dot of its own.
-                if afterNumber { separators.insert(c) }
-            } else if token != "," {
+            } else if token.count == 1, let c = token.first, "./-,".contains(c) {
+                if afterNumber {
+                    if pending != nil { return nil }
+                    pending = c
+                }
+            } else {
                 words.append(token)
+                afterNumber = false
             }
         }
+        // All numbers ("10.04.2024", "04/10/2024"): one separator, the same
+        // twice, right after each of the first two.
+        let numeric = numbers.count == 3 && between.count == 2 && between[0] == between[1] && "./-".contains(between[0])
         // A weekday's short form may also be a month's ("mar." is Tuesday
-        // in French): with two months named, the weekday ones are dropped.
+        // in French): with two months named, or before an all-numbers
+        // date, the weekday ones are dropped.
         var months = Set(words.compactMap(month(named:)))
-        if months.count > 1 { months = Set(words.filter { !isWeekday($0) }.compactMap(month(named:))) }
+        if months.count > 1 || numeric { months = Set(words.filter { !isWeekday($0) }.compactMap(month(named:))) }
         let others = words.filter { month(named: $0) == nil && !isWeekday($0) && !fillers.contains($0) }
         guard others.isEmpty, months.count <= 1 else { return nil }
 
@@ -86,7 +102,7 @@ public enum DateQuery {
             }
         }
 
-        guard numbers.count == 3, separators.count <= 1 else { return nil }
+        guard numeric else { return nil }
         let (a, b, c) = (numbers[0], numbers[1], numbers[2])
         // 2024/04/10, 2024.04.10.
         if a.digits == 4 { return valid(a.value, b.value, c.value) }
@@ -94,7 +110,7 @@ public enum DateQuery {
         let y = year(c, today)
         // Dots are day-first (10.04.2024); a slash or a dash fits both
         // orders: a number over 12 settles it, else the user's order.
-        if !separators.contains(".") {
+        if between[0] != "." {
             if a.value > 12 { return valid(y, b.value, a.value) }
             if b.value > 12 { return valid(y, a.value, b.value) }
             guard let day = monthFirst ? valid(y, a.value, b.value) : valid(y, b.value, a.value) else { return nil }
@@ -132,7 +148,12 @@ public enum DateQuery {
 
     /// Whether the locale writes the month before the day (en_US).
     public static func isMonthFirst(_ locale: Locale) -> Bool {
-        let pattern = DateFormatter.dateFormat(fromTemplate: "yMd", options: 0, locale: locale) ?? ""
+        // The locale's own short date: a yMd template puts the month
+        // first for en_TR, mt_MT and zh_SG, which write the day first.
+        let f = DateFormatter()
+        f.locale = locale
+        f.dateStyle = .short
+        let pattern = f.dateFormat ?? ""
         guard let m = pattern.firstIndex(of: "M"), let d = pattern.firstIndex(of: "d") else { return false }
         return m < d
     }
@@ -187,11 +208,16 @@ public enum DateQuery {
 
     private static func shift(_ day: Day, by offset: Int) -> Day? { fromDayNumber(dayNumber(day) + offset) }
 
+    /// Runs of letters or digits; a hyphen or an apostrophe between two
+    /// letters stays in the word ("quarta-feira", "п'ятниця").
     private static func tokens(_ s: String) -> [String] {
         var out: [String] = []
         var current = ""
-        for ch in s {
+        let chars = Array(s)
+        for (i, ch) in chars.enumerated() {
             if ch.isLetter || ch.isNumber {
+                current.append(ch)
+            } else if ch == "-" || ch == "'", current.last?.isLetter == true, i + 1 < chars.count, chars[i + 1].isLetter {
                 current.append(ch)
             } else {
                 if !current.isEmpty { out.append(current); current = "" }
@@ -202,10 +228,15 @@ public enum DateQuery {
         return out
     }
 
+    /// ’ and ʼ written as ' (Ukrainian "п’ятниця" comes in all three).
+    private static func apostrophes(_ s: String) -> String {
+        s.replacingOccurrences(of: "\u{2019}", with: "'").replacingOccurrences(of: "\u{02BC}", with: "'")
+    }
+
     private static let relative: [String: Int] = [
         "today": 0, "now": 0, "tomorrow": 1, "yesterday": -1,
         "сегодня": 0, "завтра": 1, "вчера": -1, "послезавтра": 2, "позавчера": -2,
-        "сьогодні": 0, "вчора": -1,
+        "сьогодні": 0, "вчора": -1, "післязавтра": 2,
     ]
 
     /// Words that may stand around a date ("on", "of", "year", "г.", the
@@ -232,7 +263,7 @@ public enum DateQuery {
             f.locale = Locale(identifier: id)
             for list in [f.monthSymbols, f.shortMonthSymbols, f.standaloneMonthSymbols, f.shortStandaloneMonthSymbols] {
                 for (i, name) in (list ?? []).enumerated() {
-                    out.append((name.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".")), i + 1))
+                    out.append((apostrophes(name.lowercased()).trimmingCharacters(in: CharacterSet(charactersIn: ".")), i + 1))
                 }
             }
         }
@@ -253,8 +284,13 @@ public enum DateQuery {
         for id in ["en_US", "ru_RU", "uk_UA", "de_DE", "fr_FR", "es_ES", "it_IT", "pt_PT", "pl_PL"] {
             let f = DateFormatter()
             f.locale = Locale(identifier: id)
-            for list in [f.weekdaySymbols, f.shortWeekdaySymbols, f.standaloneWeekdaySymbols] {
-                for name in list ?? [] { out.insert(name.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "."))) }
+            for list in [f.weekdaySymbols, f.shortWeekdaySymbols, f.standaloneWeekdaySymbols, f.shortStandaloneWeekdaySymbols,
+                         f.veryShortWeekdaySymbols].compactMap({ $0 }) {
+                // Single letters ("m", "t") are left out: too easily something else.
+                for name in list {
+                    let w = apostrophes(name.lowercased()).trimmingCharacters(in: CharacterSet(charactersIn: "."))
+                    if w.count > 1 { out.insert(w) }
+                }
             }
         }
         return out

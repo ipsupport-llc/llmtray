@@ -13,10 +13,12 @@ final class DateQueryTests: XCTestCase {
                      "Apr 10, 2024", "April 10, 2024", "Apr. 10th, 2024", "10 April 2024", "Wednesday, April 10, 2024",
                      "10.04.2024", "10-04-2024", "10.04.24", "10 апреля 2024", "10 апреля 2024 г.", "10-го апреля 2024",
                      "10 квітня 2024", "10. April 2024", "10 avril 2024", "apr 10 2024",
-                     "10 de abril de 2024", "le 10 avril 2024", "mar. 10 avril 2024", "Apr 10, 24", "10-Apr-24", "2024 Apr 10"] {
+                     "10 de abril de 2024", "le 10 avril 2024", "quarta-feira, 10 de abril de 2024", "середа, 10 квітня 2024", "mar. 10 avril 2024", "Apr 10, 24", "10-Apr-24", "2024 Apr 10"] {
             XCTAssertEqual(iso(text), "2024-04-10", text)
         }
         XCTAssertEqual(iso("Sept 3, 2025"), "2025-09-03")
+        XCTAssertEqual(iso("п’ятниця, 12 квітня 2024"), "2024-04-12")
+        XCTAssertEqual(iso("пʼятниця 12 квітня 2024"), "2024-04-12")
         XCTAssertEqual(iso("Apr 10, 99"), "1999-04-10", "two digits: at most 20 years ahead")
         XCTAssertEqual(DateQuery.parse("Apr 10, 00", today: DateQuery.Day(year: 2080, month: 1, day: 1), monthFirst: false)?.iso, "2100-04-10")
         XCTAssertEqual(iso("mar. 5 mar. 2024"), "2024-03-05", "the same month twice")
@@ -36,6 +38,12 @@ final class DateQueryTests: XCTestCase {
         XCTAssertEqual(iso("04-10-2024", monthFirst: true), "2024-04-10", "a dash fits both orders too")
         XCTAssertEqual(iso("04.10.2024", monthFirst: true), "2024-10-04", "dots are day-first")
         XCTAssertEqual(iso("Wed. 04/10/2024", monthFirst: true), "2024-04-10", "a weekday's dot isn't a separator")
+        XCTAssertEqual(iso("04/05/2024.", monthFirst: true), "2024-04-05", "a full stop after the date")
+        XCTAssertEqual(iso("mar. 10/04/2024", monthFirst: false), "2024-04-10", "a weekday that is also a month, before a numeric date")
+        XCTAssertNil(iso("10 04 2024"), "no separators")
+        XCTAssertNil(iso("10, 04, 2024"), "commas")
+        XCTAssertNil(iso("10/04-2024"), "two separators")
+        XCTAssertNil(iso("Mar 10-20 2024"), "a range")
         XCTAssertEqual(DateQuery.parse("04/13/2024", today: today, monthFirst: false)?.ambiguous, false)
     }
 
@@ -76,5 +84,6 @@ final class DateQueryTests: XCTestCase {
         XCTAssertEqual(DateQuery.today(in: TimeZone(identifier: "Europe/Kyiv")!, now: now).iso, "2026-11-17")
         XCTAssertTrue(DateQuery.isMonthFirst(Locale(identifier: "en_US")))
         XCTAssertFalse(DateQuery.isMonthFirst(Locale(identifier: "ru_RU")))
+        for id in ["en_TR", "mt_MT", "zh_SG", "en_GB"] { XCTAssertFalse(DateQuery.isMonthFirst(Locale(identifier: id)), id) }
     }
 }
