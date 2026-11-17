@@ -45,6 +45,13 @@ final class DateQueryTests: XCTestCase {
         XCTAssertNil(iso("10/04-2024"), "two separators")
         XCTAssertNil(iso("Mar 10-20 2024"), "a range")
         XCTAssertNil(iso("10..04.2024"), "two separators in a row")
+        XCTAssertNil(iso("10th-12th-May"), "an ordinal is a day, not a year")
+        XCTAssertNil(iso("2024th Apr 10"))
+        XCTAssertNil(iso("10/04/2024th"))
+        XCTAssertEqual(iso("2024/04/10th"), "2024-04-10")
+        XCTAssertEqual(iso("10th.04.2024"), "2024-04-10")
+        XCTAssertEqual(iso("Wed... April 10, 2024"), "2024-04-10")
+        XCTAssertEqual(iso("...April 10, 2024"), "2024-04-10")
         XCTAssertEqual(iso("10.04.2024.."), "2024-04-10")
         XCTAssertEqual(DateQuery.parse("04/13/2024", today: today, monthFirst: false)?.ambiguous, false)
     }

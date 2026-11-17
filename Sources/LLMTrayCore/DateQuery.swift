@@ -42,6 +42,8 @@ public enum DateQuery {
         // Words and numbers; ordinals ("10th") and a weekday dropped.
         var words: [String] = []
         var numbers: [(value: Int, digits: Int)] = []
+        // An ordinal ("12th") is a day, never a year.
+        var ordinals = Set<Int>()
         // What stands between consecutive numbers: a separator (". / -"),
         // a comma, or nothing but space (" "). One after the last number
         // ("04/05/2024.") or after a word ("Wed.") doesn't count.
@@ -61,6 +63,7 @@ public enum DateQuery {
                 let digits = token.prefix(while: \.isNumber)
                 if ["st", "nd", "rd", "th"].contains(String(token.dropFirst(digits.count))),
                    let n = Int(digits) {
+                    ordinals.insert(numbers.count)
                     addNumber(n, digits: digits.count)
                 } else { return nil }
             } else if token.count == 1, let c = token.first, "./-,".contains(c) {
@@ -93,8 +96,8 @@ public enum DateQuery {
                 // The year last ("Apr 10, 2024", "10-Apr-24") or first
                 // with four digits ("2024 Apr 10").
                 let (a, b) = (numbers[0], numbers[1])
-                if a.digits <= 2, b.digits == 4 || b.digits == 2 { return valid(year(b, today), month, a.value) }
-                if a.digits == 4, b.digits <= 2 { return valid(a.value, month, b.value) }
+                if a.digits <= 2, b.digits == 4 || b.digits == 2, !ordinals.contains(1) { return valid(year(b, today), month, a.value) }
+                if a.digits == 4, b.digits <= 2, !ordinals.contains(0) { return valid(a.value, month, b.value) }
                 return nil
             default:
                 return nil
@@ -104,7 +107,8 @@ public enum DateQuery {
         guard numeric else { return nil }
         let (a, b, c) = (numbers[0], numbers[1], numbers[2])
         // 2024/04/10, 2024.04.10.
-        if a.digits == 4 { return valid(a.value, b.value, c.value) }
+        if a.digits == 4 { return ordinals.contains(0) ? nil : valid(a.value, b.value, c.value) }
+        guard !ordinals.contains(2) else { return nil }
         guard a.digits <= 2, b.digits <= 2, c.digits == 4 || c.digits == 2 else { return nil }
         let y = year(c, today)
         // Dots are day-first (10.04.2024); a slash or a dash fits both
