@@ -5,13 +5,19 @@ import Foundation
 /// page tool they have. Only the app's own
 /// chat sends it -- never requests from API clients (coding agents).
 public enum LinkNote {
-    /// The web links (http, https) in `text`, in order, each once.
+    /// The web links in `text` written with their scheme (http://,
+    /// https://), in order, each once. A bare name isn't one: the system
+    /// detector makes https://main.rs of "src/main.rs" and https://user.id
+    /// of code. Local addresses (localhost, 127.x) aren't read anyway.
     public static func links(in text: String) -> [String] {
-        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return [] }
+        guard let regex = try? NSRegularExpression(pattern: #"(?i)\bhttps?://[^\s<>"'`]+"#) else { return [] }
         var seen = Set<String>()
-        return detector.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap { match in
-            guard let url = match.url, let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" else { return nil }
-            return seen.insert(url.absoluteString).inserted ? url.absoluteString : nil
+        return regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap { match in
+            guard let r = Range(match.range, in: text) else { return nil }
+            let link = String(text[r]).trimmingCharacters(in: CharacterSet(charactersIn: ".,;:!?)]}»"))
+            guard let host = URL(string: link)?.host?.lowercased(), !host.isEmpty,
+                  host != "localhost", !host.hasPrefix("127."), host != "[::1]", host != "::1" else { return nil }
+            return seen.insert(link).inserted ? link : nil
         }
     }
 
@@ -19,9 +25,11 @@ public enum LinkNote {
     /// tool isn't declared in this request (a chat without it, a coding
     /// profile, gets nothing).
     public static func text(for message: String, canReadPages: Bool) -> String? {
-        guard canReadPages, !links(in: message).isEmpty else { return nil }
-        return "[App note, not the user's words: the message has a link. "
-            + "To read it, call web_search with source=page and url set to the link.]"
+        let count = canReadPages ? links(in: message).count : 0
+        guard count > 0 else { return nil }
+        return count == 1
+            ? "[App note, not the user's words: the message has a link. To read it, call web_search with source=page and url set to the link.]"
+            : "[App note, not the user's words: the message has \(count) links. To read one, call web_search with source=page and url set to that link.]"
     }
 
     /// Whether `tools` (the request's declarations) include the page tool.
