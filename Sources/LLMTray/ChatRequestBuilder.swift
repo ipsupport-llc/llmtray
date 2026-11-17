@@ -30,6 +30,10 @@ enum ChatRequestBuilder {
         // earlier choice or another model in the history.
         let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.effectiveThinkingEffort).map(Thinking.note(budget:))
         let latestUser = history.lastIndex { $0.role == "user" && !$0.isToolContext }
+        // A message with a link is told which tool reads it (LinkNote).
+        // With every such message, not only the latest: the same text in
+        // every request keeps the server's prompt cache.
+        let readsPages = LinkNote.declaresPageReading(tools)
         // The server takes eight audio clips a request: the latest messages'
         // recordings go, older ones as "(audio)" (else a ninth recording made
         // every later request of the chat fail).
@@ -50,7 +54,10 @@ enum ChatRequestBuilder {
             // no text.
             let dropImages = message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
             let dropAudio = message.role == "user" && !message.audios.isEmpty && (!settings.modelSupportsAudio || !audioKept.contains(i))
-            let note = i == latestUser ? budgetNote : nil
+            let linkNote = message.role == "user" && !message.isToolContext
+                ? LinkNote.text(for: message.content, canReadPages: readsPages) : nil
+            let notes = [i == latestUser ? budgetNote : nil, linkNote].compactMap { $0 }
+            let note = notes.isEmpty ? nil : notes.joined(separator: "\n")
             guard dropImages || dropAudio else { return serialize(message: message, note: note) }
             // What was dropped, named when there's no text.
             let named = [dropImages && !settings.modelSupportsVision && !message.images.isEmpty ? "(image)" : nil,

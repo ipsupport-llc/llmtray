@@ -39,6 +39,13 @@
   city's lookup doesn't. Descriptions are short and imperative; a field
   gets a description only where its name doesn't say it; allowed values
   are enums; no examples unless one fixes a known confusion.
+- **A link in the user's message.** When the page mode (`web_search`
+  with `url`) is declared, each user message with an http(s) link
+  carries a one-line app note: to read it, call web_search with
+  source=page and the link (`LinkNote`). Small models (Nemotron Bolt
+  E4B) answered "I can't open this link" without trying the tool. Only
+  the in-app chat adds it, never API clients, and nothing is added when
+  the page mode is off.
 - **Schemas as data.** Each tool's `ToolSchema` (fields, types, enums,
   aliases, value aliases) builds its OpenAI function JSON and reads its
   calls. The selectable utility and web tools answer compact JSON,
