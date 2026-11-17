@@ -3,6 +3,7 @@
 
     asc_release.py deliver --file LLMTray.pkg --version 0.9.3 --build 0.9.3
     asc_release.py submit  --version 0.9.3
+    asc_release.py upload  --file LLMTray.pkg --version 0.9.3 --build 0.9.3
 
 deliver: upload the build (skipped if App Store Connect has that build
 number), wait until it is processed, find or create the version, push the
@@ -11,7 +12,11 @@ listing texts for every locale, attach the build. The version is left in
 
 submit: send that version to App Review.
 
-Both print what they would do and change nothing without --apply.
+upload: the build alone, for testers: upload it and wait until it is
+processed. No version or text is touched, so it is safe while a version
+is in review.
+
+All print what they would do and change nothing without --apply.
 The key: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH (see asc_metadata.py).
 """
 
@@ -121,6 +126,26 @@ def push_texts(args):
         sys.exit("The texts were not all pushed.")
 
 
+def upload_only(args):
+    api = am.Client()
+    app = am.find_app(api)
+    build = find_build(api, app, args.platform, args.version, args.build)
+    print(f"Build {args.version} ({args.build}): " + ("already uploaded" if build else f"upload {args.file}"))
+    if not args.apply:
+        print("Dry run. Add --apply to upload.")
+        return
+    if not build:
+        if not args.file or not pathlib.Path(args.file).exists():
+            sys.exit(f"No build file: {args.file}")
+        upload(args.file, args.platform, args.version, args.build, app)
+    wait_processed(api, app, args.platform, args.version, args.build, args.wait_minutes)
+    print(f"Uploaded: {args.platform} {args.version} ({args.build}) is processed. No version was changed.")
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as f:
+            f.write(f"**{args.platform} {args.version} ({args.build})** is uploaded and processed; no version was changed.\n")
+
+
 def deliver(args):
     api = am.Client()
     app = am.find_app(api)
@@ -206,7 +231,7 @@ def submit(args):
 
 def main():
     p = argparse.ArgumentParser(description="Deliver a build to App Store Connect, or submit it.")
-    p.add_argument("command", choices=["deliver", "submit"])
+    p.add_argument("command", choices=["deliver", "submit", "upload"])
     p.add_argument("--version", required=True, help="the version, e.g. 0.9.3")
     p.add_argument("--build", help="the build number (default: the version)")
     p.add_argument("--file", help="the package to upload")
@@ -216,7 +241,7 @@ def main():
     p.add_argument("--apply", action="store_true", help="do it (a dry run without)")
     args = p.parse_args()
     args.build = args.build or args.version
-    (deliver if args.command == "deliver" else submit)(args)
+    {"deliver": deliver, "submit": submit, "upload": upload_only}[args.command](args)
 
 
 if __name__ == "__main__":

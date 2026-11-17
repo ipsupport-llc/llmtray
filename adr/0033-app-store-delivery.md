@@ -97,6 +97,8 @@ later step; it does not block delivery.
 - `scripts/appstore/asc_release.py`, new, on the same client: `upload`,
   `wait`, `version`, `attach`, `submit`. Every command prints what it will
   do and needs `--apply` to do it, like `push`.
+  `asc_release.py upload` sends the build alone, for testers: no version
+  or text is touched, so it can run while a version is in review.
 - Offline tests for both in `build.yml`, with recorded responses; the
   deliver job itself can only be proven by a real run.
 

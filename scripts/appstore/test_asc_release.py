@@ -90,4 +90,22 @@ ar.attach(api, "v1", "b1")
 expect("attach build", api.writes[1] == ("PATCH", "/v1/appStoreVersions/v1/relationships/build",
                                          {"data": {"type": "builds", "id": "b1"}}))
 
+# upload: the build alone; nothing is written to App Store Connect.
+import argparse  # noqa: E402
+
+api = Fake({"/v1/builds": [build("VALID")]})
+ar.am.Client = lambda: api
+ar.am.find_app = lambda _: "app"
+uploads = []
+ar.upload = lambda *a: uploads.append(a)
+ar.upload_only(argparse.Namespace(platform="IOS", version="1.2.3", build="7", file=None, apply=True, wait_minutes=1))
+expect("upload: a build that is there is not sent again", uploads == [] and api.writes == [])
+api = Fake({"/v1/builds": [[], [build("VALID")]]})
+missing = exits(lambda: ar.upload_only(argparse.Namespace(platform="IOS", version="1.2.3", build="7", file="/nowhere/a.ipa",
+                                                         apply=True, wait_minutes=1)))
+expect("upload: no file stops", missing and "No build file" in missing and api.writes == [])
+api = Fake({"/v1/builds": [[]]})
+ar.upload_only(argparse.Namespace(platform="IOS", version="1.2.3", build="7", file="a.ipa", apply=False, wait_minutes=1))
+expect("upload: a dry run sends nothing", uploads == [] and api.writes == [])
+
 sys.exit(1 if failures else 0)
