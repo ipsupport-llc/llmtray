@@ -17,6 +17,9 @@ public struct ServerLogWatch {
         case prefillProgress
         /// A request ended ("Request stats: ..."): for the speed journal.
         case requestStats(RequestStats)
+        /// The generation thread finished loading the model: a thread that
+        /// dies before this failed to load, which a restart won't fix.
+        case modelLoaded
     }
 
     /// mlx_lm.server logs this once, at ERROR level, when the thread dies
@@ -42,6 +45,11 @@ public struct ServerLogWatch {
         pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Request stats: "#
     )
 
+    /// The fork's line after the default model loads.
+    static let loadedRecord = try! NSRegularExpression(
+        pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Model loaded$"#
+    )
+
     /// Output arrives in arbitrary chunks; an unfinished line waits here.
     private var partial = ""
 
@@ -61,6 +69,9 @@ public struct ServerLogWatch {
             if Self.progressRecord.firstMatch(in: line, range: range) != nil {
                 progress = true
                 return nil
+            }
+            if Self.loadedRecord.firstMatch(in: line, range: range) != nil {
+                return .modelLoaded
             }
             if let m = Self.statsRecord.firstMatch(in: line, range: range) {
                 return RequestStats.parse(ns.substring(from: m.range.location)).map { .requestStats($0) }
