@@ -10,6 +10,20 @@ final class ServerLogWatchTests: XCTestCase {
             outOfMemory: true)])
     }
 
+    func testModelLoaded() {
+        var w = ServerLogWatch()
+        XCTAssertEqual(w.feed("2026-11-18 10:51:13,436 - INFO - Model loaded\n"), [.modelLoaded])
+        XCTAssertEqual(w.feed("INFO:root:Model loaded\n"), [.modelLoaded])
+        XCTAssertEqual(w.feed("    \"content\": \"Model loaded\"\n"), [])
+    }
+
+    func testHidesInfo() {
+        XCTAssertFalse(ServerLogWatch.hidesInfo(["--model", "m"]))
+        XCTAssertFalse(ServerLogWatch.hidesInfo(["--log-level", "DEBUG"]))
+        XCTAssertTrue(ServerLogWatch.hidesInfo(["--log-level", "DEBUG", "--log-level", "warning"]))
+        XCTAssertTrue(ServerLogWatch.hidesInfo(["--log-level=ERROR"]))
+    }
+
     func testSplitAcrossChunks() {
         var w = ServerLogWatch()
         XCTAssertEqual(w.feed("INFO ok\nERROR:root:mlx_lm.server gener"), [])

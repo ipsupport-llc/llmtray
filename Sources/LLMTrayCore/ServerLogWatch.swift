@@ -17,6 +17,9 @@ public struct ServerLogWatch {
         case prefillProgress
         /// A request ended ("Request stats: ..."): for the speed journal.
         case requestStats(RequestStats)
+        /// The generation thread finished loading the model: a thread that
+        /// dies before this failed to load, which a restart won't fix.
+        case modelLoaded
     }
 
     /// mlx_lm.server logs this once, at ERROR level, when the thread dies
@@ -42,6 +45,26 @@ public struct ServerLogWatch {
         pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Request stats: "#
     )
 
+    /// The fork's line after the default model loads.
+    static let loadedRecord = try! NSRegularExpression(
+        pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Model loaded$"#
+    )
+
+    /// The server's arguments set a log level above INFO (the last
+    /// --log-level wins, as with argparse).
+    public static func hidesInfo(_ arguments: [String]) -> Bool {
+        var level: String?
+        for (i, arg) in arguments.enumerated() {
+            if arg == "--log-level", i + 1 < arguments.count {
+                level = arguments[i + 1]
+            } else if arg.hasPrefix("--log-level=") {
+                level = String(arg.dropFirst("--log-level=".count))
+            }
+        }
+        guard let level else { return false }
+        return ["WARNING", "ERROR", "CRITICAL"].contains(level.uppercased())
+    }
+
     /// Output arrives in arbitrary chunks; an unfinished line waits here.
     private var partial = ""
 
@@ -61,6 +84,9 @@ public struct ServerLogWatch {
             if Self.progressRecord.firstMatch(in: line, range: range) != nil {
                 progress = true
                 return nil
+            }
+            if Self.loadedRecord.firstMatch(in: line, range: range) != nil {
+                return .modelLoaded
             }
             if let m = Self.statsRecord.firstMatch(in: line, range: range) {
                 return RequestStats.parse(ns.substring(from: m.range.location)).map { .requestStats($0) }

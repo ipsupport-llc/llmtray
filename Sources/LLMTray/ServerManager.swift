@@ -147,6 +147,10 @@ final class ServerManager: ObservableObject {
     /// Restarts after a dead generation thread: a model that runs out of
     /// memory again right away ends up failed, not in a restart loop.
     private var threadDeathRestarts = RestartBudget()
+    /// The running process logged that its model loaded. A generation
+    /// thread that dies before that failed to load the model, and a fresh
+    /// process would fail the same way.
+    private var modelLoaded = false
 
     /// mlx_lm.server actually binds here, not to the port the user
     /// configured -- that public port is instead served by `proxy`, which
@@ -875,6 +879,9 @@ final class ServerManager: ObservableObject {
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args,
                                           environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
+        // INFO hidden by the user's own --log-level: no "Model loaded" line
+        // will come, so every thread death counts as after a load.
+        modelLoaded = ServerLogWatch.hidesInfo(args)
         lastPrefillProgressAt = nil
         lastResponseBytesAt = nil
         readyLine = ""
@@ -889,6 +896,8 @@ final class ServerManager: ObservableObject {
                     self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
                 case .prefillProgress:
                     self.lastPrefillProgressAt = Date()
+                case .modelLoaded:
+                    self.modelLoaded = true
                 case let .requestStats(stats):
                     BenchmarkRunner.serverReported(stats, modelPath: modelPath, arguments: self.launchedArguments)
                 }
@@ -980,6 +989,10 @@ final class ServerManager: ObservableObject {
         case .starting:
             // It never served anything; loading it again would fail the same way.
             failAndStop("failed to start: \(why)\(hint)")
+        case .running where !modelLoaded:
+            // mlx_lm.server loads the model after its httpd is up: this is a
+            // failed load, not a wedged process.
+            failAndStop("failed to load the model: \(why)\(hint)")
         case .running:
             let autoRestart = UserDefaults.standard[Pref.autoRestartStallThreshold] > 0
             if autoRestart, threadDeathRestarts.take() {
