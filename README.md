@@ -23,6 +23,8 @@ The models run on your Mac. Only the optional web tools reach the internet.
   <a href="https://ipsupport.us/llmtray/">ipsupport.us/llmtray</a>
   <br>
   <sub>A separate Mac App Store edition is also available: sandboxed, updated through the App Store, no command-line tool. <a href="https://apps.apple.com/app/id6817598741">Mac App Store</a></sub>
+  <br>
+  <sub>The same App Store listing has LLMTray for iPhone and iPad. For Windows there is a separate port on llama.cpp (GGUF models, x64 and ARM64): <a href="https://github.com/ipsupport-llc/llmtray-windows">LLMTray for Windows</a>.</sub>
 </p>
 
 ## What it does
