@@ -336,6 +336,8 @@ struct ChatMarkdownView: View {
 /// rows, the columns aligned as the separator row says. Scrolls sideways
 /// when it's wider than the chat.
 struct MarkdownTableView: View {
+    @Environment(\.openURL) private var openURL
+    @Environment(\.font) private var font
     let table: MarkdownTable
     let baseSize: CGFloat
     /// Each cell parsed once (ViewThatFits lays out several grids).
@@ -364,15 +366,18 @@ struct MarkdownTableView: View {
             grid(cellWidth: 200)
             grid(cellWidth: 140)
             grid(cellWidth: 100)
-            ScrollView(.horizontal, showsIndicators: false) { grid(cellWidth: 140) }
+            // Hosted on its own: carry what the bubble set (citation links, selection).
+            // Fixed cell widths: measured without a width, text still wraps.
+            SidewaysScroller(content: grid(cellWidth: 140, fixed: true)
+                .font(font).textSelection(.enabled).environment(\.openURL, openURL))
         }
     }
 
-    private func grid(cellWidth: CGFloat) -> some View {
+    private func grid(cellWidth: CGFloat, fixed: Bool = false) -> some View {
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
                 GridRow {
                     ForEach(0..<table.columnCount, id: \.self) { c in
-                        cell(header[c], column: c, width: cellWidth)
+                        cell(header[c], column: c, width: cellWidth, fixed: fixed)
                     }
                 }
                 .background(Color.primary.opacity(0.07))
@@ -380,7 +385,7 @@ struct MarkdownTableView: View {
                     Divider().gridCellUnsizedAxes(.horizontal)
                     GridRow {
                         ForEach(0..<table.columnCount, id: \.self) { c in
-                            cell(row[c], column: c, width: cellWidth)
+                            cell(row[c], column: c, width: cellWidth, fixed: fixed)
                         }
                     }
                     .background(r % 2 == 1 ? Color.primary.opacity(0.03) : Color.clear)
@@ -390,16 +395,105 @@ struct MarkdownTableView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
-    private func cell(_ content: AttributedString, column: Int, width: CGFloat) -> some View {
+    private func cell(_ content: AttributedString, column: Int, width: CGFloat, fixed: Bool) -> some View {
         let alignment = table.alignments[column]
+        let frameAlignment: Alignment = alignment == .center ? .center : alignment == .trailing ? .trailing : .leading
         return Text(content)
             .multilineTextAlignment(alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
             .fixedSize(horizontal: false, vertical: true)
-            .frame(minWidth: min(60, width), maxWidth: width, alignment: alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
+            // Fixed: a concrete width even when measured without one, so it wraps.
+            .frame(width: fixed ? width : nil, alignment: frameAlignment)
+            .frame(minWidth: fixed ? nil : min(60, width), maxWidth: fixed ? nil : width, alignment: frameAlignment)
             .padding(.horizontal, width < 140 ? 6 : 10)
             .padding(.vertical, 6)
             // The whole row's height: its shading is even across the cells.
             .frame(maxHeight: .infinity)
             .gridColumnAlignment(alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
+    }
+}
+
+/// Sideways scrolling for a table wider than the chat. SwiftUI's horizontal
+/// ScrollView keeps a vertical trackpad gesture that starts over it: the chat
+/// around it doesn't move until a few tries later. This one takes only
+/// sideways gestures and hands the rest to the chat's scroll view.
+struct SidewaysScroller<Content: View>: NSViewRepresentable {
+    let content: Content
+
+    func makeNSView(context: Context) -> Scroller {
+        let scroll = Scroller()
+        scroll.drawsBackground = false
+        scroll.hasHorizontalScroller = false
+        scroll.hasVerticalScroller = false
+        scroll.verticalScrollElasticity = .none
+        scroll.documentView = NSHostingView(rootView: content)
+        return scroll
+    }
+
+    func updateNSView(_ scroll: Scroller, context: Context) {
+        guard let host = scroll.documentView as? NSHostingView<Content> else { return }
+        host.rootView = content
+        host.setFrameSize(host.fittingSize)
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView scroll: Scroller, context: Context) -> CGSize? {
+        guard let host = scroll.documentView as? NSHostingView<Content> else { return nil }
+        let size = host.fittingSize
+        host.setFrameSize(size)
+        return CGSize(width: min(proposal.width ?? size.width, size.width), height: size.height)
+    }
+
+    final class Scroller: NSScrollView {
+        /// Whether the current gesture goes to the chat; nil until it has
+        /// moved enough to tell.
+        private var vertical: Bool?
+        /// The gesture's events while undecided: replayed, in order, to
+        /// whichever view gets it, so that one sees it whole.
+        private var pending: [NSEvent] = []
+        private var moved = CGSize.zero
+        private var lastEvent: TimeInterval = 0
+
+        override func scrollWheel(with event: NSEvent) {
+            // A pause or a new touch: a new gesture, whatever the last one was.
+            if event.timestamp - lastEvent > 0.3 || event.phase == .mayBegin || event.phase == .began {
+                vertical = nil
+                pending = []
+                moved = .zero
+            }
+            lastEvent = event.timestamp
+            if event.phase == [] && event.momentumPhase == [] {
+                // A plain mouse wheel: each click on its own; Shift turns it sideways.
+                let down = !event.modifierFlags.contains(.shift)
+                    && abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX)
+                route(event, toChat: down)
+                return
+            }
+            if vertical == nil && event.phase == [] {
+                // Momentum of a gesture that began elsewhere (the chat moving
+                // the table under a still pointer): it stays the chat's.
+                vertical = true
+            }
+            guard let vertical else {
+                pending.append(event)
+                moved.width += event.scrollingDeltaX
+                moved.height += event.scrollingDeltaY
+                let over = event.phase == .ended || event.phase == .cancelled
+                guard abs(moved.width) + abs(moved.height) >= 4 || over else { return }
+                let toChat = abs(moved.height) >= abs(moved.width)
+                self.vertical = toChat
+                let events = pending
+                pending = []
+                events.forEach { route($0, toChat: toChat) }
+                return
+            }
+            route(event, toChat: vertical)
+        }
+
+        private func route(_ event: NSEvent, toChat: Bool) {
+            if toChat, let outer = enclosingScrollView {
+                outer.scrollWheel(with: event)
+            } else {
+                super.scrollWheel(with: event)
+            }
+        }
     }
 }
