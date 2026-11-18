@@ -446,26 +446,50 @@ struct SidewaysScroller<Content: View>: NSViewRepresentable {
         /// Whether the current gesture goes to the chat; nil until it has
         /// moved enough to tell.
         private var vertical: Bool?
+        /// The gesture's events while undecided: replayed, in order, to
+        /// whichever view gets it, so that one sees it whole.
+        private var pending: [NSEvent] = []
         private var moved = CGSize.zero
+        private var lastEvent: TimeInterval = 0
 
         override func scrollWheel(with event: NSEvent) {
-            let starts = event.phase == .began || event.phase == .mayBegin
-            if starts { vertical = nil; moved = .zero }
+            // A pause or a new touch: a new gesture, whatever the last one was.
+            if event.timestamp - lastEvent > 0.3 || event.phase == .mayBegin || event.phase == .began {
+                vertical = nil
+                pending = []
+                moved = .zero
+            }
+            lastEvent = event.timestamp
             if event.phase == [] && event.momentumPhase == [] {
                 // A plain mouse wheel: each click on its own; Shift turns it sideways.
-                vertical = !event.modifierFlags.contains(.shift)
+                let down = !event.modifierFlags.contains(.shift)
                     && abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX)
-            } else if vertical == nil && event.phase == [] {
+                route(event, toChat: down)
+                return
+            }
+            if vertical == nil && event.phase == [] {
                 // Momentum of a gesture that began elsewhere (the chat moving
                 // the table under a still pointer): it stays the chat's.
                 vertical = true
-            } else if vertical == nil {
-                moved.width += abs(event.scrollingDeltaX)
-                moved.height += abs(event.scrollingDeltaY)
-                if moved.width + moved.height >= 4 { vertical = moved.height >= moved.width }
             }
-            // Undecided: the chat's too -- it gets the gesture's start.
-            if vertical != false, let outer = enclosingScrollView {
+            guard let vertical else {
+                pending.append(event)
+                moved.width += event.scrollingDeltaX
+                moved.height += event.scrollingDeltaY
+                let over = event.phase == .ended || event.phase == .cancelled
+                guard abs(moved.width) + abs(moved.height) >= 4 || over else { return }
+                let toChat = abs(moved.height) >= abs(moved.width)
+                self.vertical = toChat
+                let events = pending
+                pending = []
+                events.forEach { route($0, toChat: toChat) }
+                return
+            }
+            route(event, toChat: vertical)
+        }
+
+        private func route(_ event: NSEvent, toChat: Bool) {
+            if toChat, let outer = enclosingScrollView {
                 outer.scrollWheel(with: event)
             } else {
                 super.scrollWheel(with: event)
