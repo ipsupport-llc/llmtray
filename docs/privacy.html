@@ -187,9 +187,9 @@
 <body>
   <div class="wrap page">
     <h1>LLMTray Privacy Policy</h1>
-    <p class="meta">IPSupport LLC · effective November 9, 2026</p>
+    <p class="meta">IPSupport LLC · effective November 17, 2026</p>
 
-    <p>This policy covers LLMTray for Mac and LLMTray for iPhone and iPad. Where the iPhone and iPad app differs, <a href="#ios">its own section</a> says so.</p>
+    <p>This policy covers LLMTray for Mac, LLMTray for iPhone and iPad, and LLMTray for Windows. Where the <a href="#ios">iPhone and iPad app</a> or the <a href="#windows">Windows app</a> differs, its own section says so.</p>
 
     <p>LLMTray runs AI models on your Mac. Your prompts, chats, attached files, projects, generated images, music and voice audio stay on your Mac: LLMTray has no account, no ads and no tracking, and none of that content is ever sent to us.</p>
 
@@ -258,6 +258,19 @@
       <li><b>What is kept, and deleting it</b>: chats, with their photos, the pictures made in them and dictated words, are kept on the device until you delete them (swipe a chat in the list); a temporary chat isn't kept after you leave it. Downloaded models stay until you delete them in the model list. Deleting the app deletes all of it.</li>
     </ul>
 
+    <h2 id="windows">LLMTray for Windows</h2>
+    <p>The Windows app runs its models on your PC. Your prompts, chats, attached files, projects and voice messages stay on your PC: it has no account, no ads and no tracking, and none of that content is sent to us. What uses the network is listed here.</p>
+    <ul>
+      <li><b>Models</b>: opening the download window checks whether Hugging Face and Kaggle (where we keep a copy of the same files) can be reached; a repository you type in is looked up at the download source you picked; models are downloaded from there when you choose one. The embedding model for memory and project files comes from the same source, when you download it or turn on a feature that needs it. Those requests go to Hugging Face or Kaggle, not to us, and their privacy policies apply. A downloaded model runs without a network connection.</li>
+      <li><b>Anonymous usage statistics</b> work as described above, with Windows' version, the processor architecture and the memory size in place of the Mac's, and these counts: chat answers, tool calls, API requests from other apps and model downloads. Turn them off during setup or in <b>Settings › General › Usage statistics</b>, which shows what is sent.</li>
+      <li><b>Lookups</b> (web search, news, weather and the others) use the same services as on the Mac, described above, and send only what the lookup needs (asked for the weather without a city, the tool uses the city of your PC's time zone). When the model reads a web page (one you gave it or one from search results), that page's address is requested from its website, following its redirects, and that site's policy applies.</li>
+      <li><b>Connected servers (MCP)</b>: if you add one, LLMTray sends it its name and version when connecting, the headers and keys you set for it, and what the model passes to its tools; that server's own policy applies. A server you add as a command runs as a program on your PC, with the settings you gave it, and what it sends is up to that program. Signing in to a server opens its own page in your browser, and LLMTray then talks to the server and its sign-in service to find out how to sign in and to register, get, refresh and revoke access; the sign-in service may read the app's sign-in description published at ipsupport.us.</li>
+      <li><b>Updates</b>: the version from the Microsoft Store is updated by the Store. The other versions check GitHub for a newer release and download it from there; one installed with Scoop checks GitHub and leaves the update to Scoop.</li>
+      <li><b>The local API server</b> listens only on your PC (127.0.0.1 and ::1). It sends nothing to the internet; with usage statistics on, the number of requests from other apps and their models' families are counted in the report.</li>
+      <li><b>Microphone</b>: used only while you record a voice message for a model that hears. The recording goes to the model on your PC, not anywhere else; it is saved with the chat (a temporary chat's isn't).</li>
+      <li><b>Bug reports</b> open a new issue page on GitHub in your browser: nothing is sent unless you post it there yourself.</li>
+      <li><b>What is kept, and deleting it</b>: settings and model profiles, chats with their pictures and voice messages, projects, memory, the embedding model, the connected servers you added (with the keys and settings you gave them), the folders you let the model use and a log of the changes it made in them (with file paths), the usage statistics not yet sent, downloaded updates and logs are kept in the app's data folder on your PC; sign-in tokens for connected servers are kept there encrypted for your Windows account. Downloaded models are kept in the models folder (<code>.llmtray\models</code> in your user folder, or the one you chose). All of it stays until you delete it. Uninstalling the Microsoft Store or MSIX version deletes its data folder; the installer and portable versions keep theirs (<code>%LOCALAPPDATA%\LLMTray</code>) for you to delete; the models folder always stays.</li>
+    </ul>
     <h2>Changes and contact</h2>
     <p>If this policy changes, the new version is published on this page with a new date. Questions: <code>bugreport@ipsupport.us</code>.</p>
 
