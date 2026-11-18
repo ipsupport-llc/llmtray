@@ -17,6 +17,13 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertEqual(w.feed("    \"content\": \"Model loaded\"\n"), [])
     }
 
+    func testHidesInfo() {
+        XCTAssertFalse(ServerLogWatch.hidesInfo(["--model", "m"]))
+        XCTAssertFalse(ServerLogWatch.hidesInfo(["--log-level", "DEBUG"]))
+        XCTAssertTrue(ServerLogWatch.hidesInfo(["--log-level", "DEBUG", "--log-level", "warning"]))
+        XCTAssertTrue(ServerLogWatch.hidesInfo(["--log-level=ERROR"]))
+    }
+
     func testSplitAcrossChunks() {
         var w = ServerLogWatch()
         XCTAssertEqual(w.feed("INFO ok\nERROR:root:mlx_lm.server gener"), [])

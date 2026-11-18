@@ -50,6 +50,21 @@ public struct ServerLogWatch {
         pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Model loaded$"#
     )
 
+    /// The server's arguments set a log level above INFO (the last
+    /// --log-level wins, as with argparse).
+    public static func hidesInfo(_ arguments: [String]) -> Bool {
+        var level: String?
+        for (i, arg) in arguments.enumerated() {
+            if arg == "--log-level", i + 1 < arguments.count {
+                level = arguments[i + 1]
+            } else if arg.hasPrefix("--log-level=") {
+                level = String(arg.dropFirst("--log-level=".count))
+            }
+        }
+        guard let level else { return false }
+        return ["WARNING", "ERROR", "CRITICAL"].contains(level.uppercased())
+    }
+
     /// Output arrives in arbitrary chunks; an unfinished line waits here.
     private var partial = ""
 

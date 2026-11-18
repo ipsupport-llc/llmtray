@@ -879,7 +879,9 @@ final class ServerManager: ObservableObject {
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args,
                                           environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
-        modelLoaded = false
+        // INFO hidden by the user's own --log-level: no "Model loaded" line
+        // will come, so every thread death counts as after a load.
+        modelLoaded = ServerLogWatch.hidesInfo(args)
         lastPrefillProgressAt = nil
         lastResponseBytesAt = nil
         readyLine = ""
