@@ -3,6 +3,6 @@
 - Avanzamento del download dei modelli per immagini e musica nelle Impostazioni.
 - Una seconda fonte di modelli per cercare e scaricare quando quella abituale è bloccata nella tua rete.
 - Le tabelle larghe nella chat scorrono di lato senza interferire con lo scorrimento della chat.
-- Lo strumento dell'ora capisce le date («il 3», «venerdì prossimo»), e «Ragionamento disattivato» funziona dopo il risultato di uno strumento.
+- Lo strumento dell'ora legge una data («10 aprile 2024», «domani») e indica il giorno della settimana e quanto manca. Con il ragionamento disattivato, la risposta dopo il risultato di uno strumento non si riempie più del ragionamento del modello.
 - Un modello che non riesce a caricarsi ora si ferma indicando il motivo, invece di riavviarsi di continuo.
 - Correzioni per i server MCP che rispondono con più eventi, e si caricano più modelli.

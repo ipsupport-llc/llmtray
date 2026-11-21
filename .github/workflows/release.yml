@@ -151,9 +151,11 @@ jobs:
 
   # A stable tag goes on to the Mac App Store (ADR 0033): App Store pkg
   # builds it, delivers it and starts App Store submit. Delivery and submit
-  # each wait for the owner's approval. Not started when the App Store's
-  # "what's new" (appstore/metadata/en-US/release_notes.txt) is the same as
-  # at the stable tag before: it would describe the last version.
+  # each wait for the owner's approval. Skipped for a tag below the newest
+  # stable one (a fix on an older line), when an App Store run for the tag
+  # already exists (a re-run of this workflow), and when the "what's new"
+  # on main -- the texts delivery uses -- is empty or the same as at the
+  # stable tag before: it would describe the last version.
   app-store:
     needs: release
     if: ${{ !contains(github.ref_name, '-') }}
@@ -161,16 +163,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
       - name: Start App Store pkg
         env:
           GH_TOKEN: ${{ github.token }}
           NOTES: appstore/metadata/en-US/release_notes.txt
         run: |
-          prev="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V \
-            | awk -v t="$GITHUB_REF_NAME" '$0 == t { print p; exit } { p = $0 }')"
-          if [[ ! -s "$NOTES" ]] || { [[ -n "$prev" ]] && git diff --quiet "$prev" "$GITHUB_REF_NAME" -- "$NOTES"; }; then
-            echo "::warning::$NOTES is empty or unchanged since ${prev:-the last stable tag}: write what's new, then run App Store pkg by hand."
+          git fetch --tags --force --quiet
+          stable="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)"
+          if [[ "$(tail -1 <<< "$stable")" != "$GITHUB_REF_NAME" ]]; then
+            echo "::notice::$GITHUB_REF_NAME isn't the newest stable tag: not for the App Store."
             exit 0
           fi
-          gh workflow run appstore.yml --ref main -f tag="$GITHUB_REF_NAME" -f deliver=true -f submit=true
+          if gh run list --repo "$GITHUB_REPOSITORY" --workflow appstore.yml --limit 100 --json displayTitle,conclusion \
+              --jq ".[] | select(.displayTitle == \"App Store pkg $GITHUB_REF_NAME\" and .conclusion != \"failure\" and .conclusion != \"cancelled\")" | grep -q .; then
+            echo "::notice::An App Store run for $GITHUB_REF_NAME already exists."
+            exit 0
+          fi
+          prev="$(awk -v t="$GITHUB_REF_NAME" '$0 == t { print p; exit } { p = $0 }' <<< "$stable")"
+          if [[ ! -s "$NOTES" ]] || { [[ -n "$prev" ]] && git diff --quiet "$prev" HEAD -- "$NOTES"; }; then
+            echo "::warning::$NOTES on main is empty or unchanged since ${prev:-the last stable tag}: write what's new, then run App Store pkg by hand."
+            exit 0
+          fi
+          gh workflow run appstore.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$GITHUB_REF_NAME" -f deliver=true -f submit=true

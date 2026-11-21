@@ -3,6 +3,6 @@
 - Ayarlar'da görsel ve müzik modelleri için indirme ilerlemesi.
 - Olağan kaynak ağınızda engelliyse model aramak ve indirmek için ikinci bir model kaynağı.
 - Sohbetteki geniş tablolar, sohbetin kaydırmasını engellemeden yana kayar.
-- Saat aracı tarihleri anlar ("ayın 3'ü", "gelecek cuma") ve "Düşünme kapalı" bir araç sonucundan sonra çalışır.
+- Saat aracı bir tarihi okur ("10 Nisan 2024", "yarın") ve haftanın gününü ve ne kadar uzakta olduğunu söyler. Düşünme kapalıyken araç sonucundan sonraki yanıt artık modelin akıl yürütmesiyle dolmaz.
 - Yüklenemeyen bir model artık tekrar tekrar yeniden başlamak yerine nedenini göstererek durur.
 - Birden çok olayla yanıt veren MCP sunucuları için düzeltmeler; daha fazla model yükleniyor.

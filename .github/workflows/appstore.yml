@@ -1,4 +1,5 @@
 name: App Store pkg
+run-name: App Store pkg ${{ inputs.tag }}
 
 # Builds the Mac App Store installer package for a stable release tag:
 # started by release.yml after every stable tag (with deliver and submit),

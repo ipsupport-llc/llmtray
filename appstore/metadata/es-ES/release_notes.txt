@@ -3,6 +3,6 @@
 - Progreso de descarga de los modelos de imagen y música en Ajustes.
 - Una segunda fuente de modelos para buscar y descargar cuando la habitual está bloqueada en tu red.
 - Las tablas anchas del chat se desplazan de lado sin interferir con el desplazamiento del chat.
-- La herramienta de hora entiende fechas («el día 3», «el próximo viernes»), y «Sin razonamiento» funciona tras el resultado de una herramienta.
+- La herramienta de hora lee una fecha («10 de abril de 2024», «mañana») y da su día de la semana y cuánto falta. Con el razonamiento desactivado, la respuesta tras el resultado de una herramienta ya no se llena del razonamiento del modelo.
 - Un modelo que no puede cargarse ahora se detiene indicando el motivo, en lugar de reiniciarse una y otra vez.
 - Correcciones para servidores MCP que responden con varios eventos, y se cargan más modelos.

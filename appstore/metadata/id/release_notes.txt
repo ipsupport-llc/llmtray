@@ -3,6 +3,6 @@
 - Progres unduhan model gambar dan musik di Pengaturan.
 - Sumber model kedua untuk mencari dan mengunduh model saat sumber biasa diblokir di jaringan Anda.
 - Tabel lebar di obrolan bergulir ke samping tanpa mengganggu guliran obrolan.
-- Alat waktu memahami tanggal ("tanggal 3", "Jumat depan"), dan "Berpikir Mati" berfungsi setelah hasil alat.
+- Alat waktu membaca tanggal ("10 April 2024", "besok") dan memberi tahu harinya serta berapa lama lagi. Dengan Berpikir mati, jawaban setelah hasil alat tidak lagi dipenuhi penalaran model.
 - Model yang tidak bisa dimuat kini berhenti dengan alasannya, bukan memulai ulang terus-menerus.
 - Perbaikan untuk server MCP yang membalas dengan beberapa event, dan lebih banyak model bisa dimuat.
