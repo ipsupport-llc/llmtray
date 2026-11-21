@@ -1,0 +1,8 @@
+- Gesprochene Antworten: mit den Systemstimmen oder einem natürlichen mehrsprachigen Sprachmodell, das auf deinem Computer läuft.
+- Sprachgespräch: sprich freihändig mit dem Modell, mit Stumm-Taste. Es ignoriert die eigene Stimme und wartet, wenn du weitersprichst.
+- Download-Fortschritt für Bild- und Musikmodelle in den Einstellungen.
+- Eine zweite Modellquelle zum Suchen und Laden, wenn die übliche in deinem Netzwerk gesperrt ist.
+- Breite Tabellen im Chat scrollen seitwärts, ohne das Scrollen des Chats zu stören.
+- Das Zeit-Werkzeug liest ein Datum („10. April 2024“, „morgen“) und nennt Wochentag und Abstand. Mit „Denken aus“ füllt sich eine Antwort nach einem Werkzeugergebnis nicht mehr mit den Überlegungen des Modells.
+- Ein Modell, das nicht laden kann, stoppt jetzt mit dem Grund, statt immer wieder neu zu starten.
+- Korrekturen für MCP-Server, die mit mehreren Events antworten, und mehr Modelle laden.

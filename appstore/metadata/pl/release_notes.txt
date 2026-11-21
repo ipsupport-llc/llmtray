@@ -1,0 +1,8 @@
+- Odpowiedzi na głos: głosami systemowymi lub naturalnym wielojęzycznym modelem głosu działającym na Twoim komputerze.
+- Rozmowa głosowa: rozmawiaj z modelem bez użycia rąk, z przyciskiem Wycisz. Ignoruje własny głos i czeka, gdy mówisz dalej.
+- Postęp pobierania modeli obrazów i muzyki w Ustawieniach.
+- Drugie źródło modeli do wyszukiwania i pobierania, gdy zwykłe jest zablokowane w Twojej sieci.
+- Szerokie tabele w czacie przewijają się na boki, nie zakłócając przewijania czatu.
+- Narzędzie czasu odczytuje datę („10 kwietnia 2024”, „jutro”) i podaje dzień tygodnia oraz odległość. Przy wyłączonym myśleniu odpowiedź po wyniku narzędzia nie wypełnia się już rozumowaniem modelu.
+- Model, który nie może się załadować, zatrzymuje się teraz z podaniem przyczyny, zamiast uruchamiać się w kółko.
+- Poprawki dla serwerów MCP odpowiadających kilkoma zdarzeniami; ładuje się więcej modeli.

@@ -1,0 +1,8 @@
+- Respostas faladas: com as vozes do sistema ou um modelo de voz multilíngue natural que roda no seu computador.
+- Conversa por voz: fale com o modelo sem usar as mãos, com botão Silenciar. Ele ignora a própria voz e espera se você continuar falando.
+- Progresso do download dos modelos de imagem e música nos Ajustes.
+- Uma segunda fonte de modelos para buscar e baixar quando a habitual está bloqueada na sua rede.
+- Tabelas largas no chat rolam para o lado sem atrapalhar a rolagem do chat.
+- A ferramenta de hora lê uma data ("10 de abril de 2024", "amanhã") e informa o dia da semana e quanto falta. Com o raciocínio desligado, a resposta após o resultado de uma ferramenta não se enche mais do raciocínio do modelo.
+- Um modelo que não consegue carregar agora para mostrando o motivo, em vez de reiniciar sem parar.
+- Correções para servidores MCP que respondem com vários eventos, e mais modelos carregam.

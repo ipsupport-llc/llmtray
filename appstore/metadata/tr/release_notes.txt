@@ -1,0 +1,8 @@
+- Sesli yanıtlar: sistem sesleriyle ya da bilgisayarınızda çalışan doğal, çok dilli bir ses modeliyle.
+- Sesli sohbet: modelle eller serbest konuşun, Sessiz düğmesiyle. Kendi sesini yok sayar ve konuşmaya devam ederseniz bekler.
+- Ayarlar'da görsel ve müzik modelleri için indirme ilerlemesi.
+- Olağan kaynak ağınızda engelliyse model aramak ve indirmek için ikinci bir model kaynağı.
+- Sohbetteki geniş tablolar, sohbetin kaydırmasını engellemeden yana kayar.
+- Saat aracı bir tarihi okur ("10 Nisan 2024", "yarın") ve haftanın gününü ve ne kadar uzakta olduğunu söyler. Düşünme kapalıyken araç sonucundan sonraki yanıt artık modelin akıl yürütmesiyle dolmaz.
+- Yüklenemeyen bir model artık tekrar tekrar yeniden başlamak yerine nedenini göstererek durur.
+- Birden çok olayla yanıt veren MCP sunucuları için düzeltmeler; daha fazla model yükleniyor.
