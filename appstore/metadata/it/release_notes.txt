@@ -1,0 +1,8 @@
+- Risposte a voce: con le voci di sistema o con un modello vocale multilingue naturale che gira sul tuo computer.
+- Conversazione vocale: parla con il modello a mani libere, con il pulsante Silenzia. Ignora la propria voce e aspetta se continui a parlare.
+- Avanzamento del download dei modelli per immagini e musica nelle Impostazioni.
+- Una seconda fonte di modelli per cercare e scaricare quando quella abituale è bloccata nella tua rete.
+- Le tabelle larghe nella chat scorrono di lato senza interferire con lo scorrimento della chat.
+- Lo strumento dell'ora capisce le date («il 3», «venerdì prossimo»), e «Ragionamento disattivato» funziona dopo il risultato di uno strumento.
+- Un modello che non riesce a caricarsi ora si ferma indicando il motivo, invece di riavviarsi di continuo.
+- Correzioni per i server MCP che rispondono con più eventi, e si caricano più modelli.

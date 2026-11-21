@@ -1,14 +1,16 @@
 name: App Store pkg
 
-# Builds the Mac App Store installer package for a release tag, by hand
-# (Actions > App Store pkg > Run workflow): not on every push or tag -- it
-# takes a while and is needed only when a version goes to the App Store.
+# Builds the Mac App Store installer package for a stable release tag:
+# started by release.yml after every stable tag (with deliver and submit),
+# or by hand (Actions > App Store pkg > Run workflow). Not for betas: App
+# Store versions are numbers only.
 # The .pkg is a workflow artifact. With "deliver" it also goes to App Store
 # Connect (ADR 0033): the deliver job waits for the owner's approval in the
 # "app-store" environment, then uploads the build, finds or creates the
 # version, pushes the listing texts for every language and attaches the
 # build. The version stays in "Prepare for Submission"; sending it to
-# review is the "App Store submit" workflow.
+# review is the "App Store submit" workflow, which "submit" starts after a
+# delivery (it waits for its own approval).
 #
 # Secrets: APPSTORE_P12_BASE64 + APPSTORE_P12_PASSWORD -- one .p12 with both
 # identities, "Apple Distribution" and "3rd Party Mac Developer Installer"
@@ -29,6 +31,10 @@ on:
         default: ""
       deliver:
         description: "Deliver to App Store Connect after the build (needs approval; needs appstore/metadata/en-US/release_notes.txt on main)"
+        type: boolean
+        default: false
+      submit:
+        description: "After delivery, start App Store submit for this version (needs its own approval)"
         type: boolean
         default: false
 
@@ -185,6 +191,9 @@ jobs:
     runs-on: macos-15
     environment: app-store
     timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: write   # start App Store submit
     steps:
       - uses: actions/checkout@v4
         with:
@@ -214,3 +223,9 @@ jobs:
       - name: Remove the key
         if: always()
         run: rm -rf "$RUNNER_TEMP/asc"
+      - name: Start App Store submit
+        if: ${{ inputs.submit }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.pkg.outputs.version }}
+        run: gh workflow run appstore-submit.yml --repo "$GITHUB_REPOSITORY" --ref main -f version="$VERSION"

@@ -8,7 +8,7 @@ Two products from one codebase (adr/0018):
 | Signed with | Developer ID Application, notarized | Apple Distribution + 3rd Party Mac Developer Installer |
 | Ships as | `LLMTray.dmg`, `LLMTray-Full.dmg` on GitHub Releases | `.pkg`, uploaded to App Store Connect in Transporter |
 | Updates | Sparkle (stable / beta channels) | the App Store |
-| Built by | `release.yml`, on every `v*` tag | `appstore.yml`, **by hand** |
+| Built by | `release.yml`, on every `v*` tag | `appstore.yml`, started by `release.yml` on every stable tag (or by hand) |
 | Command-line tool | yes | no |
 
 ## Website release
@@ -47,19 +47,16 @@ When a certificate or the profile expires (yearly), export again and replace the
 
 ### Every App Store version
 
-1. Make the website release first (stable tag `vX.Y.Z`). App Store versions are numbers only: no betas.
-2. **Build the pkg:** GitHub > Actions > **App Store pkg** > Run workflow.
-   - `tag`: the stable tag, e.g. `v0.8.6`.
-   - `build_number`: empty for a version's first upload. Another upload of the **same** version needs a **higher** build number with at most three numbers, e.g. `0.8.601`, then `0.8.602`.
-   - The app is built from the tag; the build scripts from `main` (packaging fixes apply to older tags too).
-   - The job checks the bundle (every Mach-O signed, no `.o`/`.a`, version, bundle id, installer signature) and attaches **`LLMTray-X.Y.Z-AppStore.pkg`** as the run's artifact (kept 30 days).
-3. **Upload:** download the artifact, unzip, open **Transporter** (signed in with an Apple ID of the IPSupport LLC team), drag the `.pkg` in, **Deliver**. Nothing uploads automatically.
-4. Wait for *Delivered* then *Processing* (10–30 min, an email when done). Processing can still **fail** after *Delivered*, by email: fix, then upload again with a **higher build number** (a delivered build number is used up even when its processing failed). The build shows up under TestFlight > macOS. Export compliance: standard HTTPS only ("None of the algorithms mentioned above"; the Info.plist already answers it).
-5. **The version page in App Store Connect:** select the build, then fill in what's new. Metadata is kept in this repo:
-   - `appstore/metadata/en-US/`: `promotional_text.txt` (≤170), `description.txt` (≤4000), `keywords.txt` (≤100, comma-separated, no other products' names), `urls.txt`, `review_notes.txt` (App Review Information > Notes).
-   - `appstore/screenshots/`: 2880×1800, sRGB, no alpha — upload in file order.
-6. **App Privacy:** Usage Data (anonymous statistics, optional) — not linked to the user, not used for tracking. Everything else: not collected.
-7. Add for Review > Submit.
+Automatic (ADR 0033), from a stable tag:
+
+1. Before tagging, write what's new: `appstore/metadata/<locale>/release_notes.txt` (en-US is the fallback for a locale without one). Check: `python3 scripts/appstore/asc_metadata.py check --dir appstore/metadata`.
+2. Tag `vX.Y.Z`. After the website release, `release.yml` starts **App Store pkg** with `deliver` and `submit`, unless `en-US/release_notes.txt` is empty or the same as at the stable tag before (a warning says so; run it by hand once the notes are written).
+3. Approve the **app-store** deployment in the run: the job uploads the build, waits for processing, creates the version, pushes the listing texts of every locale and attaches the build.
+4. Approve the **app-store-submit** deployment: the version goes to App Review. Releasing an approved version stays a person's step in App Store Connect.
+
+By hand: Actions > **App Store pkg** > Run workflow, `tag` = the stable tag; `build_number` empty for a version's first upload, higher (at most three numbers, e.g. `0.8.601`) for another upload of the same version (a delivered build number is used up even when its processing failed). Without `deliver` the `.pkg` is only the run's artifact (30 days), for Transporter. The app is built from the tag, the build scripts and listing texts from `main`.
+
+Once per account: **App Privacy:** Usage Data (anonymous statistics, optional) — not linked to the user, not used for tracking. Everything else: not collected. Screenshots: `appstore/screenshots/`, 2880×1800, sRGB, no alpha, uploaded by hand in file order.
 
 ### Building the pkg locally (fallback)
 

@@ -1,0 +1,8 @@
+- Spoken answers: replies can be read aloud with the system voices or a natural multilingual voice model that runs on your computer.
+- Voice conversation: talk to the model hands-free, with a Mute button. It ignores its own voice and waits when you keep talking.
+- Download progress for image and music models in Settings.
+- A second model source for searching and downloading models when the usual one is blocked on your network.
+- Wide tables in the chat scroll sideways without taking over the chat's own scrolling.
+- The time tool understands dates ("the 3rd", "next Friday"), and Thinking Off works after a tool result.
+- A model that can't load now stops with the reason instead of restarting again and again.
+- Fixes for MCP servers that reply with several events, and more models load.

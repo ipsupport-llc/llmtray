@@ -148,3 +148,29 @@ jobs:
         run: |
           [[ -n "${SIGNING_KEYCHAIN:-}" ]] && security delete-keychain "$SIGNING_KEYCHAIN" || true
           rm -f "$RUNNER_TEMP/notary_key.p8" "$RUNNER_TEMP/developer_id.p12"
+
+  # A stable tag goes on to the Mac App Store (ADR 0033): App Store pkg
+  # builds it, delivers it and starts App Store submit. Delivery and submit
+  # each wait for the owner's approval. Not started when the App Store's
+  # "what's new" (appstore/metadata/en-US/release_notes.txt) is the same as
+  # at the stable tag before: it would describe the last version.
+  app-store:
+    needs: release
+    if: ${{ !contains(github.ref_name, '-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Start App Store pkg
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: appstore/metadata/en-US/release_notes.txt
+        run: |
+          prev="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V \
+            | awk -v t="$GITHUB_REF_NAME" '$0 == t { print p; exit } { p = $0 }')"
+          if [[ ! -s "$NOTES" ]] || { [[ -n "$prev" ]] && git diff --quiet "$prev" "$GITHUB_REF_NAME" -- "$NOTES"; }; then
+            echo "::warning::$NOTES is empty or unchanged since ${prev:-the last stable tag}: write what's new, then run App Store pkg by hand."
+            exit 0
+          fi
+          gh workflow run appstore.yml --ref main -f tag="$GITHUB_REF_NAME" -f deliver=true -f submit=true

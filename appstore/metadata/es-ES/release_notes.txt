@@ -1,0 +1,8 @@
+- Respuestas habladas: con las voces del sistema o con un modelo de voz multilingüe natural que se ejecuta en tu ordenador.
+- Conversación por voz: habla con el modelo sin manos, con botón de silencio. Ignora su propia voz y espera si sigues hablando.
+- Progreso de descarga de los modelos de imagen y música en Ajustes.
+- Una segunda fuente de modelos para buscar y descargar cuando la habitual está bloqueada en tu red.
+- Las tablas anchas del chat se desplazan de lado sin interferir con el desplazamiento del chat.
+- La herramienta de hora entiende fechas («el día 3», «el próximo viernes»), y «Sin razonamiento» funciona tras el resultado de una herramienta.
+- Un modelo que no puede cargarse ahora se detiene indicando el motivo, en lugar de reiniciarse una y otra vez.
+- Correcciones para servidores MCP que responden con varios eventos, y se cargan más modelos.

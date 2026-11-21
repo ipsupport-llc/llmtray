@@ -1,0 +1,8 @@
+- Trả lời bằng giọng nói: đọc câu trả lời bằng giọng của hệ thống hoặc một mô hình giọng nói đa ngôn ngữ tự nhiên chạy trên máy tính của bạn.
+- Trò chuyện bằng giọng nói: nói chuyện với mô hình rảnh tay, có nút Tắt tiếng. Mô hình bỏ qua giọng của chính nó và chờ khi bạn tiếp tục nói.
+- Tiến trình tải xuống mô hình hình ảnh và âm nhạc trong Cài đặt.
+- Nguồn mô hình thứ hai để tìm và tải mô hình khi nguồn thông thường bị chặn trong mạng của bạn.
+- Bảng rộng trong cuộc trò chuyện cuộn ngang mà không ảnh hưởng đến việc cuộn cuộc trò chuyện.
+- Công cụ thời gian hiểu ngày ("ngày 3", "thứ Sáu tới"), và "Tắt suy nghĩ" hoạt động sau kết quả của công cụ.
+- Mô hình không tải được giờ sẽ dừng và cho biết lý do, thay vì khởi động lại liên tục.
+- Sửa lỗi cho máy chủ MCP trả lời bằng nhiều sự kiện, và tải được nhiều mô hình hơn.

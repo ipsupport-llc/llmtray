@@ -1,0 +1,8 @@
+- Réponses à voix haute : avec les voix du système ou un modèle vocal multilingue naturel qui tourne sur votre ordinateur.
+- Conversation vocale : parlez au modèle sans les mains, avec un bouton Muet. Il ignore sa propre voix et attend si vous continuez à parler.
+- Progression du téléchargement des modèles d'image et de musique dans les Réglages.
+- Une seconde source de modèles pour chercher et télécharger quand la source habituelle est bloquée sur votre réseau.
+- Les tableaux larges du chat défilent latéralement sans gêner le défilement du chat.
+- L'outil d'heure comprend les dates (« le 3 », « vendredi prochain »), et « Réflexion désactivée » fonctionne après le résultat d'un outil.
+- Un modèle qui ne peut pas se charger s'arrête désormais en indiquant la raison, au lieu de redémarrer sans fin.
+- Corrections pour les serveurs MCP qui répondent par plusieurs événements, et davantage de modèles se chargent.
