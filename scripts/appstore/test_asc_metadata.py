@@ -90,7 +90,10 @@ with tempfile.TemporaryDirectory() as tmp:
         fresh = client.jwt
     finally:
         am.time.time = real_time
+    def iat(jwt):
+        part = jwt.split(".")[1]
+        return json.loads(base64.urlsafe_b64decode(part + "=" * (-len(part) % 4)))["iat"]
     expect("token reused within ten minutes", same == first)
-    expect("token renewed after ten minutes", fresh != first)
+    expect("token renewed after ten minutes", iat(first) == 5000 and iat(fresh) == 5700)
 
 sys.exit(1 if failures else 0)
