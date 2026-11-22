@@ -183,8 +183,17 @@ class Client:
         missing = [v for v in ("ASC_KEY_ID", "ASC_ISSUER_ID", "ASC_KEY_PATH") if not os.environ.get(v)]
         if missing:
             sys.exit(f"Set {', '.join(missing)} (see the top of this file).")
-        self.jwt = token(os.environ["ASC_KEY_ID"], os.environ["ASC_ISSUER_ID"],
-                         os.path.expanduser(os.environ["ASC_KEY_PATH"]))
+        self._jwt, self._minted = None, 0.0
+
+    @property
+    def jwt(self):
+        # A token lives 15 minutes; deliver uploads and then polls for much
+        # longer, so mint a fresh one before the old one runs out.
+        if self._jwt is None or time.time() - self._minted > 600:
+            self._minted = time.time()
+            self._jwt = token(os.environ["ASC_KEY_ID"], os.environ["ASC_ISSUER_ID"],
+                              os.path.expanduser(os.environ["ASC_KEY_PATH"]))
+        return self._jwt
 
     def call(self, method, path, body=None):
         url = path if path.startswith("http") else API + path

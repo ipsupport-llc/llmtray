@@ -2,6 +2,7 @@
 """Offline checks for asc_metadata.py: no network, a throwaway key."""
 import base64
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -74,5 +75,22 @@ with tempfile.TemporaryDirectory() as tmp:
     expect("signature verifies", verified.returncode == 0)
     claims = json.loads(base64.urlsafe_b64decode(body + "=" * (-len(body) % 4)))
     expect("claims", claims == {"iss": "ISSUER", "iat": 1000, "exp": 1900, "aud": "appstoreconnect-v1"})
+
+    # A client outlives one token: it mints a new one after ten minutes.
+    os.environ.update(ASC_KEY_ID="KEYID", ASC_ISSUER_ID="ISSUER", ASC_KEY_PATH=key)
+    clock = [5_000.0]
+    real_time = am.time.time
+    am.time.time = lambda: clock[0]
+    try:
+        client = am.Client()
+        first = client.jwt
+        clock[0] += 300
+        same = client.jwt
+        clock[0] += 400
+        fresh = client.jwt
+    finally:
+        am.time.time = real_time
+    expect("token reused within ten minutes", same == first)
+    expect("token renewed after ten minutes", fresh != first)
 
 sys.exit(1 if failures else 0)
