@@ -51,7 +51,12 @@ public enum Thinking {
     /// reasoning_effort, a budget where it thinks in a block.
     public static func style(chatTemplate: String?) -> ThinkingStyle {
         guard let t = chatTemplate, !t.isEmpty else { return .none }
-        if t.contains("reasoning_effort") { return t.contains("\"none\":") ? .levelsWithNone : .levels }
+        if t.contains("reasoning_effort") {
+            // "none" among the template's own effort levels (Inkling 2:
+            // `set effort_map = {"none": 0.0, ...}`), not anywhere in it.
+            let noneLevel = t.range(of: #"effort\w*\s*=\s*\{[^}]*"none"\s*:"#, options: .regularExpression) != nil
+            return noneLevel ? .levelsWithNone : .levels
+        }
         for marker in ["enable_thinking", "<think>", "<|channel>", "<|think"] where t.contains(marker) { return .budget }
         return .none
     }

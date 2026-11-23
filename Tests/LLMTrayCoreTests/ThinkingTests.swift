@@ -40,6 +40,8 @@ final class ThinkingTests: XCTestCase {
         // Inkling 2: "none" turns thinking off.
         let inkling = #"{%- set effort_map = {"none": 0.0, "low": 0.2} -%}{{ reasoning_effort }}"#
         XCTAssertEqual(Thinking.style(chatTemplate: inkling), .levelsWithNone)
+        XCTAssertEqual(Thinking.style(chatTemplate: #"{# {"none": 1} #}{% set x = {"none": 0} %}Reasoning: {{ reasoning_effort }}"#), .levels,
+                       "a \"none\" key that isn't an effort level")
         XCTAssertEqual((Thinking.requestFields(style: .levelsWithNone, effort: .off)["chat_template_kwargs"] as? [String: String])?["reasoning_effort"], "none")
         XCTAssertEqual((Thinking.requestFields(style: .levelsWithNone, effort: .high)["chat_template_kwargs"] as? [String: String])?["reasoning_effort"], "high")
     }
