@@ -25,6 +25,9 @@ public enum ThinkingStyle: Equatable, Sendable {
     case budget
     /// Has its own effort levels (gpt-oss's reasoning_effort).
     case levels
+    /// Has its own effort levels and a "none" that turns thinking off
+    /// (Inkling 2's reasoning_effort).
+    case levelsWithNone
 }
 
 public enum Thinking {
@@ -48,7 +51,7 @@ public enum Thinking {
     /// reasoning_effort, a budget where it thinks in a block.
     public static func style(chatTemplate: String?) -> ThinkingStyle {
         guard let t = chatTemplate, !t.isEmpty else { return .none }
-        if t.contains("reasoning_effort") { return .levels }
+        if t.contains("reasoning_effort") { return t.contains("\"none\":") ? .levelsWithNone : .levels }
         for marker in ["enable_thinking", "<think>", "<|channel>", "<|think"] where t.contains(marker) { return .budget }
         return .none
     }
@@ -73,6 +76,8 @@ public enum Thinking {
             return budgets[e].map { ["thinking_budget": $0] } ?? [:]
         case (.levels, let e):
             return ["chat_template_kwargs": ["reasoning_effort": e == .off ? "low" : e.rawValue]]
+        case (.levelsWithNone, let e):
+            return ["chat_template_kwargs": ["reasoning_effort": e == .off ? "none" : e.rawValue]]
         }
     }
 }
